@@ -15,6 +15,8 @@ import static com.caio.utli.Printers.printPaths;
 public class Main
 {
 
+    private static final List<String> EXISTENT_FLAGS = List.of("-v");
+
     public static void main( String[] args ) throws IOException {
 
         if (args.length == 0) {
@@ -30,6 +32,7 @@ public class Main
         }else if (args.length == 2) {
             directory = Paths.get(args[1]);;
             flag = args[0];
+            if(!EXISTENT_FLAGS.contains(flag)) throw new IllegalArgumentException("A flag " + flag + " não existe.");
         }else {
             throw new IllegalArgumentException("Muitos argumentos, no máximo 2");
         }
