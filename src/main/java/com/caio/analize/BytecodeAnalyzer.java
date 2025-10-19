@@ -13,7 +13,11 @@ import java.util.List;
 public class BytecodeAnalyzer {
 
 
-    private static final String[] TARGETS_DESC = {"Lorg/springframework/security/access/prepost/PreAuthorize;", "Lorg/springframework/security/access/prepost/PostAuthorize;"};
+    private static final List<String> TARGETS_DESC = List.of(
+            "Lorg/springframework/security/access/prepost/PreAuthorize;",
+            "Lorg/springframework/security/access/prepost/PostAuthorize;"
+    );
+
 
     public static void analyzeClass(Path classFilePath) throws IOException {
         byte[] bytes = Files.readAllBytes(classFilePath);
@@ -48,8 +52,8 @@ public class BytecodeAnalyzer {
     private static void classeAnnotations(ClassNode classNode){
         if (classNode.visibleAnnotations != null) {
             for (AnnotationNode an : classNode.visibleAnnotations) {
-                System.out.println("    " + an.desc);
-                if (an.values != null) {
+                if (an.values != null && TARGETS_DESC.contains(an.desc)) {
+                    System.out.println("    " + an.desc);
                     for (int i = 0; i < an.values.size(); i += 2) {
                         String key = (String) an.values.get(i);
                         Object val = an.values.get(i + 1);
@@ -63,10 +67,14 @@ public class BytecodeAnalyzer {
     private static void methodAnnotations(ClassNode classNode) {
         if (classNode.methods != null ) {
             for (MethodNode method : classNode.methods) {
-                if (method.visibleAnnotations != null) {
-                    System.out.println("  Método: " + method.name);
+                if (method.visibleAnnotations != null ) {
                     for (AnnotationNode an : method.visibleAnnotations) {
-                        System.out.println("    " + an.desc);
+                        if (TARGETS_DESC.contains(an.desc)) {
+                            System.out.println("  Método: " + method.name);
+
+                            System.out.println("    Annotation" + an.desc);
+                        }
+
                     }
                 }
             }
