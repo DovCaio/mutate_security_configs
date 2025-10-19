@@ -18,10 +18,7 @@ public class Main
 
         Path directory = Paths.get(args[0]);
 
-        if (!Files.exists(directory) || !Files.isDirectory(directory)) {
-            System.err.println("Erro: caminho inválido ou não é um diretório");
-            System.exit(1);
-        }
+
 
         DirectoryScan directoryScan = new DirectoryScan(directory);
         directoryScan.scan();
