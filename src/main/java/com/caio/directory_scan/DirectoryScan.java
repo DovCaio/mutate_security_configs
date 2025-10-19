@@ -18,8 +18,8 @@ public class DirectoryScan {
 
         if (!Files.exists(baseDir) || !Files.isDirectory(baseDir))
             throw new PathNotExists("Diretório não encontrado: " + baseDir.toAbsolutePath());
-        directory = baseDir;
 
+        directory = baseDir;
     }
 
     public List<Path> scan() throws IOException {
