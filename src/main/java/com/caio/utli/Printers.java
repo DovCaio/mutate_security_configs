@@ -7,7 +7,20 @@ import java.util.List;
 
 public class Printers {
 
+    public static void printPaths(List<Path> paths) {
+        if (paths == null || paths.isEmpty()) {
+            return;
+        }
+
+        System.out.print("Caminhos das classes encontradas:");
+        for (Path path : paths) {
+            System.out.println("    " + path.toAbsolutePath());
+        }
+    }
+
     public static void printMutationPoints(List<AnnotationMutationPoint> points) {
+        System.out.println("\n");
+
         for (AnnotationMutationPoint amp : points) {
             System.out.println("---- AnnotationMutationPoint ----");
             System.out.println("Target Type: " + amp.getTargetType());
@@ -24,17 +37,10 @@ public class Printers {
             }
             System.out.println("-------------------------------\n");
         }
+
+        System.out.println("\n");
+
     }
 
-    public static void printPaths(List<Path> paths) {
-        if (paths == null || paths.isEmpty()) {
-            return;
-        }
-
-        System.out.print("Caminhos das classes encontradas:");
-        for (Path path : paths) {
-            System.out.println("    " + path.toAbsolutePath());
-        }
-    }
 
 }
