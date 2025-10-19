@@ -12,29 +12,39 @@ import java.util.List;
 
 public class BytecodeAnalyzer {
 
-
     private static final List<String> TARGETS_DESC = List.of(
             "Lorg/springframework/security/access/prepost/PreAuthorize;",
-            "Lorg/springframework/security/access/prepost/PostAuthorize;"
+            "Lorg/springframework/security/access/prepost/PostAuthorize;" // talvez esse diretório esteja errado
     );
 
+    private List<Path> classFilePath;
 
-    public static void analyzeClass(Path classFilePath) throws IOException {
-        byte[] bytes = Files.readAllBytes(classFilePath);
-        ClassReader reader = new ClassReader(bytes);
-        ClassNode classNode = new ClassNode();
-        reader.accept(classNode, 0);
+    public BytecodeAnalyzer(List<Path> classFilePath) {
+        if (classFilePath == null) throw  new IllegalArgumentException("O classsFilePathd não pode ser null.");
+        this.classFilePath = classFilePath;
+    }
 
-        //desc(classNode);
+    public void analyzeClass() throws IOException {
+        for (Path path :  classFilePath) {
+            byte[] bytes = Files.readAllBytes(path);
+            ClassReader reader = new ClassReader(bytes);
+            ClassNode classNode = new ClassNode();
+            reader.accept(classNode, 0);
 
-        if (isController(classNode)) {
-            classeAnnotations(classNode);
-            methodAnnotations(classNode);
+            //desc(classNode);
+
+            if (isController(classNode)) {
+                classeAnnotations(classNode);
+                methodAnnotations(classNode);
+                //Ele ainda teria que analizar dentro do config de segurança do springboot, por que é possível de usar da mesma forma essas annotations
+            }
         }
+
+
 
     }
 
-    private static boolean isController(ClassNode cn) throws IOException { //Detecta se é um controller, isso apartir das classes que ela possui, para quando o operador é para toda a classe, ou seja, todos os endpoints, quando isso é feito colocamos a annotattion dele na classe
+    private boolean isController(ClassNode cn) throws IOException { //Detecta se é um controller, isso apartir das classes que ela possui, para quando o operador é para toda a classe, ou seja, todos os endpoints, quando isso é feito colocamos a annotattion dele na classe
 
         List<AnnotationNode> annotations = cn.visibleAnnotations;
         if (annotations != null) {
@@ -49,7 +59,7 @@ public class BytecodeAnalyzer {
         return false;
     }
 
-    private static void classeAnnotations(ClassNode classNode){
+    private void classeAnnotations(ClassNode classNode){
         if (classNode.visibleAnnotations != null) {
             for (AnnotationNode an : classNode.visibleAnnotations) {
                 if (an.values != null && TARGETS_DESC.contains(an.desc)) {
@@ -64,14 +74,13 @@ public class BytecodeAnalyzer {
         }
     }
 
-    private static void methodAnnotations(ClassNode classNode) {
+    private void methodAnnotations(ClassNode classNode) {
         if (classNode.methods != null ) {
             for (MethodNode method : classNode.methods) {
                 if (method.visibleAnnotations != null ) {
                     for (AnnotationNode an : method.visibleAnnotations) {
                         if (TARGETS_DESC.contains(an.desc)) {
                             System.out.println("  Método: " + method.name);
-
                             System.out.println("    Annotation" + an.desc);
                         }
 
@@ -82,7 +91,7 @@ public class BytecodeAnalyzer {
 
     }
 
-    private static  void desc(ClassNode classNode) { //Apenas para depurar
+    private   void desc(ClassNode classNode) { //Apenas para depurar
         System.out.println("Classe: " + classNode.name);
         for (MethodNode method : classNode.methods) {
             System.out.println("  Método: " + method.name + method.desc);

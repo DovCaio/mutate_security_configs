@@ -23,11 +23,9 @@ public class Main
         DirectoryScan directoryScan = new DirectoryScan(directory);
         List<Path> finded_paths = directoryScan.scan();
 
-        BytecodeAnalyzer bca = new BytecodeAnalyzer();
+        BytecodeAnalyzer bca = new BytecodeAnalyzer(finded_paths);
+        bca.analyzeClass();
 
-        for (Path path :  finded_paths) {
-            bca.analyzeClass(path);
-        }
 
     }
 }
