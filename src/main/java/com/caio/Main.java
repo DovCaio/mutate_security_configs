@@ -1,10 +1,12 @@
 package com.caio;
+import com.caio.analize.BytecodeAnalyzer;
 import com.caio.directory_scan.DirectoryScan;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 
 public class Main
 {
@@ -18,10 +20,14 @@ public class Main
 
         Path directory = Paths.get(args[0]);
 
-
-
         DirectoryScan directoryScan = new DirectoryScan(directory);
-        directoryScan.scan();
+        List<Path> finded_paths = directoryScan.scan();
+
+        BytecodeAnalyzer bca = new BytecodeAnalyzer();
+
+        for (Path path :  finded_paths) {
+            bca.analyzeClass(path);
+        }
 
     }
 }

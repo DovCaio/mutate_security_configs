@@ -28,7 +28,7 @@ public class DirectoryScan {
                     .filter(p -> p.toString().endsWith(".class"))
                     .collect(Collectors.toList());
 
-            if (finded.isEmpty()) throw new NoOneClasseFinded("Nenhum arquivo .class encontrado em: " + directory.toAbsolutePath());
+            if (finded.isEmpty()) throw new NoOneClasseFinded("Nenhum arquivo .class encontrado em: " + directory.toAbsolutePath() + "\n Caso tenha passado o diretorio corretamnete, experimente compilar o projeto antes, para que seja gerado os arquivos que serão mutados.");
 
             return finded;
         }
