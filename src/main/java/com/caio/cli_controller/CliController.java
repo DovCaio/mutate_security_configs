@@ -2,6 +2,7 @@ package com.caio.cli_controller;
 
 import com.caio.analize.BytecodeAnalyzer;
 import com.caio.directory_scan.DirectoryScan;
+import com.caio.engine.Engine;
 import com.caio.models.AnnotationMutationPoint;
 
 import java.io.IOException;
@@ -12,7 +13,7 @@ import java.util.List;
 import static com.caio.utli.Printers.printMutationPoints;
 import static com.caio.utli.Printers.printPaths;
 
-public class CliController {
+public class CliController { //Gerencia as entradas e guarda o contexto da aplicação
 
     private static final List<String> EXISTENT_FLAGS = List.of("-v");
     private Path directory;
@@ -26,7 +27,7 @@ public class CliController {
             System.exit(1);
         }
 
-        if (args.length == 1) { //provisório, somente para já ter a opção de flags
+        if (args.length == 1) {
             this.directory = Paths.get(args[0]);;
         }else if (args.length == 2) {
             this.directory = Paths.get(args[1]);;
@@ -38,10 +39,10 @@ public class CliController {
 
     }
 
-
     public void execute() throws IOException {
         this.scanForDotClasses();
         this.searchForPossibleMutations();
+        this.applyTheMutations();
     }
 
     private void scanForDotClasses() throws IOException {
@@ -54,5 +55,10 @@ public class CliController {
         BytecodeAnalyzer bca = new BytecodeAnalyzer(finded_paths);
         this.amp =  bca.analyzeClass();
         if(flag.equals("-v")) printMutationPoints(amp);
+    }
+
+    private void applyTheMutations() {
+        Engine engine = new Engine(amp);
+        engine.start();
     }
 }

@@ -11,7 +11,7 @@ public class AnnotationMutationPoint {
     private TargetType targetType;   // Onde está a annotation
     private String ownerClass;       // Nome da classe (qualificado)
     private String annotationDesc;   // Descriptor ASM
-    private Object targetElement;    // ClassNode / MethodNode / FieldNode
+    private Object targetElement;    // ClassNode / MethodNode
     private List<Object> values;     // Lista de pares key/value (ASM)
 
     public AnnotationMutationPoint(TargetType targetType, String ownerClass,
