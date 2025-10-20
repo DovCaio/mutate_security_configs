@@ -20,6 +20,7 @@ public class CliController { //Gerencia as entradas e guarda o contexto da aplic
     private String flag = "";
     private List<Path> finded_paths;
     private List<AnnotationMutationPoint> amp;
+    private Engine engine;
 
     public CliController(String[] args) {
         if (args.length == 0) {
@@ -42,7 +43,8 @@ public class CliController { //Gerencia as entradas e guarda o contexto da aplic
     public void execute() throws IOException {
         this.scanForDotClasses();
         this.searchForPossibleMutations();
-        this.applyTheMutations();
+        this.createTheMutations();
+        this.applyMutantes();
     }
 
     private void scanForDotClasses() throws IOException {
@@ -57,8 +59,18 @@ public class CliController { //Gerencia as entradas e guarda o contexto da aplic
         if(flag.equals("-v")) printMutationPoints(amp);
     }
 
-    private void applyTheMutations() {
-        Engine engine = new Engine(amp);
+    private void createTheMutations() {
+        this.engine = new Engine(amp);
+        engine.createMutants();
+        if(flag.equals("-v")){
+            System.out.println("Mutantes");
+            printMutationPoints(engine.getMutants());
+        }
+    }
+
+    private void applyMutantes() {
+        if (engine == null) throw new NullPointerException("Antes de startar o motor de mutação, tem que criar os mutantes");
         engine.start();
+
     }
 }
