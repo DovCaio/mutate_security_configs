@@ -1,28 +1,60 @@
 package com.caio.models;
 
+import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.FieldNode;
 
+import java.nio.file.Path;
 import java.util.List;
 
 public class AnnotationMutationPoint {
+
+
     public enum TargetType { CLASS, METHOD }
 
     private TargetType targetType;   // Onde está a annotation
     private String ownerClass;       // Nome da classe (qualificado)
     private String annotationDesc;   // Descriptor ASM
-    private Object targetElement;    // ClassNode / MethodNode
+    private ClassNode targetElement;    // ClassNode / MethodNode
     private List<Object> values;     // Lista de pares key/value (ASM)
+    private byte[] bytes;
+    private MethodNode method;
 
     public AnnotationMutationPoint(TargetType targetType, String ownerClass,
-                                   String annotationDesc, Object targetElement,
+                                   String annotationDesc, ClassNode targetElement,
+                                   List<Object> values, byte[] bytes,
+                                   MethodNode method) {
+        this.targetType = targetType;
+        this.ownerClass = ownerClass;
+        this.annotationDesc = annotationDesc;
+        this.targetElement = targetElement;
+        this.values = values;
+        this.bytes = bytes;
+        this.method = method;
+    }
+
+    public AnnotationMutationPoint(TargetType targetType, String ownerClass,
+                                   String annotationDesc, ClassNode targetElement,
+                                   List<Object> values, byte[] bytes) {
+        this.targetType = targetType;
+        this.ownerClass = ownerClass;
+        this.annotationDesc = annotationDesc;
+        this.targetElement = targetElement;
+        this.values = values;
+        this.bytes = bytes;
+    }
+
+    public AnnotationMutationPoint(TargetType targetType, String ownerClass,
+                                   String annotationDesc, ClassNode targetElement,
                                    List<Object> values) {
         this.targetType = targetType;
         this.ownerClass = ownerClass;
         this.annotationDesc = annotationDesc;
         this.targetElement = targetElement;
         this.values = values;
+        this.bytes = null;
     }
+
 
     public TargetType getTargetType() {
         return targetType;
@@ -48,11 +80,11 @@ public class AnnotationMutationPoint {
         this.annotationDesc = annotationDesc;
     }
 
-    public Object getTargetElement() {
+    public ClassNode getTargetElement() {
         return targetElement;
     }
 
-    public void setTargetElement(Object targetElement) {
+    public void setTargetElement(ClassNode targetElement) {
         this.targetElement = targetElement;
     }
 
@@ -62,6 +94,23 @@ public class AnnotationMutationPoint {
 
     public void setValues(List<Object> values) {
         this.values = values;
+    }
+
+    public byte[] getBytes() {
+        return bytes;
+    }
+
+    public void setBytes(byte[] bytes) {
+        this.bytes = bytes;
+    }
+
+
+    public MethodNode getMethod() {
+        return method;
+    }
+
+    public void setMethod(MethodNode method) {
+        this.method = method;
     }
 }
 

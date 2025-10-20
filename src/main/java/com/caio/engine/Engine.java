@@ -1,9 +1,17 @@
 package com.caio.engine;
 
 import com.caio.models.AnnotationMutationPoint;
+import com.caio.utli.ClassNodeCloner;
 import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.tree.AnnotationNode;
 import org.objectweb.asm.tree.ClassNode;
+import org.objectweb.asm.tree.FieldNode;
+import org.objectweb.asm.tree.MethodNode;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -22,20 +30,22 @@ public class Engine {
         this.mutants = new ArrayList<>();
     }
 
-    public void createMutants() {
+    public void start() throws Exception {
+        createMutants();
+    }
+
+    public void createMutants() throws Exception {
         for (AnnotationMutationPoint amp : amps) {
             String mutate = mutateValue(amp.getValues());
-            this.mutants.add(applyMutant(amp, mutate));
+            this.mutants.add(createMutant(amp, mutate));
         }
     }
 
-    public void start() {
 
-    }
 
     private String mutateValue (List<Object> values) {
         String mutateOperator = "";
-        Pattern pattern = Pattern.compile("'([^']*)'");
+        Pattern pattern = Pattern.compile("'([^']*)'"); //Dessa forma ele vai mutar todos já, porém talvez fosse interessante a possibilidade de ser as aspas duas dentro das simples
         for (int i = 0; i < values.size(); i += 2) {
             String key = (String) values.get(i);
 
@@ -52,35 +62,86 @@ public class Engine {
         return  mutateOperator;
     }
 
-    private AnnotationMutationPoint applyMutant(AnnotationMutationPoint amp, String novoValor) {
+    private AnnotationMutationPoint createMutant(AnnotationMutationPoint amp, String novoValor) throws Exception {
 
         List<Object> values = amp.getValues();
-        List<Object> valuesMutant = new ArrayList<Object>();
+        List<Object> valuesMutant = new ArrayList<>(); //deve dar para reaproveitar esse bloco de alguma forma
         if (values != null) {
             for (int i = 0; i < values.size(); i += 2) {
                 String key = (String) values.get(i);
                 String value = (String) values.get(i);
                 if (key.equals("value")) {
-                    value = novoValor; // altera o valor da annotation
+                    value = novoValor;
                 }
                 valuesMutant.add(key);
                 valuesMutant.add(value);
             }
         }
 
-        return new AnnotationMutationPoint(
+        ClassNode classNode = ClassNodeCloner.cloneClassNode(amp.getTargetElement()); //gambiarra, nem sei como copiar objetos em java
+
+        AnnotationMutationPoint mutante = new AnnotationMutationPoint(
                 amp.getTargetType(),
                 amp.getOwnerClass(),
                 amp.getAnnotationDesc(),
-                amp.getTargetElement(),
+                classNode,
                 valuesMutant
         );
+
+        byte[] mutateBytes = new byte[0];
+
+
+        if (mutante.getTargetType() == AnnotationMutationPoint.TargetType.METHOD) {
+            for (MethodNode m : mutante.getTargetElement().methods) {
+                if (mutante.getMethod() != null && m.name.equals(mutante.getMethod().name) && m.visibleAnnotations != null) {
+                    for (AnnotationNode ann : m.visibleAnnotations) {
+                        if (ann.desc.equals(mutante.getAnnotationDesc())) {
+                            for (int i = 0; i < ann.values.size(); i++) {
+                                Object v = ann.values.get(i);
+                                if (v instanceof String s && s.equals("value")) {
+                                    ann.values.set(i + 1, novoValor);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            mutateBytes = generateMutatedClassBytes(mutante.getTargetElement());
+
+
+        }else {
+            // Mutação da annotation da classe
+        }
+
+        mutante.setBytes(mutateBytes);
+
+        return mutante;
     }
+
+
 
     private static byte[] generateMutatedClassBytes(ClassNode classNode) {
         ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES | ClassWriter.COMPUTE_MAXS);
         classNode.accept(cw);
         return cw.toByteArray();
+    }
+
+    private boolean runAllTests() throws IOException, InterruptedException {
+        ProcessBuilder pb  = new ProcessBuilder("mvn", "test", "-q");
+        pb.redirectErrorStream(true);
+        Process process = pb.start();
+
+        BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+        StringBuilder output = new StringBuilder();
+        String line;
+        while ((line = reader.readLine()) != null) {
+            output.append(line).append("\n");
+        }
+
+        int exitCode = process.waitFor();
+
+        return exitCode == 0; //Nesse caso, ele deveria garantir que a mesma quantidade de testes estava a passar, não necessariamente todos os testes vão estar passando né?
     }
 
     public List<AnnotationMutationPoint> getMutants() {

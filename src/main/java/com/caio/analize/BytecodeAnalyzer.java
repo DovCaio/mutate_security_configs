@@ -40,8 +40,8 @@ public class BytecodeAnalyzer {
 
 
             if (isController(classNode)) {
-                classeAnnotations(classNode);
-                methodAnnotations(classNode);
+                classeAnnotations(classNode, bytes);
+                methodAnnotations(classNode, bytes);
             }
             //Ele ainda teria que analizar dentro do config de segurança do springboot, por que é possível de usar da mesma forma essas annotations
         }
@@ -64,7 +64,7 @@ public class BytecodeAnalyzer {
         return false;
     }
 
-    private void classeAnnotations(ClassNode classNode){
+    private void classeAnnotations(ClassNode classNode, byte[] bytes){
         if (classNode.visibleAnnotations != null) {
             for (AnnotationNode an : classNode.visibleAnnotations) {
                 if (an.values != null && TARGETS_DESC.contains(an.desc)) {
@@ -72,8 +72,9 @@ public class BytecodeAnalyzer {
                             AnnotationMutationPoint.TargetType.CLASS,
                             classNode.name,
                             an.desc,
-                            classNode, //Talvez isso não esteja totalmente certo
-                            List.copyOf(an.values)
+                            classNode,
+                            List.copyOf(an.values),
+                            bytes
                     );
                     mutationsPoints.add(amp);
                 }
@@ -81,7 +82,7 @@ public class BytecodeAnalyzer {
         }
     }
 
-    private void methodAnnotations(ClassNode classNode) {
+    private void methodAnnotations(ClassNode classNode, byte[] bytes) {
         if (classNode.methods != null ) {
             for (MethodNode method : classNode.methods) {
                 if (method.visibleAnnotations != null ) {
@@ -92,8 +93,10 @@ public class BytecodeAnalyzer {
                                     AnnotationMutationPoint.TargetType.METHOD,
                                     classNode.name,
                                     an.desc,
-                                    method,
-                                    List.copyOf(an.values)
+                                    classNode,
+                                    List.copyOf(an.values),
+                                    bytes,
+                                    method
                             );
                             mutationsPoints.add(amp);
 

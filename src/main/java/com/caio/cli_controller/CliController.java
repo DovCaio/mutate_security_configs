@@ -40,11 +40,10 @@ public class CliController { //Gerencia as entradas e guarda o contexto da aplic
 
     }
 
-    public void execute() throws IOException {
+    public void execute() throws Exception {
         this.scanForDotClasses();
         this.searchForPossibleMutations();
-        this.createTheMutations();
-        this.applyMutantes();
+        this.startEngine();
     }
 
     private void scanForDotClasses() throws IOException {
@@ -59,18 +58,13 @@ public class CliController { //Gerencia as entradas e guarda o contexto da aplic
         if(flag.equals("-v")) printMutationPoints(amp);
     }
 
-    private void createTheMutations() {
+    private void startEngine() throws Exception {
         this.engine = new Engine(amp);
-        engine.createMutants();
+        engine.start();
         if(flag.equals("-v")){
             System.out.println("Mutantes");
             printMutationPoints(engine.getMutants());
         }
     }
 
-    private void applyMutantes() {
-        if (engine == null) throw new NullPointerException("Antes de startar o motor de mutação, tem que criar os mutantes");
-        engine.start();
-
-    }
 }
