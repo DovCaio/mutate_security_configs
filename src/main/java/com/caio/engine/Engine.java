@@ -1,5 +1,13 @@
 package com.caio.engine;
 
+import org.junit.platform.launcher.Launcher;
+import org.junit.platform.launcher.LauncherDiscoveryRequest;
+import org.junit.platform.launcher.core.LauncherDiscoveryRequestBuilder;
+import org.junit.platform.launcher.core.LauncherFactory;
+import org.junit.platform.engine.discovery.DiscoverySelectors;
+import org.junit.platform.launcher.listeners.SummaryGeneratingListener;
+import org.junit.platform.launcher.listeners.TestExecutionSummary;
+
 import com.caio.models.AnnotationMutationPoint;
 import com.caio.utli.ClassNodeCloner;
 import org.objectweb.asm.ClassWriter;
@@ -32,6 +40,7 @@ public class Engine {
 
     public void start() throws Exception {
         createMutants();
+        runTest();
     }
 
     public void createMutants() throws Exception {
@@ -63,7 +72,7 @@ public class Engine {
     }
 
     private AnnotationMutationPoint createMutant(AnnotationMutationPoint amp, String novoValor) throws Exception {
-
+        //Dá para dar uma boa melhorada nesse código
         List<Object> values = amp.getValues();
         List<Object> valuesMutant = new ArrayList<>(); //deve dar para reaproveitar esse bloco de alguma forma
         if (values != null) {
@@ -91,7 +100,7 @@ public class Engine {
         byte[] mutateBytes = new byte[0];
 
 
-        if (mutante.getTargetType() == AnnotationMutationPoint.TargetType.METHOD) {
+        if (mutante.getTargetType() == AnnotationMutationPoint.TargetType.METHOD) { //Dá para criar métodos auxiliares, tem muito aninhamento
             for (MethodNode m : mutante.getTargetElement().methods) {
                 if (mutante.getMethod() != null && m.name.equals(mutante.getMethod().name) && m.visibleAnnotations != null) {
                     for (AnnotationNode ann : m.visibleAnnotations) {
@@ -125,6 +134,27 @@ public class Engine {
         ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES | ClassWriter.COMPUTE_MAXS);
         classNode.accept(cw);
         return cw.toByteArray();
+    }
+
+    private void runTest() { //Vai depender do contexto em que é executado
+        LauncherDiscoveryRequest request = LauncherDiscoveryRequestBuilder.request()
+                .selectors(DiscoverySelectors.selectPackage("com.caio"))
+                .build();
+        Launcher launcher = LauncherFactory.create();
+
+        SummaryGeneratingListener listener = new SummaryGeneratingListener();
+        launcher.registerTestExecutionListeners(listener);
+
+        launcher.execute(request);
+
+        // Mostra o resumo dos testes
+        TestExecutionSummary summary = listener.getSummary();
+        System.out.println("Total tests: " + summary.getTestsFoundCount());
+        System.out.println("Succeeded: " + summary.getTestsSucceededCount());
+        System.out.println("Failed: " + summary.getTestsFailedCount());
+        summary.getFailures().forEach(f ->
+                System.out.println("Failed test: " + f.getTestIdentifier().getDisplayName() + " -> " + f.getException())
+        );
     }
 
     private boolean runAllTests() throws IOException, InterruptedException {
