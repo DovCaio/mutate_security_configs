@@ -40,7 +40,7 @@ public class Engine {
 
     public void start() throws Exception {
         createMutants();
-        runTest();
+        loadInMemory();
     }
 
     public void createMutants() throws Exception {
@@ -130,25 +130,38 @@ public class Engine {
 
 
 
-    private static byte[] generateMutatedClassBytes(ClassNode classNode) {
+    private  byte[] generateMutatedClassBytes(ClassNode classNode) {
         ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES | ClassWriter.COMPUTE_MAXS);
         classNode.accept(cw);
         return cw.toByteArray();
     }
 
-    private void runTest() { //Vai depender do contexto em que é executado
-        LauncherDiscoveryRequest request = LauncherDiscoveryRequestBuilder.request()
-                .selectors(DiscoverySelectors.selectPackage("com.caio"))
-                .build();
-        Launcher launcher = LauncherFactory.create();
 
+    private void loadInMemory() throws ClassNotFoundException {
+        for (AnnotationMutationPoint mutation: mutants){
+            MutantClassLoader mutantClassLoader = new MutantClassLoader(mutation.getTargetElement().name.replace('/', '.'), mutation.getBytes());
+            mutantClassLoader.loadClass(mutation.getTargetElement().name.replace('/', '.'));
+            runTest(mutantClassLoader);
+
+        }
+    }
+
+    private void runTest(MutantClassLoader mutantClassLoader) { //Vai precissar carergar as classes mutadas para que isso funcione
+        // Define o classloader atual da thread
+        Thread.currentThread().setContextClassLoader(mutantClassLoader);
+
+        LauncherDiscoveryRequest request = LauncherDiscoveryRequestBuilder.request()
+                .selectors(DiscoverySelectors.selectPackage("pk.habsoft.demo.estore"))
+                .build();
+
+        Launcher launcher = LauncherFactory.create();
         SummaryGeneratingListener listener = new SummaryGeneratingListener();
         launcher.registerTestExecutionListeners(listener);
 
         launcher.execute(request);
 
-        // Mostra o resumo dos testes
         TestExecutionSummary summary = listener.getSummary();
+
         System.out.println("Total tests: " + summary.getTestsFoundCount());
         System.out.println("Succeeded: " + summary.getTestsSucceededCount());
         System.out.println("Failed: " + summary.getTestsFailedCount());

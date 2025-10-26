@@ -19,8 +19,8 @@ public class CliController { //Gerencia as entradas e guarda o contexto da aplic
     private Path directory;
     private String flag = "";
     private List<Path> finded_paths;
-    private List<AnnotationMutationPoint> amp;
     private Engine engine;
+    private BytecodeAnalyzer bca;
 
     public CliController(String[] args) {
         if (args.length == 0) {
@@ -38,6 +38,8 @@ public class CliController { //Gerencia as entradas e guarda o contexto da aplic
             throw new IllegalArgumentException("Muitos argumentos, no máximo 2");
         }
 
+        this.bca = new BytecodeAnalyzer();
+
     }
 
     public void execute() throws Exception {
@@ -53,13 +55,12 @@ public class CliController { //Gerencia as entradas e guarda o contexto da aplic
     }
 
     private void searchForPossibleMutations() throws IOException {
-        BytecodeAnalyzer bca = new BytecodeAnalyzer(finded_paths);
-        this.amp =  bca.analyzeClass();
-        if(flag.equals("-v")) printMutationPoints(amp);
+        this.bca.analyzeClass(finded_paths);
+        if(flag.equals("-v")) printMutationPoints(bca.getMutationsPoints());
     }
 
     private void startEngine() throws Exception {
-        this.engine = new Engine(amp);
+        this.engine = new Engine(bca.getMutationsPoints());
         engine.start();
         if(flag.equals("-v")){
             System.out.println("Mutantes");
