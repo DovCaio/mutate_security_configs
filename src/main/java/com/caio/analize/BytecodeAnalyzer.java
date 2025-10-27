@@ -23,14 +23,17 @@ public class BytecodeAnalyzer {
 
     private List<AnnotationMutationPoint> mutationsPoints;
 
-    private List<AnnotationMutationPoint> allClasses;
+    private List<AnnotationMutationPoint> mainClasses;
+
+    private List<AnnotationMutationPoint> testClasses;
 
     private Dependencies dependencies;
 
 
     public BytecodeAnalyzer() {
         this.mutationsPoints = new ArrayList<AnnotationMutationPoint>();
-        this.allClasses = new ArrayList<AnnotationMutationPoint>();
+        this.mainClasses = new ArrayList<AnnotationMutationPoint>();
+        this.testClasses = new ArrayList<AnnotationMutationPoint>();
         this.dependencies = new Dependencies();
     }
 
@@ -51,7 +54,7 @@ public class BytecodeAnalyzer {
             }
             //Ele ainda teria que analizar dentro do config de segurança do springboot, por que é possível de usar da mesma forma essas annotations
 
-            findAllClasses(classNode, bytes);
+            findmainClasses(classNode, bytes);
             
         }
         if (this.mutationsPoints != null && this.mutationsPoints.isEmpty()) throw new NoOneAnnotationMutableFinded();
@@ -121,7 +124,7 @@ public class BytecodeAnalyzer {
 
     }
 
-    public void findAllClasses(ClassNode classNode, byte[] bytes){
+    public void findmainClasses(ClassNode classNode, byte[] bytes){
 
         AnnotationMutationPoint amp = new AnnotationMutationPoint(
             AnnotationMutationPoint.TargetType.CLASS,
@@ -130,10 +133,42 @@ public class BytecodeAnalyzer {
             classNode,
             List.of(),     
             bytes
-    );
-    allClasses.add(amp);
+        );
+
+        boolean isTestClass = hasTestAnnotations(classNode);
+
+        if (isTestClass) {
+            testClasses.add(amp);
+        }else {
+            mainClasses.add(amp);
+
+        }
 
     }
+
+
+    private boolean hasTestAnnotations(ClassNode classNode) {
+    List<AnnotationNode> annotations = new ArrayList<>();
+    if (classNode.visibleAnnotations != null)
+        annotations.addAll(classNode.visibleAnnotations);
+    if (classNode.invisibleAnnotations != null)
+        annotations.addAll(classNode.invisibleAnnotations);
+
+    for (AnnotationNode annotation : annotations) {
+        String desc = annotation.desc;
+
+        // Verifica anotações mais comuns em testes JUnit e Spring
+        if (desc.contains("org/junit")
+            || desc.contains("org/mockito")
+            || desc.contains("org/springframework/boot/test")
+            || desc.contains("org/springframework/test")
+            || desc.contains("org/testng")) {
+            return true;
+        }
+    }
+
+    return false;
+}
 
     public List<AnnotationMutationPoint> getMutationsPoints() {
         return mutationsPoints;
@@ -143,14 +178,23 @@ public class BytecodeAnalyzer {
         this.mutationsPoints = mutationsPoints;
     }
 
-    public List<AnnotationMutationPoint> getAllClasses() {
-        return allClasses;
+    public List<AnnotationMutationPoint> getmainClasses() {
+        return mainClasses;
     }
 
-    public void setAllClasses(List<AnnotationMutationPoint> allClasses) {
-        this.allClasses = allClasses;
+    public void setmainClasses(List<AnnotationMutationPoint> mainClasses) {
+        this.mainClasses = mainClasses;
     }
 
+    public List<AnnotationMutationPoint> getTestClasses() {
+        return testClasses;
+    }
+
+    public void setTestClasses(List<AnnotationMutationPoint> testClasses) {
+        this.testClasses = testClasses;
+    }
+
+    
     
 
 }

@@ -61,8 +61,8 @@ public class CliController { //Gerencia as entradas e guarda o contexto da aplic
     }
 
     private void startEngine() throws Exception {
-        this.engine = new Engine(bca.getMutationsPoints());
-        engine.start(bca.getAllClasses());
+        this.engine = new Engine(bca.getMutationsPoints(), bca.getmainClasses(), bca.getTestClasses());
+        engine.start();
         if(flag.equals("-v")){
             System.out.println("Mutantes");
             printMutationPoints(engine.getMutants());
