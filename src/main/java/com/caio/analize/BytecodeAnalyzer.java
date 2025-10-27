@@ -25,10 +25,13 @@ public class BytecodeAnalyzer {
 
     private List<AnnotationMutationPoint> allClasses;
 
+    private Dependencies dependencies;
+
 
     public BytecodeAnalyzer() {
         this.mutationsPoints = new ArrayList<AnnotationMutationPoint>();
         this.allClasses = new ArrayList<AnnotationMutationPoint>();
+        this.dependencies = new Dependencies();
     }
 
     public void analyzeClass(List<Path> classFilePath) throws IOException {
@@ -47,6 +50,9 @@ public class BytecodeAnalyzer {
                 methodAnnotations(classNode, bytes);
             }
             //Ele ainda teria que analizar dentro do config de segurança do springboot, por que é possível de usar da mesma forma essas annotations
+
+            findAllClasses(classNode, bytes);
+            
         }
         if (this.mutationsPoints != null && this.mutationsPoints.isEmpty()) throw new NoOneAnnotationMutableFinded();
         
@@ -71,7 +77,7 @@ public class BytecodeAnalyzer {
     private void classeAnnotations(ClassNode classNode, byte[] bytes){
         if (classNode.visibleAnnotations != null) {
             for (AnnotationNode an : classNode.visibleAnnotations) {
-                if (an.values != null ){
+                if (an.values != null && TARGETS_DESC.contains(an.desc)){
 
                     AnnotationMutationPoint amp = new AnnotationMutationPoint(
                                 AnnotationMutationPoint.TargetType.CLASS,
@@ -81,11 +87,7 @@ public class BytecodeAnalyzer {
                                 List.copyOf(an.values),
                                 bytes
                     );
-                    allClasses.add(amp);
-                    if ( TARGETS_DESC.contains(an.desc)) {
-                        
-                        mutationsPoints.add(amp);
-                    }
+                    mutationsPoints.add(amp);
                 }
 
             }
@@ -116,6 +118,20 @@ public class BytecodeAnalyzer {
                 }
             }
         }
+
+    }
+
+    public void findAllClasses(ClassNode classNode, byte[] bytes){
+
+        AnnotationMutationPoint amp = new AnnotationMutationPoint(
+            AnnotationMutationPoint.TargetType.CLASS,
+            classNode.name,
+            null,
+            classNode,
+            List.of(),     
+            bytes
+    );
+    allClasses.add(amp);
 
     }
 

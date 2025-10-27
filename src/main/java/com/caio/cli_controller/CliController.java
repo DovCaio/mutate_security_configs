@@ -43,14 +43,16 @@ public class CliController { //Gerencia as entradas e guarda o contexto da aplic
     }
 
     public void execute() throws Exception {
-        this.scanForDotClasses();
+        this.scanForDotFiles();
         this.searchForPossibleMutations();
         this.startEngine();
     }
 
-    private void scanForDotClasses() throws IOException {
+    private void scanForDotFiles() throws IOException {
         DirectoryScan directoryScan = new DirectoryScan(directory);
-        this.finded_paths = directoryScan.scan();
+        this.finded_paths = directoryScan.findClasses();
+        directoryScan.findPomFile();
+        System.out.println(directoryScan.getPomFileDirectory() + "---------- Pom file");
         if(flag.equals("-v")) printPaths(finded_paths);
     }
 
@@ -61,7 +63,7 @@ public class CliController { //Gerencia as entradas e guarda o contexto da aplic
 
     private void startEngine() throws Exception {
         this.engine = new Engine(bca.getMutationsPoints());
-        engine.start();
+        engine.start(bca.getAllClasses());
         if(flag.equals("-v")){
             System.out.println("Mutantes");
             printMutationPoints(engine.getMutants());

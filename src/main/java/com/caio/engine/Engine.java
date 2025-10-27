@@ -4,6 +4,7 @@ import org.junit.platform.launcher.Launcher;
 import org.junit.platform.launcher.LauncherDiscoveryRequest;
 import org.junit.platform.launcher.core.LauncherDiscoveryRequestBuilder;
 import org.junit.platform.launcher.core.LauncherFactory;
+import org.junit.platform.engine.DiscoverySelector;
 import org.junit.platform.engine.discovery.DiscoverySelectors;
 import org.junit.platform.launcher.listeners.SummaryGeneratingListener;
 import org.junit.platform.launcher.listeners.TestExecutionSummary;
@@ -20,12 +21,17 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Serializable;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
 import java.util.List;
+import java.util.Map;
 
 public class Engine {
 
@@ -38,9 +44,10 @@ public class Engine {
         this.mutants = new ArrayList<>();
     }
 
-    public void start() throws Exception {
+    public void start(List<AnnotationMutationPoint> allClasses) throws Exception {
         createMutants();
-        loadInMemory();
+        loadAllInMemory(allClasses);
+        loadMutantInMemory();
     }
 
     public void createMutants() throws Exception {
@@ -70,6 +77,7 @@ public class Engine {
 
         return  mutateOperator;
     }
+
 
     private AnnotationMutationPoint createMutant(AnnotationMutationPoint amp, String novoValor) throws Exception {
         //Dá para dar uma boa melhorada nesse código
@@ -127,8 +135,7 @@ public class Engine {
 
         return mutante;
     }
-
-
+    
 
     private  byte[] generateMutatedClassBytes(ClassNode classNode) {
         ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES | ClassWriter.COMPUTE_MAXS);
@@ -136,58 +143,82 @@ public class Engine {
         return cw.toByteArray();
     }
 
+    private void loadAllInMemory(List<AnnotationMutationPoint> allClasses) throws ClassNotFoundException, IllegalAccessException, InvocationTargetException, InstantiationException, IllegalArgumentException, NoSuchMethodException, SecurityException {
+        Map<String, byte[]> allBytes = new HashMap<>();
+        for (AnnotationMutationPoint c : allClasses) {
+            allBytes.put(c.getTargetElement().name.replace('/', '.'), c.getBytes());
+        }
 
-    private void loadInMemory() throws ClassNotFoundException {
+        NonMutantClassLoader loader = new NonMutantClassLoader(allBytes);
+
+        List<Class<?>> testClasses = new ArrayList<>();
+
+        for (String className : allBytes.keySet()) {
+            Class<?> clazz = loader.loadClass(className);
+
+            boolean hasTest = Arrays.stream(clazz.getDeclaredMethods())
+                .anyMatch(m -> m.isAnnotationPresent(org.junit.jupiter.api.Test.class));
+
+            if (hasTest) {
+                testClasses.add(clazz);
+                System.out.println("Classe de teste encontrada: " + className);
+            }
+        }
+
+        System.out.println("Classes carregadas em memória:");
+        allBytes.keySet().forEach(System.out::println);
+
+        System.out.println("Com as classes normais");
+        
+        
+        
+
+    }
+
+    private void loadMutantInMemory() throws ClassNotFoundException {
         for (AnnotationMutationPoint mutation: mutants){
             MutantClassLoader mutantClassLoader = new MutantClassLoader(mutation.getTargetElement().name.replace('/', '.'), mutation.getBytes());
             mutantClassLoader.loadClass(mutation.getTargetElement().name.replace('/', '.'));
-            runTest(mutantClassLoader);
-
+            runAllTests(mutantClassLoader);
         }
     }
 
-    private void runTest(MutantClassLoader mutantClassLoader) { //Vai precissar carergar as classes mutadas para que isso funcione
-        // Define o classloader atual da thread
-        Thread.currentThread().setContextClassLoader(mutantClassLoader);
 
-        LauncherDiscoveryRequest request = LauncherDiscoveryRequestBuilder.request()
-                .selectors(DiscoverySelectors.selectPackage("pk.habsoft.demo.estore"))
-                .build();
+    
 
-        Launcher launcher = LauncherFactory.create();
-        SummaryGeneratingListener listener = new SummaryGeneratingListener();
-        launcher.registerTestExecutionListeners(listener);
+  private void runAllTests(ClassLoader loader) {
 
-        launcher.execute(request);
+    Thread.currentThread().setContextClassLoader(loader);
 
-        TestExecutionSummary summary = listener.getSummary();
+    LauncherDiscoveryRequest request = LauncherDiscoveryRequestBuilder.request()
+            .selectors(DiscoverySelectors.selectPackage("pk.habsoft.demo.estore"))
+            .build();
 
-        System.out.println("Total tests: " + summary.getTestsFoundCount());
-        System.out.println("Succeeded: " + summary.getTestsSucceededCount());
-        System.out.println("Failed: " + summary.getTestsFailedCount());
-        summary.getFailures().forEach(f ->
-                System.out.println("Failed test: " + f.getTestIdentifier().getDisplayName() + " -> " + f.getException())
-        );
+    Launcher launcher = LauncherFactory.create();
+    SummaryGeneratingListener listener = new SummaryGeneratingListener();
+    launcher.registerTestExecutionListeners(listener);
+
+    launcher.execute(request);
+
+    TestExecutionSummary summary = listener.getSummary();
+
+    System.out.println("=== RESULTADOS DOS TESTES ===");
+    System.out.println("Total tests: " + summary.getTestsFoundCount());
+    System.out.println("Succeeded: " + summary.getTestsSucceededCount());
+    System.out.println("Failed: " + summary.getTestsFailedCount());
+    summary.getFailures().forEach(f ->
+            System.out.println("❌ " + f.getTestIdentifier().getDisplayName() + " -> " + f.getException())
+    );
     }
 
-    private boolean runAllTests() throws IOException, InterruptedException {
-        ProcessBuilder pb  = new ProcessBuilder("mvn", "test", "-q");
-        pb.redirectErrorStream(true);
-        Process process = pb.start();
+  public List<AnnotationMutationPoint> getMutants() {
+    return mutants;
+  }
 
-        BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-        StringBuilder output = new StringBuilder();
-        String line;
-        while ((line = reader.readLine()) != null) {
-            output.append(line).append("\n");
-        }
+  public void setMutants(List<AnnotationMutationPoint> mutants) {
+    this.mutants = mutants;
+  }
 
-        int exitCode = process.waitFor();
+    
 
-        return exitCode == 0; //Nesse caso, ele deveria garantir que a mesma quantidade de testes estava a passar, não necessariamente todos os testes vão estar passando né?
-    }
-
-    public List<AnnotationMutationPoint> getMutants() {
-        return mutants;
-    }
 }

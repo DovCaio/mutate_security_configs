@@ -11,6 +11,7 @@ public class MutantClassLoader extends ClassLoader{
         this.classBytes = classBytes;
     }
 
+
     @Override
     protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
         // Se for a classe mutada, define a partir dos bytes mutados
