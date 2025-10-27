@@ -37,11 +37,12 @@ public class Engine {
 
     private List<AnnotationMutationPoint> amps;
     private List<AnnotationMutationPoint> mutants;
-
+    private RunTest runTest;
 
     public Engine(List<AnnotationMutationPoint> amps) {
         this.amps = amps;
         this.mutants = new ArrayList<>();
+        this.runTest = new RunTest();
     }
 
     public void start(List<AnnotationMutationPoint> allClasses) throws Exception {
@@ -153,7 +154,49 @@ public class Engine {
 
         List<Class<?>> testClasses = new ArrayList<>();
 
+        for (String className : allBytes.keySet()) {
+            Class<?> clazz = loader.loadClass(className);
+
+            boolean hasTest = Arrays.stream(clazz.getDeclaredMethods())
+                .anyMatch(m -> m.isAnnotationPresent(org.junit.jupiter.api.Test.class));
+
+            if (hasTest) {
+                testClasses.add(clazz);
+                System.out.println("Classe de teste encontrada: " + className);
+            }
+        }
+
+        System.out.println("Classes carregadas em memória:");
+        allBytes.keySet().forEach(System.out::println);
+
+        System.out.println("Com as classes normais");
         
+        
+        LauncherDiscoveryRequestBuilder builder = LauncherDiscoveryRequestBuilder.request();
+
+        for (Class<?> testClass : testClasses) {
+            builder.selectors(DiscoverySelectors.selectClass(testClass));
+        }
+
+        LauncherDiscoveryRequest request = builder.build();
+
+
+
+        Thread.currentThread().setContextClassLoader(loader);
+
+        Launcher launcher = LauncherFactory.create();
+        SummaryGeneratingListener listener = new SummaryGeneratingListener();
+        launcher.registerTestExecutionListeners(listener);
+
+        launcher.execute(request);
+
+        var summary = listener.getSummary();
+        System.out.println("Total tests: " + summary.getTestsFoundCount());
+        System.out.println("Succeeded: " + summary.getTestsSucceededCount());
+        System.out.println("Failed: " + summary.getTestsFailedCount());
+        summary.getFailures().forEach(f ->
+            System.out.println("Failed test: " + f.getTestIdentifier().getDisplayName() + " -> " + f.getException())
+        );
 
     }
 
@@ -161,37 +204,14 @@ public class Engine {
         for (AnnotationMutationPoint mutation: mutants){
             MutantClassLoader mutantClassLoader = new MutantClassLoader(mutation.getTargetElement().name.replace('/', '.'), mutation.getBytes());
             mutantClassLoader.loadClass(mutation.getTargetElement().name.replace('/', '.'));
-            runAllTests(mutantClassLoader);
+            runTest.runAllTests(mutantClassLoader);
         }
     }
 
 
     
 
-  private void runAllTests(ClassLoader loader) {
-
-    Thread.currentThread().setContextClassLoader(loader);
-
-    LauncherDiscoveryRequest request = LauncherDiscoveryRequestBuilder.request()
-            .selectors(DiscoverySelectors.selectPackage("pk.habsoft.demo.estore"))
-            .build();
-
-    Launcher launcher = LauncherFactory.create();
-    SummaryGeneratingListener listener = new SummaryGeneratingListener();
-    launcher.registerTestExecutionListeners(listener);
-
-    launcher.execute(request);
-
-    TestExecutionSummary summary = listener.getSummary();
-
-    System.out.println("=== RESULTADOS DOS TESTES ===");
-    System.out.println("Total tests: " + summary.getTestsFoundCount());
-    System.out.println("Succeeded: " + summary.getTestsSucceededCount());
-    System.out.println("Failed: " + summary.getTestsFailedCount());
-    summary.getFailures().forEach(f ->
-            System.out.println("❌ " + f.getTestIdentifier().getDisplayName() + " -> " + f.getException())
-    );
-    }
+  
 
   public List<AnnotationMutationPoint> getMutants() {
     return mutants;
