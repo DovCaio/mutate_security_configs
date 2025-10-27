@@ -18,9 +18,10 @@ public class CliController { //Gerencia as entradas e guarda o contexto da aplic
     private static final List<String> EXISTENT_FLAGS = List.of("-v");
     private Path directory;
     private String flag = "";
-    private List<Path> finded_paths;
     private Engine engine;
     private BytecodeAnalyzer bca;
+    private DirectoryScan directoryScan;
+
 
     public CliController(String[] args) {
         if (args.length == 0) {
@@ -39,7 +40,7 @@ public class CliController { //Gerencia as entradas e guarda o contexto da aplic
         }
 
         this.bca = new BytecodeAnalyzer();
-
+        this.directoryScan = new DirectoryScan(directory);
     }
 
     public void execute() throws Exception {
@@ -49,15 +50,13 @@ public class CliController { //Gerencia as entradas e guarda o contexto da aplic
     }
 
     private void scanForDotFiles() throws IOException {
-        DirectoryScan directoryScan = new DirectoryScan(directory);
-        this.finded_paths = directoryScan.findClasses();
+        directoryScan.findClasses();
         directoryScan.findPomFile();
-        System.out.println(directoryScan.getPomFileDirectory() + "---------- Pom file");
-        if(flag.equals("-v")) printPaths(finded_paths);
+        if(flag.equals("-v")) printPaths(directoryScan.getFindeds());
     }
 
     private void searchForPossibleMutations() throws IOException {
-        this.bca.analyzeClass(finded_paths);
+        this.bca.analyzeClass(directoryScan.getFindeds());
         if(flag.equals("-v")) printMutationPoints(bca.getMutationsPoints());
     }
 

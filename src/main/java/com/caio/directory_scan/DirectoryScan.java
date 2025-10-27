@@ -13,6 +13,8 @@ public class DirectoryScan {
 
     private Path directory;
     private Path pomFileDirectory;
+    private List<Path> findeds;
+
 
     public DirectoryScan(Path baseDir){
         if (baseDir == null)
@@ -24,7 +26,7 @@ public class DirectoryScan {
         directory = baseDir;
     }
 
-    public List<Path> findClasses() throws IOException {
+    public void findClasses() throws IOException {
         try (Stream<Path> stream = Files.walk(this.directory)) {
             List<Path> finded =  stream
                     .filter(p -> p.toString().endsWith(".class"))
@@ -32,8 +34,7 @@ public class DirectoryScan {
 
         
             if (finded.isEmpty()) throw new NoOneClasseFinded("Nenhum arquivo .class encontrado em: " + directory.toAbsolutePath() + "\n Caso tenha passado o diretorio corretamnete, experimente compilar o projeto antes, para que seja gerado os arquivos que serão mutados.");
-
-            return finded;
+            this.findeds = finded;
         }
     }
 
@@ -57,7 +58,13 @@ public class DirectoryScan {
         this.pomFileDirectory = pomFileDirectory;
     }
 
-    
+    public List<Path> getFindeds() {
+        return findeds;
+    }
+
+    public void setFindeds(List<Path> findeds) {
+        this.findeds = findeds;
+    }
 
 
 }

@@ -153,24 +153,6 @@ public class Engine {
 
         List<Class<?>> testClasses = new ArrayList<>();
 
-        for (String className : allBytes.keySet()) {
-            Class<?> clazz = loader.loadClass(className);
-
-            boolean hasTest = Arrays.stream(clazz.getDeclaredMethods())
-                .anyMatch(m -> m.isAnnotationPresent(org.junit.jupiter.api.Test.class));
-
-            if (hasTest) {
-                testClasses.add(clazz);
-                System.out.println("Classe de teste encontrada: " + className);
-            }
-        }
-
-        System.out.println("Classes carregadas em memória:");
-        allBytes.keySet().forEach(System.out::println);
-
-        System.out.println("Com as classes normais");
-        
-        
         
 
     }

@@ -62,7 +62,8 @@ class DirectoryScanTest {
         Files.createFile(tempDir.resolve("not_a_class.txt"));
 
         DirectoryScan scanner = new DirectoryScan(tempDir);
-        List<Path> found = scanner.findClasses();
+        scanner.findClasses();
+        List<Path> found = scanner.getFindeds();
 
         assertEquals(2, found.size());
         assertTrue(found.stream().allMatch(p -> p.toString().endsWith(".class")));
@@ -75,7 +76,8 @@ class DirectoryScanTest {
         Files.createFile(subDir.resolve("Inner.class"));
 
         DirectoryScan scanner = new DirectoryScan(tempDir);
-        List<Path> found = scanner.findClasses();
+        scanner.findClasses();
+        List<Path> found = scanner.getFindeds();
 
         assertEquals(1, found.size());
         assertTrue(found.get(0).toString().endsWith("Inner.class"));
