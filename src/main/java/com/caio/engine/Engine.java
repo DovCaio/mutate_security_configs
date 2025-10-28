@@ -1,22 +1,11 @@
 package com.caio.engine;
 
-import org.junit.platform.launcher.Launcher;
-import org.junit.platform.launcher.LauncherDiscoveryRequest;
-import org.junit.platform.launcher.core.LauncherDiscoveryRequestBuilder;
-import org.junit.platform.launcher.core.LauncherFactory;
-import org.junit.platform.engine.discovery.DiscoverySelectors;
-import org.junit.platform.launcher.listeners.SummaryGeneratingListener;
 
 import com.caio.models.AnnotationMutationPoint;
 
-import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 
 
 import java.util.List;
-import java.util.Map;
 
 public class Engine {
 

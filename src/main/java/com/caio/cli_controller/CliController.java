@@ -55,8 +55,9 @@ public class CliController { //Gerencia as entradas e guarda o contexto da aplic
         if(flag.equals("-v")) printPaths(directoryScan.getFindeds());
     }
 
-    private void searchForPossibleMutations() throws IOException {
+    private void searchForPossibleMutations() throws Exception {
         this.bca.analyzeClass(directoryScan.getFindeds());
+        this.bca.getDependenciesClasses(directoryScan.getPomFileDirectory());
         if(flag.equals("-v")) printMutationPoints(bca.getMutationsPoints());
     }
 

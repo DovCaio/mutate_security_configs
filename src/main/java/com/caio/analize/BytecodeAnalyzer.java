@@ -18,7 +18,7 @@ public class BytecodeAnalyzer {
 
     private static final List<String> TARGETS_DESC = List.of(
             "Lorg/springframework/security/access/prepost/PreAuthorize;",
-            "Lorg/springframework/security/access/prepost/PostAuthorize;" // talvez esse diretório esteja errado
+            "Lorg/springframework/security/access/prepost/PostAuthorize;"
     );
 
     private List<AnnotationMutationPoint> mutationsPoints;
@@ -57,6 +57,9 @@ public class BytecodeAnalyzer {
             findmainClasses(classNode, bytes);
             
         }
+
+        
+
         if (this.mutationsPoints != null && this.mutationsPoints.isEmpty()) throw new NoOneAnnotationMutableFinded();
         
     }
@@ -157,7 +160,6 @@ public class BytecodeAnalyzer {
     for (AnnotationNode annotation : annotations) {
         String desc = annotation.desc;
 
-        // Verifica anotações mais comuns em testes JUnit e Spring
         if (desc.contains("org/junit")
             || desc.contains("org/mockito")
             || desc.contains("org/springframework/boot/test")
@@ -168,7 +170,14 @@ public class BytecodeAnalyzer {
     }
 
     return false;
-}
+    }
+
+
+    public void getDependenciesClasses(Path path) throws Exception{
+        dependencies.searchForDependencies(path);
+        //dependencies.downloadDependenciesJar();
+        //return dependencies.getClassesFromTheJar();
+    }
 
     public List<AnnotationMutationPoint> getMutationsPoints() {
         return mutationsPoints;
