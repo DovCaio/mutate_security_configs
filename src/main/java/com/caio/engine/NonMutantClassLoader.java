@@ -32,17 +32,6 @@ public class NonMutantClassLoader extends ClassLoader {
         }
     }
 
-    // opcional — apenas para debug
-    @Override
-    protected Class<?> findClass(String name) throws ClassNotFoundException {
-        byte[] bytes = classes.get(name);
-        if (bytes == null) {
-            bytes = classes.get(name.replace('.', '/'));
-        }
-        if (bytes != null) {
-            return defineClass(name, bytes, 0, bytes.length);
-        }
-        throw new ClassNotFoundException(name);
-    }
+    
 }
 

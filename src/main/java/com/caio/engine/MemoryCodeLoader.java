@@ -3,6 +3,7 @@ package com.caio.engine;
 import static org.junit.jupiter.api.DynamicTest.stream;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -49,8 +50,9 @@ public class MemoryCodeLoader {
             InstantiationException, IllegalArgumentException, NoSuchMethodException, SecurityException,
             URISyntaxException, IOException {
 
-        loadDependencieInMemory(); //Isso está aparentando não fazer nada
+        loadDependencieInMemory(); // deve adicionar bytes das dependências no allBytes
 
+        // adiciona classes main e test
         for (AnnotationMutationPoint c : this.mainClasses) {
             this.allBytes.put(c.getTargetElement().name.replace('/', '.'), c.getBytes());
         }
@@ -59,34 +61,28 @@ public class MemoryCodeLoader {
             this.allBytes.put(c.getTargetElement().name.replace('/', '.'), c.getBytes());
         }
 
-
-        this.allBytes.forEach((k, v) -> System.out.println(k)); 
-
         NonMutantClassLoader loader = new NonMutantClassLoader(this.allBytes);
-
 
         LauncherDiscoveryRequestBuilder builder = LauncherDiscoveryRequestBuilder.request();
 
         for (AnnotationMutationPoint c : this.testClasses) {
-            Class<?> testClass = loader.findClass(c.getTargetElement().name.replace('/', '.'));
-
+            System.out.println("Test class: " + c.getTargetElement().name.replace('/', '.'));
+            Class<?> testClass = loader.loadClass(c.getTargetElement().name.replace('/', '.'));
             builder.selectors(DiscoverySelectors.selectClass(testClass));
-
         }
 
 
-       
         LauncherDiscoveryRequest request = builder.build();
 
-        // NÃO troque o classloader da thread
+        // Não é necessário trocar o context classloader
         // Thread.currentThread().setContextClassLoader(loader);
 
         Launcher launcher = LauncherFactory.create();
         SummaryGeneratingListener listener = new SummaryGeneratingListener();
-
         launcher.registerTestExecutionListeners(listener);
-        launcher.execute(request);
+            //Estudar o pitesste, e ver como que ele faz isso dqui
 
+        launcher.execute(request);
         var summary = listener.getSummary();
         System.out.println("Total tests: " + summary.getTestsFoundCount());
         System.out.println("Succeeded: " + summary.getTestsSucceededCount());
@@ -106,12 +102,29 @@ public class MemoryCodeLoader {
     }
 
     private void loadDependencieInMemory() throws URISyntaxException, IOException {
-        URLClassLoader dependenciesClassLoader = new URLClassLoader(
-            dependenciesJarURLs.toArray(new URL[0]),
-            Thread.currentThread().getContextClassLoader()
-        );
-
-        Thread.currentThread().setContextClassLoader(dependenciesClassLoader);
+        for (URL jarUrl : dependenciesJarURLs) {
+            Path jarPath = Paths.get(jarUrl.toURI());
+            try (JarFile jarFile = new JarFile(jarPath.toFile())) {
+                jarFile.stream()
+                        .filter(e -> e.getName().endsWith(".class"))
+                        .forEach(entry -> {
+                            try (InputStream in = jarFile.getInputStream(entry)) {
+                                byte[] bytes = in.readAllBytes();
+                                // Converte nome interno do JAR para nome de classe
+                                String className = entry.getName()
+                                        .replace('/', '.')
+                                        .replace(".class", "");
+                                // Adiciona no mapa
+                                allBytes.put(className, bytes);
+                            } catch (IOException ex) {
+                                System.err.println("Erro lendo classe: " + entry.getName());
+                            }
+                        });
+            } catch (Exception e) {
+                System.err.println("Erro lendo JAR: " + jarUrl);
+                e.printStackTrace();
+            }
+        }
     }
 
 }

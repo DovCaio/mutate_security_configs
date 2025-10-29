@@ -1,5 +1,10 @@
 package com.caio.engine;
 
+import java.security.KeyStore.Entry;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.junit.platform.engine.discovery.DiscoverySelectors;
 import org.junit.platform.launcher.Launcher;
 import org.junit.platform.launcher.LauncherDiscoveryRequest;
@@ -7,6 +12,7 @@ import org.junit.platform.launcher.core.LauncherDiscoveryRequestBuilder;
 import org.junit.platform.launcher.core.LauncherFactory;
 import org.junit.platform.launcher.listeners.SummaryGeneratingListener;
 import org.junit.platform.launcher.listeners.TestExecutionSummary;
+import org.junit.platform.launcher.listeners.TestExecutionSummary.Failure;
 
 public class RunTest {
 
@@ -30,13 +36,76 @@ public class RunTest {
 
     TestExecutionSummary summary = listener.getSummary();
 
-    System.out.println("=== RESULTADOS DOS TESTES ===");
-    System.out.println("Total tests: " + summary.getTestsFoundCount());
-    System.out.println("Succeeded: " + summary.getTestsSucceededCount());
-    System.out.println("Failed: " + summary.getTestsFailedCount());
-    summary.getFailures().forEach(f ->
-            System.out.println("❌ " + f.getTestIdentifier().getDisplayName() + " -> " + f.getException())
-    );
+
+    TestResult testResult = new TestResult(summary.getTestsFoundCount(), summary.getTestsSucceededCount(), summary.getTestsFailedCount(), summary.getFailures());
+
+    System.out.println(testResult.toString());
+
+    }
+
+    public class TestResult {
+
+        private boolean sucessuful;
+        private Long totalTest;
+        private Long succedded;
+        private Long failed;
+        private Map<String, String> failures;
+
+        public TestResult(Long totalTest, Long succedded, Long failed, List<?> failures){
+
+                this.totalTest = totalTest;
+                this.succedded = succedded;
+                this.failed = failed;
+                this.failures = new HashMap<String, String>();
+                failures.forEach(f -> this.failures.put(((Failure) f).getTestIdentifier().getDisplayName(), ((Failure) f).getException().toString()));
+
+        }
+
+        @Override()
+        public String toString(){
+                //final String failuresString = failures.entrySet().stream().reduce( f  ->  f.getKey() + " -> " + f.getValue());
+                              
+
+                return "=== RESULTADOS DOS TESTES === \n" +
+                        "Total tests: " + this.totalTest + "\n" +
+                        "Succeeded: " + this.succedded + "\n" +
+                        "Failed: " + this.failed + "\n";
+        }
+
+        public boolean isSucessuful() {
+                return sucessuful;
+        }
+
+        public void setSucessuful(boolean sucessuful) {
+                this.sucessuful = sucessuful;
+        }
+
+        public Long getTotalTest() {
+                return totalTest;
+        }
+
+        public void setTotalTest(Long totalTest) {
+                this.totalTest = totalTest;
+        }
+
+        public Long getSuccedded() {
+                return succedded;
+        }
+
+        public void setSuccedded(Long succedded) {
+                this.succedded = succedded;
+        }
+
+        public Long getFailed() {
+                return failed;
+        }
+
+        public void setFailed(Long failed) {
+                this.failed = failed;
+        }
+
+
+        
     }
     
 }
