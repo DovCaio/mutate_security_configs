@@ -8,6 +8,7 @@ import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.MethodNode;
 
 import java.io.IOException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -173,10 +174,8 @@ public class BytecodeAnalyzer {
     }
 
 
-    public void getDependenciesClasses(Path path) throws Exception{
-        dependencies.searchForDependencies(path);
-        //dependencies.downloadDependenciesJar();
-        //return dependencies.getClassesFromTheJar();
+    public void getDependenciesClasses(List<Path> repositoriePath) throws Exception{
+        dependencies.extractJars(repositoriePath);
     }
 
     public List<AnnotationMutationPoint> getMutationsPoints() {
@@ -203,7 +202,10 @@ public class BytecodeAnalyzer {
         this.testClasses = testClasses;
     }
 
-    
+
+    public List<URL> getDependenciesJarURL(){
+        return this.dependencies.getJarUrls();
+    }
     
 
 }

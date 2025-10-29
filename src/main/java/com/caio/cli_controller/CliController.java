@@ -51,18 +51,18 @@ public class CliController { //Gerencia as entradas e guarda o contexto da aplic
 
     private void scanForDotFiles() throws IOException {
         directoryScan.findClasses();
-        directoryScan.findPomFile();
+        directoryScan.findJarDependencies();
         if(flag.equals("-v")) printPaths(directoryScan.getFindeds());
     }
 
     private void searchForPossibleMutations() throws Exception {
         this.bca.analyzeClass(directoryScan.getFindeds());
-        this.bca.getDependenciesClasses(directoryScan.getPomFileDirectory());
+        this.bca.getDependenciesClasses(directoryScan.getDependenciesPath());
         if(flag.equals("-v")) printMutationPoints(bca.getMutationsPoints());
     }
 
     private void startEngine() throws Exception {
-        this.engine = new Engine(bca.getMutationsPoints(), bca.getmainClasses(), bca.getTestClasses());
+        this.engine = new Engine(bca.getMutationsPoints(), bca.getmainClasses(), bca.getTestClasses(), bca.getDependenciesJarURL());
         engine.start();
         if(flag.equals("-v")){
             System.out.println("Mutantes");

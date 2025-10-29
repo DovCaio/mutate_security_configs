@@ -12,7 +12,7 @@ import java.util.stream.Stream;
 public class DirectoryScan {
 
     private Path directory;
-    private Path pomFileDirectory;
+    private List<Path> dependenciesPath;
     private List<Path> findeds;
 
 
@@ -38,24 +38,16 @@ public class DirectoryScan {
         }
     }
 
-    public void findPomFile() throws IOException{
+    public void findJarDependencies() throws IOException{
         try (Stream<Path> stream = Files.walk(this.directory)) {
             List<Path> pomFile = stream
             .filter(Files::isRegularFile)
-            .filter(p -> p.getFileName().toString().equals("pom.xml"))
+            .filter(p -> p.getFileName().toString().endsWith(".jar"))
             .collect(Collectors.toList());
             if (pomFile.isEmpty()) throw new PomFileNotFoundException();
-            this.pomFileDirectory = pomFile.get(0);
+            this.dependenciesPath = pomFile;
 
         }
-    }
-
-    public Path getPomFileDirectory() {
-        return pomFileDirectory;
-    }
-
-    public void setPomFileDirectory(Path pomFileDirectory) {
-        this.pomFileDirectory = pomFileDirectory;
     }
 
     public List<Path> getFindeds() {
@@ -65,6 +57,16 @@ public class DirectoryScan {
     public void setFindeds(List<Path> findeds) {
         this.findeds = findeds;
     }
+
+    public List<Path> getDependenciesPath() {
+        return dependenciesPath;
+    }
+
+    public void setDependenciesPath(List<Path> dependenciesPath) {
+        this.dependenciesPath = dependenciesPath;
+    }
+
+    
 
 
 }
