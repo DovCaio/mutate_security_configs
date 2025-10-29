@@ -36,10 +36,10 @@ public class MemoryCodeLoader {
     private Map<String, byte[]> allBytes = new HashMap<>();
 
     public MemoryCodeLoader(List<AnnotationMutationPoint> mainClasses, List<AnnotationMutationPoint> testClasses,
-            List<URL> dependenciesJarURLs) {
+            List<URL> dependenciesJarURLs, RunTest runTest) {
         this.mainClasses = mainClasses;
         this.testClasses = testClasses;
-        this.runTest = new RunTest();
+        this.runTest = runTest;
         this.dependenciesJarURLs = dependenciesJarURLs;
         dependenciesClassLoader = new URLClassLoader(
                 dependenciesJarURLs.toArray(new URL[0]), ClassLoader.getSystemClassLoader());

@@ -1,6 +1,6 @@
 package com.caio.engine;
 
-import java.security.KeyStore.Entry;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,7 +16,11 @@ import org.junit.platform.launcher.listeners.TestExecutionSummary.Failure;
 
 public class RunTest {
 
+    private List<TestResult> testsResults;
+
     public RunTest(){
+
+        this.testsResults = new ArrayList<TestResult>();
 
     }
 
@@ -41,11 +45,12 @@ public class RunTest {
 
     System.out.println(testResult.toString());
 
+    this.testsResults.add(testResult);
+
     }
 
     public class TestResult {
 
-        private boolean sucessuful;
         private Long totalTest;
         private Long succedded;
         private Long failed;
@@ -72,13 +77,10 @@ public class RunTest {
                         "Failed: " + this.failed + "\n";
         }
 
-        public boolean isSucessuful() {
-                return sucessuful;
+        public boolean whasCaptured() {
+                return this.totalTest != this.succedded;
         }
 
-        public void setSucessuful(boolean sucessuful) {
-                this.sucessuful = sucessuful;
-        }
 
         public Long getTotalTest() {
                 return totalTest;
@@ -104,8 +106,18 @@ public class RunTest {
                 this.failed = failed;
         }
 
+        public String getFailures() {
+                return "";
+        }
+
 
         
     }
+
+    public List<TestResult> getTestsResults() {
+        return testsResults;
+    }
+
+    
     
 }

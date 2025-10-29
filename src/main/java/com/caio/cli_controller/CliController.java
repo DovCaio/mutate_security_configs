@@ -3,7 +3,7 @@ package com.caio.cli_controller;
 import com.caio.analize.BytecodeAnalyzer;
 import com.caio.directory_scan.DirectoryScan;
 import com.caio.engine.Engine;
-import com.caio.models.AnnotationMutationPoint;
+import com.caio.report.Report;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -18,9 +18,11 @@ public class CliController { //Gerencia as entradas e guarda o contexto da aplic
     private static final List<String> EXISTENT_FLAGS = List.of("-v");
     private Path directory;
     private String flag = "";
-    private Engine engine;
-    private BytecodeAnalyzer bca;
     private DirectoryScan directoryScan;
+    private BytecodeAnalyzer bca;
+    private Engine engine;
+    private Report report;
+
 
 
     public CliController(String[] args) {
@@ -47,6 +49,7 @@ public class CliController { //Gerencia as entradas e guarda o contexto da aplic
         this.scanForDotFiles();
         this.searchForPossibleMutations();
         this.startEngine();
+        this.generateReport();
     }
 
     private void scanForDotFiles() throws IOException {
@@ -69,5 +72,11 @@ public class CliController { //Gerencia as entradas e guarda o contexto da aplic
             printMutationPoints(engine.getMutants());
         }
     }
+
+    private void generateReport(){
+        this.report = new Report(engine.getTestsResults());
+        this.report.generate(directory);
+    }
+
 
 }
