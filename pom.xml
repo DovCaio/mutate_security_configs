@@ -44,6 +44,16 @@
           <artifactId>asm-tree</artifactId>
           <version>9.5</version>
       </dependency>
+
+
+
+            <!-- Para executar o junit 4 -->
+
+      <dependency>
+        <groupId>org.junit.vintage</groupId>
+        <artifactId>junit-vintage-engine</artifactId>
+        <version>5.10.0</version> <!-- ou a versão compatível -->
+       </dependency>
   </dependencies>
     <build>
         <plugins>

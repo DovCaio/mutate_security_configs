@@ -29,7 +29,7 @@ public class RunTest {
     Thread.currentThread().setContextClassLoader(loader);
 
     LauncherDiscoveryRequest request = LauncherDiscoveryRequestBuilder.request()
-            .selectors(DiscoverySelectors.selectPackage("pk.habsoft.demo.estore"))
+            .selectors(DiscoverySelectors.selectPackage(""))
             .build();
 
     Launcher launcher = LauncherFactory.create();

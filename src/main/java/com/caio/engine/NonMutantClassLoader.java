@@ -6,8 +6,8 @@ public class NonMutantClassLoader extends ClassLoader {
 
     private final Map<String, byte[]> classes;
 
-    public NonMutantClassLoader(Map<String, byte[]> classes) {
-        super(ClassLoader.getSystemClassLoader());
+    public NonMutantClassLoader(Map<String, byte[]> classes, ClassLoader parent) {
+        super(parent);
         this.classes = classes;
     }
 

@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.DynamicTest.stream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -23,6 +24,11 @@ import org.junit.platform.launcher.LauncherDiscoveryRequest;
 import org.junit.platform.launcher.core.LauncherDiscoveryRequestBuilder;
 import org.junit.platform.launcher.core.LauncherFactory;
 import org.junit.platform.launcher.listeners.SummaryGeneratingListener;
+
+import org.junit.runner.JUnitCore;
+import org.junit.runner.Result;
+import org.junit.runner.notification.Failure;
+
 
 import com.caio.models.AnnotationMutationPoint;
 
@@ -50,9 +56,6 @@ public class MemoryCodeLoader {
             InstantiationException, IllegalArgumentException, NoSuchMethodException, SecurityException,
             URISyntaxException, IOException {
 
-        loadDependencieInMemory(); // deve adicionar bytes das dependências no allBytes
-
-        // adiciona classes main e test
         for (AnnotationMutationPoint c : this.mainClasses) {
             this.allBytes.put(c.getTargetElement().name.replace('/', '.'), c.getBytes());
         }
@@ -61,34 +64,52 @@ public class MemoryCodeLoader {
             this.allBytes.put(c.getTargetElement().name.replace('/', '.'), c.getBytes());
         }
 
-        NonMutantClassLoader loader = new NonMutantClassLoader(this.allBytes);
+       NonMutantClassLoader loader = new NonMutantClassLoader(this.allBytes, dependenciesClassLoader);
+
+        
+
+        // Troca antes da descoberta
+        Thread.currentThread().setContextClassLoader(loader);
 
         LauncherDiscoveryRequestBuilder builder = LauncherDiscoveryRequestBuilder.request();
 
         for (AnnotationMutationPoint c : this.testClasses) {
-            System.out.println("Test class: " + c.getTargetElement().name.replace('/', '.'));
             Class<?> testClass = loader.loadClass(c.getTargetElement().name.replace('/', '.'));
-            builder.selectors(DiscoverySelectors.selectClass(testClass));
+
+            System.out.println("Executando: " + testClass.getName());
+            JUnitCore junit = new JUnitCore();
+            Result result = junit.run(testClass);
+
+            for (Failure f : result.getFailures()) {
+                System.out.println("❌ " + f);
+            }
+            System.out.println("✅ Executados: " + result.getRunCount());
+
+            Arrays.stream(testClass.getDeclaredMethods()).forEach(m -> {
+            if (m.isAnnotationPresent(org.junit.Test.class)) {
+                System.out.println("Method: " + m.getName() + ", Annotations: " + Arrays.toString(m.getAnnotations()));
+            }
+        });
         }
 
 
-        LauncherDiscoveryRequest request = builder.build();
 
-        // Não é necessário trocar o context classloader
-        // Thread.currentThread().setContextClassLoader(loader);
+        
+    LauncherDiscoveryRequest request = builder.build();
+    Launcher launcher = LauncherFactory.create();
+    SummaryGeneratingListener listener = new SummaryGeneratingListener();
+    launcher.registerTestExecutionListeners(listener);
 
-        Launcher launcher = LauncherFactory.create();
-        SummaryGeneratingListener listener = new SummaryGeneratingListener();
-        launcher.registerTestExecutionListeners(listener);
-            //Estudar o pitesste, e ver como que ele faz isso dqui
+    launcher.execute(request);
 
-        launcher.execute(request);
-        var summary = listener.getSummary();
-        System.out.println("Total tests: " + summary.getTestsFoundCount());
-        System.out.println("Succeeded: " + summary.getTestsSucceededCount());
-        System.out.println("Failed: " + summary.getTestsFailedCount());
-        summary.getFailures().forEach(f -> System.out
-                .println("Failed test: " + f.getTestIdentifier().getDisplayName() + " -> " + f.getException()));
+    var summary = listener.getSummary();
+    System.out.println("=== RESULTADOS DOS TESTES ===");
+    System.out.println("Total tests: " + summary.getTestsFoundCount());
+    System.out.println("Succeeded: " + summary.getTestsSucceededCount());
+    System.out.println("Failed: " + summary.getTestsFailedCount());
+    summary.getFailures().forEach(f ->
+        System.out.println("Failed test: " + f.getTestIdentifier().getDisplayName() + " -> " + f.getException())
+    );
 
     }
 
@@ -110,11 +131,9 @@ public class MemoryCodeLoader {
                         .forEach(entry -> {
                             try (InputStream in = jarFile.getInputStream(entry)) {
                                 byte[] bytes = in.readAllBytes();
-                                // Converte nome interno do JAR para nome de classe
                                 String className = entry.getName()
                                         .replace('/', '.')
                                         .replace(".class", "");
-                                // Adiciona no mapa
                                 allBytes.put(className, bytes);
                             } catch (IOException ex) {
                                 System.err.println("Erro lendo classe: " + entry.getName());

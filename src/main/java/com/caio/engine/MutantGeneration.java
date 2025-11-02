@@ -17,6 +17,8 @@ public class MutantGeneration {
 
     private List<AnnotationMutationPoint> amps;
     private List<AnnotationMutationPoint> mutants;
+    private final String regex = "\"'([^']*)'\"";
+
 
     public MutantGeneration(List<AnnotationMutationPoint> amps){
         this.amps = amps;
@@ -34,7 +36,7 @@ public class MutantGeneration {
 
     private String mutateValue (List<Object> values) {
         String mutateOperator = "";
-        Pattern pattern = Pattern.compile("'([^']*)'"); //Dessa forma ele vai mutar todos já, porém talvez fosse interessante a possibilidade de ser as aspas duas dentro das simples
+        Pattern pattern = Pattern.compile(regex); //Dessa forma ele vai mutar todos já, porém talvez fosse interessante a possibilidade de ser as aspas duas dentro das simples
         for (int i = 0; i < values.size(); i += 2) {
             String key = (String) values.get(i);
 
