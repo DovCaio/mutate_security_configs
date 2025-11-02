@@ -1,4 +1,6 @@
 package com.caio.directory_scan;
+
+import com.caio.exceptions.DependenciesNotFound;
 import com.caio.exceptions.NoOneClasseFinded;
 import com.caio.exceptions.PathNotExists;
 import com.caio.exceptions.PomFileNotFoundException;
@@ -13,10 +15,10 @@ public class DirectoryScan {
 
     private Path directory;
     private List<Path> dependenciesPath;
+    private List<Path> configsPath;
     private List<Path> findeds;
 
-
-    public DirectoryScan(Path baseDir){
+    public DirectoryScan(Path baseDir) {
         if (baseDir == null)
             throw new IllegalArgumentException("O diretório base não pode ser nulo.");
 
@@ -28,24 +30,43 @@ public class DirectoryScan {
 
     public void findClasses() throws IOException {
         try (Stream<Path> stream = Files.walk(this.directory)) {
-            List<Path> finded =  stream
+            List<Path> finded = stream
                     .filter(p -> p.toString().endsWith(".class"))
                     .collect(Collectors.toList());
 
-        
-            if (finded.isEmpty()) throw new NoOneClasseFinded("Nenhum arquivo .class encontrado em: " + directory.toAbsolutePath() + "\n Caso tenha passado o diretorio corretamnete, experimente compilar o projeto antes, para que seja gerado os arquivos que serão mutados.");
+            if (finded.isEmpty())
+                throw new NoOneClasseFinded("Nenhum arquivo .class encontrado em: " + directory.toAbsolutePath()
+                        + "\n Caso tenha passado o diretorio corretamnete, experimente compilar o projeto antes, para que seja gerado os arquivos que serão mutados.");
             this.findeds = finded;
         }
     }
 
-    public void findJarDependencies() throws IOException{
+    public void findJarDependencies() throws IOException {
         try (Stream<Path> stream = Files.walk(this.directory)) {
-            List<Path> pomFile = stream
-            .filter(Files::isRegularFile)
-            .filter(p -> p.getFileName().toString().endsWith(".jar"))
-            .collect(Collectors.toList());
-            if (pomFile.isEmpty()) throw new PomFileNotFoundException();
-            this.dependenciesPath = pomFile;
+            List<Path> dependenciesFiles = stream
+                    .filter(Files::isRegularFile)
+                    .filter(p -> p.getFileName().toString().endsWith(".jar"))
+                    .collect(Collectors.toList());
+            if (dependenciesFiles.isEmpty())
+                throw new DependenciesNotFound("Dependências jar's não encontradas");
+            this.dependenciesPath = dependenciesFiles;
+
+        }
+    }
+
+    public void findConfigFiles() throws IOException {
+        try (Stream<Path> stream = Files.walk(this.directory)) {
+            List<Path> configsFiles = stream
+                    .filter(Files::isRegularFile)
+                    .filter(p -> p.getFileName().toString().endsWith(".properties")
+                            || p.getFileName().toString().endsWith(".xml")
+                            || p.getFileName().toString().endsWith(".lst")
+                            || p.getFileName().toString().endsWith(".yml")
+                            || p.getFileName().toString().endsWith(".yaml"))
+                    .collect(Collectors.toList());
+            if (configsFiles.isEmpty())
+                throw new DependenciesNotFound("Arquivos de configurações não encontrados");
+            this.configsPath = configsFiles;
 
         }
     }
@@ -66,7 +87,8 @@ public class DirectoryScan {
         this.dependenciesPath = dependenciesPath;
     }
 
-    
-
+    public List<Path> getConfigsPath() {
+        return configsPath;
+    }
 
 }

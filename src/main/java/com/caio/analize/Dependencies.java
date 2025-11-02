@@ -19,8 +19,6 @@ public class Dependencies {
     protected Dependencies(){
     }
 
-
-
     public void extractJars(List<Path> paths) throws Exception{
 
         if (paths == null) throw new DependenciePathIsNull();

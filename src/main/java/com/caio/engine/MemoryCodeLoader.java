@@ -1,35 +1,25 @@
 package com.caio.engine;
 
-import static org.junit.jupiter.api.DynamicTest.stream;
 
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.jar.JarFile;
 
-import org.junit.platform.engine.discovery.DiscoverySelectors;
-import org.junit.platform.launcher.Launcher;
-import org.junit.platform.launcher.LauncherDiscoveryRequest;
-import org.junit.platform.launcher.core.LauncherDiscoveryRequestBuilder;
-import org.junit.platform.launcher.core.LauncherFactory;
-import org.junit.platform.launcher.listeners.SummaryGeneratingListener;
 
 import org.junit.runner.JUnitCore;
 import org.junit.runner.Result;
 import org.junit.runner.notification.Failure;
 
-
+import com.caio.exceptions.SpringbootContextNotFound;
 import com.caio.models.AnnotationMutationPoint;
 
 public class MemoryCodeLoader {
@@ -50,6 +40,7 @@ public class MemoryCodeLoader {
         dependenciesClassLoader = new URLClassLoader(
                 dependenciesJarURLs.toArray(new URL[0]), ClassLoader.getSystemClassLoader());
 
+
     }
 
     public void loadAllInMemory() throws ClassNotFoundException, IllegalAccessException, InvocationTargetException,
@@ -64,52 +55,53 @@ public class MemoryCodeLoader {
             this.allBytes.put(c.getTargetElement().name.replace('/', '.'), c.getBytes());
         }
 
-       NonMutantClassLoader loader = new NonMutantClassLoader(this.allBytes, dependenciesClassLoader);
-
-        
-
-        // Troca antes da descoberta
-        Thread.currentThread().setContextClassLoader(loader);
-
-        LauncherDiscoveryRequestBuilder builder = LauncherDiscoveryRequestBuilder.request();
-
-        for (AnnotationMutationPoint c : this.testClasses) {
-            Class<?> testClass = loader.loadClass(c.getTargetElement().name.replace('/', '.'));
-
-            System.out.println("Executando: " + testClass.getName());
-            JUnitCore junit = new JUnitCore();
-            Result result = junit.run(testClass);
-
-            for (Failure f : result.getFailures()) {
-                System.out.println("❌ " + f);
-            }
-            System.out.println("✅ Executados: " + result.getRunCount());
-
-            Arrays.stream(testClass.getDeclaredMethods()).forEach(m -> {
-            if (m.isAnnotationPresent(org.junit.Test.class)) {
-                System.out.println("Method: " + m.getName() + ", Annotations: " + Arrays.toString(m.getAnnotations()));
-            }
-        });
+        for ( URL u : dependenciesJarURLs) {
+            System.out.println(u.toString());
         }
 
+       NonMutantClassLoader loader = new NonMutantClassLoader(this.allBytes, dependenciesClassLoader);
 
+        factoreVerification(loader);
+        Thread.currentThread().setContextClassLoader(loader);
+        JUnitCore junit = new JUnitCore();
 
-        
-    LauncherDiscoveryRequest request = builder.build();
-    Launcher launcher = LauncherFactory.create();
-    SummaryGeneratingListener listener = new SummaryGeneratingListener();
-    launcher.registerTestExecutionListeners(listener);
+        for (AnnotationMutationPoint c : this.testClasses) {
+            String className = c.getTargetElement().name.replace('/', '.');
+            System.out.println("\n-----------------------------------------");
+            System.out.println("🧪 Executando: " + className);
 
-    launcher.execute(request);
+            try {
+                Class<?> testClass = loader.loadClass(className);
+                Result result = junit.run(testClass);
 
-    var summary = listener.getSummary();
-    System.out.println("=== RESULTADOS DOS TESTES ===");
-    System.out.println("Total tests: " + summary.getTestsFoundCount());
-    System.out.println("Succeeded: " + summary.getTestsSucceededCount());
-    System.out.println("Failed: " + summary.getTestsFailedCount());
-    summary.getFailures().forEach(f ->
-        System.out.println("Failed test: " + f.getTestIdentifier().getDisplayName() + " -> " + f.getException())
-    );
+                for (Failure f : result.getFailures()) {
+                    System.out.println("❌ " + f.getTestHeader());
+                    Throwable ex = f.getException();
+                    if (ex != null) {
+                        System.out.println("   ➤ Causa: " + ex.getClass().getName() + " - " + ex.getMessage());
+
+                        StringWriter sw = new StringWriter();
+                        ex.printStackTrace(new PrintWriter(sw));
+                        String trace = sw.toString();
+                        Arrays.stream(trace.split("\n"))
+                            .limit(15)
+                            .forEach(line -> System.out.println("     " + line));
+                    }
+                }
+                System.out.println("✅ Executados: " + result.getRunCount());
+
+                // Opcional: listar métodos de teste
+                Arrays.stream(testClass.getDeclaredMethods()).forEach(m -> {
+                    if (m.isAnnotationPresent(org.junit.Test.class)) {
+                        System.out.println("Method: " + m.getName() + ", Annotations: " + Arrays.toString(m.getAnnotations()));
+                    }
+                });
+
+            } catch (Throwable t) {
+                System.out.println("💥 Falha ao carregar classe " + className + ": " + t.getMessage());
+                t.printStackTrace(System.out);
+            }
+        }
 
     }
 
@@ -122,28 +114,13 @@ public class MemoryCodeLoader {
         }
     }
 
-    private void loadDependencieInMemory() throws URISyntaxException, IOException {
-        for (URL jarUrl : dependenciesJarURLs) {
-            Path jarPath = Paths.get(jarUrl.toURI());
-            try (JarFile jarFile = new JarFile(jarPath.toFile())) {
-                jarFile.stream()
-                        .filter(e -> e.getName().endsWith(".class"))
-                        .forEach(entry -> {
-                            try (InputStream in = jarFile.getInputStream(entry)) {
-                                byte[] bytes = in.readAllBytes();
-                                String className = entry.getName()
-                                        .replace('/', '.')
-                                        .replace(".class", "");
-                                allBytes.put(className, bytes);
-                            } catch (IOException ex) {
-                                System.err.println("Erro lendo classe: " + entry.getName());
-                            }
-                        });
-            } catch (Exception e) {
-                System.err.println("Erro lendo JAR: " + jarUrl);
-                e.printStackTrace();
-            }
+    private void factoreVerification(NonMutantClassLoader classLoader) throws IOException {
+
+        Enumeration<URL> factories = classLoader.getResources("META-INF/spring.factories");
+        if (!factories.hasMoreElements()) {
+            throw new SpringbootContextNotFound("Não foi possível encontrar as factories para a inicialização do spring boo");            
         }
+
     }
 
 }

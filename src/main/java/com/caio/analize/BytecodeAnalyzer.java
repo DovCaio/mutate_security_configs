@@ -174,9 +174,10 @@ public class BytecodeAnalyzer {
     }
 
 
-    public void getDependenciesClasses(List<Path> repositoriePath) throws Exception{
+    public void transformPathIntoUrl(List<Path> repositoriePath) throws Exception{
         dependencies.extractJars(repositoriePath);
     }
+
 
     public List<AnnotationMutationPoint> getMutationsPoints() {
         return mutationsPoints;
@@ -190,22 +191,17 @@ public class BytecodeAnalyzer {
         return mainClasses;
     }
 
-    public void setmainClasses(List<AnnotationMutationPoint> mainClasses) {
-        this.mainClasses = mainClasses;
-    }
 
     public List<AnnotationMutationPoint> getTestClasses() {
         return testClasses;
     }
 
-    public void setTestClasses(List<AnnotationMutationPoint> testClasses) {
-        this.testClasses = testClasses;
-    }
 
 
     public List<URL> getDependenciesJarURL(){
         return this.dependencies.getJarUrls();
     }
     
+
 
 }

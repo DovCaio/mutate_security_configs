@@ -55,12 +55,15 @@ public class CliController { //Gerencia as entradas e guarda o contexto da aplic
     private void scanForDotFiles() throws IOException {
         directoryScan.findClasses();
         directoryScan.findJarDependencies();
+        directoryScan.findConfigFiles();
         if(flag.equals("-v")) printPaths(directoryScan.getFindeds());
     }
 
     private void searchForPossibleMutations() throws Exception {
         this.bca.analyzeClass(directoryScan.getFindeds());
-        this.bca.getDependenciesClasses(directoryScan.getDependenciesPath());
+        List<Path> allDependenciesNedded = directoryScan.getDependenciesPath();
+        allDependenciesNedded.addAll(directoryScan.getConfigsPath());
+        this.bca.transformPathIntoUrl(allDependenciesNedded);
         if(flag.equals("-v")) printMutationPoints(bca.getMutationsPoints());
     }
 

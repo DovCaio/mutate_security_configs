@@ -55,9 +55,9 @@ public class MutantGeneration {
 
 
     private AnnotationMutationPoint createMutant(AnnotationMutationPoint amp, String novoValor) throws Exception {
-        //Dá para dar uma boa melhorada nesse código
+        //Dá para dar uma boa melhorada nesse código, long method absurdo
         List<Object> values = amp.getValues();
-        List<Object> valuesMutant = new ArrayList<>(); //deve dar para reaproveitar esse bloco de alguma forma
+        List<Object> valuesMutant = new ArrayList<>(); 
         if (values != null) {
             for (int i = 0; i < values.size(); i += 2) {
                 String key = (String) values.get(i);
