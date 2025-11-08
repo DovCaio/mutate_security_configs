@@ -1,6 +1,5 @@
 package com.caio.engine;
 
-
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -14,7 +13,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-
+import org.junit.platform.engine.discovery.DiscoverySelectors;
+import org.junit.platform.launcher.Launcher;
+import org.junit.platform.launcher.LauncherDiscoveryRequest;
+import org.junit.platform.launcher.core.LauncherDiscoveryRequestBuilder;
+import org.junit.platform.launcher.core.LauncherFactory;
+import org.junit.platform.launcher.listeners.SummaryGeneratingListener;
+import org.junit.platform.launcher.listeners.TestExecutionSummary;
 import org.junit.runner.JUnitCore;
 import org.junit.runner.Result;
 import org.junit.runner.notification.Failure;
@@ -40,7 +45,6 @@ public class MemoryCodeLoader {
         dependenciesClassLoader = new URLClassLoader(
                 dependenciesJarURLs.toArray(new URL[0]), ClassLoader.getSystemClassLoader());
 
-
     }
 
     public void loadAllInMemory() throws ClassNotFoundException, IllegalAccessException, InvocationTargetException,
@@ -55,15 +59,11 @@ public class MemoryCodeLoader {
             this.allBytes.put(c.getTargetElement().name.replace('/', '.'), c.getBytes());
         }
 
-        for ( URL u : dependenciesJarURLs) {
-            System.out.println(u.toString());
-        }
-
-       NonMutantClassLoader loader = new NonMutantClassLoader(this.allBytes, dependenciesClassLoader);
-
+        NonMutantClassLoader loader = new NonMutantClassLoader(this.allBytes, dependenciesClassLoader);
         factoreVerification(loader);
         Thread.currentThread().setContextClassLoader(loader);
-        JUnitCore junit = new JUnitCore();
+
+        System.out.println("🧩 Total de classes de teste: " + this.testClasses.size());
 
         for (AnnotationMutationPoint c : this.testClasses) {
             String className = c.getTargetElement().name.replace('/', '.');
@@ -72,37 +72,41 @@ public class MemoryCodeLoader {
 
             try {
                 Class<?> testClass = loader.loadClass(className);
-                Result result = junit.run(testClass);
 
-                for (Failure f : result.getFailures()) {
-                    System.out.println("❌ " + f.getTestHeader());
-                    Throwable ex = f.getException();
+                LauncherDiscoveryRequest request = LauncherDiscoveryRequestBuilder.request()
+                        .selectors(DiscoverySelectors.selectClass(testClass))
+                        .build();
+
+                Launcher launcher = LauncherFactory.create();
+                SummaryGeneratingListener listener = new SummaryGeneratingListener();
+
+                launcher.registerTestExecutionListeners(listener);
+                launcher.execute(request);
+
+                TestExecutionSummary summary = listener.getSummary();
+
+                System.out.println("✅ Testes encontrados: " + summary.getTestsFoundCount());
+                System.out.println("🏁 Testes executados: " + summary.getTestsSucceededCount());
+                System.out.println("❌ Falhas: " + summary.getFailures().size());
+
+                for (TestExecutionSummary.Failure failure : summary.getFailures()) {
+                    System.out.println("   ➤ " + failure.getTestIdentifier().getDisplayName());
+                    Throwable ex = failure.getException();
                     if (ex != null) {
-                        System.out.println("   ➤ Causa: " + ex.getClass().getName() + " - " + ex.getMessage());
+                        System.out.println("     Causa: " + ex.getClass().getName() + " - " + ex.getMessage());
 
                         StringWriter sw = new StringWriter();
                         ex.printStackTrace(new PrintWriter(sw));
-                        String trace = sw.toString();
-                        Arrays.stream(trace.split("\n"))
-                            .limit(15)
-                            .forEach(line -> System.out.println("     " + line));
+                        Arrays.stream(sw.toString().split("\n"))
+                                .forEach(line -> System.out.println("       " + line));
                     }
                 }
-                System.out.println("✅ Executados: " + result.getRunCount());
-
-                // Opcional: listar métodos de teste
-                Arrays.stream(testClass.getDeclaredMethods()).forEach(m -> {
-                    if (m.isAnnotationPresent(org.junit.Test.class)) {
-                        System.out.println("Method: " + m.getName() + ", Annotations: " + Arrays.toString(m.getAnnotations()));
-                    }
-                });
 
             } catch (Throwable t) {
-                System.out.println("💥 Falha ao carregar classe " + className + ": " + t.getMessage());
+                System.out.println("💥 Falha ao carregar/executar " + className + ": " + t.getMessage());
                 t.printStackTrace(System.out);
             }
         }
-
     }
 
     public void loadMutantInMemory(List<AnnotationMutationPoint> mutants) throws ClassNotFoundException {
@@ -118,7 +122,8 @@ public class MemoryCodeLoader {
 
         Enumeration<URL> factories = classLoader.getResources("META-INF/spring.factories");
         if (!factories.hasMoreElements()) {
-            throw new SpringbootContextNotFound("Não foi possível encontrar as factories para a inicialização do spring boo");            
+            throw new SpringbootContextNotFound(
+                    "Não foi possível encontrar as factories para a inicialização do spring boo");
         }
 
     }

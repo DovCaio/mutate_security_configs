@@ -5,6 +5,7 @@ import com.caio.models.AnnotationMutationPoint;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.tree.AnnotationNode;
 import org.objectweb.asm.tree.ClassNode;
+import org.objectweb.asm.tree.FieldNode;
 import org.objectweb.asm.tree.MethodNode;
 
 import java.io.IOException;
@@ -14,13 +15,11 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
-
 public class BytecodeAnalyzer {
 
     private static final List<String> TARGETS_DESC = List.of(
             "Lorg/springframework/security/access/prepost/PreAuthorize;",
-            "Lorg/springframework/security/access/prepost/PostAuthorize;"
-    );
+            "Lorg/springframework/security/access/prepost/PostAuthorize;");
 
     private List<AnnotationMutationPoint> mutationsPoints;
 
@@ -29,7 +28,6 @@ public class BytecodeAnalyzer {
     private List<AnnotationMutationPoint> testClasses;
 
     private Dependencies dependencies;
-
 
     public BytecodeAnalyzer() {
         this.mutationsPoints = new ArrayList<AnnotationMutationPoint>();
@@ -40,32 +38,36 @@ public class BytecodeAnalyzer {
 
     public void analyzeClass(List<Path> classFilePath) throws IOException {
 
-        if (classFilePath == null) throw new IllegalArgumentException("O classFilePath não deve ser null");
+        if (classFilePath == null)
+            throw new IllegalArgumentException("O classFilePath não deve ser null");
 
-        for (Path path :  classFilePath) {
+        for (Path path : classFilePath) {
             byte[] bytes = Files.readAllBytes(path);
             ClassReader reader = new ClassReader(bytes);
             ClassNode classNode = new ClassNode();
             reader.accept(classNode, 0);
 
-
             if (isController(classNode)) {
                 classeAnnotations(classNode, bytes);
                 methodAnnotations(classNode, bytes);
             }
-            //Ele ainda teria que analizar dentro do config de segurança do springboot, por que é possível de usar da mesma forma essas annotations
+            // Ele ainda teria que analizar dentro do config de segurança do springboot, por
+            // que é possível de usar da mesma forma essas annotations
 
             findmainClasses(classNode, bytes);
-            
+
         }
 
-        
+        if (this.mutationsPoints != null && this.mutationsPoints.isEmpty())
+            throw new NoOneAnnotationMutableFinded();
 
-        if (this.mutationsPoints != null && this.mutationsPoints.isEmpty()) throw new NoOneAnnotationMutableFinded();
-        
     }
 
-    private boolean isController(ClassNode cn) throws IOException { //Detecta se é um controller, isso apartir das classes que ela possui, para quando o operador é para toda a classe, ou seja, todos os endpoints, quando isso é feito colocamos a annotattion dele na classe
+    private boolean isController(ClassNode cn) throws IOException { // Detecta se é um controller, isso apartir das
+                                                                    // classes que ela possui, para quando o operador é
+                                                                    // para toda a classe, ou seja, todos os endpoints,
+                                                                    // quando isso é feito colocamos a annotattion dele
+                                                                    // na classe
 
         List<AnnotationNode> annotations = cn.visibleAnnotations;
         if (annotations != null) {
@@ -80,20 +82,18 @@ public class BytecodeAnalyzer {
         return false;
     }
 
-
-    private void classeAnnotations(ClassNode classNode, byte[] bytes){
+    private void classeAnnotations(ClassNode classNode, byte[] bytes) {
         if (classNode.visibleAnnotations != null) {
             for (AnnotationNode an : classNode.visibleAnnotations) {
-                if (an.values != null && TARGETS_DESC.contains(an.desc)){
+                if (an.values != null && TARGETS_DESC.contains(an.desc)) {
 
                     AnnotationMutationPoint amp = new AnnotationMutationPoint(
-                                AnnotationMutationPoint.TargetType.CLASS,
-                                classNode.name,
-                                an.desc,
-                                classNode,
-                                List.copyOf(an.values),
-                                bytes
-                    );
+                            AnnotationMutationPoint.TargetType.CLASS,
+                            classNode.name,
+                            an.desc,
+                            classNode,
+                            List.copyOf(an.values),
+                            bytes);
                     mutationsPoints.add(amp);
                 }
 
@@ -102,9 +102,9 @@ public class BytecodeAnalyzer {
     }
 
     private void methodAnnotations(ClassNode classNode, byte[] bytes) {
-        if (classNode.methods != null ) {
+        if (classNode.methods != null) {
             for (MethodNode method : classNode.methods) {
-                if (method.visibleAnnotations != null ) {
+                if (method.visibleAnnotations != null) {
                     for (AnnotationNode an : method.visibleAnnotations) {
                         if (TARGETS_DESC.contains(an.desc)) {
 
@@ -115,8 +115,7 @@ public class BytecodeAnalyzer {
                                     classNode,
                                     List.copyOf(an.values),
                                     bytes,
-                                    method
-                            );
+                                    method);
                             mutationsPoints.add(amp);
 
                         }
@@ -128,56 +127,77 @@ public class BytecodeAnalyzer {
 
     }
 
-    public void findmainClasses(ClassNode classNode, byte[] bytes){
+    public void findmainClasses(ClassNode classNode, byte[] bytes) {
 
         AnnotationMutationPoint amp = new AnnotationMutationPoint(
-            AnnotationMutationPoint.TargetType.CLASS,
-            classNode.name,
-            null,
-            classNode,
-            List.of(),     
-            bytes
-        );
+                AnnotationMutationPoint.TargetType.CLASS,
+                classNode.name,
+                null,
+                classNode,
+                List.of(),
+                bytes);
 
         boolean isTestClass = hasTestAnnotations(classNode);
 
         if (isTestClass) {
             testClasses.add(amp);
-        }else {
+        } else {
             mainClasses.add(amp);
 
         }
 
     }
 
-
     private boolean hasTestAnnotations(ClassNode classNode) {
-    List<AnnotationNode> annotations = new ArrayList<>();
-    if (classNode.visibleAnnotations != null)
-        annotations.addAll(classNode.visibleAnnotations);
-    if (classNode.invisibleAnnotations != null)
-        annotations.addAll(classNode.invisibleAnnotations);
+    List<AnnotationNode> annotations = collectAllAnnotations(classNode);
+    return annotations.stream().anyMatch(this::isTestRelatedAnnotation);
+}
 
-    for (AnnotationNode annotation : annotations) {
+    private List<AnnotationNode> collectAllAnnotations(ClassNode classNode) {
+        List<AnnotationNode> all = new ArrayList<>();
+
+        addAnnotations(all, classNode.visibleAnnotations);
+        addAnnotations(all, classNode.invisibleAnnotations);
+
+        if (classNode.methods != null) {
+            for (MethodNode method : classNode.methods) {
+                addAnnotations(all, method.visibleAnnotations);
+                addAnnotations(all, method.invisibleAnnotations);
+            }
+        }
+
+        if (classNode.fields != null) {
+            for (FieldNode field : classNode.fields) {
+                addAnnotations(all, field.visibleAnnotations);
+                addAnnotations(all, field.invisibleAnnotations);
+            }
+        }
+
+        return all;
+    }
+
+    private void addAnnotations(List<AnnotationNode> target, List<AnnotationNode> source) {
+        if (source != null) target.addAll(source);
+    }
+
+    private boolean isTestRelatedAnnotation(AnnotationNode annotation) {
         String desc = annotation.desc;
 
-        if (desc.contains("org/junit")
-            || desc.contains("org/mockito")
-            || desc.contains("org/springframework/boot/test")
-            || desc.contains("org/springframework/test")
-            || desc.contains("org/testng")) {
-            return true;
+        if (desc.startsWith("L") && desc.endsWith(";")) {
+            desc = desc.substring(1, desc.length() - 1);
         }
+        return desc.startsWith("org/junit")
+            || desc.startsWith("org/mockito")
+            || desc.startsWith("org/springframework/boot/test")
+            || desc.startsWith("org/springframework/test")
+            || desc.startsWith("org/testng");
     }
 
-    return false;
-    }
 
 
-    public void transformPathIntoUrl(List<Path> repositoriePath) throws Exception{
+    public void transformPathIntoUrl(List<Path> repositoriePath) throws Exception {
         dependencies.extractJars(repositoriePath);
     }
-
 
     public List<AnnotationMutationPoint> getMutationsPoints() {
         return mutationsPoints;
@@ -191,17 +211,12 @@ public class BytecodeAnalyzer {
         return mainClasses;
     }
 
-
     public List<AnnotationMutationPoint> getTestClasses() {
         return testClasses;
     }
 
-
-
-    public List<URL> getDependenciesJarURL(){
+    public List<URL> getDependenciesJarURL() {
         return this.dependencies.getJarUrls();
     }
-    
-
 
 }
