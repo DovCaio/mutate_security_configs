@@ -13,14 +13,14 @@ public class Engine {
 
     public Engine(List<AnnotationMutationPoint> amps, List<AnnotationMutationPoint> mainClasses,
             List<AnnotationMutationPoint> testClasses, List<URL> dependenciesJarURLs) {
-        this.runTest = new RunTest();
+        this.runTest = new RunTest(testClasses);
         this.mutantGeneration = new MutantGeneration(amps);
         this.memoryCodeLoader = new MemoryCodeLoader(mainClasses, testClasses, dependenciesJarURLs, this.runTest);
     }
 
     public void start() throws Exception {
         this.mutantGeneration.createMutants();
-        this.memoryCodeLoader.loadAllInMemory();
+        this.memoryCodeLoader.verifyTestsPassing();
         this.memoryCodeLoader.loadMutantInMemory(this.mutantGeneration.getMutants());
     }
 
