@@ -20,6 +20,7 @@ public class RunTest {
 
         private List<TestResult> testsResults;
         private List<AnnotationMutationPoint> testClasses;
+        private TestResult verifyTestResult; 
 
         public RunTest(List<AnnotationMutationPoint> testClasses) {
 
@@ -27,7 +28,7 @@ public class RunTest {
                 this.testClasses = testClasses;
         }
 
-        public TestResult runAllTests(ClassLoader loader) {
+        private TestResult runAllTests(ClassLoader loader) {
                 Thread.currentThread().setContextClassLoader(loader);
 
                 Long totalTests = 0L;
@@ -63,9 +64,21 @@ public class RunTest {
                 }
                 Long succeddeds = totalTests - failed;
                 TestResult testResult = new TestResult(totalTests, succeddeds, failed, failures);
-                this.testsResults.add(testResult);
+
                 return testResult;
 
+        }
+
+        public TestResult executeTestForVerification(ClassLoader loader){
+                TestResult testResult = runAllTests(loader);
+                verifyTestResult = testResult;
+                return testResult;
+        }
+
+        public TestResult executeTestForMutation(ClassLoader loader) {
+                TestResult testResult = runAllTests(loader);
+                this.testsResults.add(testResult);
+                return testResult;
         }
 
         public class TestResult {
@@ -101,8 +114,12 @@ public class RunTest {
                                         "=============================";
                 }
 
+                public boolean equals(TestResult b){
+                        return this.totalTest.equals(b.totalTest) && this.succedded.equals(b.succedded) && this.failed.equals(b.failed);
+                }
+
                 public boolean whasCaptured() {
-                        return this.totalTest != this.succedded;
+                        return this.equals(verifyTestResult);
                 }
 
                 public Long getTotalTest() {

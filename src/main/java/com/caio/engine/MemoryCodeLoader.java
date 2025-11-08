@@ -47,23 +47,22 @@ public class MemoryCodeLoader {
             this.allBytes.put(c.getTargetElement().name.replace('/', '.'), c.getBytes());
         }
 
-        NonMutantClassLoader loader = new NonMutantClassLoader(this.allBytes, dependenciesClassLoader);
+        AllClassesClassLoader loader = new AllClassesClassLoader(this.allBytes, dependenciesClassLoader);
         factoreVerification(loader);
 
-        System.out.println(runTest.runAllTests(loader).toString());
+        System.out.println(runTest.executeTestForVerification(loader).toString());
         
     }
 
     public void loadMutantInMemory(List<AnnotationMutationPoint> mutants) throws ClassNotFoundException {
         for (AnnotationMutationPoint mutation : mutants) {
-            MutantClassLoader mutantClassLoader = new MutantClassLoader(
-                    mutation.getTargetElement().name.replace('/', '.'), mutation.getBytes());
-            mutantClassLoader.loadClass(mutation.getTargetElement().name.replace('/', '.'));
-            runTest.runAllTests(mutantClassLoader);
+            //MutantClassLoader mutantClassLoader = new MutantClassLoader(mutation.getBytes());
+            //mutantClassLoader.loadClass(mutation.getTargetElement().name.replace('/', '.'));
+            //runTest.executeTestForMutation(mutantClassLoader);
         }
     }
 
-    private void factoreVerification(NonMutantClassLoader classLoader) throws IOException {
+    private void factoreVerification(AllClassesClassLoader classLoader) throws IOException {
 
         Enumeration<URL> factories = classLoader.getResources("META-INF/spring.factories");
         if (!factories.hasMoreElements()) {
