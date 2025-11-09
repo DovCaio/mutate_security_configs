@@ -29,7 +29,7 @@ java -jar target/mutate_security_configs-1.0-SNAPSHOT.jar /meu/caminho/fake
 Antes de rodar o `mutate_security_configs`, certifique-se de **compilar o projeto alvo**.  
 Se estiver usando Maven, execute os comandos abaixo:
 
-`## 🔹 Com Maven
+## 🔹 Com Maven
 
 O comando a seguir:
 
@@ -92,7 +92,7 @@ Esses comandos garantem que todas as classes e dependências necessárias estar�
 
 | Etapa | Maven | Gradle | Descrição |
 |-------|--------|---------|-----------|
-| 🧩 Build do projeto | `mvn clean package` | `./gradlew clean build` | Gera o `.jar` principal do projeto |
-| 🧪 Compilar código e testes | `mvn compile && mvn test-compile` | `./gradlew compileJava compileTestJava` | Prepara as classes principais e de teste |
-| 📦 Copiar dependências | `mvn dependency:copy-dependencies` | `./gradlew copyDependencies` *(task personalizada)* | Copia todas as libs para `target/dependency` (Maven) ou `build/dependencies` (Gradle) |
-| 🚀 Executar | `java -jar target/mutate_security_configs-1.0-SNAPSHOT.jar /seu/projeto` | `java -jar build/libs/mutate_security_configs-1.0-SNAPSHOT.jar /seu/projeto` | Inicia a execução do `.jar` com os testes em memória |
+| 🧩 Build do projeto (Projeto mutate_security_configs) | `mvn clean package` |  | Gera o `.jar` principal do projeto |
+| 🧪 Compilar código e testes (Projeto alvo) | `mvn compile && mvn test-compile` | `./gradlew compileJava compileTestJava` | Prepara as classes principais e de teste |
+| 📦 Copiar dependências (Projeto alvo) | `mvn dependency:copy-dependencies` | `./gradlew copyDependencies` *(task personalizada)* | Copia todas as libs para `target/dependency` (Maven) ou `build/dependencies` (Gradle) |
+| 🚀 Executar (Projeto mutate_security_configs) | `java -jar target/mutate_security_configs-1.0-SNAPSHOT.jar /seu/projeto` |  | Inicia a execução do `.jar` com os testes em memória |
