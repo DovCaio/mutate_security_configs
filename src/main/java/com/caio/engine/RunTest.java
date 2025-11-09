@@ -14,6 +14,7 @@ import org.junit.platform.launcher.listeners.SummaryGeneratingListener;
 import org.junit.platform.launcher.listeners.TestExecutionSummary;
 import org.junit.platform.launcher.listeners.TestExecutionSummary.Failure;
 
+import com.caio.exceptions.NoOneTestPasses;
 import com.caio.models.AnnotationMutationPoint;
 
 public class RunTest {
@@ -72,6 +73,7 @@ public class RunTest {
         public TestResult executeTestForVerification(ClassLoader loader){
                 TestResult testResult = runAllTests(loader);
                 verifyTestResult = testResult;
+                if (testResult.totalTest == testResult.failed ) throw new NoOneTestPasses();
                 return testResult;
         }
 
@@ -119,7 +121,7 @@ public class RunTest {
                 }
 
                 public boolean whasCaptured() {
-                        return this.equals(verifyTestResult);
+                        return !this.equals(verifyTestResult);
                 }
 
                 public Long getTotalTest() {

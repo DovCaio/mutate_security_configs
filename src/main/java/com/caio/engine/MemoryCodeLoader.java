@@ -1,19 +1,14 @@
 package com.caio.engine;
 
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.lang.reflect.InvocationTargetException;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-
+import com.caio.exceptions.NoOneClasseFinded;
 import com.caio.exceptions.SpringbootContextNotFound;
 import com.caio.models.AnnotationMutationPoint;
 
@@ -35,10 +30,6 @@ public class MemoryCodeLoader {
         dependenciesClassLoader = new URLClassLoader( //Muito importante
                 dependenciesJarURLs.toArray(new URL[0]), ClassLoader.getSystemClassLoader());
 
-    }
-
-    public void verifyTestsPassing() throws IOException{
-
         for (AnnotationMutationPoint c : this.mainClasses) {
             this.allBytes.put(c.getTargetElement().name.replace('/', '.'), c.getBytes());
         }
@@ -47,18 +38,34 @@ public class MemoryCodeLoader {
             this.allBytes.put(c.getTargetElement().name.replace('/', '.'), c.getBytes());
         }
 
+    }
+
+    public void verifyTestsPassing() throws IOException{
+
         AllClassesClassLoader loader = new AllClassesClassLoader(this.allBytes, dependenciesClassLoader);
         factoreVerification(loader);
-
-        System.out.println(runTest.executeTestForVerification(loader).toString());
+        runTest.executeTestForVerification(loader).toString();
         
     }
 
     public void loadMutantInMemory(List<AnnotationMutationPoint> mutants) throws ClassNotFoundException {
+
+        if (this.allBytes.isEmpty()) throw new NoOneClasseFinded("Nenhuma classe encotrada para a aplicação dos mutantes.");
+
+        Map<String, byte[]> applyMutantMap = this.allBytes;
         for (AnnotationMutationPoint mutation : mutants) {
-            //MutantClassLoader mutantClassLoader = new MutantClassLoader(mutation.getBytes());
-            //mutantClassLoader.loadClass(mutation.getTargetElement().name.replace('/', '.'));
-            //runTest.executeTestForMutation(mutantClassLoader);
+            String className = mutation.getTargetElement().name.replace("/", "."); //Bem que esse AnnotationMutationPoint podia ter um getName que desse um retorno bonitinho já
+            byte[] mutadedClasse = mutation.getBytes();
+
+
+            byte[] originalClass = applyMutantMap.get(className);
+            applyMutantMap.put(className, mutadedClasse);
+
+            AllClassesClassLoader allClassesClassLoader = new AllClassesClassLoader(applyMutantMap, dependenciesClassLoader);
+            runTest.executeTestForMutation(allClassesClassLoader);
+
+            applyMutantMap.put(className, originalClass);
+
         }
     }
 

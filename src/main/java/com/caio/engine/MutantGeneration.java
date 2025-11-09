@@ -10,6 +10,7 @@ import org.objectweb.asm.tree.AnnotationNode;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.MethodNode;
 
+import com.caio.exceptions.NoOnePossibleMutant;
 import com.caio.models.AnnotationMutationPoint;
 import com.caio.utli.ClassNodeCloner;
 
@@ -17,26 +18,25 @@ public class MutantGeneration {
 
     private List<AnnotationMutationPoint> amps;
     private List<AnnotationMutationPoint> mutants;
-    private final String regex = "\"'([^']*)'\"";
+    private final String regex = "(?:hasAuthority|hasRole)\\(['\"]([^'\"]+)['\"]\\)";
 
-
-    public MutantGeneration(List<AnnotationMutationPoint> amps){
+    public MutantGeneration(List<AnnotationMutationPoint> amps) {
         this.amps = amps;
         this.mutants = new ArrayList<>();
     }
 
-     public void createMutants() throws Exception {
+    public void createMutants() throws Exception {
         for (AnnotationMutationPoint amp : amps) {
             String mutate = mutateValue(amp.getValues());
-            this.mutants.add(createMutant(amp, mutate));
+            if (!mutate.equals("")) this.mutants.add(createMutant(amp, mutate));
         }
+        if (this.mutants.isEmpty()) throw new NoOnePossibleMutant();
     }
 
-
-
-    private String mutateValue (List<Object> values) {
+    private String mutateValue(List<Object> values) {
         String mutateOperator = "";
-        Pattern pattern = Pattern.compile(regex); //Dessa forma ele vai mutar todos já, porém talvez fosse interessante a possibilidade de ser as aspas duas dentro das simples
+        Pattern pattern = Pattern.compile(regex); // Dessa forma ele vai mutar todos já, porém talvez fosse interessante
+                                                  // a possibilidade de ser as aspas duas dentro das simples
         for (int i = 0; i < values.size(); i += 2) {
             String key = (String) values.get(i);
 
@@ -49,70 +49,89 @@ public class MutantGeneration {
                 }
             }
         }
-
-        return  mutateOperator;
+        return mutateOperator;
     }
 
-
     private AnnotationMutationPoint createMutant(AnnotationMutationPoint amp, String novoValor) throws Exception {
-        //Dá para dar uma boa melhorada nesse código, long method absurdo
-        List<Object> values = amp.getValues();
-        List<Object> valuesMutant = new ArrayList<>(); 
-        if (values != null) {
-            for (int i = 0; i < values.size(); i += 2) {
-                String key = (String) values.get(i);
-                String value = (String) values.get(i);
-                if (key.equals("value")) {
-                    value = novoValor;
-                }
-                valuesMutant.add(key);
-                valuesMutant.add(value);
-            }
-        }
+        List<Object> mutatedValues = mutateAnnotationValues(amp.getValues(), novoValor);
+        ClassNode clonedClassNode = cloneClassNode(amp.getTargetElement());
 
-        ClassNode classNode = ClassNodeCloner.cloneClassNode(amp.getTargetElement()); //gambiarra, nem sei como copiar objetos em java
-
-        AnnotationMutationPoint mutante = new AnnotationMutationPoint(
+        AnnotationMutationPoint mutant = new AnnotationMutationPoint(
                 amp.getTargetType(),
                 amp.getOwnerClass(),
                 amp.getAnnotationDesc(),
-                classNode,
-                valuesMutant
-        );
+                clonedClassNode,
+                mutatedValues);
 
-        byte[] mutateBytes = new byte[0];
+        byte[] mutatedBytes = switch (mutant.getTargetType()) {
+            case METHOD -> mutateMethodAnnotation(mutant, novoValor);
+            case CLASS -> mutateClassAnnotation(mutant, novoValor);
+            default -> new byte[0];
+        };
 
+        mutant.setBytes(mutatedBytes);
+        return mutant;
+    }
 
-        if (mutante.getTargetType() == AnnotationMutationPoint.TargetType.METHOD) { //Dá para criar métodos auxiliares, tem muito aninhamento
-            for (MethodNode m : mutante.getTargetElement().methods) {
-                if (mutante.getMethod() != null && m.name.equals(mutante.getMethod().name) && m.visibleAnnotations != null) {
-                    for (AnnotationNode ann : m.visibleAnnotations) {
-                        if (ann.desc.equals(mutante.getAnnotationDesc())) {
-                            for (int i = 0; i < ann.values.size(); i++) {
-                                Object v = ann.values.get(i);
-                                if (v instanceof String s && s.equals("value")) {
-                                    ann.values.set(i + 1, novoValor);
-                                }
-                            }
-                        }
+    private List<Object> mutateAnnotationValues(List<Object> originalValues, String novoValor) {
+        if (originalValues == null)
+            return new ArrayList<>();
+
+        List<Object> mutated = new ArrayList<>();
+        for (int i = 0; i < originalValues.size(); i += 2) {
+            String key = (String) originalValues.get(i);
+            String value = (String) originalValues.get(i + 1);
+
+            if ("value".equals(key)) {
+                value = novoValor;
+            }
+
+            mutated.add(key);
+            mutated.add(value);
+        }
+        return mutated;
+    }
+
+    private ClassNode cloneClassNode(ClassNode original) throws Exception {
+        return ClassNodeCloner.cloneClassNode(original);
+    }
+
+    private byte[] mutateMethodAnnotation(AnnotationMutationPoint mutant, String novoValor) throws Exception {
+        for (MethodNode method : mutant.getTargetElement().methods) {
+            if (shouldMutateMethod(mutant, method)) {
+                mutateAnnotationValue(method.visibleAnnotations, mutant.getAnnotationDesc(), novoValor);
+            }
+        }
+        return generateMutatedClassBytes(mutant.getTargetElement());
+    }
+
+    private boolean shouldMutateMethod(AnnotationMutationPoint mutant, MethodNode method) {
+        return mutant.getMethod() != null
+                && method.name.equals(mutant.getMethod().name)
+                && method.visibleAnnotations != null;
+    }
+
+    private void mutateAnnotationValue(List<AnnotationNode> annotations, String targetDesc, String novoValor) {
+        for (AnnotationNode annotation : annotations) {
+            if (annotation.desc.equals(targetDesc) && annotation.values != null) {
+                for (int i = 0; i < annotation.values.size(); i++) {
+                    Object value = annotation.values.get(i);
+                    if (value instanceof String key && key.equals("value")) {
+                        annotation.values.set(i + 1, novoValor);
                     }
                 }
             }
-
-            mutateBytes = generateMutatedClassBytes(mutante.getTargetElement());
-
-
-        }else {
-            // Mutação da annotation da classe
         }
-
-        mutante.setBytes(mutateBytes);
-
-        return mutante;
     }
+
+    private byte[] mutateClassAnnotation(AnnotationMutationPoint mutant, String novoValor) throws Exception {
+        // (TODO) Lógica futura para mutação de annotation de classe
+        return new byte[0];
+    }
+
     
 
-    private  byte[] generateMutatedClassBytes(ClassNode classNode) {
+    private byte[] generateMutatedClassBytes(ClassNode classNode) {
         ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES | ClassWriter.COMPUTE_MAXS);
         classNode.accept(cw);
         return cw.toByteArray();
@@ -134,7 +153,4 @@ public class MutantGeneration {
         this.mutants = mutants;
     }
 
-
-    
-    
 }
