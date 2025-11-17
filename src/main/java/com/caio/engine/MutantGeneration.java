@@ -29,9 +29,11 @@ public class MutantGeneration {
     public void createMutants() throws Exception {
         for (AnnotationMutationPoint amp : amps) {
             String mutate = mutateValue(amp.getValues());
-            if (!mutate.equals("")) this.mutants.add(createMutant(amp, mutate));
+            if (!mutate.equals(""))
+                this.mutants.add(createMutant(amp, mutate));
         }
-        if (this.mutants.isEmpty()) throw new NoOnePossibleMutant();
+        if (this.mutants.isEmpty())
+            throw new NoOnePossibleMutant();
     }
 
     private String mutateValue(List<Object> values) {
@@ -53,7 +55,13 @@ public class MutantGeneration {
     }
 
     private AnnotationMutationPoint createMutant(AnnotationMutationPoint amp, String novoValor) throws Exception {
-        List<Object> mutatedValues = mutateAnnotationValues(amp.getValues(), novoValor); //Seria muito bom se o amp.getValues() retornase um map, ao invés de uma list que de certa forma representa um. Dá forma que tá complicou muito o entendimento
+        List<Object> mutatedValues = mutateAnnotationValues(amp.getValues(), novoValor); // Seria muito bom se o
+                                                                                         // amp.getValues() retornase um
+                                                                                         // map, ao invés de uma list
+                                                                                         // que de certa forma
+                                                                                         // representa um. Dá forma que
+                                                                                         // tá complicou muito o
+                                                                                         // entendimento
         ClassNode clonedClassNode = cloneClassNode(amp.getTargetElement());
 
         AnnotationMutationPoint mutant = AnnotationMutationPoint.forMethod(
@@ -62,8 +70,7 @@ public class MutantGeneration {
                 clonedClassNode,
                 mutatedValues,
                 null,
-                amp.getMethod()
-                );
+                amp.getMethod());
 
         byte[] mutatedBytes = switch (mutant.getTargetType()) {
             case METHOD -> mutateMethodAnnotation(mutant, novoValor);
@@ -84,7 +91,7 @@ public class MutantGeneration {
             String key = (String) originalValues.get(i);
             String value = (String) originalValues.get(i + 1);
 
-            if ("value".equals(key)) { 
+            if ("value".equals(key)) {
                 value = novoValor;
             }
 
@@ -98,9 +105,10 @@ public class MutantGeneration {
         return ClassNodeCloner.cloneClassNode(original);
     }
 
-    private byte[] mutateMethodAnnotation(AnnotationMutationPoint mutant, String novoValor) throws Exception { //Por algum motivo o mutant.getMethod() ta vindo nullo 
+    private byte[] mutateMethodAnnotation(AnnotationMutationPoint mutant, String novoValor) throws Exception {
         for (MethodNode method : mutant.getTargetElement().methods) {
-            if (shouldMutateMethod(mutant, method)) { //Dá para recuperar nome do metodo e da classe, para especificar no relatório
+            if (shouldMutateMethod(mutant, method)) { // Dá para recuperar nome do metodo e da classe, para especificar
+                                                      // no relatório
                 mutateAnnotationValue(method.visibleAnnotations, mutant.getAnnotationDesc(), novoValor);
             }
         }
@@ -111,16 +119,24 @@ public class MutantGeneration {
         return mutant.getMethod() != null
                 && method.name.equals(mutant.getMethod().name)
                 && method.visibleAnnotations != null;
-    }   
+    }
 
     private void mutateAnnotationValue(List<AnnotationNode> annotations, String targetDesc, String novoValor) {
         for (AnnotationNode annotation : annotations) {
-            if (annotation.desc.equals(targetDesc) && annotation.values != null) {
-                for (int i = 0; i < annotation.values.size(); i++) {
-                    Object value = annotation.values.get(i);
-                    if (value instanceof String key && key.equals("value")) {
-                        annotation.values.set(i + 1, novoValor);
+            if (annotation != null && annotation.desc.equals(targetDesc) && annotation.values != null) {
+
+                List<Object> values = annotation.values;
+
+                for (int i = 0; i < values.size() - 1; i += 2) {
+                    String key = (String) values.get(i);
+                    Object oldValue = values.get(i + 1);
+
+                    // Apenas substitui se for String (PreAuthorize, etc)
+                    if (oldValue instanceof String) {
+                        values.set(i + 1, novoValor);
                     }
+
+                    // Se fosse array, enum, class, etc você trataria aqui
                 }
             }
         }
