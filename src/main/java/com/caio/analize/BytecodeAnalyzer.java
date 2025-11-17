@@ -87,8 +87,7 @@ public class BytecodeAnalyzer {
             for (AnnotationNode an : classNode.visibleAnnotations) {
                 if (an.values != null && TARGETS_DESC.contains(an.desc)) {
 
-                    AnnotationMutationPoint amp = new AnnotationMutationPoint(
-                            AnnotationMutationPoint.TargetType.CLASS,
+                    AnnotationMutationPoint amp = AnnotationMutationPoint.forClass(
                             classNode.name,
                             an.desc,
                             classNode,
@@ -108,16 +107,14 @@ public class BytecodeAnalyzer {
                     for (AnnotationNode an : method.visibleAnnotations) {
                         if (TARGETS_DESC.contains(an.desc)) {
 
-                            AnnotationMutationPoint amp = new AnnotationMutationPoint(
-                                    AnnotationMutationPoint.TargetType.METHOD,
+                            AnnotationMutationPoint amp = AnnotationMutationPoint.forMethod(
                                     classNode.name,
                                     an.desc,
                                     classNode,
                                     List.copyOf(an.values),
-                                    bytes,
-                                    method);
+                                    (byte[]) bytes,
+                                    method); //Tá indo nullo por algum motivo
                             mutationsPoints.add(amp);
-
                         }
 
                     }
@@ -129,8 +126,7 @@ public class BytecodeAnalyzer {
 
     public void findmainClasses(ClassNode classNode, byte[] bytes) {
 
-        AnnotationMutationPoint amp = new AnnotationMutationPoint(
-                AnnotationMutationPoint.TargetType.CLASS,
+        AnnotationMutationPoint amp = AnnotationMutationPoint.forClass(
                 classNode.name,
                 null,
                 classNode,

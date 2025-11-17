@@ -6,6 +6,7 @@ import org.objectweb.asm.tree.FieldNode;
 
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Objects;
 
 public class AnnotationMutationPoint {
 
@@ -20,40 +21,66 @@ public class AnnotationMutationPoint {
     private byte[] bytes;
     private MethodNode method;
 
-    public AnnotationMutationPoint(TargetType targetType, String ownerClass,
-                                   String annotationDesc, ClassNode targetElement,
-                                   List<Object> values, byte[] bytes,
-                                   MethodNode method) {
+    private AnnotationMutationPoint(
+            TargetType targetType,
+            String ownerClass,
+            String annotationDesc,
+            ClassNode targetElement,
+            List<Object> values,
+            byte[] bytes,
+            MethodNode method) {
+
         this.targetType = targetType;
         this.ownerClass = ownerClass;
         this.annotationDesc = annotationDesc;
         this.targetElement = targetElement;
-        this.values = values;
+        this.values = values != null ? values : List.of();
         this.bytes = bytes;
         this.method = method;
     }
 
-    public AnnotationMutationPoint(TargetType targetType, String ownerClass,
-                                   String annotationDesc, ClassNode targetElement,
-                                   List<Object> values, byte[] bytes) {
-        this.targetType = targetType;
-        this.ownerClass = ownerClass;
-        this.annotationDesc = annotationDesc;
-        this.targetElement = targetElement;
-        this.values = values;
-        this.bytes = bytes;
+
+
+    /** Factory para METHOD */
+    public static AnnotationMutationPoint forMethod(
+            String ownerClass,
+            String annotationDesc,
+            ClassNode classNode,
+            List<Object> values,
+            byte[] bytes,
+            MethodNode method) {
+
+        return new AnnotationMutationPoint(
+                TargetType.METHOD,
+                ownerClass,
+                annotationDesc,
+                classNode,
+                values,
+                bytes,
+                method
+        );
     }
 
-    public AnnotationMutationPoint(TargetType targetType, String ownerClass,
-                                   String annotationDesc, ClassNode targetElement,
-                                   List<Object> values) {
-        this.targetType = targetType;
-        this.ownerClass = ownerClass;
-        this.annotationDesc = annotationDesc;
-        this.targetElement = targetElement;
-        this.values = values;
-        this.bytes = null;
+
+    /** Factory para CLASS */
+    public static AnnotationMutationPoint forClass(
+            String ownerClass,
+            String annotationDesc,
+            ClassNode classNode,
+            List<Object> values,
+            byte[] bytes) {
+
+        return new AnnotationMutationPoint(
+                TargetType.CLASS,
+                ownerClass,
+                annotationDesc,
+                classNode,
+                values,
+                bytes,
+                null   // não existe método
+        );
     }
+
 
 
     public TargetType getTargetType() {

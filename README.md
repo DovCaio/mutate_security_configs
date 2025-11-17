@@ -17,10 +17,10 @@ mvn clean package
 Após gerar o `.jar`, execute passando o caminho do diretório do projeto alvo:
 
 ```bash
-java -jar target/mutate_security_configs-1.0-SNAPSHOT.jar /meu/caminho/fake
+java -jar target/mutate_security_configs-1.0-SNAPSHOT.jar /meu/caminho/repositorio
 ```
 
-> 📝 **Importante:** Substitua `/meu/caminho/fake` pelo caminho real do projeto que você deseja testar ou analisar.
+> 📝 **Importante:** Substitua `/meu/caminho/repositorio` pelo caminho real do projeto que você deseja testar ou analisar.
 
 ---
 

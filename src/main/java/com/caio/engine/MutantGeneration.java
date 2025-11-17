@@ -11,6 +11,7 @@ import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.MethodNode;
 
 import com.caio.exceptions.NoOnePossibleMutant;
+import com.caio.exceptions.TypeOfAnnotationPointMutationNonDetected;
 import com.caio.models.AnnotationMutationPoint;
 import com.caio.utli.ClassNodeCloner;
 
@@ -35,8 +36,7 @@ public class MutantGeneration {
 
     private String mutateValue(List<Object> values) {
         String mutateOperator = "";
-        Pattern pattern = Pattern.compile(regex); // Dessa forma ele vai mutar todos já, porém talvez fosse interessante
-                                                  // a possibilidade de ser as aspas duas dentro das simples
+        Pattern pattern = Pattern.compile(regex);
         for (int i = 0; i < values.size(); i += 2) {
             String key = (String) values.get(i);
 
@@ -53,20 +53,22 @@ public class MutantGeneration {
     }
 
     private AnnotationMutationPoint createMutant(AnnotationMutationPoint amp, String novoValor) throws Exception {
-        List<Object> mutatedValues = mutateAnnotationValues(amp.getValues(), novoValor);
+        List<Object> mutatedValues = mutateAnnotationValues(amp.getValues(), novoValor); //Seria muito bom se o amp.getValues() retornase um map, ao invés de uma list que de certa forma representa um. Dá forma que tá complicou muito o entendimento
         ClassNode clonedClassNode = cloneClassNode(amp.getTargetElement());
 
-        AnnotationMutationPoint mutant = new AnnotationMutationPoint(
-                amp.getTargetType(),
+        AnnotationMutationPoint mutant = AnnotationMutationPoint.forMethod(
                 amp.getOwnerClass(),
                 amp.getAnnotationDesc(),
                 clonedClassNode,
-                mutatedValues);
+                mutatedValues,
+                null,
+                amp.getMethod()
+                );
 
         byte[] mutatedBytes = switch (mutant.getTargetType()) {
             case METHOD -> mutateMethodAnnotation(mutant, novoValor);
             case CLASS -> mutateClassAnnotation(mutant, novoValor);
-            default -> new byte[0];
+            default -> throw new TypeOfAnnotationPointMutationNonDetected();
         };
 
         mutant.setBytes(mutatedBytes);
@@ -82,7 +84,7 @@ public class MutantGeneration {
             String key = (String) originalValues.get(i);
             String value = (String) originalValues.get(i + 1);
 
-            if ("value".equals(key)) {
+            if ("value".equals(key)) { 
                 value = novoValor;
             }
 
@@ -96,9 +98,9 @@ public class MutantGeneration {
         return ClassNodeCloner.cloneClassNode(original);
     }
 
-    private byte[] mutateMethodAnnotation(AnnotationMutationPoint mutant, String novoValor) throws Exception {
+    private byte[] mutateMethodAnnotation(AnnotationMutationPoint mutant, String novoValor) throws Exception { //Por algum motivo o mutant.getMethod() ta vindo nullo 
         for (MethodNode method : mutant.getTargetElement().methods) {
-            if (shouldMutateMethod(mutant, method)) {
+            if (shouldMutateMethod(mutant, method)) { //Dá para recuperar nome do metodo e da classe, para especificar no relatório
                 mutateAnnotationValue(method.visibleAnnotations, mutant.getAnnotationDesc(), novoValor);
             }
         }
@@ -109,7 +111,7 @@ public class MutantGeneration {
         return mutant.getMethod() != null
                 && method.name.equals(mutant.getMethod().name)
                 && method.visibleAnnotations != null;
-    }
+    }   
 
     private void mutateAnnotationValue(List<AnnotationNode> annotations, String targetDesc, String novoValor) {
         for (AnnotationNode annotation : annotations) {
@@ -128,8 +130,6 @@ public class MutantGeneration {
         // (TODO) Lógica futura para mutação de annotation de classe
         return new byte[0];
     }
-
-    
 
     private byte[] generateMutatedClassBytes(ClassNode classNode) {
         ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES | ClassWriter.COMPUTE_MAXS);
