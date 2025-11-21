@@ -15,11 +15,12 @@ import com.caio.exceptions.TypeOfAnnotationPointMutationNonDetected;
 import com.caio.models.AnnotationMutationPoint;
 import com.caio.utli.ClassNodeCloner;
 
+import com.caio.engine.mutant.MutantMaker;
+
 public class MutantGeneration {
 
     private List<AnnotationMutationPoint> amps;
     private List<AnnotationMutationPoint> mutants;
-    private final String regex = "(?:hasAuthority|hasRole)\\(['\"]([^'\"]+)['\"]\\)";
 
     public MutantGeneration(List<AnnotationMutationPoint> amps) {
         this.amps = amps;
@@ -28,31 +29,29 @@ public class MutantGeneration {
 
     public void createMutants() throws Exception {
         for (AnnotationMutationPoint amp : amps) {
-            String mutate = mutateValue(amp.getValues());
-            if (!mutate.equals(""))
-                this.mutants.add(createMutant(amp, mutate));
+            MutantMaker mutantGeneration  = new MutantMaker(amp.getValues());
+            List<String> mutates = mutantGeneration.genAllMutants();
+            if (!mutates.isEmpty()){
+
+                List<AnnotationMutationPoint> aux = new ArrayList<>();
+
+                mutates.stream().forEach(mutant -> {
+                    try {
+                        if(!mutant.equals(""))
+                            aux.add(createMutant(amp, mutant));
+                    } catch (Exception e) {
+                        System.out.println("Não foi possível de adicionar o mutant " + mutant );
+                    }
+                });
+
+                if(!aux.isEmpty())
+                    this.mutants.addAll(aux);
+                }
         }
         if (this.mutants.isEmpty())
             throw new NoOnePossibleMutant();
     }
 
-    private String mutateValue(List<Object> values) {
-        String mutateOperator = "";
-        Pattern pattern = Pattern.compile(regex);
-        for (int i = 0; i < values.size(); i += 2) {
-            String key = (String) values.get(i);
-
-            if (key.equals("value")) {
-                String value = (String) values.get(i + 1);
-                Matcher matcher = pattern.matcher(value);
-                if (matcher.find()) {
-                    String insideQuotes = matcher.group(1);
-                    mutateOperator = value.replace(insideQuotes, "NO_" + insideQuotes);
-                }
-            }
-        }
-        return mutateOperator;
-    }
 
     private AnnotationMutationPoint createMutant(AnnotationMutationPoint amp, String novoValor) throws Exception {
         List<Object> mutatedValues = mutateAnnotationValues(amp.getValues(), novoValor); // Seria muito bom se o
