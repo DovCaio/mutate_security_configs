@@ -5,9 +5,6 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-
-import com.caio.exceptions.NoOnePossibleMutant;
-
 public class MutantMaker {
     private final String regexSimpleCases = "(?:hasAuthority|hasRole)\\(['\"]([^'\"]+)['\"]\\)";
     private final String regexCompostCases = "(?:hasAnyAuthority|hasAnyRole)\\(['\"]([^'\"]+)['\"]\\)";
@@ -27,7 +24,6 @@ public class MutantMaker {
                 this.key = key;
                 this.value = (String) values.get(i + 1);
             }
-
         }
     }
 
@@ -44,19 +40,24 @@ public class MutantMaker {
         Matcher matcherPermitAllCase = patternPermitAll.matcher(this.value);
         Matcher matcherDenyCase = patternDenyAll.matcher(this.value);
 
-        if (!matcherPermitAllCase.find() && !matcherDenyCase.find()){
+        boolean hasSimple = matcherSimpleCase.find();
+        boolean hasCompost = matcherCompostCase.find();
+        boolean hasPermitAll = matcherPermitAllCase.find();
+        boolean hasDenyAll = matcherDenyCase.find();
+
+        if (!hasDenyAll && !hasPermitAll){
             result.add("permitAll()");
             result.add("denyAll");
         }
 
-        if (matcherSimpleCase.find()){
+        if (hasSimple){
             result.add(mutateSimpleValue(matcherSimpleCase));
-        }else if (matcherCompostCase.find()){
+        }else if (hasCompost){
             System.out.println("TODO");
         
-        } else if (matcherPermitAllCase.find()){
+        } else if (hasPermitAll){
             System.out.print("TODO");
-        }else if(matcherDenyCase.find()) {
+        }else if(hasDenyAll) {
             System.out.print("TODO");
 
         }

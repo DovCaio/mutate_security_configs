@@ -29,10 +29,13 @@ public class BytecodeAnalyzer {
 
     private Dependencies dependencies;
 
+    private List<String> classNameTest = new ArrayList<>(); // --- IGNORE ---
+
     public BytecodeAnalyzer() {
         this.mutationsPoints = new ArrayList<AnnotationMutationPoint>();
         this.mainClasses = new ArrayList<AnnotationMutationPoint>();
         this.testClasses = new ArrayList<AnnotationMutationPoint>();
+        this.classNameTest = new ArrayList<String>();
         this.dependencies = new Dependencies();
     }
 
@@ -113,7 +116,7 @@ public class BytecodeAnalyzer {
                                     classNode,
                                     List.copyOf(an.values),
                                     (byte[]) bytes,
-                                    method); //Tá indo nullo por algum motivo
+                                    method); // Tá indo nullo por algum motivo
                             mutationsPoints.add(amp);
                         }
 
@@ -137,6 +140,7 @@ public class BytecodeAnalyzer {
 
         if (isTestClass) {
             testClasses.add(amp);
+            classNameTest.add(classNode.name);
         } else {
             mainClasses.add(amp);
 
@@ -145,9 +149,9 @@ public class BytecodeAnalyzer {
     }
 
     private boolean hasTestAnnotations(ClassNode classNode) {
-    List<AnnotationNode> annotations = collectAllAnnotations(classNode);
-    return annotations.stream().anyMatch(this::isTestRelatedAnnotation);
-}
+        List<AnnotationNode> annotations = collectAllAnnotations(classNode);
+        return annotations.stream().anyMatch(this::isTestRelatedAnnotation);
+    }
 
     private List<AnnotationNode> collectAllAnnotations(ClassNode classNode) {
         List<AnnotationNode> all = new ArrayList<>();
@@ -173,7 +177,8 @@ public class BytecodeAnalyzer {
     }
 
     private void addAnnotations(List<AnnotationNode> target, List<AnnotationNode> source) {
-        if (source != null) target.addAll(source);
+        if (source != null)
+            target.addAll(source);
     }
 
     private boolean isTestRelatedAnnotation(AnnotationNode annotation) {
@@ -183,13 +188,11 @@ public class BytecodeAnalyzer {
             desc = desc.substring(1, desc.length() - 1);
         }
         return desc.startsWith("org/junit")
-            || desc.startsWith("org/mockito")
-            || desc.startsWith("org/springframework/boot/test")
-            || desc.startsWith("org/springframework/test")
-            || desc.startsWith("org/testng");
+                || desc.startsWith("org/mockito")
+                || desc.startsWith("org/springframework/boot/test")
+                || desc.startsWith("org/springframework/test")
+                || desc.startsWith("org/testng");
     }
-
-
 
     public void transformPathIntoUrl(List<Path> repositoriePath) throws Exception {
         dependencies.extractJars(repositoriePath);
@@ -215,4 +218,7 @@ public class BytecodeAnalyzer {
         return this.dependencies.getJarUrls();
     }
 
+    public List<String> getClassNameTest() {
+        return this.classNameTest;
+    }
 }

@@ -1,9 +1,14 @@
 package com.caio.engine;
 
+import java.io.File;
+import java.io.PrintWriter;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.junit.platform.engine.discovery.DiscoverySelectors;
 import org.junit.platform.launcher.Launcher;
@@ -21,7 +26,7 @@ public class RunTest {
 
         private List<TestResult> testsResults;
         private List<AnnotationMutationPoint> testClasses;
-        private TestResult verifyTestResult; 
+        private TestResult verifyTestResult;
 
         public RunTest(List<AnnotationMutationPoint> testClasses) {
 
@@ -70,10 +75,30 @@ public class RunTest {
 
         }
 
-        public TestResult executeTestForVerification(ClassLoader loader){
+        public void runAllTestsCorrect(ClassLoader loader, List<Class<?>> loadedTestClasses) {
+                Thread.currentThread().setContextClassLoader(loader);
+
+                Launcher launcher = LauncherFactory.create();
+                SummaryGeneratingListener summary = new SummaryGeneratingListener();
+
+                LauncherDiscoveryRequestBuilder builder = LauncherDiscoveryRequestBuilder.request();
+
+                for (Class<?> testClass : loadedTestClasses) {
+                        builder.selectors(DiscoverySelectors.selectClass(testClass));
+                }
+
+                LauncherDiscoveryRequest request = builder.build();
+                launcher.execute(request, summary);
+
+                summary.getSummary().printTo(new PrintWriter(System.out));
+        }
+
+        public TestResult executeTestForVerification(ClassLoader loader) {
                 TestResult testResult = runAllTests(loader);
+                runAllTestsCorrect(loader, null);
                 verifyTestResult = testResult;
-                if (testResult.totalTest == testResult.failed ) throw new NoOneTestPasses();
+                if (testResult.totalTest == testResult.failed)
+                        throw new NoOneTestPasses();
                 return testResult;
         }
 
@@ -103,10 +128,7 @@ public class RunTest {
 
                 @Override()
                 public String toString() {
-                        String failuresString = failures.entrySet()
-                                        .stream()
-                                        .map(entry -> entry.getKey() + " -> " + entry.getValue())
-                                        .reduce("", (a, b) -> a + "\n" + b);
+                        String failuresString = getFailures();
 
                         return "=== RESULTADOS DOS TESTES ===\n" +
                                         "Total tests: " + this.totalTest + "\n" +
@@ -116,8 +138,9 @@ public class RunTest {
                                         "=============================";
                 }
 
-                public boolean equals(TestResult b){
-                        return this.totalTest.equals(b.totalTest) && this.succedded.equals(b.succedded) && this.failed.equals(b.failed);
+                public boolean equals(TestResult b) {
+                        return this.totalTest.equals(b.totalTest) && this.succedded.equals(b.succedded)
+                                        && this.failed.equals(b.failed);
                 }
 
                 public boolean whasCaptured() {
@@ -149,7 +172,10 @@ public class RunTest {
                 }
 
                 public String getFailures() {
-                        return "";
+                        return failures.entrySet()
+                                        .stream()
+                                        .map(entry -> entry.getKey() + " -> " + entry.getValue())
+                                        .reduce("", (a, b) -> a + "\n" + b);
                 }
 
         }

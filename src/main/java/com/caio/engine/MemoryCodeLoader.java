@@ -21,47 +21,55 @@ public class MemoryCodeLoader {
     private URLClassLoader dependenciesClassLoader;
     private Map<String, byte[]> allBytes = new HashMap<>();
 
+
+    private List<String> classesTest; // --- IGNORE ---
+
     public MemoryCodeLoader(List<AnnotationMutationPoint> mainClasses, List<AnnotationMutationPoint> testClasses,
-            List<URL> dependenciesJarURLs, RunTest runTest) {
+            List<URL> dependenciesJarURLs, RunTest runTest, List<String> classesTest) {
         this.mainClasses = mainClasses;
         this.testClasses = testClasses;
         this.runTest = runTest;
         this.dependenciesJarURLs = dependenciesJarURLs;
-        dependenciesClassLoader = new URLClassLoader( //Muito importante
+        dependenciesClassLoader = new URLClassLoader( // Muito importante
                 dependenciesJarURLs.toArray(new URL[0]), ClassLoader.getSystemClassLoader());
+        this.classesTest = classesTest; // --- IGNORE ---
 
         for (AnnotationMutationPoint c : this.mainClasses) {
-            this.allBytes.put(c.getTargetElement().name.replace('/', '.'), c.getBytes());
+            String className = c.getTargetElement().name.replace('/', '.');
+            this.allBytes.put(className, c.getBytes());
         }
 
         for (AnnotationMutationPoint c : this.testClasses) {
-            this.allBytes.put(c.getTargetElement().name.replace('/', '.'), c.getBytes());
+            String className = c.getTargetElement().name.replace('/', '.');
+            this.allBytes.put(className, c.getBytes());
         }
-
     }
 
-    public void verifyTestsPassing() throws IOException{
-
+    public void verifyTestsPassing() throws IOException {
         AllClassesClassLoader loader = new AllClassesClassLoader(this.allBytes, dependenciesClassLoader);
+
         factoreVerification(loader);
         runTest.executeTestForVerification(loader).toString();
-        
     }
 
     public void loadMutantInMemory(List<AnnotationMutationPoint> mutants) throws ClassNotFoundException {
 
-        if (this.allBytes.isEmpty()) throw new NoOneClasseFinded("Nenhuma classe encotrada para a aplicação dos mutantes.");
+        if (this.allBytes.isEmpty())
+            throw new NoOneClasseFinded("Nenhuma classe encontrada para a aplicação dos mutantes.");
 
         Map<String, byte[]> applyMutantMap = this.allBytes;
         for (AnnotationMutationPoint mutation : mutants) {
-            String className = mutation.getTargetElement().name.replace("/", "."); //Bem que esse AnnotationMutationPoint podia ter um getName que desse um retorno bonitinho já
+            String className = mutation.getTargetElement().name.replace("/", "."); // Bem que esse
+                                                                                   // AnnotationMutationPoint podia ter
+                                                                                   // um getName que desse um retorno
+                                                                                   // bonitinho já
             byte[] mutadedClasse = mutation.getBytes();
-
 
             byte[] originalClass = applyMutantMap.get(className);
             applyMutantMap.put(className, mutadedClasse);
 
-            AllClassesClassLoader allClassesClassLoader = new AllClassesClassLoader(applyMutantMap, dependenciesClassLoader);
+            AllClassesClassLoader allClassesClassLoader = new AllClassesClassLoader(applyMutantMap,
+                    dependenciesClassLoader);
             runTest.executeTestForMutation(allClassesClassLoader);
 
             applyMutantMap.put(className, originalClass);

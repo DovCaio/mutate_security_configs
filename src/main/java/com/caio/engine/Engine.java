@@ -12,10 +12,11 @@ public class Engine {
     private RunTest runTest;
 
     public Engine(List<AnnotationMutationPoint> amps, List<AnnotationMutationPoint> mainClasses,
-            List<AnnotationMutationPoint> testClasses, List<URL> dependenciesJarURLs) {
+            List<AnnotationMutationPoint> testClasses, List<URL> dependenciesJarURLs, List<String> classesTest) {
         this.runTest = new RunTest(testClasses);
         this.mutantGeneration = new MutantGeneration(amps);
-        this.memoryCodeLoader = new MemoryCodeLoader(mainClasses, testClasses, dependenciesJarURLs, this.runTest);
+        this.memoryCodeLoader = new MemoryCodeLoader(mainClasses, testClasses, dependenciesJarURLs, this.runTest,
+                classesTest);
     }
 
     public void start() throws Exception {
@@ -32,7 +33,7 @@ public class Engine {
         this.mutantGeneration.setMutants(mutants);
     }
 
-    public List<RunTest.TestResult> getTestsResults(){
+    public List<RunTest.TestResult> getTestsResults() {
         return this.runTest.getTestsResults();
     }
 

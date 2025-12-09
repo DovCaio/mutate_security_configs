@@ -9,11 +9,12 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.caio.utli.Printers.printMutationPoints;
 import static com.caio.utli.Printers.printPaths;
 
-public class CliController { //Gerencia as entradas e guarda o contexto da aplicação
+public class CliController { // Gerencia as entradas e guarda o contexto da aplicação
 
     private static final List<String> EXISTENT_FLAGS = List.of("-v");
     private Path directory;
@@ -23,8 +24,6 @@ public class CliController { //Gerencia as entradas e guarda o contexto da aplic
     private Engine engine;
     private Report report;
 
-
-
     public CliController(String[] args) {
         if (args.length == 0) {
             System.err.println("Uso: java  Main <flag> <diretorio>");
@@ -32,12 +31,15 @@ public class CliController { //Gerencia as entradas e guarda o contexto da aplic
         }
 
         if (args.length == 1) {
-            this.directory = Paths.get(args[0]);;
-        }else if (args.length == 2) {
-            this.directory = Paths.get(args[1]);;
+            this.directory = Paths.get(args[0]);
+            ;
+        } else if (args.length == 2) {
+            this.directory = Paths.get(args[1]);
+            ;
             this.flag = args[0];
-            if(!EXISTENT_FLAGS.contains(this.flag)) throw new IllegalArgumentException("A flag " + this.flag + " não existe.");
-        }else {
+            if (!EXISTENT_FLAGS.contains(this.flag))
+                throw new IllegalArgumentException("A flag " + this.flag + " não existe.");
+        } else {
             throw new IllegalArgumentException("Muitos argumentos, no máximo 2");
         }
 
@@ -56,7 +58,8 @@ public class CliController { //Gerencia as entradas e guarda o contexto da aplic
         directoryScan.findClasses();
         directoryScan.findJarDependencies();
         directoryScan.findConfigFiles();
-        if(flag.equals("-v")) printPaths(directoryScan.getFindeds());
+        if (flag.equals("-v"))
+            printPaths(directoryScan.getFindeds());
     }
 
     private void searchForPossibleMutations() throws Exception {
@@ -64,22 +67,28 @@ public class CliController { //Gerencia as entradas e guarda o contexto da aplic
         List<Path> allDependenciesNedded = directoryScan.getDependenciesPath();
         allDependenciesNedded.addAll(directoryScan.getConfigsPath());
         this.bca.transformPathIntoUrl(allDependenciesNedded);
-        if(flag.equals("-v")) printMutationPoints(bca.getMutationsPoints());
+        if (flag.equals("-v"))
+            printMutationPoints(bca.getMutationsPoints());
     }
 
     private void startEngine() throws Exception {
-        this.engine = new Engine(bca.getMutationsPoints(), bca.getmainClasses(), bca.getTestClasses(), bca.getDependenciesJarURL());
+        this.engine = new Engine(bca.getMutationsPoints(), bca.getmainClasses(), bca.getTestClasses(),
+                bca.getDependenciesJarURL(), bca.getClassNameTest());
         engine.start();
-        if(flag.equals("-v")){
+        if (flag.equals("-v")) {
             System.out.println("Mutantes");
             printMutationPoints(engine.getMutants());
+
+            List<String> allResults = engine.getTestsResults().stream().map(value -> value.toString())
+                    .collect(Collectors.toList());
+            ;
+            allResults.stream().forEach(value -> System.out.println(value));
         }
     }
 
-    private void generateReport(){
+    private void generateReport() {
         this.report = new Report(engine.getTestsResults());
         this.report.generate(directory);
     }
-
 
 }

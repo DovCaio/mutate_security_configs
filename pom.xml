@@ -8,52 +8,50 @@
   <name>mutate_security_configs</name>
   <url>http://maven.apache.org</url>
   <dependencies>
-      <dependency>
-          <groupId>org.junit.jupiter</groupId>
-          <artifactId>junit-jupiter</artifactId>
-          <version>5.10.0</version>
-          <scope>test</scope>
-      </dependency>
 
-      <dependency>
-          <groupId>org.junit.jupiter</groupId>
-          <artifactId>junit-jupiter-api</artifactId>
-          <version>5.11.0</version>
-      </dependency>
+    <dependency>
+    <groupId>org.junit.platform</groupId>
+    <artifactId>junit-platform-launcher</artifactId>
+    <version>1.11.0</version>
+</dependency>
+    <!-- (usas somente uma versão injetada do junit) -->
+    <dependency>
+        <groupId>org.junit.platform</groupId>
+        <artifactId>junit-platform-engine</artifactId>
+        <version>1.11.0</version>
+    </dependency>
 
-      <dependency>
-          <groupId>org.junit.jupiter</groupId>
-          <artifactId>junit-jupiter-engine</artifactId>
-          <version>5.11.0</version>
-      </dependency>
+    <dependency>
+        <groupId>org.junit.platform</groupId>
+        <artifactId>junit-platform-commons</artifactId>
+        <version>1.11.0</version>
+    </dependency>
 
-      <dependency>
-          <groupId>org.junit.platform</groupId>
-          <artifactId>junit-platform-launcher</artifactId>
-          <version>1.11.0</version>
-      </dependency>
+    <dependency>
+        <groupId>org.junit.jupiter</groupId>
+        <artifactId>junit-jupiter</artifactId>
+        <version>5.11.0</version>
+    </dependency>
+    
+    <!-- Usa a versão do proprio código que está sendo analizado-->
+    <dependency>
+        <groupId>org.junit.platform</groupId>
+        <artifactId>junit-platform-launcher</artifactId>
+        <version>1.11.0</version>
+    </dependency>
 
+    <dependency>
+        <groupId>org.ow2.asm</groupId>
+        <artifactId>asm</artifactId>
+        <version>9.5</version>
+    </dependency>
 
-      <dependency>
-          <groupId>org.ow2.asm</groupId>
-          <artifactId>asm</artifactId>
-          <version>9.5</version>
-      </dependency>
-      <dependency>
-          <groupId>org.ow2.asm</groupId>
-          <artifactId>asm-tree</artifactId>
-          <version>9.5</version>
-      </dependency>
+    <dependency>
+        <groupId>org.ow2.asm</groupId>
+        <artifactId>asm-tree</artifactId>
+        <version>9.5</version>
+    </dependency>
 
-
-
-            <!-- Para executar o junit 4 -->
-
-      <dependency>
-        <groupId>org.junit.vintage</groupId>
-        <artifactId>junit-vintage-engine</artifactId>
-        <version>5.10.0</version> <!-- ou a versão compatível -->
-       </dependency>
   </dependencies>
     <build>
         <plugins>
