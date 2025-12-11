@@ -21,8 +21,9 @@ public class MemoryCodeLoader {
     private URLClassLoader dependenciesClassLoader;
     private Map<String, byte[]> allBytes = new HashMap<>();
 
-
+    
     private List<String> classesTest; // --- IGNORE ---
+    private List<Class<?>> tests = new java.util.ArrayList<>();
 
     public MemoryCodeLoader(List<AnnotationMutationPoint> mainClasses, List<AnnotationMutationPoint> testClasses,
             List<URL> dependenciesJarURLs, RunTest runTest, List<String> classesTest) {
@@ -43,13 +44,28 @@ public class MemoryCodeLoader {
             String className = c.getTargetElement().name.replace('/', '.');
             this.allBytes.put(className, c.getBytes());
         }
+
+
+    }
+
+    private void findTests(ClassLoader loader) {
+        classesTest.stream().forEach(classname -> {
+            try {
+                Class<?> test = loader.loadClass(classname.replace("/", "."));
+                tests.add(test);
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+        });
     }
 
     public void verifyTestsPassing() throws IOException {
         AllClassesClassLoader loader = new AllClassesClassLoader(this.allBytes, dependenciesClassLoader);
 
+        findTests(loader);
+
         factoreVerification(loader);
-        runTest.executeTestForVerification(loader).toString();
+        runTest.executeTestForVerification(loader, tests);
     }
 
     public void loadMutantInMemory(List<AnnotationMutationPoint> mutants) throws ClassNotFoundException {
@@ -70,7 +86,8 @@ public class MemoryCodeLoader {
 
             AllClassesClassLoader allClassesClassLoader = new AllClassesClassLoader(applyMutantMap,
                     dependenciesClassLoader);
-            runTest.executeTestForMutation(allClassesClassLoader);
+
+            runTest.executeTestForMutation(allClassesClassLoader, tests);
 
             applyMutantMap.put(className, originalClass);
 

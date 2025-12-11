@@ -3,7 +3,6 @@ package com.caio.directory_scan;
 import com.caio.exceptions.DependenciesNotFound;
 import com.caio.exceptions.NoOneClasseFinded;
 import com.caio.exceptions.PathNotExists;
-import com.caio.exceptions.PomFileNotFoundException;
 
 import java.io.IOException;
 import java.nio.file.*;

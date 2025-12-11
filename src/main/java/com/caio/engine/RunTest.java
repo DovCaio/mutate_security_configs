@@ -1,14 +1,9 @@
 package com.caio.engine;
 
-import java.io.File;
-import java.io.PrintWriter;
-import java.net.URL;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.junit.platform.engine.discovery.DiscoverySelectors;
 import org.junit.platform.launcher.Launcher;
@@ -34,48 +29,8 @@ public class RunTest {
                 this.testClasses = testClasses;
         }
 
-        private TestResult runAllTests(ClassLoader loader) {
-                Thread.currentThread().setContextClassLoader(loader);
-
-                Long totalTests = 0L;
-                Long failed = 0L;
-                List<Failure> failures = new ArrayList<>();
-                for (AnnotationMutationPoint c : this.testClasses) {
-                        String className = c.getTargetElement().name.replace('/', '.');
-
-                        try {
-                                Class<?> testClass = loader.loadClass(className);
-
-                                LauncherDiscoveryRequest request = LauncherDiscoveryRequestBuilder.request()
-                                                .selectors(DiscoverySelectors.selectClass(testClass))
-                                                .build();
-
-                                Launcher launcher = LauncherFactory.create();
-                                SummaryGeneratingListener listener = new SummaryGeneratingListener();
-
-                                launcher.registerTestExecutionListeners(listener);
-                                launcher.execute(request);
-
-                                TestExecutionSummary summary = listener.getSummary();
-
-                                totalTests += (long) summary.getTestsFoundCount();
-                                failed += (long) summary.getFailures().size();
-                                failures.addAll(summary.getFailures());
-
-                        } catch (Throwable t) {
-                                // System.out.println(
-                                // "💥 Falha ao carregar/executar " + className + ": " + t.getMessage());
-                                // t.printStackTrace(System.out);
-                        }
-                }
-                Long succeddeds = totalTests - failed;
-                TestResult testResult = new TestResult(totalTests, succeddeds, failed, failures);
-
-                return testResult;
-
-        }
-
-        public void runAllTestsCorrect(ClassLoader loader, List<Class<?>> loadedTestClasses) {
+ 
+        public TestResult runAllTestsCorrect(ClassLoader loader, List<Class<?>> loadedTestClasses) {
                 Thread.currentThread().setContextClassLoader(loader);
 
                 Launcher launcher = LauncherFactory.create();
@@ -90,20 +45,27 @@ public class RunTest {
                 LauncherDiscoveryRequest request = builder.build();
                 launcher.execute(request, summary);
 
-                summary.getSummary().printTo(new PrintWriter(System.out));
+                //summary.getSummary().printTo(new PrintWriter(System.out));
+
+                TestResult testResult = new TestResult(
+                                summary.getSummary().getTestsFoundCount(),
+                                summary.getSummary().getTestsSucceededCount(),
+                                summary.getSummary().getTestsFailedCount(),
+                                summary.getSummary().getFailures());
+                return testResult;
         }
 
-        public TestResult executeTestForVerification(ClassLoader loader) {
-                TestResult testResult = runAllTests(loader);
-                runAllTestsCorrect(loader, null);
+        public TestResult executeTestForVerification(ClassLoader loader, List<Class<?>> loadedTestClasses){
+                TestResult testResult = runAllTestsCorrect(loader, loadedTestClasses);
                 verifyTestResult = testResult;
                 if (testResult.totalTest == testResult.failed)
                         throw new NoOneTestPasses();
                 return testResult;
         }
 
-        public TestResult executeTestForMutation(ClassLoader loader) {
-                TestResult testResult = runAllTests(loader);
+        public TestResult executeTestForMutation(ClassLoader loader, List<Class<?>> loadedTestClasses) {
+                //TestResult testResult = runAllTests(loader);
+                TestResult testResult = runAllTestsCorrect(loader, loadedTestClasses);
                 this.testsResults.add(testResult);
                 return testResult;
         }
