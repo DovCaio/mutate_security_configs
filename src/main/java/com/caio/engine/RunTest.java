@@ -57,7 +57,7 @@ public class RunTest {
                 verifyTestResult = testResult;
                 if (testResult.totalTest == testResult.failed)
                         throw new NoOneTestPasses();
-                //this.failuresFromFirstExecution = testResult.failures;
+                // this.failuresFromFirstExecution = testResult.failures;
                 return testResult;
         }
 
@@ -81,16 +81,14 @@ public class RunTest {
                         this.failures = new HashMap<String, String>();
 
                         failures.forEach(f -> {
-                                if (f != null && f instanceof Failure) {
-                                        if ((failuresFromFirstExecution != null &&
-                                                        failuresFromFirstExecution.containsKey(
-                                                                        ((Failure) f).getTestIdentifier()
-                                                                                           .getDisplayName()))) {
-                                                this.failures.put(
+                                if (f != null && f instanceof Failure && failuresFromFirstExecution != null &&
+                                                failuresFromFirstExecution.containsKey(
                                                                 ((Failure) f).getTestIdentifier()
-                                                                                .getDisplayName(),
-                                                                ((Failure) f).getException().toString());
-                                        }
+                                                                                .getDisplayName())) {
+                                        this.failures.put(
+                                                        ((Failure) f).getTestIdentifier()
+                                                                        .getDisplayName(),
+                                                        ((Failure) f).getException().toString());
                                 }
                         });
                 }
