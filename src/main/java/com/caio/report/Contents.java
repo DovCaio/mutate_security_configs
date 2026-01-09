@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
+import com.caio.engine.ParamsForTestMutationApresentation;
 import com.caio.engine.RunTest;
 import com.caio.engine.RunTest.TestResult;
 
@@ -98,6 +99,10 @@ th, td {
                 <table>
                     <tr>
                         <th>#</th>
+                        <th>ClassName</th>
+                        <th>Método</th>
+                        <th>Valor original</th>
+                        <th>Mutação</th>
                         <th>Total</th>
                         <th>Sucesso</th>
                         <th>Falhas</th>
@@ -112,16 +117,23 @@ th, td {
         String rowClass = captured ? "captured" : "survived";
         String capturedText = captured ? "Sim" : "Não";
 
+        ParamsForTestMutationApresentation params = result.getParamsForTestMutationApresentation();
+
         html.append(String.format("""
             <tr class="%s">
                 <td>%d</td>
+                <td>%s</td>
+                <td>%s</td>
+                <td>%s</td>
+                <td>%s</td>
                 <td>%d</td>
                 <td>%d</td>
                 <td>%d</td>
                 <td>%s</td>
                 <td>%s</td>
             </tr>
-        """, rowClass, index++, result.getTotalTest(), result.getSuccedded(),
+        """, rowClass, index++, params.className, params.method,
+                params.originalValue, params.mutatedValue,result.getTotalTest(), result.getSuccedded(),
                 result.getFailed(), result.getFailures(), capturedText));
     }
 

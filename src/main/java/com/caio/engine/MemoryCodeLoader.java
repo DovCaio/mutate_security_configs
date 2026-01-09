@@ -85,7 +85,14 @@ public class MemoryCodeLoader {
             AllClassesClassLoader allClassesClassLoader = new AllClassesClassLoader(applyMutantMap,
                     dependenciesClassLoader);
 
-            runTest.executeTestForMutation(allClassesClassLoader, tests);
+            ParamsForTestMutationApresentation params = new ParamsForTestMutationApresentation(
+                    mutation.getOwnerClass(),
+                    mutation.getMethod().name,
+                    mutation.getAnnotationDesc(),
+                    "Placeholder",
+                    "Placeholder");
+
+            runTest.executeTestForMutation(allClassesClassLoader, tests, params);
 
             applyMutantMap.put(className, originalClass);
         }
