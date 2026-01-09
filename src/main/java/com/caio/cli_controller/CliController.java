@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 import static com.caio.utli.Printers.printMutationPoints;
 import static com.caio.utli.Printers.printPaths;
 
-public class CliController { // Gerencia as entradas e guarda o contexto da aplicação
+public class CliController {
 
     private static final List<String> EXISTENT_FLAGS = List.of("-v");
     private Path directory;

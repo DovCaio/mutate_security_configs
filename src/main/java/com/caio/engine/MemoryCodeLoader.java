@@ -21,8 +21,7 @@ public class MemoryCodeLoader {
     private URLClassLoader dependenciesClassLoader;
     private Map<String, byte[]> allBytes = new HashMap<>();
 
-    
-    private List<String> classesTest; // --- IGNORE ---
+    private List<String> classesTest; 
     private List<Class<?>> tests = new java.util.ArrayList<>();
 
     public MemoryCodeLoader(List<AnnotationMutationPoint> mainClasses, List<AnnotationMutationPoint> testClasses,
@@ -33,7 +32,7 @@ public class MemoryCodeLoader {
         this.dependenciesJarURLs = dependenciesJarURLs;
         dependenciesClassLoader = new URLClassLoader( // Muito importante
                 dependenciesJarURLs.toArray(new URL[0]), ClassLoader.getSystemClassLoader());
-        this.classesTest = classesTest; // --- IGNORE ---
+        this.classesTest = classesTest; 
 
         for (AnnotationMutationPoint c : this.mainClasses) {
             String className = c.getTargetElement().name.replace('/', '.');
@@ -44,7 +43,6 @@ public class MemoryCodeLoader {
             String className = c.getTargetElement().name.replace('/', '.');
             this.allBytes.put(className, c.getBytes());
         }
-
 
     }
 
@@ -90,7 +88,6 @@ public class MemoryCodeLoader {
             runTest.executeTestForMutation(allClassesClassLoader, tests);
 
             applyMutantMap.put(className, originalClass);
-
         }
     }
 

@@ -11,7 +11,6 @@ import org.junit.platform.launcher.LauncherDiscoveryRequest;
 import org.junit.platform.launcher.core.LauncherDiscoveryRequestBuilder;
 import org.junit.platform.launcher.core.LauncherFactory;
 import org.junit.platform.launcher.listeners.SummaryGeneratingListener;
-import org.junit.platform.launcher.listeners.TestExecutionSummary;
 import org.junit.platform.launcher.listeners.TestExecutionSummary.Failure;
 
 import com.caio.exceptions.NoOneTestPasses;
@@ -22,6 +21,7 @@ public class RunTest {
         private List<TestResult> testsResults;
         private List<AnnotationMutationPoint> testClasses;
         private TestResult verifyTestResult;
+        private Map<String, String> failuresFromFirstExecution;
 
         public RunTest(List<AnnotationMutationPoint> testClasses) {
 
@@ -29,7 +29,6 @@ public class RunTest {
                 this.testClasses = testClasses;
         }
 
- 
         public TestResult runAllTestsCorrect(ClassLoader loader, List<Class<?>> loadedTestClasses) {
                 Thread.currentThread().setContextClassLoader(loader);
 
@@ -45,8 +44,6 @@ public class RunTest {
                 LauncherDiscoveryRequest request = builder.build();
                 launcher.execute(request, summary);
 
-                //summary.getSummary().printTo(new PrintWriter(System.out));
-
                 TestResult testResult = new TestResult(
                                 summary.getSummary().getTestsFoundCount(),
                                 summary.getSummary().getTestsSucceededCount(),
@@ -55,16 +52,16 @@ public class RunTest {
                 return testResult;
         }
 
-        public TestResult executeTestForVerification(ClassLoader loader, List<Class<?>> loadedTestClasses){
+        public TestResult executeTestForVerification(ClassLoader loader, List<Class<?>> loadedTestClasses) {
                 TestResult testResult = runAllTestsCorrect(loader, loadedTestClasses);
                 verifyTestResult = testResult;
                 if (testResult.totalTest == testResult.failed)
                         throw new NoOneTestPasses();
+                //this.failuresFromFirstExecution = testResult.failures;
                 return testResult;
         }
 
         public TestResult executeTestForMutation(ClassLoader loader, List<Class<?>> loadedTestClasses) {
-                //TestResult testResult = runAllTests(loader);
                 TestResult testResult = runAllTestsCorrect(loader, loadedTestClasses);
                 this.testsResults.add(testResult);
                 return testResult;
@@ -78,14 +75,24 @@ public class RunTest {
                 private Map<String, String> failures;
 
                 public TestResult(Long totalTest, Long succedded, Long failed, List<?> failures) {
-
                         this.totalTest = totalTest;
                         this.succedded = succedded;
                         this.failed = failed;
                         this.failures = new HashMap<String, String>();
-                        failures.forEach(f -> this.failures.put(((Failure) f).getTestIdentifier().getDisplayName(),
-                                        ((Failure) f).getException().toString()));
 
+                        failures.forEach(f -> {
+                                if (f != null && f instanceof Failure) {
+                                        if ((failuresFromFirstExecution != null &&
+                                                        failuresFromFirstExecution.containsKey(
+                                                                        ((Failure) f).getTestIdentifier()
+                                                                                           .getDisplayName()))) {
+                                                this.failures.put(
+                                                                ((Failure) f).getTestIdentifier()
+                                                                                .getDisplayName(),
+                                                                ((Failure) f).getException().toString());
+                                        }
+                                }
+                        });
                 }
 
                 @Override()
