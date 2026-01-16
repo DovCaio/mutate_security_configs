@@ -49,7 +49,7 @@ public class CliController {
 
     public void execute() throws Exception {
         this.scanForDotFiles();
-        //this.searchForPossibleMutations();
+        this.searchForPossibleMutations();
         //this.startEngine();
         //this.generateReport();
     }
@@ -61,17 +61,17 @@ public class CliController {
     }
 
     private void searchForPossibleMutations() throws Exception {
-        this.bca.analyzeClass(directoryScan.getFindeds());
+        this.bca.analyze(directoryScan.getFindeds());
         List<Path> allDependenciesNedded = directoryScan.getDependenciesPath();
         allDependenciesNedded.addAll(directoryScan.getConfigsPath());
-        this.bca.transformPathIntoUrl(allDependenciesNedded);
+        //this.bca.transformPathIntoUrl(allDependenciesNedded);
         if (flag.equals("-v"))
             printMutationPoints(bca.getMutationsPoints());
     }
 
     private void startEngine() throws Exception {
-        this.engine = new Engine(bca.getMutationsPoints(), bca.getmainClasses(), bca.getTestClasses(),
-                bca.getDependenciesJarURL(), bca.getClassNameTest());
+        //this.engine = new Engine(bca.getMutationsPoints(), bca.getmainClasses(), bca.getTestClasses(),
+                //bca.getDependenciesJarURL(), bca.getClassNameTest());
         engine.start();
         if (flag.equals("-v")) {
             System.out.println("Mutantes");
