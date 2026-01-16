@@ -29,8 +29,6 @@ public class RunTest {
                 this.testClasses = testClasses;
         }
 
-
-
         private TestResult runAllTestsCorrect(ClassLoader loader, List<Class<?>> loadedTestClasses, ParamsForTestMutationApresentation params) {
                 Thread.currentThread().setContextClassLoader(loader);
 
@@ -46,15 +44,14 @@ public class RunTest {
                 LauncherDiscoveryRequest request = builder.build();
                 launcher.execute(request, summary);
 
-
-
-                if (params == null) // Execução inicial, sem mutations
+                if (params == null){ // Execução inicial, sem mutations
+                        
                         return new TestResult(
                                 summary.getSummary().getTestsFoundCount(),
                                 summary.getSummary().getTestsSucceededCount(),
                                 summary.getSummary().getTestsFailedCount(),
                                 summary.getSummary().getFailures());
-                else {
+                }else {
                         return new TestResult(
                                 summary.getSummary().getTestsFoundCount(),
                                 summary.getSummary().getTestsSucceededCount(),

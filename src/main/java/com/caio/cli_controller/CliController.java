@@ -49,15 +49,13 @@ public class CliController {
 
     public void execute() throws Exception {
         this.scanForDotFiles();
-        this.searchForPossibleMutations();
-        this.startEngine();
-        this.generateReport();
+        //this.searchForPossibleMutations();
+        //this.startEngine();
+        //this.generateReport();
     }
 
     private void scanForDotFiles() throws IOException {
         directoryScan.findClasses();
-        directoryScan.findJarDependencies();
-        directoryScan.findConfigFiles();
         if (flag.equals("-v"))
             printPaths(directoryScan.getFindeds());
     }

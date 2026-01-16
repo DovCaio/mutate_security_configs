@@ -2,11 +2,8 @@ package com.caio.models;
 
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.MethodNode;
-import org.objectweb.asm.tree.FieldNode;
 
-import java.nio.file.Path;
 import java.util.List;
-import java.util.Objects;
 
 public class AnnotationMutationPoint {
 
@@ -31,7 +28,7 @@ public class AnnotationMutationPoint {
             MethodNode method) {
 
         this.targetType = targetType;
-        this.ownerClass = ownerClass;
+        this.ownerClass = ownerClass.replace( "/", ".");
         this.annotationDesc = annotationDesc;
         this.targetElement = targetElement;
         this.values = values != null ? values : List.of();

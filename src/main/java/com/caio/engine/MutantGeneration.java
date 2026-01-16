@@ -2,8 +2,6 @@ package com.caio.engine;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.tree.AnnotationNode;
@@ -135,7 +133,6 @@ public class MutantGeneration {
                         values.set(i + 1, novoValor);
                     }
 
-                    // Se fosse array, enum, class, etc você trataria aqui
                 }
             }
         }

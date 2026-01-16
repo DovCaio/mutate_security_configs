@@ -1,11 +1,9 @@
 package com.caio.analize;
 
 import java.net.URL;
-import java.nio.file.Files;
 import java.nio.file.Path;
 
 import com.caio.exceptions.DependenciePathIsNull;
-import com.caio.exceptions.NotFoundedDependency;
 
 import java.util.*;
 import java.util.stream.Collectors;

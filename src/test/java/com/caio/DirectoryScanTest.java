@@ -47,18 +47,18 @@ class DirectoryScanTest {
     }
 
     @Test
-    @DisplayName("Deve lançar NoOneClasseFinded se o diretório não contiver .class")
+    @DisplayName("Deve lançar NoOneClasseFinded se o diretório não contiver .java")
     void testThrowsWhenNoClassFiles() throws IOException {
         DirectoryScan scanner = new DirectoryScan(tempDir);
         assertThrows(NoOneClasseFinded.class, scanner::findClasses);
     }
 
     @Test
-    @DisplayName("Deve retornar lista de arquivos .class encontrados")
+    @DisplayName("Deve retornar lista de arquivos .java encontrados")
     void testFindsClassFiles() throws IOException {
         // Cria arquivos simulando classes compiladas
-        Files.createFile(tempDir.resolve("Main.class"));
-        Files.createFile(tempDir.resolve("Helper.class"));
+        Files.createFile(tempDir.resolve("Main.java"));
+        Files.createFile(tempDir.resolve("Helper.java"));
         Files.createFile(tempDir.resolve("not_a_class.txt"));
 
         DirectoryScan scanner = new DirectoryScan(tempDir);
@@ -66,20 +66,20 @@ class DirectoryScanTest {
         List<Path> found = scanner.getFindeds();
 
         assertEquals(2, found.size());
-        assertTrue(found.stream().allMatch(p -> p.toString().endsWith(".class")));
+        assertTrue(found.stream().allMatch(p -> p.toString().endsWith(".java")));
     }
 
     @Test
-    @DisplayName("Deve encontrar arquivos .class em subdiretórios também")
+    @DisplayName("Deve encontrar arquivos .java em subdiretórios também")
     void testFindsClassesInSubdirectories() throws IOException {
         Path subDir = Files.createDirectories(tempDir.resolve("subdir"));
-        Files.createFile(subDir.resolve("Inner.class"));
+        Files.createFile(subDir.resolve("Inner.java"));
 
         DirectoryScan scanner = new DirectoryScan(tempDir);
         scanner.findClasses();
         List<Path> found = scanner.getFindeds();
 
         assertEquals(1, found.size());
-        assertTrue(found.get(0).toString().endsWith("Inner.class"));
+        assertTrue(found.get(0).toString().endsWith("Inner.java"));
     }
 }

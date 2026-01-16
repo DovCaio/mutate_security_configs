@@ -30,7 +30,7 @@ public class DirectoryScan {
     public void findClasses() throws IOException {
         try (Stream<Path> stream = Files.walk(this.directory)) {
             List<Path> finded = stream
-                    .filter(p -> p.toString().endsWith(".class"))
+                    .filter(p -> p.toString().endsWith(".java"))
                     .collect(Collectors.toList());
 
             if (finded.isEmpty())
@@ -40,35 +40,7 @@ public class DirectoryScan {
         }
     }
 
-    public void findJarDependencies() throws IOException {
-        try (Stream<Path> stream = Files.walk(this.directory)) {
-            List<Path> dependenciesFiles = stream
-                    .filter(Files::isRegularFile)
-                    .filter(p -> p.getFileName().toString().endsWith(".jar"))
-                    .collect(Collectors.toList());
-            if (dependenciesFiles.isEmpty())
-                throw new DependenciesNotFound("Dependências jar's não encontradas");
-            this.dependenciesPath = dependenciesFiles;
-
-        }
-    }
-
-    public void findConfigFiles() throws IOException {
-        try (Stream<Path> stream = Files.walk(this.directory)) {
-            List<Path> configsFiles = stream
-                    .filter(Files::isRegularFile)
-                    .filter(p -> p.getFileName().toString().endsWith(".properties")
-                            || p.getFileName().toString().endsWith(".xml")
-                            || p.getFileName().toString().endsWith(".lst")
-                            || p.getFileName().toString().endsWith(".yml")
-                            || p.getFileName().toString().endsWith(".yaml"))
-                    .collect(Collectors.toList());
-            if (configsFiles.isEmpty())
-                throw new DependenciesNotFound("Arquivos de configurações não encontrados");
-            this.configsPath = configsFiles;
-
-        }
-    }
+    
 
     public List<Path> getFindeds() {
         return findeds;
