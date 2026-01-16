@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
 
-public class BytecodeAnalyzer {
+public class CodeAnalyzer {
 
 
     private List<AnnotationMutationPoint> mutationsPoints;
@@ -26,7 +26,7 @@ public class BytecodeAnalyzer {
 
     private Map<Path, String> controllers;
 
-    public BytecodeAnalyzer() {
+    public CodeAnalyzer() {
         this.mutationsPoints = new ArrayList<AnnotationMutationPoint>();
         this.mainClasses = new ArrayList<AnnotationMutationPoint>();
         this.controllers = new HashMap<Path, String>();

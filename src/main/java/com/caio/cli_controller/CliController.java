@@ -1,6 +1,6 @@
 package com.caio.cli_controller;
 
-import com.caio.analize.BytecodeAnalyzer;
+import com.caio.analize.CodeAnalyzer;
 import com.caio.directory_scan.DirectoryScan;
 import com.caio.engine.Engine;
 import com.caio.report.Report;
@@ -20,7 +20,7 @@ public class CliController {
     private Path directory;
     private String flag = "";
     private DirectoryScan directoryScan;
-    private BytecodeAnalyzer bca;
+    private CodeAnalyzer bca;
     private Engine engine;
     private Report report;
 
@@ -43,7 +43,7 @@ public class CliController {
             throw new IllegalArgumentException("Muitos argumentos, no máximo 2");
         }
 
-        this.bca = new BytecodeAnalyzer();
+        this.bca = new CodeAnalyzer();
         this.directoryScan = new DirectoryScan(directory);
     }
 
