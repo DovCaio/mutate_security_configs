@@ -1,6 +1,6 @@
 package com.caio.directory_scan;
 
-import com.caio.exceptions.DependenciesNotFound;
+import com.caio.enums.BuildTool;
 import com.caio.exceptions.NoOneClasseFinded;
 import com.caio.exceptions.PathNotExists;
 
@@ -16,6 +16,7 @@ public class DirectoryScan {
     private List<Path> dependenciesPath;
     private List<Path> configsPath;
     private List<Path> findeds;
+    private BuildTool buildTool;
 
     public DirectoryScan(Path baseDir) {
         if (baseDir == null)
@@ -38,6 +39,21 @@ public class DirectoryScan {
                         + "\n Caso tenha passado o diretorio corretamnete, experimente compilar o projeto antes, para que seja gerado os arquivos que serão mutados.");
             this.findeds = finded;
         }
+    }
+
+    public BuildTool getBuildTool() {
+
+        if (Files.exists(this.directory.resolve("pom.xml")))
+            this.buildTool = BuildTool.MAVEN;
+        else if (Files.exists(this.directory.resolve("build.gradle")))
+            this.buildTool = BuildTool.GRADLE;
+        else if (Files.exists(this.directory.resolve("gradlew")))
+            this.buildTool = BuildTool.GRADLE_WRAPPER;
+        else
+            throw new IllegalArgumentException(
+                    "Não foi possível identificar a ferramenta de build do projeto. Nenhum arquivo pom.xml, build.gradle ou gradlew encontrado no diretório raiz. Talvez esse não seja o diretório raiz do projeto.");
+
+        return this.buildTool;
     }
 
     

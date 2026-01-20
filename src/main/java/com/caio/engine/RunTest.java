@@ -11,6 +11,7 @@ import java.util.Map;
 
 import org.junit.platform.launcher.listeners.TestExecutionSummary.Failure;
 
+import com.caio.enums.BuildTool;
 import com.caio.exceptions.NoOneTestPasses;
 
 public class RunTest {
@@ -19,10 +20,12 @@ public class RunTest {
         private TestResult verifyTestResult;
         private Map<String, String> failuresFromFirstExecution;
         private Path repoDirectory;
+        private BuildTool buildTool;
 
 
-        public RunTest(Path repoDirectory) {
+        public RunTest(Path repoDirectory, BuildTool buildTool) {
                 this.repoDirectory = repoDirectory;     
+                this.buildTool = buildTool;
                 this.testsResults = new ArrayList<TestResult>();
         }
 
@@ -48,6 +51,7 @@ public class RunTest {
                 for (String line : output) {
                         System.out.println(line);
                 }
+                System.out.println("O gerenciador de build utilizado é: " + this.buildTool);
 
                 int exitCode = process.waitFor();
 

@@ -1,5 +1,6 @@
 package com.caio.engine;
 
+import com.caio.enums.BuildTool;
 import com.caio.models.AnnotationMutationPoint;
 
 import java.nio.file.Path;
@@ -11,8 +12,8 @@ public class Engine {
     private MemoryCodeLoader memoryCodeLoader;
     private RunTest runTest;
 
-    public Engine(List<AnnotationMutationPoint> amps, List<AnnotationMutationPoint> mainClasses, Path repoDirectory ) {
-        this.runTest = new RunTest(repoDirectory);
+    public Engine(List<AnnotationMutationPoint> amps, List<AnnotationMutationPoint> mainClasses, Path repoDirectory, BuildTool buildTool) {
+        this.runTest = new RunTest(repoDirectory, buildTool);
         this.mutantGeneration = new MutantGeneration(amps);
         this.memoryCodeLoader = new MemoryCodeLoader(this.runTest);
     }
