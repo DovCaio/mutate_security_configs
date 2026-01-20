@@ -23,18 +23,12 @@ public class Printers {
 
         for (AnnotationMutationPoint amp : points) {
             System.out.println("---- AnnotationMutationPoint ----");
+            System.out.println("Annotation Name: " + amp.getAnnotationName());
+            System.out.println("Original Value: " + amp.getOriginalValue());
+            System.out.println("Mutated Value: " + amp.getMutatedValue());
             System.out.println("Target Type: " + amp.getTargetType());
-            System.out.println("Owner Class: " + amp.getOwnerClass());
-            System.out.println("Annotation Desc: " + amp.getAnnotationDesc());
-            System.out.println("Target Element: " + amp.getTargetElement());
-            System.out.println("Values:");
-            if (amp.getValues() != null) {
-                for (int i = 0; i < amp.getValues().size(); i += 2) {
-                    String key = (String) amp.getValues().get(i);
-                    Object val = amp.getValues().get(i + 1);
-                    System.out.println("  " + key + " = " + val);
-                }
-            }
+            System.out.println("File Path: " + amp.getFilePath());
+            System.out.println("Line Number: " + amp.getLineNumber());
             System.out.println("-------------------------------\n");
         }
 

@@ -1,4 +1,4 @@
-package com.caio.engine;
+/*package com.caio.engine;
 
 import java.io.IOException;
 import java.net.URL;
@@ -109,3 +109,4 @@ public class MemoryCodeLoader {
     }
 
 }
+*/

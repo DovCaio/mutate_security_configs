@@ -1,4 +1,4 @@
-package com.caio.engine;
+/*package com.caio.engine;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,7 +50,7 @@ public class MutantGeneration {
             throw new NoOnePossibleMutant();
     }
 
-
+    
     private AnnotationMutationPoint createMutant(AnnotationMutationPoint amp, String novoValor) throws Exception {
         List<Object> mutatedValues = mutateAnnotationValues(amp.getValues(), novoValor); // Seria muito bom se o
                                                                                          // amp.getValues() retornase um
@@ -165,4 +165,4 @@ public class MutantGeneration {
         this.mutants = mutants;
     }
 
-}
+}*/
