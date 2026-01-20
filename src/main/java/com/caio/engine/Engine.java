@@ -1,8 +1,8 @@
-/*package com.caio.engine;
+package com.caio.engine;
 
 import com.caio.models.AnnotationMutationPoint;
 
-import java.net.URL;
+import java.nio.file.Path;
 import java.util.List;
 
 public class Engine {
@@ -11,18 +11,16 @@ public class Engine {
     private MemoryCodeLoader memoryCodeLoader;
     private RunTest runTest;
 
-    public Engine(List<AnnotationMutationPoint> amps, List<AnnotationMutationPoint> mainClasses,
-            List<AnnotationMutationPoint> testClasses, List<URL> dependenciesJarURLs, List<String> classesTest) {
-        this.runTest = new RunTest(testClasses);
+    public Engine(List<AnnotationMutationPoint> amps, List<AnnotationMutationPoint> mainClasses, Path repoDirectory ) {
+        this.runTest = new RunTest(repoDirectory);
         this.mutantGeneration = new MutantGeneration(amps);
-        this.memoryCodeLoader = new MemoryCodeLoader(mainClasses, testClasses, dependenciesJarURLs, this.runTest,
-                classesTest);
+        this.memoryCodeLoader = new MemoryCodeLoader(this.runTest);
     }
 
     public void start() throws Exception {
         this.mutantGeneration.createMutants();
         this.memoryCodeLoader.verifyTestsPassing();
-        this.memoryCodeLoader.loadMutantInMemory(this.mutantGeneration.getMutants());
+        //this.memoryCodeLoader.loadMutantInMemory(this.mutantGeneration.getMutants());
     }
 
     public List<AnnotationMutationPoint> getMutants() {
@@ -38,4 +36,3 @@ public class Engine {
     }
 
 }
-*/

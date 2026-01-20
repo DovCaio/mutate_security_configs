@@ -4,14 +4,7 @@ import com.caio.exceptions.NoOneAnnotationMutableFinded;
 import com.caio.models.AnnotationMutationPoint;
 import com.caio.models.AnnotationMutationPoint.AnnotationType;
 
-import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.tree.AnnotationNode;
-import org.objectweb.asm.tree.ClassNode;
-import org.objectweb.asm.tree.FieldNode;
-import org.objectweb.asm.tree.MethodNode;
-
 import java.io.IOException;
-import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;

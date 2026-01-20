@@ -2,7 +2,7 @@ package com.caio.cli_controller;
 
 import com.caio.analize.CodeAnalyzer;
 import com.caio.directory_scan.DirectoryScan;
-//import com.caio.engine.Engine;
+import com.caio.engine.Engine;
 import com.caio.report.Report;
 
 import java.io.IOException;
@@ -21,7 +21,7 @@ public class CliController {
     private String flag = "";
     private DirectoryScan directoryScan;
     private CodeAnalyzer bca;
-    //private Engine engine;
+    private Engine engine;
     private Report report;
 
     public CliController(String[] args) {
@@ -50,7 +50,7 @@ public class CliController {
     public void execute() throws Exception {
         this.scanForDotFiles();
         this.searchForPossibleMutations();
-        //this.startEngine();
+        this.startEngine();
         //this.generateReport();
     }
 
@@ -66,9 +66,8 @@ public class CliController {
             printMutationPoints(bca.getMutationsPoints());
     }
 
-    /*private void startEngine() throws Exception {
-        //this.engine = new Engine(bca.getMutationsPoints(), bca.getmainClasses(), bca.getTestClasses(),
-                //bca.getDependenciesJarURL(), bca.getClassNameTest());
+    private void startEngine() throws Exception {
+        this.engine = new Engine(bca.getMutationsPoints(), bca.getmainClasses(), directoryScan.getDirectory());
         engine.start();
         if (flag.equals("-v")) {
             System.out.println("Mutantes");
@@ -79,7 +78,7 @@ public class CliController {
             ;
             allResults.stream().forEach(value -> System.out.println(value));
         }
-    }*/
+    }
 
     /*private void generateReport() {
         this.report = new Report(engine.getTestsResults());

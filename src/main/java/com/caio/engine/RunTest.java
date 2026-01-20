@@ -1,49 +1,57 @@
 package com.caio.engine;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.platform.engine.discovery.DiscoverySelectors;
-import org.junit.platform.launcher.Launcher;
-import org.junit.platform.launcher.LauncherDiscoveryRequest;
-import org.junit.platform.launcher.core.LauncherDiscoveryRequestBuilder;
-import org.junit.platform.launcher.core.LauncherFactory;
-import org.junit.platform.launcher.listeners.SummaryGeneratingListener;
 import org.junit.platform.launcher.listeners.TestExecutionSummary.Failure;
 
 import com.caio.exceptions.NoOneTestPasses;
-import com.caio.models.AnnotationMutationPoint;
 
 public class RunTest {
 
         private List<TestResult> testsResults;
-        private List<AnnotationMutationPoint> testClasses;
         private TestResult verifyTestResult;
         private Map<String, String> failuresFromFirstExecution;
+        private Path repoDirectory;
 
-        public RunTest(List<AnnotationMutationPoint> testClasses) {
 
+        public RunTest(Path repoDirectory) {
+                this.repoDirectory = repoDirectory;     
                 this.testsResults = new ArrayList<TestResult>();
-                this.testClasses = testClasses;
         }
 
-        private TestResult runAllTestsCorrect(ClassLoader loader, List<Class<?>> loadedTestClasses, ParamsForTestMutationApresentation params) {
-                Thread.currentThread().setContextClassLoader(loader);
+        private TestResult runAllTestsCorrect(ParamsForTestMutationApresentation params) throws IOException, InterruptedException {
 
-                Launcher launcher = LauncherFactory.create();
-                SummaryGeneratingListener summary = new SummaryGeneratingListener();
+                ProcessBuilder processBuilder = new ProcessBuilder();
+                processBuilder.command("sh", "-c", "echo 'Hello World!" + repoDirectory.toString() + "'");
 
-                LauncherDiscoveryRequestBuilder builder = LauncherDiscoveryRequestBuilder.request();
+                List<String> output = new ArrayList<>();
 
-                for (Class<?> testClass : loadedTestClasses) {
-                        builder.selectors(DiscoverySelectors.selectClass(testClass));
+                Process process = processBuilder.start();
+
+                try (BufferedReader reader = new BufferedReader(
+                        new InputStreamReader(process.getInputStream()))) {
+
+                String line;
+                while ((line = reader.readLine()) != null) {
+                        output.add(line);
+                }
                 }
 
-                LauncherDiscoveryRequest request = builder.build();
-                launcher.execute(request, summary);
+                System.out.println("Output do processo:");
+                for (String line : output) {
+                        System.out.println(line);
+                }
 
+                int exitCode = process.waitFor();
+
+                /* 
                 if (params == null){ // Execução inicial, sem mutations
                         
                         return new TestResult(
@@ -58,11 +66,13 @@ public class RunTest {
                                 summary.getSummary().getTestsFailedCount(),
                                 summary.getSummary().getFailures(),
                                 params);
-                }
+                }*/
+
+                return null;
         }
 
-        public TestResult executeTestForVerification(ClassLoader loader, List<Class<?>> loadedTestClasses) {
-                TestResult testResult = runAllTestsCorrect(loader, loadedTestClasses, null);
+        public TestResult executeTestForVerification() throws IOException, InterruptedException {
+                TestResult testResult = runAllTestsCorrect(null);
                 verifyTestResult = testResult;
                 if (testResult.totalTest == testResult.failed)
                         throw new NoOneTestPasses();
@@ -70,8 +80,8 @@ public class RunTest {
                 return testResult;
         }
 
-        public TestResult executeTestForMutation(ClassLoader loader, List<Class<?>> loadedTestClasses, ParamsForTestMutationApresentation params) {
-                TestResult testResult = runAllTestsCorrect(loader, loadedTestClasses, params);
+        public TestResult executeTestForMutation(ParamsForTestMutationApresentation params) throws IOException, InterruptedException {
+                TestResult testResult = runAllTestsCorrect(params);
                 this.testsResults.add(testResult);
                 return testResult;
         }

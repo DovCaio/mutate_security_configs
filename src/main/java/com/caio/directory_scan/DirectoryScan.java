@@ -62,4 +62,10 @@ public class DirectoryScan {
         return configsPath;
     }
 
+    public Path getDirectory() {
+        return directory;
+    }
+
+    
+
 }

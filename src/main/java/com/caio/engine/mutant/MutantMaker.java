@@ -13,18 +13,11 @@ public class MutantMaker {
     private final String regexDenyAll = "(?:denyAll)";
 
 
-    private String key;
     private String value;
 
-    public MutantMaker(List<Object> values){
+    public MutantMaker(String value){
 
-        for (int i = 0; i < values.size(); i += 2 ) {
-            String key = (String) values.get(i);
-            if (key.equals("value")){
-                this.key = key;
-                this.value = (String) values.get(i + 1);
-            }
-        }
+        this.value = value;
     }
 
     public List<String> genAllMutants() throws Exception{
