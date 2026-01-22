@@ -55,7 +55,7 @@ public class CliController {
     }
 
     private void scanForDotFiles() throws IOException {
-        directoryScan.findClasses();
+        directoryScan.findFiles(".java");
         if (flag.equals("-v"))
             printPaths(directoryScan.getFindeds());
     }

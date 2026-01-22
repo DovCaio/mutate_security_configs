@@ -50,7 +50,7 @@ class DirectoryScanTest {
     @DisplayName("Deve lançar NoOneClasseFinded se o diretório não contiver .java")
     void testThrowsWhenNoClassFiles() throws IOException {
         DirectoryScan scanner = new DirectoryScan(tempDir);
-        assertThrows(NoOneClasseFinded.class, scanner::findClasses);
+        assertThrows(NoOneClasseFinded.class, () -> scanner.findFiles(".java"));
     }
 
     @Test
@@ -62,7 +62,7 @@ class DirectoryScanTest {
         Files.createFile(tempDir.resolve("not_a_class.txt"));
 
         DirectoryScan scanner = new DirectoryScan(tempDir);
-        scanner.findClasses();
+        scanner.findFiles(".java");
         List<Path> found = scanner.getFindeds();
 
         assertEquals(2, found.size());
@@ -76,7 +76,7 @@ class DirectoryScanTest {
         Files.createFile(subDir.resolve("Inner.java"));
 
         DirectoryScan scanner = new DirectoryScan(tempDir);
-        scanner.findClasses();
+        scanner.findFiles(".java");
         List<Path> found = scanner.getFindeds();
 
         assertEquals(1, found.size());

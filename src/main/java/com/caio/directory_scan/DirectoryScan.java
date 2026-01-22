@@ -1,14 +1,29 @@
 package com.caio.directory_scan;
 
 import com.caio.enums.BuildTool;
+import com.caio.enums.TestStatus;
 import com.caio.exceptions.NoOneClasseFinded;
 import com.caio.exceptions.PathNotExists;
+import com.caio.models.tests.FailureDetail;
+import com.caio.models.tests.TestCaseResult;
+import com.caio.models.tests.TestExecutionReport;
+import com.caio.models.tests.TestSuiteResult;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
+import org.w3c.dom.Element;
 
 public class DirectoryScan {
 
@@ -28,14 +43,15 @@ public class DirectoryScan {
         directory = baseDir;
     }
 
-    public void findClasses() throws IOException {
+    public void findFiles(String extension) throws IOException {
         try (Stream<Path> stream = Files.walk(this.directory)) {
             List<Path> finded = stream
-                    .filter(p -> p.toString().endsWith(".java"))
+                    .filter(p -> p.toString().endsWith(extension))
                     .collect(Collectors.toList());
 
             if (finded.isEmpty())
-                throw new NoOneClasseFinded("Nenhum arquivo .class encontrado em: " + directory.toAbsolutePath()
+                throw new NoOneClasseFinded("Nenhum arquivo " + extension + " encontrado em: "
+                        + directory.toAbsolutePath()
                         + "\n Caso tenha passado o diretorio corretamnete, experimente compilar o projeto antes, para que seja gerado os arquivos que serão mutados.");
             this.findeds = finded;
         }
@@ -56,7 +72,85 @@ public class DirectoryScan {
         return this.buildTool;
     }
 
-    
+    private FailureDetail extractFailure(Element element) { //Acho que vou ter que criar uma nova classe para tudo isso daqui
+        FailureDetail fd = new FailureDetail(element.getAttribute("type"), element.getAttribute("message"),
+                element.getTextContent());
+        return fd;
+    }
+
+    private TestCaseResult extractTestCase(Element tc) {
+        String className = tc.getAttribute("classname");
+        String name = tc.getAttribute("name");
+        double timeTestCase = Double.parseDouble(tc.getAttribute("time"));
+
+        TestStatus status = TestStatus.PASSED;
+        FailureDetail failure = null;
+
+        if (tc.getElementsByTagName("failure").getLength() > 0) {
+            status = TestStatus.FAILED;
+            Element f = (Element) tc.getElementsByTagName("failure").item(0);
+            failure = extractFailure(f);
+        } else if (tc.getElementsByTagName("error").getLength() > 0) {
+            status = TestStatus.ERROR;
+            Element e = (Element) tc.getElementsByTagName("error").item(0);
+            failure = extractFailure(e);
+        } else if (tc.getElementsByTagName("skipped").getLength() > 0) {
+            status = TestStatus.SKIPPED;
+        }
+
+        TestCaseResult testCase = new TestCaseResult(className, name, timeTestCase, status, failure);
+        return null;
+    }
+
+    private TestSuiteResult extractSuitCase(File file) throws ParserConfigurationException, SAXException, IOException {
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder builder = factory.newDocumentBuilder();
+        org.w3c.dom.Document document = builder.parse(file);
+        document.getDocumentElement().normalize();
+
+        String testSuiteName = document.getDocumentElement().getAttribute("name");
+        String tests = document.getDocumentElement().getAttribute("tests");
+        String failures = document.getDocumentElement().getAttribute("failures");
+        String errors = document.getDocumentElement().getAttribute("errors");
+        int skipped = Integer.parseInt(
+                document.getDocumentElement().getAttribute("skipped").isEmpty() ? "0"
+                        : document.getDocumentElement().getAttribute("skipped"));
+        double time = Double.parseDouble(document.getDocumentElement().getAttribute("time"));
+
+        NodeList testCases = document.getElementsByTagName("testcase");
+
+        List<TestCaseResult> testCaseResults = new ArrayList<>();
+
+        for (int i = 0; i < testCases.getLength(); i++) {
+            Element tc = (Element) testCases.item(i);
+            TestCaseResult testCase = extractTestCase(tc);
+            testCaseResults.add(testCase);
+        }
+
+        TestSuiteResult suiteResult = new TestSuiteResult(testSuiteName, Integer.parseInt(tests),
+                Integer.parseInt(failures), Integer.parseInt(errors), skipped, time, testCaseResults);
+        return suiteResult;
+
+    }
+
+    public TestExecutionReport getTestsReports() throws IOException, ParserConfigurationException, SAXException {
+        // Ler os arquivos de relatório de teste gerados pela ferramenta de build
+        findFiles(".xml");
+
+        List<File> reportFiles = this.findeds.stream()
+                .filter(path -> path.getFileName().toString().startsWith("TEST-"))
+                .map(Path::toFile)
+                .collect(Collectors.toList());
+
+        TestExecutionReport testReport = new TestExecutionReport();
+
+        for (File file : reportFiles) {
+            TestSuiteResult suiteResult = extractSuitCase(file);
+            testReport.addSuite(suiteResult);
+        }
+
+        return testReport;
+    }
 
     public List<Path> getFindeds() {
         return findeds;
@@ -81,7 +175,5 @@ public class DirectoryScan {
     public Path getDirectory() {
         return directory;
     }
-
-    
 
 }
