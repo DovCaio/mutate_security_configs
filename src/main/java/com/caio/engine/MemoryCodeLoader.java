@@ -21,9 +21,9 @@ public class MemoryCodeLoader {
     
     public void verifyTestsPassing() throws IOException, InterruptedException {
         RunTest.TestResult testResult = runTest.executeTestForVerification();
-        //if (testResult.failed > 0) {
-            //throw new IOException("Nem todos os testes passaram na execução inicial. Impossível continuar com a mutação.");
-        //}
+        if (testResult.getFailed() > 0) {
+            throw new IOException("Nem todos os testes passaram na execução inicial. Impossível continuar com a mutação.");
+        }
     }
 
     public void modifyCode(List<AnnotationMutationPoint> mutants) throws ClassNotFoundException {

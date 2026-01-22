@@ -98,8 +98,7 @@ public class DirectoryScan {
             status = TestStatus.SKIPPED;
         }
 
-        TestCaseResult testCase = new TestCaseResult(className, name, timeTestCase, status, failure);
-        return null;
+        return new TestCaseResult(className, name, timeTestCase, status, failure);
     }
 
     private TestSuiteResult extractSuitCase(File file) throws ParserConfigurationException, SAXException, IOException {
@@ -142,12 +141,14 @@ public class DirectoryScan {
                 .map(Path::toFile)
                 .collect(Collectors.toList());
 
-        TestExecutionReport testReport = new TestExecutionReport();
 
+        List<TestSuiteResult> testSuiteResults = new ArrayList<>();
+        
         for (File file : reportFiles) {
-            TestSuiteResult suiteResult = extractSuitCase(file);
-            testReport.addSuite(suiteResult);
+            testSuiteResults.add(extractSuitCase(file));
         }
+
+        TestExecutionReport testReport = new TestExecutionReport(testSuiteResults);
 
         return testReport;
     }

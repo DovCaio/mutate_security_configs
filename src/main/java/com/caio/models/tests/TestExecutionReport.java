@@ -12,8 +12,8 @@ public class TestExecutionReport {
     private Long totalSkipped;
     private Double totalTime;
 
-    public TestExecutionReport() {
-        suites = new ArrayList<>();
+    public TestExecutionReport(List<TestSuiteResult> suites) {
+        this.suites = suites;
         this.totalTests = suites.stream().mapToLong(suite -> suite.tests).sum();
         this.totalFailures = suites.stream().mapToLong(suite -> suite.failures).sum();
         this.totalErrors = suites.stream().mapToLong(suite -> suite.errors).sum();
@@ -51,7 +51,12 @@ public class TestExecutionReport {
 
     public List<FailureDetail> getFailureDetails() {
         return suites.stream()
-                .flatMap(suite -> suite.getFailures().stream())
+                .flatMap(suite -> {
+                    if (suite.getFailures() == null) {
+                        return java.util.stream.Stream.empty();
+                    }
+                    return suite.getFailures().stream();
+                })
                 .collect(java.util.stream.Collectors.toList());
     }
 
