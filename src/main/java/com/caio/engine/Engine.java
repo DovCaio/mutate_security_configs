@@ -10,19 +10,19 @@ import java.util.List;
 public class Engine {
 
     private MutantGeneration mutantGeneration;
-    private MemoryCodeLoader memoryCodeLoader;
+    private CodeLoader codeLoader;
     private RunTest runTest;
 
     public Engine(List<AnnotationMutationPoint> amps, List<AnnotationMutationPoint> mainClasses, Path repoDirectory, BuildTool buildTool) {
         this.runTest = new RunTest(repoDirectory, buildTool);
         this.mutantGeneration = new MutantGeneration(amps);
-        this.memoryCodeLoader = new MemoryCodeLoader(this.runTest);
+        this.codeLoader = new CodeLoader(this.runTest);
     }
 
     public void start() throws Exception {
         this.mutantGeneration.createMutants();
-        this.memoryCodeLoader.verifyTestsPassing();
-        //this.memoryCodeLoader.loadMutantInMemory(this.mutantGeneration.getMutants());
+        this.codeLoader.verifyTestsPassing();
+        this.codeLoader.start(getMutants());
     }
 
     public List<AnnotationMutationPoint> getMutants() {

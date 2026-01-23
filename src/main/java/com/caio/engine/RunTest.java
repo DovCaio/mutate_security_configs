@@ -25,34 +25,32 @@ public class RunTest {
         private BuildTool buildTool;
         private String command = "";
         private DirectoryScan directoryScan;
+        private Path projectRoot;
 
         public RunTest(Path repoDirectory, BuildTool buildTool) {
                 this.repoDirectory = repoDirectory;
                 this.buildTool = buildTool;
                 this.testsResults = new ArrayList<TestResult>();
-
+                this.projectRoot = repoDirectory;
                 String dir = repoDirectory.toAbsolutePath().toString();
 
                 switch (this.buildTool) {
                         case MAVEN:
-                                this.command = "mvn test";
+                                this.command = "mvn -U clean test";
                                 dir = dir + "/target/surefire-reports";
                                 break;
                         case GRADLE:
-                                this.command = "gradle test"; // Me parece meio suspeitor de estar errado
-                                dir = dir + "/build/test-results/test";
-                                break;
                         case GRADLE_WRAPPER:
-                                this.command = "./gradlew test";
+                                this.command = "./gradlew test --no-daemon --rerun-tasks --no-build-cache";
                                 dir = dir + "/build/test-results/test";
                                 break;
+
                         default:
                                 throw new IllegalArgumentException("Build tool não suportada: " + this.buildTool);
                 }
 
                 Path reportsDir = Path.of(dir);
                 this.directoryScan = new DirectoryScan(reportsDir);
-                System.out.println("Diretório de relatórios de teste definido para: " + reportsDir.toAbsolutePath());
         }
 
         private TestExecutionReport readResult() {
@@ -71,23 +69,15 @@ public class RunTest {
                         throws IOException, InterruptedException {
 
                 ProcessBuilder processBuilder = new ProcessBuilder();
+                processBuilder.directory(projectRoot.toFile());
                 processBuilder.command("sh", "-c", this.command);
-
-                List<String> output = new ArrayList<>();
 
                 Process process = processBuilder.start();
 
-                int exitCode = process.waitFor();
+                int exitCode = process.waitFor(); //Pode ser um indicio de que os testes falharam
 
-                if (exitCode != 0) {
-                        BufferedReader reader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
-                        String line;
-                        while ((line = reader.readLine()) != null) {
-                                output.add(line);
-                        }
-                        throw new IOException("Erro ao executar os testes. Código de saída: " + exitCode + "\n" +
-                                        String.join("\n", output));
-                }
+                BufferedReader stdOut = new BufferedReader(new InputStreamReader(process.getInputStream())); //Tem que ser consumido para não travar o processo
+                BufferedReader stdErr = new BufferedReader(new InputStreamReader(process.getErrorStream()));
 
                 TestExecutionReport testExecutionReport = readResult();
 
@@ -108,6 +98,7 @@ public class RunTest {
                 if (testResult.getTotalTest() == testResult.getFailed())
                         throw new NoOneTestPasses();
                 this.failuresFromFirstExecution = testResult.getFailures();
+
                 return testResult;
         }
 
@@ -152,7 +143,8 @@ public class RunTest {
                 }
 
                 public boolean equals(TestResult b) {
-                        return this.getSuccedded().equals(b.getSuccedded()) && this.getSuccedded().equals(b.getSuccedded())
+                        return this.getSuccedded().equals(b.getSuccedded())
+                                        && this.getSuccedded().equals(b.getSuccedded())
                                         && this.getFailed().equals(b.getFailed());
                 }
 
@@ -165,7 +157,8 @@ public class RunTest {
                 }
 
                 public Long getSuccedded() {
-                        return testExecutionReport.getTotalTests() - testExecutionReport.getTotalFailures() - testExecutionReport.getTotalErrors();
+                        return testExecutionReport.getTotalTests() - testExecutionReport.getTotalFailures()
+                                        - testExecutionReport.getTotalErrors();
                 }
 
                 public Long getFailed() {

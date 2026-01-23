@@ -22,12 +22,11 @@ public class TestSuiteResult {
     }
 
     public List<FailureDetail> getFailures(){
-        testCases.stream().reduce((List<FailureDetail>) null, (acc, testCase) -> {
-            if(testCase.status == com.caio.enums.TestStatus.FAILED){
+        return testCases.stream().reduce((List<FailureDetail>) null, (acc, testCase) -> {
+            if(acc != null && testCase.status == com.caio.enums.TestStatus.FAILED){
                 acc.add(testCase.getFailure());
             }
             return acc;
         }, (a, b) -> a);
-        return null;
-    }    
+    }   
 }

@@ -51,7 +51,7 @@ public class CliController {
         this.scanForDotFiles();
         this.searchForPossibleMutations();
         this.startEngine();
-        // this.generateReport();
+        this.generateReport();
     }
 
     private void scanForDotFiles() throws IOException {
@@ -81,11 +81,10 @@ public class CliController {
         }
     }
 
-    /*
-     * private void generateReport() {
-     * this.report = new Report(engine.getTestsResults());
-     * this.report.generate(directory);
-     * }
-     */
+    
+    private void generateReport() {
+        this.report = new Report(engine.getTestsResults());
+        this.report.generate(directory);
+    }
 
 }
