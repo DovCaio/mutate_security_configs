@@ -84,6 +84,9 @@ public class CodeAnalyzer {
         if (controllers == null || controllers.isEmpty())
             throw new NoOneAnnotationMutableFinded(); // Talvez esse erro devesse ser diferente
 
+        Map<Path, String> aux = this.getControllers().entrySet().stream()
+                .collect(HashMap::new, (m, e) -> m.put(e.getKey(), e.getValue()), HashMap::putAll);
+
         for (Map.Entry<Path, String> entry : controllers.entrySet()) {
             Path path = entry.getKey();
             String content = entry.getValue();
@@ -91,14 +94,14 @@ public class CodeAnalyzer {
             boolean containsPre = content.contains("@PreAuthorize");
             boolean containsPost = content.contains("@PostAuthorize");
 
-            if (!(containsPre || containsPost)) { // Deixa somente os que podem ser possíveis de mutar
-                this.controllers.remove(path);
+            if (!(containsPre || containsPost)) {
+                aux.remove(path); //Não posso modificar um hashmap enquanto estou iterando sobre ele
             } else {
                 List<AuthorizationOccurrence> originalValues = findOriginalsValues(content);
 
                 for (int i = 0; i < originalValues.size(); i++) {
                     String originalValue = originalValues.get(i).value;
-                    String mutatedValue = ""; // Isso daqui é definido em outro lugar
+                    String mutatedValue = ""; //Isso daqui é definido em outro lugar
                     AnnotationMutationPoint annotationMutationPoint = new AnnotationMutationPoint(
                             originalValue,
                             mutatedValue,
@@ -119,8 +122,10 @@ public class CodeAnalyzer {
 
         }
 
-        if (controllers == null || controllers.isEmpty())
+        if (aux == null || aux.isEmpty())
             throw new NoOneAnnotationMutableFinded();
+
+        this.controllers = aux;
     }
 
     public Map<Path, String> getControllers() {

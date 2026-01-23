@@ -20,7 +20,6 @@ public class RunTest {
 
         private List<TestResult> testsResults;
         private TestResult verifyTestResult;
-        private String failuresFromFirstExecution;
         private Path repoDirectory;
         private BuildTool buildTool;
         private String command = "";
@@ -93,7 +92,6 @@ public class RunTest {
                 verifyTestResult = testResult;
                 if (testResult.getTotalTest() == testResult.getFailed())
                         throw new NoOneTestPasses();
-                this.failuresFromFirstExecution = testResult.getFailures();
 
                 return testResult;
         }

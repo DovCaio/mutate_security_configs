@@ -42,7 +42,6 @@ public class CodeLoader {
             modifiedContent = replace(content, amp.getMutatedValue(), amp.getOriginalValue(), amp.getLineNumber() - 1);
         }
 
-
         Files.writeString(amp.getFilePath(), modifiedContent);
     }
 
