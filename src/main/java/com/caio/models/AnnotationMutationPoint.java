@@ -9,21 +9,25 @@ public class AnnotationMutationPoint {
     public enum TargetType { CLASS, METHOD }
     public enum AnnotationType { PRE, POST }
 
+    public String packageName;
+    public String methodOrClassName;
     public AnnotationType annotationName;
     public String originalValue;
     public String mutatedValue;
     public TargetType targetType;
     public Path filePath;
     public Integer lineNumber;
+    
 
     public AnnotationMutationPoint(
+        String packageName,
         String originalValue,
         String mutatedValue,
         TargetType targetType,
         Path filePath,
         Integer lineNumber
             ) {
-
+        this.packageName = packageName;
         this.originalValue = originalValue;
         this.mutatedValue = mutatedValue;
         this.targetType = targetType;
@@ -79,7 +83,11 @@ public class AnnotationMutationPoint {
         this.lineNumber = lineNumber;
     }
 
-    
+    public String getPackageName() {
+        return packageName;
+    }
+
+        
 
 }
 

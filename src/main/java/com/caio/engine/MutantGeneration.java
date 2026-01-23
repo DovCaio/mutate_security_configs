@@ -47,6 +47,7 @@ public class MutantGeneration {
     private AnnotationMutationPoint createMutant(AnnotationMutationPoint amp, String novoValor) throws Exception {
 
         AnnotationMutationPoint mutant = new AnnotationMutationPoint(
+            amp.getPackageName(),
             amp.getOriginalValue(),
             novoValor,
             amp.getTargetType(),

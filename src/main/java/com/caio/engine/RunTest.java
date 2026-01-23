@@ -7,10 +7,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.xml.parsers.ParserConfigurationException;
-
-import org.xml.sax.SAXException;
-
 import com.caio.directory_scan.DirectoryScan;
 import com.caio.enums.BuildTool;
 import com.caio.exceptions.NoOneTestPasses;
@@ -53,11 +49,7 @@ public class RunTest {
         private TestExecutionReport readResult() {
                 try {
                         return directoryScan.getTestsReports();
-                } catch (IOException e) { // Talvez tentar personalizar cada um desses seja uma boa.
-                        throw new RuntimeException("Erro ao ler relatórios de testes: " + e.getMessage(), e);
-                } catch (ParserConfigurationException e) {
-                        throw new RuntimeException("Erro ao ler relatórios de testes: " + e.getMessage(), e);
-                } catch (SAXException e) {
+                } catch (Exception e) { //Está genérico porque eu não tenho como controlar muita coisa.
                         throw new RuntimeException("Erro ao ler relatórios de testes: " + e.getMessage(), e);
                 }
         }
@@ -71,7 +63,7 @@ public class RunTest {
 
                 Process process = processBuilder.start();
 
-                int exitCode = process.waitFor();
+                process.waitFor();
 
                 BufferedReader stdOut = new BufferedReader(new InputStreamReader(process.getInputStream())); //Tem que ser consumido para não travar o processo
                 BufferedReader stdErr = new BufferedReader(new InputStreamReader(process.getErrorStream()));

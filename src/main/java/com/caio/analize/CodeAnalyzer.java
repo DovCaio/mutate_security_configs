@@ -58,6 +58,19 @@ public class CodeAnalyzer {
         return false;
     }
 
+    private String extractPackageName(String content) {
+
+        Pattern pattern = Pattern.compile("package\\s+([a-zA-Z_][\\.\\w]*);");
+
+        Matcher matcher = pattern.matcher(content);
+
+        if (matcher.find()) {
+            return matcher.group(1);
+        } else {
+            return "";
+        }
+    }
+
     private List<AuthorizationOccurrence> findOriginalsValues(String content) { // Uma regex resolve isso daqui fácil
 
         Pattern pattern = Pattern.compile(
@@ -84,7 +97,7 @@ public class CodeAnalyzer {
         if (controllers == null || controllers.isEmpty())
             throw new NoOneAnnotationMutableFinded(); // Talvez esse erro devesse ser diferente
 
-        Map<Path, String> aux = this.getControllers().entrySet().stream()
+        Map<Path, String> aux = this.getControllers().entrySet().stream()//Não posso modificar um hashmap enquanto estou iterando sobre ele
                 .collect(HashMap::new, (m, e) -> m.put(e.getKey(), e.getValue()), HashMap::putAll);
 
         for (Map.Entry<Path, String> entry : controllers.entrySet()) {
@@ -95,14 +108,17 @@ public class CodeAnalyzer {
             boolean containsPost = content.contains("@PostAuthorize");
 
             if (!(containsPre || containsPost)) {
-                aux.remove(path); //Não posso modificar um hashmap enquanto estou iterando sobre ele
+                aux.remove(path); 
             } else {
                 List<AuthorizationOccurrence> originalValues = findOriginalsValues(content);
 
                 for (int i = 0; i < originalValues.size(); i++) {
                     String originalValue = originalValues.get(i).value;
                     String mutatedValue = ""; //Isso daqui é definido em outro lugar
+                    String packageName = extractPackageName(content);
+
                     AnnotationMutationPoint annotationMutationPoint = new AnnotationMutationPoint(
+                            packageName,
                             originalValue,
                             mutatedValue,
                             AnnotationMutationPoint.TargetType.METHOD, //Isso daqui não está certo, tem que ser verificado se de fato é de nível método ou classe

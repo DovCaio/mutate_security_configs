@@ -99,7 +99,7 @@ th, td {
                 <table>
                     <tr>
                         <th>#</th>
-                        <th>ClassName</th>
+                        <th>Package Name</th>
                         <th>Método</th>
                         <th>Valor original</th>
                         <th>Mutação</th>
@@ -132,7 +132,7 @@ th, td {
                 <td>%s</td>
                 <td>%s</td>
             </tr>
-        """, rowClass, index++, params.className, params.method,
+        """, rowClass, index++, params.packageName, params.method,
                 params.originalValue, params.mutatedValue,result.getTotalTest(), result.getSuccedded(),
                 result.getFailed(), result.getFailures(), capturedText));
     }
