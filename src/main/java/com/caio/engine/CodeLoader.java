@@ -21,13 +21,23 @@ public class CodeLoader {
         }
     }
 
+
+    private String replace(String content, String original, String newValue, Integer line){
+
+        String[] aux = content.split("\n");
+
+        aux[line] = aux[line].replace(original, newValue);
+
+        return String.join("\n", aux);
+    }
+
     private void modifyCode(AnnotationMutationPoint amp, Boolean revert) throws ClassNotFoundException, IOException {
 
         String content = Files.readString(amp.getFilePath());
         String modifiedContent;
 
         if (!revert) {
-            modifiedContent = content.replace(amp.getOriginalValue(), amp.getMutatedValue());
+            modifiedContent = replace(content, amp.getOriginalValue(), amp.getMutatedValue(), amp.getLineNumber() - 1);
         } else {
             modifiedContent = content.replace(amp.getMutatedValue(), amp.getOriginalValue());
         }

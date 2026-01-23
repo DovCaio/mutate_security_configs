@@ -14,14 +14,14 @@ public class AnnotationMutationPoint {
     public String mutatedValue;
     public TargetType targetType;
     public Path filePath;
-    public Long lineNumber;
+    public Integer lineNumber;
 
     public AnnotationMutationPoint(
         String originalValue,
         String mutatedValue,
         TargetType targetType,
         Path filePath,
-        Long lineNumber
+        Integer lineNumber
             ) {
 
         this.originalValue = originalValue;
@@ -71,11 +71,11 @@ public class AnnotationMutationPoint {
         this.filePath = filePath;
     }
 
-    public Long getLineNumber() {
+    public Integer getLineNumber() {
         return lineNumber;
     }
 
-    public void setLineNumber(Long lineNumber) {
+    public void setLineNumber(Integer lineNumber) {
         this.lineNumber = lineNumber;
     }
 

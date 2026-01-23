@@ -22,7 +22,7 @@ public class CodeAnalyzer {
 
     private Map<Path, String> controllers;
 
-    public record AuthorizationOccurrence(String value, Long lineNumber) {
+    public record AuthorizationOccurrence(String value, Integer lineNumber) {
 
     }
 
@@ -66,7 +66,7 @@ public class CodeAnalyzer {
         Matcher matcher = pattern.matcher(content);
         List<AuthorizationOccurrence> results = new ArrayList<>();
         while (matcher.find()) {
-            Long line = 1L;
+            Integer line = 1;
             for (int i = 0; i < matcher.start(); i++) {
                 if (content.charAt(i) == '\n') {
                     line++;

@@ -25,13 +25,11 @@ public class RunTest {
         private BuildTool buildTool;
         private String command = "";
         private DirectoryScan directoryScan;
-        private Path projectRoot;
 
         public RunTest(Path repoDirectory, BuildTool buildTool) {
                 this.repoDirectory = repoDirectory;
                 this.buildTool = buildTool;
                 this.testsResults = new ArrayList<TestResult>();
-                this.projectRoot = repoDirectory;
                 String dir = repoDirectory.toAbsolutePath().toString();
 
                 switch (this.buildTool) {
@@ -69,12 +67,12 @@ public class RunTest {
                         throws IOException, InterruptedException {
 
                 ProcessBuilder processBuilder = new ProcessBuilder();
-                processBuilder.directory(projectRoot.toFile());
+                processBuilder.directory(repoDirectory.toFile());
                 processBuilder.command("sh", "-c", this.command);
 
                 Process process = processBuilder.start();
 
-                int exitCode = process.waitFor(); //Pode ser um indicio de que os testes falharam
+                int exitCode = process.waitFor();
 
                 BufferedReader stdOut = new BufferedReader(new InputStreamReader(process.getInputStream())); //Tem que ser consumido para não travar o processo
                 BufferedReader stdErr = new BufferedReader(new InputStreamReader(process.getErrorStream()));
@@ -82,14 +80,12 @@ public class RunTest {
                 TestExecutionReport testExecutionReport = readResult();
 
                 if (params == null) { // Execução inicial, sem mutations
-
                         return new TestResult(testExecutionReport);
                 } else {
                         return new TestResult(
                                         testExecutionReport,
                                         params);
                 }
-
         }
 
         public TestResult executeTestForVerification() throws IOException, InterruptedException {
