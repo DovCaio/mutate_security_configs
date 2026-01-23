@@ -39,7 +39,7 @@ public class CodeLoader {
         if (!revert) {
             modifiedContent = replace(content, amp.getOriginalValue(), amp.getMutatedValue(), amp.getLineNumber() - 1);
         } else {
-            modifiedContent = content.replace(amp.getMutatedValue(), amp.getOriginalValue());
+            modifiedContent = replace(content, amp.getMutatedValue(), amp.getOriginalValue(), amp.getLineNumber() - 1);
         }
 
 
