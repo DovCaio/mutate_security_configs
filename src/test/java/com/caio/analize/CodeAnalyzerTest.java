@@ -29,7 +29,7 @@ public class CodeAnalyzerTest {
     
     @Test
     void testAnalyzeWithNullPath() {
-        assertThrows(IllegalArgumentException.class, () -> codeAnalyzer.analyze(null)); 
+        assertThrows(IllegalArgumentException.class, () -> codeAnalyzer.analyze(null));     
     }
     
     @Test

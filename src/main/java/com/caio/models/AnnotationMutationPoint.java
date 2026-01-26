@@ -30,6 +30,7 @@ public class AnnotationMutationPoint {
         Integer lineNumber
             ) {
         this.packageName = packageName;
+        this.className = classname;
         this.originalValue = originalValue;
         this.mutatedValue = mutatedValue;
         this.targetType = targetType;
@@ -92,8 +93,6 @@ public class AnnotationMutationPoint {
     public String getClassName() {
         return className;
     }
-
-            
 
 }
 

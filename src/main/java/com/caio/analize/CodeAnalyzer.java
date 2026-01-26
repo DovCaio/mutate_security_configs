@@ -84,6 +84,36 @@ public class CodeAnalyzer {
         }
     }
 
+    private String extractMethod(String content, Integer lineNumber) {
+
+        String[] lines = content.split("\n");
+
+        if (lineNumber < 1 || lineNumber > lines.length) {
+            return "";
+        }
+
+        String result = "";
+
+        String line = lines[lineNumber - 1];
+
+        Pattern pattern = Pattern.compile("\\s*(public|private|protected)\\s+([\\w<>\\[\\]]+)\\s+([a-zA-Z_][\\w]*)\\s*\\(.*\\)\\s*\\{?");
+
+        for (int i = 0 ; i < lines.length ; i++) {
+            line = lines[i];
+
+            Matcher matcher = pattern.matcher(line);
+
+            if (matcher.find()) {
+                result = matcher.group(3);
+                break;
+            }  else if (line.contains("class ")) { //O espaço é muito importante
+                return  "";
+            }
+        }
+
+        return result;        
+    }
+
     private List<AuthorizationOccurrence> findOriginalsValues(String content) { // Uma regex resolve isso daqui fácil
 
         Pattern pattern = Pattern.compile(
@@ -130,7 +160,6 @@ public class CodeAnalyzer {
                     String mutatedValue = ""; //Isso daqui é definido em outro lugar
                     String packageName = extractPackageName(content);
                     String className = extractClassName(content);
-
                     AnnotationMutationPoint annotationMutationPoint = new AnnotationMutationPoint(
                             packageName,
                             className,
