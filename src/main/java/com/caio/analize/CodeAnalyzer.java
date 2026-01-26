@@ -94,24 +94,22 @@ public class CodeAnalyzer {
 
         String result = "";
 
-        String line = lines[lineNumber - 1];
+        Pattern pattern = Pattern.compile(
+                "\\s*(public|private|protected)\\s+([\\w<>\\[\\]?]+)\\s+([a-zA-Z_][\\w]*)\\s*\\(.*\\)");
 
-        Pattern pattern = Pattern.compile("\\s*(public|private|protected)\\s+([\\w<>\\[\\]]+)\\s+([a-zA-Z_][\\w]*)\\s*\\(.*\\)\\s*\\{?");
-
-        for (int i = 0 ; i < lines.length ; i++) {
-            line = lines[i];
+        for (int i = lineNumber - 1; i < lines.length; i++) {
+            String line = lines[i];
 
             Matcher matcher = pattern.matcher(line);
-
             if (matcher.find()) {
                 result = matcher.group(3);
                 break;
-            }  else if (line.contains("class ")) { //O espaço é muito importante
-                return  "";
+            } else if (line.contains("class ")) { // O espaço é muito importante
+                return "";
             }
         }
 
-        return result;        
+        return result;
     }
 
     private List<AuthorizationOccurrence> findOriginalsValues(String content) { // Uma regex resolve isso daqui fácil
@@ -140,7 +138,8 @@ public class CodeAnalyzer {
         if (controllers == null || controllers.isEmpty())
             throw new NoOneAnnotationMutableFinded(); // Talvez esse erro devesse ser diferente
 
-        Map<Path, String> aux = this.getControllers().entrySet().stream()//Não posso modificar um hashmap enquanto estou iterando sobre ele
+        Map<Path, String> aux = this.getControllers().entrySet().stream()// Não posso modificar um hashmap enquanto
+                                                                         // estou iterando sobre ele
                 .collect(HashMap::new, (m, e) -> m.put(e.getKey(), e.getValue()), HashMap::putAll);
 
         for (Map.Entry<Path, String> entry : controllers.entrySet()) {
@@ -151,24 +150,32 @@ public class CodeAnalyzer {
             boolean containsPost = content.contains("@PostAuthorize");
 
             if (!(containsPre || containsPost)) {
-                aux.remove(path); 
+                aux.remove(path);
             } else {
                 List<AuthorizationOccurrence> originalValues = findOriginalsValues(content);
 
                 for (int i = 0; i < originalValues.size(); i++) {
                     String originalValue = originalValues.get(i).value;
-                    String mutatedValue = ""; //Isso daqui é definido em outro lugar
+                    String mutatedValue = ""; // Isso daqui é definido em outro lugar
                     String packageName = extractPackageName(content);
                     String className = extractClassName(content);
+                    String methodName = extractMethod(content, originalValues.get(i).lineNumber);
+                    AnnotationMutationPoint.TargetType targetType;
+                    if (methodName.equals("")) {
+                        targetType = AnnotationMutationPoint.TargetType.CLASS;
+                    } else {
+                        targetType = AnnotationMutationPoint.TargetType.METHOD;
+                    }
                     AnnotationMutationPoint annotationMutationPoint = new AnnotationMutationPoint(
                             packageName,
                             className,
+                            methodName,
                             originalValue,
                             mutatedValue,
-                            AnnotationMutationPoint.TargetType.METHOD, //Isso daqui não está certo, tem que ser verificado se de fato é de nível método ou classe
+                            targetType,
                             path,
                             originalValues.get(i).lineNumber);
-                            if (containsPre) {
+                    if (containsPre) {
 
                         AnnotationType annotationType = AnnotationType.PRE;
                         annotationMutationPoint.setAnnotationName(annotationType);

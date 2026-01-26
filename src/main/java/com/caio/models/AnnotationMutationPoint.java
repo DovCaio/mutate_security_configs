@@ -23,6 +23,7 @@ public class AnnotationMutationPoint {
     public AnnotationMutationPoint(
         String packageName,
         String classname,
+        String methodName,
         String originalValue,
         String mutatedValue,
         TargetType targetType,
@@ -31,6 +32,7 @@ public class AnnotationMutationPoint {
             ) {
         this.packageName = packageName;
         this.className = classname;
+        this.methodName = methodName;
         this.originalValue = originalValue;
         this.mutatedValue = mutatedValue;
         this.targetType = targetType;
@@ -94,5 +96,8 @@ public class AnnotationMutationPoint {
         return className;
     }
 
+    public String getMethodName() {
+        return methodName;
+    }
 }
 
