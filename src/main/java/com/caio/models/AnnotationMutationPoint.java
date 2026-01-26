@@ -10,7 +10,8 @@ public class AnnotationMutationPoint {
     public enum AnnotationType { PRE, POST }
 
     public String packageName;
-    public String methodOrClassName;
+    public String className;
+    public String methodName;
     public AnnotationType annotationName;
     public String originalValue;
     public String mutatedValue;
@@ -21,6 +22,7 @@ public class AnnotationMutationPoint {
 
     public AnnotationMutationPoint(
         String packageName,
+        String classname,
         String originalValue,
         String mutatedValue,
         TargetType targetType,
@@ -87,7 +89,11 @@ public class AnnotationMutationPoint {
         return packageName;
     }
 
-        
+    public String getClassName() {
+        return className;
+    }
+
+            
 
 }
 

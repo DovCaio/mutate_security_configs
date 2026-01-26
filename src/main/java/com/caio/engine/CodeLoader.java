@@ -51,7 +51,7 @@ public class CodeLoader {
             try {
                 modifyCode(amp, false);
                 runTest.executeTestForMutation(
-                        new ParamsForTestMutationApresentation(amp.getPackageName(), "", "", amp.getOriginalValue(), amp.getMutatedValue()));
+                        new ParamsForTestMutationApresentation(amp.getPackageName(), amp.getClassName(), "", "", amp.getOriginalValue(), amp.getMutatedValue()));
                 modifyCode(amp, true);
             } catch (Exception e) { //Provisório
                 e.printStackTrace();

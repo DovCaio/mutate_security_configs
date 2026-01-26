@@ -71,6 +71,19 @@ public class CodeAnalyzer {
         }
     }
 
+    private String extractClassName(String content) {
+
+        Pattern pattern = Pattern.compile("public\\s+class\\s+([a-zA-Z_][\\w]*)");
+
+        Matcher matcher = pattern.matcher(content);
+
+        if (matcher.find()) {
+            return matcher.group(1);
+        } else {
+            return "";
+        }
+    }
+
     private List<AuthorizationOccurrence> findOriginalsValues(String content) { // Uma regex resolve isso daqui fácil
 
         Pattern pattern = Pattern.compile(
@@ -116,16 +129,18 @@ public class CodeAnalyzer {
                     String originalValue = originalValues.get(i).value;
                     String mutatedValue = ""; //Isso daqui é definido em outro lugar
                     String packageName = extractPackageName(content);
+                    String className = extractClassName(content);
 
                     AnnotationMutationPoint annotationMutationPoint = new AnnotationMutationPoint(
                             packageName,
+                            className,
                             originalValue,
                             mutatedValue,
                             AnnotationMutationPoint.TargetType.METHOD, //Isso daqui não está certo, tem que ser verificado se de fato é de nível método ou classe
                             path,
                             originalValues.get(i).lineNumber);
+                            if (containsPre) {
 
-                    if (containsPre) {
                         AnnotationType annotationType = AnnotationType.PRE;
                         annotationMutationPoint.setAnnotationName(annotationType);
                     } else {

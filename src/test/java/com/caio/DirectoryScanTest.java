@@ -1,6 +1,7 @@
 package com.caio;
 
 import com.caio.directory_scan.DirectoryScan;
+import com.caio.enums.BuildTool;
 import com.caio.exceptions.NoOneClasseFinded;
 import com.caio.exceptions.PathNotExists;
 import org.junit.jupiter.api.*;
@@ -81,5 +82,63 @@ class DirectoryScanTest {
 
         assertEquals(1, found.size());
         assertTrue(found.get(0).toString().endsWith("Inner.java"));
+    }
+
+    @Test
+    @DisplayName("Deve identificar o build tool como MAVEN se pom.xml existir")
+    void testGetBuildToolMaven() throws IOException {
+        Files.createFile(tempDir.resolve("pom.xml"));
+        DirectoryScan scanner = new DirectoryScan(tempDir);
+        assertEquals(BuildTool.MAVEN, scanner.getBuildTool());
+    }
+
+    @Test
+    @DisplayName("Deve identificar o build tool como GRADLE se build.gradle existir")
+    void testGetBuildToolGradle() throws IOException {
+        Files.createFile(tempDir.resolve("build.gradle"));
+        DirectoryScan scanner = new DirectoryScan(tempDir);
+        assertEquals(BuildTool.GRADLE, scanner.getBuildTool());
+    }
+
+    @Test
+    @DisplayName("Deve identificar o build tool como GRADLE_WRAPPER se gradlew existir")
+    void testGetBuildToolGradleWrapper() throws IOException {
+        Files.createFile(tempDir.resolve("gradlew"));
+        DirectoryScan scanner = new DirectoryScan(tempDir);
+        assertEquals(BuildTool.GRADLE_WRAPPER, scanner.getBuildTool());
+    }
+
+    @Test
+    @DisplayName("Deve lançar IllegalArgumentException se nenhum arquivo de build for encontrado")
+    void testGetBuildToolThrows() {
+        DirectoryScan scanner = new DirectoryScan(tempDir);
+        assertThrows(IllegalArgumentException.class, scanner::getBuildTool);
+    }
+
+    @Test
+    @DisplayName("getFindeds e setFindeds devem funcionar corretamente")
+    void testGetAndSetFindeds() throws IOException {
+        DirectoryScan scanner = new DirectoryScan(tempDir);
+        Path file = Files.createFile(tempDir.resolve("A.java"));
+        scanner.setFindeds(List.of(file));
+        assertEquals(1, scanner.getFindeds().size());
+        assertEquals(file, scanner.getFindeds().get(0));
+    }
+
+    @Test
+    @DisplayName("getDependenciesPath e setDependenciesPath devem funcionar corretamente")
+    void testGetAndSetDependenciesPath() throws IOException {
+        DirectoryScan scanner = new DirectoryScan(tempDir);
+        Path dep = Files.createFile(tempDir.resolve("dep.jar"));
+        scanner.setDependenciesPath(List.of(dep));
+        assertEquals(1, scanner.getDependenciesPath().size());
+        assertEquals(dep, scanner.getDependenciesPath().get(0));
+    }
+
+    @Test
+    @DisplayName("getDirectory deve retornar o diretório base correto")
+    void testGetDirectory() {
+        DirectoryScan scanner = new DirectoryScan(tempDir);
+        assertEquals(tempDir, scanner.getDirectory());
     }
 }

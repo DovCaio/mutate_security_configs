@@ -48,6 +48,7 @@ public class MutantGeneration {
 
         AnnotationMutationPoint mutant = new AnnotationMutationPoint(
             amp.getPackageName(),
+            amp.getClassName(),
             amp.getOriginalValue(),
             novoValor,
             amp.getTargetType(),
