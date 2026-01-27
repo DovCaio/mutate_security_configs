@@ -49,7 +49,6 @@ public class CodeLoader {
 
         for (AnnotationMutationPoint amp : mutants) {
             try {
-                System.out.println(amp.getMethodName());
                 modifyCode(amp, false);
                 runTest.executeTestForMutation(
                         new ParamsForTestMutationApresentation(amp.getPackageName(), amp.getClassName(), amp.getMethodName(), "", amp.getOriginalValue(), amp.getMutatedValue()));

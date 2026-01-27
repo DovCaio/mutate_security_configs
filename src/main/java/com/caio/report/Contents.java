@@ -1,15 +1,11 @@
 package com.caio.report;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import com.caio.engine.ParamsForTestMutationApresentation;
 import com.caio.engine.RunTest;
-import com.caio.engine.RunTest.TestResult;
 
 public class Contents {
 
