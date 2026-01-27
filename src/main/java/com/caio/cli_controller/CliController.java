@@ -62,6 +62,13 @@ public class CliController {
 
     private void searchForPossibleMutations() throws Exception {
         this.bca.analyze(directoryScan.getFindeds());
+        for (String s : this.bca.getRoles()){
+            System.out.println(s);
+        }
+
+        for (String s : this.bca.getAuthorities()){
+            System.out.println(s);
+        }
         if (flag.equals("-v"))
             printMutationPoints(bca.getMutationsPoints());
     }
