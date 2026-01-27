@@ -47,9 +47,9 @@ public class MutantMaker {
         } else if (hasCompost) {
             result.addAll(mutateCompositeValue(matcherCompostCase));
         } else if (hasPermitAll) {
-            System.out.print("TODO");
+            result.addAll(mutePermitAll(matcherPermitAllCase));
         } else if (hasDenyAll) {
-            System.out.print("TODO");
+            result.addAll(muteDenyAll(matcherDenyCase));
 
         } else {
             result.add("");
@@ -105,6 +105,26 @@ public class MutantMaker {
         }
 
         return mutateOperators;
+    }
+
+    private List<String> mutePermitAll(Matcher matcher) {
+
+        List<String> mutateOperators = new ArrayList<>();
+
+        mutateOperators.add("denyAll");
+
+        return mutateOperators;
+
+    }
+
+    private List<String> muteDenyAll(Matcher matcher) {
+
+        List<String> mutateOperators = new ArrayList<>();
+
+        mutateOperators.add("permitAll()");
+
+        return mutateOperators;
+
     }
 
 }
