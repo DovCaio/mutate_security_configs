@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 
 import static com.caio.utli.Printers.printMutationPoints;
 import static com.caio.utli.Printers.printPaths;
+import static com.caio.utli.Printers.printSimpleListString;
 
 public class CliController {
 
@@ -32,10 +33,8 @@ public class CliController {
 
         if (args.length == 1) {
             this.directory = Paths.get(args[0]);
-            ;
         } else if (args.length == 2) {
             this.directory = Paths.get(args[1]);
-            ;
             this.flag = args[0];
             if (!EXISTENT_FLAGS.contains(this.flag))
                 throw new IllegalArgumentException("A flag " + this.flag + " não existe.");
@@ -62,20 +61,17 @@ public class CliController {
 
     private void searchForPossibleMutations() throws Exception {
         this.bca.analyze(directoryScan.getFindeds());
-        for (String s : this.bca.getRoles()){
-            System.out.println(s);
-        }
-
-        for (String s : this.bca.getAuthorities()){
-            System.out.println(s);
-        }
-        if (flag.equals("-v"))
+        if (flag.equals("-v")){
+            printSimpleListString("Roles encontradas", bca.getRoles());
+            printSimpleListString("Authorities encontradas", bca.getAuthorities());
             printMutationPoints(bca.getMutationsPoints());
+
+        }
     }
 
     private void startEngine() throws Exception {
         this.engine = new Engine(bca.getMutationsPoints(), bca.getmainClasses(), directoryScan.getDirectory(),
-                directoryScan.getBuildTool());
+                directoryScan.getBuildTool(), bca.getRoles(), bca.getAuthorities());
         engine.start();
         if (flag.equals("-v")) {
             System.out.println("Mutantes");

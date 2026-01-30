@@ -36,5 +36,16 @@ public class Printers {
 
     }
 
+    public static void printSimpleListString(String title, List<String> list) {
+
+        if (list == null || list.isEmpty()) {
+            return;
+        }
+        System.out.println("\n" + title + ":");
+        for (String item : list) {
+            System.out.println(" - " + item);
+        }
+        System.out.println("\n");
+    }
 
 }

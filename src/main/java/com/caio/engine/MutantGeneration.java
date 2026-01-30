@@ -18,9 +18,9 @@ public class MutantGeneration {
         this.mutants = new ArrayList<>();
     }
 
-    public void createMutants() throws Exception {
+    public void createMutants(List<String> roles, List<String> authorities) throws Exception {
         for (AnnotationMutationPoint amp : amps) {
-            MutantMaker mutantGeneration  = new MutantMaker(amp.getOriginalValue());
+            MutantMaker mutantGeneration  = new MutantMaker(amp.getOriginalValue(),roles, authorities);
             List<String> mutates = mutantGeneration.genAllMutants();
             if (!mutates.isEmpty()){
 

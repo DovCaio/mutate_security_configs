@@ -12,15 +12,19 @@ public class Engine {
     private MutantGeneration mutantGeneration;
     private CodeLoader codeLoader;
     private RunTest runTest;
+    private List<String> roles;
+    private List<String> authorities;
 
-    public Engine(List<AnnotationMutationPoint> amps, List<AnnotationMutationPoint> mainClasses, Path repoDirectory, BuildTool buildTool) {
+    public Engine(List<AnnotationMutationPoint> amps, List<AnnotationMutationPoint> mainClasses, Path repoDirectory, BuildTool buildTool, List<String> roles, List<String> authorities) {
         this.runTest = new RunTest(repoDirectory, buildTool);
         this.mutantGeneration = new MutantGeneration(amps);
         this.codeLoader = new CodeLoader(this.runTest);
+        this.roles = roles;
+        this.authorities = authorities;
     }
 
     public void start() throws Exception {
-        this.mutantGeneration.createMutants();
+        this.mutantGeneration.createMutants(roles, authorities);
         this.codeLoader.verifyTestsPassing();
         this.codeLoader.start(getMutants());
     }

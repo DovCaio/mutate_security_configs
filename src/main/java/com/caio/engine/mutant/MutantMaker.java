@@ -13,10 +13,14 @@ public class MutantMaker {
     private final String regexDenyAll = "(?:denyAll)";
 
     private String value;
+    private List<String> roles;
+    private List<String> authorities;
 
-    public MutantMaker(String value) {
+    public MutantMaker(String value, List<String> roles, List<String> authorities) {
 
         this.value = value;
+        this.roles = roles;
+        this.authorities = authorities;
     }
 
     public List<String> genAllMutants() throws Exception {
@@ -81,12 +85,28 @@ public class MutantMaker {
 
         String[] values = insideQuotes.split(",");
 
+        //Uma forma de mutar é trocar hasAnyRole por hasAnyAuthority e vice-versa
         if (matcher.group(0).contains("hasAnyAuthority")) {
             mutateOperators.add("hasAnyRole(" + insideQuotes + ")");
         } else if (matcher.group(0).contains("hasAnyRole")) {
             mutateOperators.add("hasAnyAuthority(" + insideQuotes + ")");
         }
 
+        List<String> rolesAndAuthorities = new ArrayList<>();
+        rolesAndAuthorities.addAll(roles);
+        rolesAndAuthorities.addAll(authorities);
+
+        //Outra forma é adicionar um novo valor
+        for( String ra : rolesAndAuthorities){
+            System.out.println("RA: " + ra);
+            if (!insideQuotes.contains(ra)){
+                String mutatedInsideQuotes = insideQuotes + ", " + ra;
+                String mutatedExpression = fullExpression.replace(insideQuotes, mutatedInsideQuotes);
+                mutateOperators.add(mutatedExpression);
+            }
+        }
+
+        //Outra forma é mutar cada valor individualmente
         for (int i = 0; i < values.length; i++) {
 
             String[] mutatedValues = values.clone();

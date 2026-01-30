@@ -196,16 +196,31 @@ public class CodeAnalyzer {
 
     public List<String> getRoles() {
 
-        List<String> roles = new ArrayList<String>();
+        List<String> roles = new ArrayList<>();
+
+        Pattern outer = Pattern.compile("(hasRole|hasAnyRole)\\s*\\(([^)]*)\\)");
+        Pattern inner = Pattern.compile("['\"]([^'\"]+)['\"]");
 
         for (AnnotationMutationPoint amp : this.mutationsPoints) {
+
             String originalValue = amp.getOriginalValue();
-            Pattern pattern = Pattern.compile("hasRole\\s*\\(\\s*['\"]([^'\"]+)['\"]\\s*\\)");
-            Matcher matcher = pattern.matcher(originalValue);
-            while (matcher.find()) {
-                String role = matcher.group(1);
-                if (!roles.contains(role)) {
-                    roles.add(role);
+
+            Matcher outerMatcher = outer.matcher(originalValue);
+
+            while (outerMatcher.find()) {
+
+                String params = outerMatcher.group(2);
+
+                Matcher innerMatcher = inner.matcher(params);
+
+                while (innerMatcher.find()) {
+
+                    String role = innerMatcher.group(1);
+
+
+                    if (!roles.contains(role)) {
+                        roles.add(role);
+                    }
                 }
             }
         }
@@ -215,16 +230,31 @@ public class CodeAnalyzer {
 
     public List<String> getAuthorities() {
 
-        List<String> authorities = new ArrayList<String>();
+        List<String> authorities = new ArrayList<>();
+
+        Pattern outer = Pattern.compile("(hasAuthority|hasAnyAuthority)\\s*\\(([^)]*)\\)");
+        Pattern inner = Pattern.compile("['\"]([^'\"]+)['\"]");
 
         for (AnnotationMutationPoint amp : this.mutationsPoints) {
+
             String originalValue = amp.getOriginalValue();
-            Pattern pattern = Pattern.compile("hasAuthority\\s*\\(\\s*['\"]([^'\"]+)['\"]\\s*\\)");
-            Matcher matcher = pattern.matcher(originalValue);
-            while (matcher.find()) {
-                String authority = matcher.group(1);
-                if (!authorities.contains(authority)) {
-                    authorities.add(authority);
+
+            Matcher outerMatcher = outer.matcher(originalValue);
+
+            while (outerMatcher.find()) {
+
+                String params = outerMatcher.group(2);
+
+                Matcher innerMatcher = inner.matcher(params);
+
+                while (innerMatcher.find()) {
+
+                    String authority = innerMatcher.group(1);
+
+
+                    if (!authorities.contains(authority)) {
+                        authorities.add(authority);
+                    }
                 }
             }
         }
