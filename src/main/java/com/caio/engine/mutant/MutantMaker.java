@@ -15,12 +15,20 @@ public class MutantMaker {
     private String value;
     private List<String> roles;
     private List<String> authorities;
+    private List<String> rolesAndAuthorities;
 
     public MutantMaker(String value, List<String> roles, List<String> authorities) {
 
         this.value = value;
         this.roles = roles;
         this.authorities = authorities;
+
+
+        this.rolesAndAuthorities = new ArrayList<>();
+        rolesAndAuthorities.addAll(roles);
+        rolesAndAuthorities.addAll(authorities);
+
+
     }
 
     public List<String> genAllMutants() throws Exception {
@@ -74,6 +82,13 @@ public class MutantMaker {
             mutateOperators.add(value.replace("hasRole", "hasAuthority"));
         }
 
+
+        for (String ra : rolesAndAuthorities) {
+            if (!insideQuotes.equals(ra)) {
+                mutateOperators.add(value.replace(insideQuotes, ra));
+            }
+        }
+
         return mutateOperators;
     }
 
@@ -92,13 +107,9 @@ public class MutantMaker {
             mutateOperators.add("hasAnyAuthority(" + insideQuotes + ")");
         }
 
-        List<String> rolesAndAuthorities = new ArrayList<>();
-        rolesAndAuthorities.addAll(roles);
-        rolesAndAuthorities.addAll(authorities);
-
+        
         //Outra forma é adicionar um novo valor
         for( String ra : rolesAndAuthorities){
-            System.out.println("RA: " + ra);
             if (!insideQuotes.contains(ra)){
                 String mutatedInsideQuotes = insideQuotes + ", " + ra;
                 String mutatedExpression = fullExpression.replace(insideQuotes, mutatedInsideQuotes);
