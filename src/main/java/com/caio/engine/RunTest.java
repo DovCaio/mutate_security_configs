@@ -20,10 +20,12 @@ public class RunTest {
         private BuildTool buildTool;
         private String command = "";
         private DirectoryScan directoryScan;
+        private String flag;
 
-        public RunTest(Path repoDirectory, BuildTool buildTool) {
+        public RunTest(Path repoDirectory, BuildTool buildTool, String flag) {
                 this.repoDirectory = repoDirectory;
                 this.buildTool = buildTool;
+                this.flag = flag;
                 this.testsResults = new ArrayList<TestResult>();
                 String dir = repoDirectory.toAbsolutePath().toString();
 
@@ -73,9 +75,13 @@ public class RunTest {
                 if (params == null) { // Execução inicial, sem mutations
                         return new TestResult(testExecutionReport);
                 } else {
-                        return new TestResult(
-                                        testExecutionReport,
-                                        params);
+
+                        TestResult testResult = new TestResult(testExecutionReport, params);
+
+                        if (flag.equals("-v")) {
+                                System.out.println(testResult.toString());
+                        }
+                        return testResult;
                 }
         }
 
@@ -116,16 +122,18 @@ public class RunTest {
                         this.params = params;
                 }
 
-                @Override()
-                public String toString() { // Adaptar tudo isso
+                @Override
+                public String toString() {
                         String failuresString = getFailures();
+                        String color = whasCaptured() ? "\u001B[32m" : "\u001B[31m";
+                        String reset = "\u001B[0m";
 
-                        return "=== RESULTADOS DOS TESTES ===\n" +
+                        return color + "=== RESULTADOS DOS TESTES ===\n" +
                                         "Total tests: " + this.getTotalTest() + "\n" +
                                         "Succeeded: " + this.getSuccedded() + "\n" +
                                         "Failed: " + this.getFailed() + "\n" +
                                         (this.getFailed() == 0 ? "" : "Failures:\n" + failuresString + "\n") +
-                                        "=============================";
+                                        "=============================" + reset;
                 }
 
                 public boolean equals(TestResult b) {

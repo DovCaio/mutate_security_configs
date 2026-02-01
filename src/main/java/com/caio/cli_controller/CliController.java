@@ -71,7 +71,7 @@ public class CliController {
 
     private void startEngine() throws Exception {
         this.engine = new Engine(bca.getMutationsPoints(), bca.getmainClasses(), directoryScan.getDirectory(),
-                directoryScan.getBuildTool(), bca.getRoles(), bca.getAuthorities());
+                directoryScan.getBuildTool(), bca.getRoles(), bca.getAuthorities(), flag);
         engine.start();
         if (flag.equals("-v")) {
             System.out.println("Mutantes");
