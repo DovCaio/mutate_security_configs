@@ -1,15 +1,18 @@
 package com.caio;
-import com.caio.cli_controller.CliController;
 
-import java.io.IOException;
+    import com.caio.cli_controller.CliController;
 
-public class Main
-{
+public class Main {
 
-    public static void main( String[] args ) throws Exception {
+    public static void main(String[] args) throws Exception {
 
-        CliController cliController = new CliController(args);
-        cliController.execute();
+        try {
+            CliController cliController = new CliController(args);
+            cliController.execute();
+
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
 
     }
 }
