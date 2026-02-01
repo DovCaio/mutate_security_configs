@@ -1,4 +1,4 @@
-package com.caio.engine.mutant;
+    package com.caio.engine.mutant;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -98,43 +98,60 @@ public class MutantMaker {
         String fullExpression = matcher.group(0); // hasAnyRole("User", "Admin", "Guest")
         String insideQuotes = matcher.group(1); // "User", "Admin", "Guest"
 
-        String[] values = insideQuotes.split(",");
+        mutateOperators.addAll(swapAuthenticationMethod(fullExpression));
+        mutateOperators.addAll(addNewRoleOrAuthority(fullExpression, insideQuotes));
+        mutateOperators.addAll(mutateEachValue(fullExpression, insideQuotes));
 
-        //Uma forma de mutar é trocar hasAnyRole por hasAnyAuthority e vice-versa
-        if (matcher.group(0).contains("hasAnyAuthority")) {
-            mutateOperators.add("hasAnyRole(" + insideQuotes + ")");
-        } else if (matcher.group(0).contains("hasAnyRole")) {
-            mutateOperators.add("hasAnyAuthority(" + insideQuotes + ")");
-        }
+        return mutateOperators;
+    }
 
+    private List<String> swapAuthenticationMethod(String fullExpression) {
+        List<String> mutateOperators = new ArrayList<>();
         
-        //Outra forma é adicionar um novo valor
-        for( String ra : rolesAndAuthorities){
-            if (!insideQuotes.contains(ra)){
+        if (fullExpression.contains("hasAnyAuthority")) {
+            mutateOperators.add(fullExpression.replace("hasAnyAuthority", "hasAnyRole"));
+        } else if (fullExpression.contains("hasAnyRole")) {
+            mutateOperators.add(fullExpression.replace("hasAnyRole", "hasAnyAuthority"));
+        }
+        
+        return mutateOperators;
+    }
+
+    private List<String> addNewRoleOrAuthority(String fullExpression, String insideQuotes) {
+        List<String> mutateOperators = new ArrayList<>();
+        
+        for (String ra : rolesAndAuthorities) {
+            if (!insideQuotes.contains(ra)) {
                 String mutatedInsideQuotes = insideQuotes + ", " + ra;
                 String mutatedExpression = fullExpression.replace(insideQuotes, mutatedInsideQuotes);
                 mutateOperators.add(mutatedExpression);
             }
         }
+        
+        return mutateOperators;
+    }
 
-        //Outra forma é mutar cada valor individualmente
+    private List<String> mutateEachValue(String fullExpression, String insideQuotes) {
+        List<String> mutateOperators = new ArrayList<>();
+        
+        String[] values = insideQuotes.split(",");
+        
         for (int i = 0; i < values.length; i++) {
-
             String[] mutatedValues = values.clone();
-
+            
             String value = values[i].trim();
             String mutatedValue = value.startsWith("NO_")
-                    ? value.substring(3)
-                    : "NO_" + value;
-
+                    ? "" + value.substring(4)
+                    : "NO_" + value.substring(1);
+            
             mutatedValues[i] = mutatedValue;
-
+            
             String mutatedInsideQuotes = String.join(", ", mutatedValues);
             String mutatedExpression = fullExpression.replace(insideQuotes, mutatedInsideQuotes);
-
+            
             mutateOperators.add(mutatedExpression);
         }
-
+        
         return mutateOperators;
     }
 
