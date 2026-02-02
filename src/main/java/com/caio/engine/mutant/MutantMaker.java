@@ -61,6 +61,7 @@ public class MutantMaker {
         } else if (hasCompost) {
             result.addAll(mutateCompositeValue(matcherCompostCase));
             result.add(removeInsideParentheses(matcherCompostCase));
+            result.addAll(alterIntoQuantitiesOfParamsAndWhichParams(matcherCompostCase));
 
         } else if (hasPermitAll) {
             result.addAll(mutePermitAll(matcherPermitAllCase));
@@ -183,6 +184,33 @@ public class MutantMaker {
         String str = matcher.group(0);
         String mutant = str.replaceAll("\\(([^)]*)\\)", "()");
         return mutant;
+    }
+
+    private List<String> alterIntoQuantitiesOfParamsAndWhichParams(Matcher matcher) {
+
+        List<String> ra = matcher.group(1) != null ?
+                List.of(matcher.group(1).split(",")) : new ArrayList<>();
+
+        List<String> result = new ArrayList<>();
+
+
+        for (int i = 0 ; i < ra.size(); i++) {
+            StringBuilder sb = new StringBuilder();
+            for (int j = 0 ; j < ra.size(); j++) {
+                if (i != j) {
+                    if (sb.length() > 0) {
+                        sb.append(", ");
+                    }
+                    sb.append(ra.get(j));
+                }
+            }
+            String mutatedInsideQuotes = sb.toString();
+            String fullExpression = matcher.group(0);
+            String mutatedExpression = fullExpression.replace(matcher.group(1), mutatedInsideQuotes);
+            result.add(mutatedExpression);
+        }
+
+        return result;
     }
 
 }
