@@ -27,4 +27,34 @@ public class TestSuiteResult {
     public List<FailureDetail> getFailureDetails() {
         return this.failureDetails;
     }
+
+    public String getName() {
+        return name;
+    }
+
+    public int getTests() {
+        return tests;
+    }
+
+    public int getTotalFailures() {
+        return totalFailures;
+    }
+
+    public int getErrors() {
+        return errors;
+    }
+
+    public int getSkipped() {
+        return skipped;
+    }
+
+    public double getTime() {
+        return time;
+    }
+
+    public List<TestCaseResult> getTestCases() {
+        return testCases;
+    }
+
+    
 }
