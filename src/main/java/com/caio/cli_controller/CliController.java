@@ -27,8 +27,6 @@ public class CliController {
     private Engine engine;
     private Report report;
 
-
-    
     public CliController(String[] args) throws IOException {
         if (args.length == 0) {
             System.err.println("Uso: java  Main <flag> <diretorio>");
@@ -45,7 +43,7 @@ public class CliController {
         } else {
             throw new IllegalArgumentException("Muitos argumentos, no máximo 2");
         }
-        
+
         temporaryDirectory = copyToTemporaryDirectory(originalDirectory);
 
         this.bca = new CodeAnalyzer();

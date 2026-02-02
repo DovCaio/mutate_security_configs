@@ -54,10 +54,14 @@ public class MutantMaker {
             result.add("denyAll");
         }
 
+
         if (hasSimple) {
             result.addAll(mutateSimpleValue(matcherSimpleCase));
+            result.add(removeInsideParentheses(matcherSimpleCase));
         } else if (hasCompost) {
             result.addAll(mutateCompositeValue(matcherCompostCase));
+            result.add(removeInsideParentheses(matcherCompostCase));
+
         } else if (hasPermitAll) {
             result.addAll(mutePermitAll(matcherPermitAllCase));
         } else if (hasDenyAll) {
@@ -173,6 +177,12 @@ public class MutantMaker {
 
         return mutateOperators;
 
+    }
+
+    private String removeInsideParentheses(Matcher matcher) {
+        String str = matcher.group(0);
+        String mutant = str.replaceAll("\\(([^)]*)\\)", "()");
+        return mutant;
     }
 
 }
