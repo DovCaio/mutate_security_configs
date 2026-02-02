@@ -32,9 +32,6 @@ class MutantGenerationTest {
     private List<String> roles = List.of("USER", "ADMIN");
     private List<String> authorities = List.of("READ", "WRITE");
 
-    // ===============================
-    // ✅ happy path — mutants gerados
-    // ===============================
     @Test
     void shouldGenerateMutantsAndCopyAllFieldsCorrectly() throws Exception {
 
@@ -70,9 +67,6 @@ class MutantGenerationTest {
         }
     }
 
-    // ===============================
-    // 🚫 ignora mutants vazios
-    // ===============================
     @Test
     void shouldIgnoreEmptyMutantStrings() throws Exception {
 
@@ -93,9 +87,6 @@ class MutantGenerationTest {
         }
     }
 
-    // ===============================
-    // 🚫 lista vazia → exceção
-    // ===============================
     @Test
     void shouldThrowWhenNoMutantsGenerated() {
 
@@ -112,9 +103,6 @@ class MutantGenerationTest {
         }
     }
 
-    // ===============================
-    // 🔁 múltiplos AMPs
-    // ===============================
     @Test
     void shouldAggregateMutantsFromMultipleAmps() throws Exception {
 
