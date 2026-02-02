@@ -5,28 +5,26 @@ import java.util.List;
 public class TestSuiteResult {
     String name;
     int tests;
-    int failures;
+    int totalFailures;
     int errors;
     int skipped;
     double time;
+    List<FailureDetail> failureDetails;
     List<TestCaseResult> testCases;
 
-    public TestSuiteResult(String name, int tests, int failures, int errors, int skipped, double time, List<TestCaseResult> testCases) {
+    public TestSuiteResult(String name, int tests, int totalFailures, int errors, int skipped, double time,
+            List<TestCaseResult> testCases, List<FailureDetail> failureDetails) {
         this.name = name;
         this.tests = tests;
-        this.failures = failures;
+        this.totalFailures = totalFailures;
         this.errors = errors;
         this.skipped = skipped;
         this.testCases = testCases;
         this.time = time;
+        this.failureDetails = failureDetails;
     }
 
-    public List<FailureDetail> getFailures(){
-        return testCases.stream().reduce((List<FailureDetail>) null, (acc, testCase) -> {
-            if(acc != null && testCase.status == com.caio.enums.TestStatus.FAILED){
-                acc.add(testCase.getFailure());
-            }
-            return acc;
-        }, (a, b) -> a);
-    }   
+    public List<FailureDetail> getFailureDetails() {
+        return this.failureDetails;
+    }
 }

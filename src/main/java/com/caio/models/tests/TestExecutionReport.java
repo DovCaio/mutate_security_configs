@@ -15,7 +15,7 @@ public class TestExecutionReport {
     public TestExecutionReport(List<TestSuiteResult> suites) {
         this.suites = suites;
         this.totalTests = suites.stream().mapToLong(suite -> suite.tests).sum();
-        this.totalFailures = suites.stream().mapToLong(suite -> suite.failures).sum();
+        this.totalFailures = suites.stream().mapToLong(suite -> suite.totalFailures).sum();
         this.totalErrors = suites.stream().mapToLong(suite -> suite.errors).sum();
         this.totalSkipped = suites.stream().mapToLong(suite -> suite.skipped).sum();
         this.totalTime = suites.stream().mapToDouble(suite -> suite.time).sum();
@@ -50,14 +50,13 @@ public class TestExecutionReport {
     }
 
     public List<FailureDetail> getFailureDetails() {
-        return suites.stream()
-                .flatMap(suite -> {
-                    if (suite.getFailures() == null) {
-                        return java.util.stream.Stream.empty();
-                    }
-                    return suite.getFailures().stream();
-                })
-                .collect(java.util.stream.Collectors.toList());
+        return suites.stream().reduce(new ArrayList<>(), (acc, suite) -> {
+            List<FailureDetail> failureDetails = suite.getFailureDetails();
+            if (failureDetails != null && !failureDetails.isEmpty()) {
+                acc.addAll(failureDetails);
+            }
+            return acc;
+        }, (a, b) -> a);
     }
 
 }

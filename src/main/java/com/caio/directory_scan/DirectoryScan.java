@@ -72,7 +72,8 @@ public class DirectoryScan {
         return this.buildTool;
     }
 
-    private FailureDetail extractFailure(Element element) { //Acho que vou ter que criar uma nova classe para tudo isso daqui
+    private FailureDetail extractFailure(Element element) { // Acho que vou ter que criar uma nova classe para tudo isso
+                                                            // daqui
         FailureDetail fd = new FailureDetail(element.getAttribute("type"), element.getAttribute("message"),
                 element.getTextContent());
         return fd;
@@ -101,6 +102,37 @@ public class DirectoryScan {
         return new TestCaseResult(className, name, timeTestCase, status, failure);
     }
 
+    private FailureDetail extractFailureDetail(Element element) {
+
+        String message = element.getAttribute("message");
+        String type = element.getAttribute("type");
+        String stacktrace = element.getTextContent().trim();
+
+        FailureDetail fd = new FailureDetail(type, message, stacktrace);
+
+        return fd;
+    }
+
+
+    private List<FailureDetail> getFailureDetails(org.w3c.dom.Document document) {
+
+        NodeList failures = document.getElementsByTagName("failure");
+
+        if (failures.getLength() == 0) {
+            return null; // ou ""
+        }
+
+        List<FailureDetail> failureDetails = new ArrayList<>();
+
+        for (int i = 0; i < failures.getLength(); i++) {
+            Element failure = (Element) failures.item(i);
+            FailureDetail fd = extractFailureDetail(failure);
+            failureDetails.add(fd);
+        }
+
+        return failureDetails;
+    }
+
     private TestSuiteResult extractSuitCase(File file) throws ParserConfigurationException, SAXException, IOException {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = factory.newDocumentBuilder();
@@ -109,12 +141,14 @@ public class DirectoryScan {
 
         String testSuiteName = document.getDocumentElement().getAttribute("name");
         String tests = document.getDocumentElement().getAttribute("tests");
-        String failures = document.getDocumentElement().getAttribute("failures");
+        String totalFailures = document.getDocumentElement().getAttribute("failures");
         String errors = document.getDocumentElement().getAttribute("errors");
         int skipped = Integer.parseInt(
                 document.getDocumentElement().getAttribute("skipped").isEmpty() ? "0"
                         : document.getDocumentElement().getAttribute("skipped"));
         double time = Double.parseDouble(document.getDocumentElement().getAttribute("time"));
+        List<FailureDetail> failureDetails = getFailureDetails(document);
+
 
         NodeList testCases = document.getElementsByTagName("testcase");
 
@@ -127,7 +161,7 @@ public class DirectoryScan {
         }
 
         TestSuiteResult suiteResult = new TestSuiteResult(testSuiteName, Integer.parseInt(tests),
-                Integer.parseInt(failures), Integer.parseInt(errors), skipped, time, testCaseResults);
+                Integer.parseInt(totalFailures), Integer.parseInt(errors), skipped, time, testCaseResults, failureDetails);
         return suiteResult;
 
     }
@@ -141,9 +175,8 @@ public class DirectoryScan {
                 .map(Path::toFile)
                 .collect(Collectors.toList());
 
-
         List<TestSuiteResult> testSuiteResults = new ArrayList<>();
-        
+
         for (File file : reportFiles) {
             testSuiteResults.add(extractSuitCase(file));
         }

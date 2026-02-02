@@ -10,6 +10,7 @@ import java.util.List;
 import com.caio.directory_scan.DirectoryScan;
 import com.caio.enums.BuildTool;
 import com.caio.exceptions.NoOneTestPasses;
+import com.caio.models.tests.FailureDetail;
 import com.caio.models.tests.TestExecutionReport;
 
 public class RunTest {
@@ -144,8 +145,8 @@ public class RunTest {
 
                 public boolean whasCaptured() {
                         return !this.equals(verifyTestResult);
-                }
 
+                }
                 public Long getTotalTest() {
                         return testExecutionReport.getTotalTests();
                 }
@@ -159,10 +160,17 @@ public class RunTest {
                         return testExecutionReport.getTotalFailures() + testExecutionReport.getTotalErrors();
                 }
 
+                private String makeFailureDetailsString(FailureDetail failure) {
+                        return "Type: " + failure.getType() + "\n" +
+                                        "Message: " + failure.getMessage() + "\n" +
+                                        "StackTrace: " + failure.getStackTrace() + "\n";
+                }
+
                 public String getFailures() {
+
                         return testExecutionReport.getFailureDetails()
                                         .stream()
-                                        .map(failure -> failure.getMessage())
+                                        .map(this::makeFailureDetailsString)
                                         .reduce("", (a, b) -> a + "\n" + b);
                 }
 
