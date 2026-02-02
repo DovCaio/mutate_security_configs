@@ -132,66 +132,73 @@ public class CodeAnalyzer {
 
     }
 
-    private void analizeMutabelsControllers() { // Isso daqui vai se tornar um long method, mas por enquanto tá ok
-
+    private void analizeMutabelsControllers() {
         if (controllers == null || controllers.isEmpty())
-            throw new NoOneAnnotationMutableFinded(); // Talvez esse erro devesse ser diferente
+            throw new NoOneAnnotationMutableFinded();
 
-        Map<Path, String> aux = this.getControllers().entrySet().stream()// Não posso modificar um hashmap enquanto
-                                                                         // estou iterando sobre ele
-                .collect(HashMap::new, (m, e) -> m.put(e.getKey(), e.getValue()), HashMap::putAll);
+        Map<Path, String> aux = cloneControllersMap();
 
         for (Map.Entry<Path, String> entry : controllers.entrySet()) {
-            Path path = entry.getKey();
-            String content = entry.getValue();
-
-            boolean containsPre = content.contains("@PreAuthorize");
-            boolean containsPost = content.contains("@PostAuthorize");
-
-            if (!(containsPre || containsPost)) {
-                aux.remove(path);
-            } else {
-                List<AuthorizationOccurrence> originalValues = findOriginalsValues(content);
-
-                for (int i = 0; i < originalValues.size(); i++) {
-                    String originalValue = originalValues.get(i).value;
-                    String mutatedValue = ""; // Isso daqui é definido em outro lugar
-                    String packageName = extractPackageName(content);
-                    String className = extractClassName(content);
-                    String methodName = extractMethod(content, originalValues.get(i).lineNumber);
-                    AnnotationMutationPoint.TargetType targetType;
-                    if (methodName.equals("")) {
-                        targetType = AnnotationMutationPoint.TargetType.CLASS;
-                    } else {
-                        targetType = AnnotationMutationPoint.TargetType.METHOD;
-                    }
-                    AnnotationMutationPoint annotationMutationPoint = new AnnotationMutationPoint(
-                            packageName,
-                            className,
-                            methodName,
-                            originalValue,
-                            mutatedValue,
-                            targetType,
-                            path,
-                            originalValues.get(i).lineNumber);
-                    if (containsPre) {
-
-                        AnnotationType annotationType = AnnotationType.PRE;
-                        annotationMutationPoint.setAnnotationName(annotationType);
-                    } else {
-                        AnnotationType annotationType = AnnotationType.POST;
-                        annotationMutationPoint.setAnnotationName(annotationType);
-                    }
-                    this.mutationsPoints.add(annotationMutationPoint);
-                }
-            }
-
+            processControllerEntry(entry, aux);
         }
 
         if (aux == null || aux.isEmpty())
             throw new NoOneAnnotationMutableFinded();
 
         this.controllers = aux;
+    }
+
+    private Map<Path, String> cloneControllersMap() {
+        return this.getControllers().entrySet().stream()
+                .collect(HashMap::new, (m, e) -> m.put(e.getKey(), e.getValue()), HashMap::putAll);
+    }
+
+    private void processControllerEntry(Map.Entry<Path, String> entry, Map<Path, String> aux) {
+        Path path = entry.getKey();
+        String content = entry.getValue();
+
+        boolean containsPre = content.contains("@PreAuthorize");
+        boolean containsPost = content.contains("@PostAuthorize");
+
+        if (!(containsPre || containsPost)) {
+            aux.remove(path);
+        } else {
+            List<AuthorizationOccurrence> originalValues = findOriginalsValues(content);
+            for (int i = 0; i < originalValues.size(); i++) {
+                addMutationPointFromOccurrence(content, path, originalValues.get(i), containsPre, containsPost);
+            }
+        }
+    }
+
+    private void addMutationPointFromOccurrence(String content, Path path, AuthorizationOccurrence occurrence, boolean containsPre, boolean containsPost) {
+        String originalValue = occurrence.value;
+        String mutatedValue = "";
+        String packageName = extractPackageName(content);
+        String className = extractClassName(content);
+        String methodName = extractMethod(content, occurrence.lineNumber);
+        AnnotationMutationPoint.TargetType targetType;
+        if (methodName.equals("")) {
+            targetType = AnnotationMutationPoint.TargetType.CLASS;
+        } else {
+            targetType = AnnotationMutationPoint.TargetType.METHOD;
+        }
+        AnnotationMutationPoint annotationMutationPoint = new AnnotationMutationPoint(
+                packageName,
+                className,
+                methodName,
+                originalValue,
+                mutatedValue,
+                targetType,
+                path,
+                occurrence.lineNumber);
+        if (containsPre) {
+            AnnotationType annotationType = AnnotationType.PRE;
+            annotationMutationPoint.setAnnotationName(annotationType);
+        } else {
+            AnnotationType annotationType = AnnotationType.POST;
+            annotationMutationPoint.setAnnotationName(annotationType);
+        }
+        this.mutationsPoints.add(annotationMutationPoint);
     }
 
     public List<String> getRoles() {
@@ -201,8 +208,8 @@ public class CodeAnalyzer {
         Pattern outer = Pattern.compile("(hasRole|hasAnyRole)\\s*\\(([^)]*)\\)");
         Pattern inner = Pattern.compile("['\"]([^'\"]+)['\"]");
 
+        
         for (AnnotationMutationPoint amp : this.mutationsPoints) {
-
             String originalValue = amp.getOriginalValue();
 
             Matcher outerMatcher = outer.matcher(originalValue);
