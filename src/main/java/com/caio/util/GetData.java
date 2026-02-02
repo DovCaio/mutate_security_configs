@@ -1,4 +1,4 @@
-package com.caio.utli;
+package com.caio.util;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;

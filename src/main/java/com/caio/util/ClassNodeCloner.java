@@ -1,4 +1,4 @@
-package com.caio.utli;
+package com.caio.util;
 
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;

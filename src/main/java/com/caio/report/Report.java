@@ -7,7 +7,7 @@ import java.nio.file.StandardOpenOption;
 import java.util.List;
 
 import com.caio.engine.RunTest;
-import com.caio.utli.GetData;
+import com.caio.util.GetData;
 
 public class Report {
 

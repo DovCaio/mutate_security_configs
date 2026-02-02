@@ -5,45 +5,51 @@ import com.caio.directory_scan.DirectoryScan;
 import com.caio.engine.Engine;
 import com.caio.report.Report;
 
+import static com.caio.util.Printers.printMutationPoints;
+import static com.caio.util.Printers.printPaths;
+import static com.caio.util.Printers.printSimpleListString;
+import static com.caio.util.HandleWithFile.copyToTemporaryDirectory;
+
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.caio.utli.Printers.printMutationPoints;
-import static com.caio.utli.Printers.printPaths;
-import static com.caio.utli.Printers.printSimpleListString;
-
 public class CliController {
 
     private static final List<String> EXISTENT_FLAGS = List.of("-v");
-    private Path directory;
+    private Path originalDirectory;
+    private Path temporaryDirectory;
     private String flag = "";
     private DirectoryScan directoryScan;
     private CodeAnalyzer bca;
     private Engine engine;
     private Report report;
 
-    public CliController(String[] args) {
+
+    
+    public CliController(String[] args) throws IOException {
         if (args.length == 0) {
             System.err.println("Uso: java  Main <flag> <diretorio>");
             System.exit(1);
         }
 
         if (args.length == 1) {
-            this.directory = Paths.get(args[0]);
+            this.originalDirectory = Paths.get(args[0]);
         } else if (args.length == 2) {
-            this.directory = Paths.get(args[1]);
+            this.originalDirectory = Paths.get(args[1]);
             this.flag = args[0];
             if (!EXISTENT_FLAGS.contains(this.flag))
                 throw new IllegalArgumentException("A flag " + this.flag + " não existe.");
         } else {
             throw new IllegalArgumentException("Muitos argumentos, no máximo 2");
         }
+        
+        temporaryDirectory = copyToTemporaryDirectory(originalDirectory);
 
         this.bca = new CodeAnalyzer();
-        this.directoryScan = new DirectoryScan(directory);
+        this.directoryScan = new DirectoryScan(temporaryDirectory);
     }
 
     public void execute() throws Exception {
@@ -84,10 +90,14 @@ public class CliController {
         }
     }
 
-    
     private void generateReport() {
         this.report = new Report(engine.getTestsResults());
-        this.report.generate(directory);
+        this.report.generate(originalDirectory);
     }
 
+    public Path getTemporaryDirectory() {
+        return temporaryDirectory;
+    }
+
+    
 }

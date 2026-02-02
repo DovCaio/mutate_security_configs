@@ -1,4 +1,4 @@
-package com.caio.utli;
+package com.caio.util;
 
 import com.caio.models.AnnotationMutationPoint;
 
