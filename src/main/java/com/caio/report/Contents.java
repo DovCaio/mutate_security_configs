@@ -103,7 +103,7 @@ th, td {
                         <th>Total</th>
                         <th>Sucesso</th>
                         <th>Falhas</th>
-                        <th>Erros</th>
+                        <th>Log&apos;s</th>
                         <th>Capturado</th>
                     </tr>
         """.formatted(date, totalMutants, capturedCount, survivedCount, captureRate));
