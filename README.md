@@ -22,77 +22,21 @@ java -jar target/mutate_security_configs-1.0-SNAPSHOT.jar /meu/caminho/repositor
 
 > 📝 **Importante:** Substitua `/meu/caminho/repositorio` pelo caminho real do projeto que você deseja testar ou analisar.
 
----
+## 🔍 Modo Verbose
 
-## 🧱 **Preparando o projeto alvo**
-
-Antes de rodar o `mutate_security_configs`, certifique-se de **compilar o projeto alvo**.  
-Se estiver usando Maven, execute os comandos abaixo:
-
-## 🔹 Com Maven
-
-O comando a seguir:
+Você pode usar a flag `-v` para habilitar saída detalhada (verbose) durante a execução da ferramenta, permitindo acompanhar cada etapa do processamento:
 
 ```bash
-mvn compile && mvn test-compile && mvn dependency:copy-dependencies
+java -jar target/mutate_security_configs-1.0-SNAPSHOT.jar /meu/caminho/repositorio -v
 ```
 
-Executa as seguintes etapas:
+Depois da execução um arquivo report vai ser gerado dentro do arquivo do repositorio, as execuções são nomeadas pelo, dia-mes-ano-horas-minutos-segundos
 
-1. **Compila o código-fonte principal**
-   - Diretório: `src/main/java`
-2. **Compila o código de teste**
-   - Diretório: `src/test/java`
-3. **Copia as dependências do projeto**
-   - Diretório de saída: `target/dependency`
+## 📄 Geração de Relatórios
 
----
+Após a execução, a ferramenta gera automaticamente um arquivo de relatório dentro do diretório do repositório analisado.
 
-## 🔸 Com Gradle
-
-O Gradle não possui uma task equivalente a `dependency:copy-dependencies` por padrão.  
-É necessário criar uma **task personalizada**.
-
-### 1. Usando Groovy DSL (`build.gradle`)
-
-```groovy
-tasks.register('copyDependencies', Copy) {
-    from configurations.runtimeClasspath
-    from configurations.testRuntimeClasspath
-    into "$buildDir/dependencies"
-}
-```
-
-### 2. Usando Kotlin DSL (`build.gradle.kts`)
-
-```kotlin
-tasks.register<Copy>("copyDependencies") {
-    from(configurations.runtimeClasspath)
-    from(configurations.testRuntimeClasspath)
-    into("$buildDir/dependencies")
-}
-```
-
----
-
-## 💻 Executando
-
-Após adicionar a task acima, você pode executar o equivalente ao comando Maven:
-
+Cada relatório recebe um nome baseado em timestamp para evitar sobrescrita de execuções anteriores:
 ```bash
-./gradlew compileJava compileTestJava copyDependencies
+dia-mes-ano-horas-minutos-segundos
 ```
-
-
-Esses comandos garantem que todas as classes e dependências necessárias estarão disponíveis para o carregamento dinâmico e execução dos testes.
-
----
-
-## ✅ **Resumo**
-
-| Etapa | Maven | Gradle | Descrição |
-|-------|--------|---------|-----------|
-| 🧩 Build do projeto (Projeto mutate_security_configs) | `mvn clean package` |  | Gera o `.jar` principal do projeto |
-| 🧪 Compilar código e testes (Projeto alvo) | `mvn compile && mvn test-compile` | `./gradlew compileJava compileTestJava` | Prepara as classes principais e de teste |
-| 📦 Copiar dependências (Projeto alvo) | `mvn dependency:copy-dependencies` | `./gradlew copyDependencies` *(task personalizada)* | Copia todas as libs para `target/dependency` (Maven) ou `build/dependencies` (Gradle) |
-| 🚀 Executar (Projeto mutate_security_configs) | `java -jar target/mutate_security_configs-1.0-SNAPSHOT.jar /seu/projeto` |  | Inicia a execução do `.jar` com os testes em memória |
