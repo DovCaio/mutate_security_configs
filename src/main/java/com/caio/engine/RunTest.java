@@ -52,7 +52,7 @@ public class RunTest {
         private TestExecutionReport readResult() {
                 try {
                         return directoryScan.getTestsReports();
-                } catch (Exception e) { //Está genérico porque eu não tenho como controlar muita coisa.
+                } catch (Exception e) { // Está genérico porque eu não tenho como controlar muita coisa.
                         throw new RuntimeException("Erro ao ler relatórios de testes: " + e.getMessage(), e);
                 }
         }
@@ -68,7 +68,12 @@ public class RunTest {
 
                 process.waitFor();
 
-                BufferedReader stdOut = new BufferedReader(new InputStreamReader(process.getInputStream())); //Tem que ser consumido para não travar o processo
+                BufferedReader stdOut = new BufferedReader(new InputStreamReader(process.getInputStream())); // Tem que
+                                                                                                             // ser
+                                                                                                             // consumido
+                                                                                                             // para não
+                                                                                                             // travar o
+                                                                                                             // processo
                 BufferedReader stdErr = new BufferedReader(new InputStreamReader(process.getErrorStream()));
 
                 TestExecutionReport testExecutionReport = readResult();
@@ -87,6 +92,7 @@ public class RunTest {
         }
 
         public TestResult executeTestForVerification() throws IOException, InterruptedException {
+
                 TestResult testResult = runAllTestsCorrect(null);
                 verifyTestResult = testResult;
                 if (testResult.getTotalTest() == testResult.getFailed())
@@ -151,6 +157,7 @@ public class RunTest {
                         return !this.equals(verifyTestResult);
 
                 }
+
                 public Long getTotalTest() {
                         return testExecutionReport.getTotalTests();
                 }

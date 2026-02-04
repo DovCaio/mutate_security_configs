@@ -19,6 +19,7 @@ public class CodeLoader {
         if (testResult.getFailed() > 0) {
             throw new IOException("Nem todos os testes passaram na execução inicial. Impossível continuar com a mutação.");
         }
+
     }
 
 
@@ -46,6 +47,7 @@ public class CodeLoader {
     }
 
     public void start( List<AnnotationMutationPoint> mutants) throws IOException, InterruptedException {
+
 
         for (AnnotationMutationPoint amp : mutants) {
             try {

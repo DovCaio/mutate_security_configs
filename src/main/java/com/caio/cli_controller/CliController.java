@@ -3,17 +3,24 @@ package com.caio.cli_controller;
 import com.caio.analize.CodeAnalyzer;
 import com.caio.directory_scan.DirectoryScan;
 import com.caio.engine.Engine;
+import com.caio.models.AnnotationMutationPoint;
 import com.caio.report.Report;
+import com.caio.util.ParallelExecutionContext;
 
 import static com.caio.util.Printers.printMutationPoints;
 import static com.caio.util.Printers.printPaths;
 import static com.caio.util.Printers.printSimpleListString;
 import static com.caio.util.HandleWithFile.copyToTemporaryDirectory;
 
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+
 
 public class CliController {
 
@@ -25,6 +32,7 @@ public class CliController {
     private CodeAnalyzer bca;
     private Engine engine;
     private Report report;
+    private ParallelExecutionContext parallelExecutionConfiguration;
 
     public CliController(String[] args) throws IOException {
         if (args.length == 0) {
@@ -47,6 +55,11 @@ public class CliController {
 
         this.bca = new CodeAnalyzer();
         this.directoryScan = new DirectoryScan(temporaryDirectory);
+
+        this.parallelExecutionConfiguration = new ParallelExecutionContext(new LinkedBlockingQueue<>(1000),
+            new LinkedBlockingQueue<>(5000), new AtomicInteger(0)
+        );
+
     }
 
     public void execute() throws Exception {
@@ -64,7 +77,7 @@ public class CliController {
 
     private void searchForPossibleMutations() throws Exception {
         this.bca.analyze(directoryScan.getFindeds());
-        if (flag.equals("-v")){
+        if (flag.equals("-v")) {
             printSimpleListString("Roles encontradas", bca.getRoles());
             printSimpleListString("Authorities encontradas", bca.getAuthorities());
             System.out.println("Possíveis pontos de mutação:");
@@ -88,5 +101,4 @@ public class CliController {
         return temporaryDirectory;
     }
 
-    
 }

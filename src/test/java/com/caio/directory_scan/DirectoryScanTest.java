@@ -1,4 +1,4 @@
-package com.caio;
+package com.caio.directory_scan;
 
 import com.caio.directory_scan.DirectoryScan;
 import com.caio.enums.BuildTool;
@@ -8,12 +8,16 @@ import com.caio.models.tests.TestExecutionReport;
 import com.caio.models.tests.TestSuiteResult;
 
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.io.TempDir;
+
+import java.nio.file.*;
 
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
-import java.nio.file.*;
 import java.util.List;
+
+import static org.mockito.Mockito.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -155,8 +159,7 @@ class DirectoryScanTest {
         assertEquals(tempDir, scanner.getDirectory());
     }
 
-
-     @Test
+    @Test
     void shouldThrowWhenDirectoryIsNull() {
         assertThrows(IllegalArgumentException.class,
                 () -> new DirectoryScan(null));
@@ -240,28 +243,28 @@ class DirectoryScanTest {
 
     private String fullJUnitXml() {
         return """
-        <testsuite name="SuiteA" tests="3" failures="1" errors="1" skipped="1" time="0.5">
+                <testsuite name="SuiteA" tests="3" failures="1" errors="1" skipped="1" time="0.5">
 
-            <testcase classname="A" name="passTest" time="0.1"/>
+                    <testcase classname="A" name="passTest" time="0.1"/>
 
-            <testcase classname="A" name="failTest" time="0.2">
-                <failure type="AssertionError" message="boom">
-                    stacktrace here
-                </failure>
-            </testcase>
+                    <testcase classname="A" name="failTest" time="0.2">
+                        <failure type="AssertionError" message="boom">
+                            stacktrace here
+                        </failure>
+                    </testcase>
 
-            <testcase classname="A" name="errorTest" time="0.2">
-                <error type="Exception" message="bad">
-                    error stack
-                </error>
-            </testcase>
+                    <testcase classname="A" name="errorTest" time="0.2">
+                        <error type="Exception" message="bad">
+                            error stack
+                        </error>
+                    </testcase>
 
-            <testcase classname="A" name="skipTest" time="0.0">
-                <skipped/>
-            </testcase>
+                    <testcase classname="A" name="skipTest" time="0.0">
+                        <skipped/>
+                    </testcase>
 
-        </testsuite>
-        """;
+                </testsuite>
+                """;
     }
 
     @Test
@@ -347,15 +350,14 @@ class DirectoryScanTest {
         assertEquals(1, scan.getDependenciesPath().size());
     }
 
-
     @Test
     void shouldHandleMissingSkippedAttribute() throws Exception {
 
         String xml = """
-        <testsuite name="S" tests="1" failures="0" errors="0" skipped="" time="0.1">
-            <testcase classname="A" name="t" time="0.1"/>
-        </testsuite>
-        """;
+                <testsuite name="S" tests="1" failures="0" errors="0" skipped="" time="0.1">
+                    <testcase classname="A" name="t" time="0.1"/>
+                </testsuite>
+                """;
 
         createFile("TEST-no-skip.xml", xml);
 
@@ -364,6 +366,89 @@ class DirectoryScanTest {
         TestExecutionReport report = scan.getTestsReports();
 
         assertEquals(0, report.getSuites().get(0).getSkipped());
+    }
+
+    @Nested
+    public class WorkersQuantities {
+
+        @TempDir
+        Path tempDir;
+
+        @Test
+        void shouldCalculateRepoSize() throws IOException {
+
+            // 2 arquivos de 1MB
+            Files.write(tempDir.resolve("a.txt"), new byte[1024 * 1024]);
+            Files.write(tempDir.resolve("b.txt"), new byte[1024 * 1024]);
+
+            DirectoryScan calc = new DirectoryScan(tempDir);
+
+            long size = calc.repoSizeMB();
+
+            assertEquals(2, size);
+        }
+
+        @Test
+        void shouldIgnoreTargetDirectory() throws IOException {
+
+            Path target = Files.createDirectory(tempDir.resolve("target"));
+
+            Files.write(target.resolve("big.bin"), new byte[5 * 1024 * 1024]);
+
+            DirectoryScan calc = new DirectoryScan(tempDir);
+
+            long size = calc.repoSizeMB();
+
+            assertEquals(0, size);
+        }
+
+        @Test
+        void shouldCalculateWorkersSmallRepo(@TempDir Path dir) throws IOException {
+
+            Files.write(dir.resolve("a.txt"), new byte[10]);
+
+            DirectoryScan scan = spy(new DirectoryScan(dir));
+
+            doReturn(8).when(scan).availableProcessors();
+            doReturn(16000L).when(scan).totalMemoryMB();
+            doReturn(600L).when(scan).repoSizeMB();
+
+            int workers = scan.calculateWorkers();
+
+            assertTrue(workers >= 1);
+        }
+
+        @Test
+        void shouldReduceWorkersForLargeRepo(@TempDir Path dir) throws IOException {
+
+            Files.write(dir.resolve("big.bin"),
+                    new byte[600 * 1024 * 1024]);
+
+            DirectoryScan calc = spy(new DirectoryScan(dir));
+
+            doReturn(8).when(calc).availableProcessors();
+            doReturn(16000L).when(calc).totalMemoryMB();
+            doReturn(600L).when(calc).repoSizeMB(); // simula repo grande
+
+            int workers = calc.calculateWorkers();
+
+            assertTrue(workers <= 4); // fator 0.5 aplicado
+        }
+
+        @Test
+        void shouldReturnAtLeastOneWorker(@TempDir Path dir) {
+
+            DirectoryScan calc = spy(new DirectoryScan(dir));
+
+            doReturn(1).when(calc).availableProcessors();
+            doReturn(500L).when(calc).totalMemoryMB();
+            doReturn(10L).when(calc).repoSizeMB();
+
+            int workers = calc.calculateWorkers();
+
+            assertEquals(1, workers);
+        }
+
     }
 
 }
