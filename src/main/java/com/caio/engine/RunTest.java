@@ -130,6 +130,10 @@ public class RunTest {
                         String reset = "\u001B[0m";
 
                         return color + "=== RESULTADOS DOS TESTES ===\n" +
+                                        "ClassName: " + this.params.className + "\n" +
+                                        "Method: " + this.params.method + "\n" +
+                                        "OriginalValue: " + this.params.originalValue + "\n" +
+                                        "MutateValue: " + this.params.mutatedValue + "\n" +
                                         "Total tests: " + this.getTotalTest() + "\n" +
                                         "Succeeded: " + this.getSuccedded() + "\n" +
                                         "Failed: " + this.getFailed() + "\n" +
