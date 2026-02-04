@@ -1,6 +1,5 @@
 package com.caio.engine;
 
-import com.caio.directory_scan.DirectoryScan;
 import com.caio.enums.BuildTool;
 import com.caio.models.AnnotationMutationPoint;
 
@@ -17,7 +16,7 @@ public class Engine {
 
     public Engine(List<AnnotationMutationPoint> amps, List<AnnotationMutationPoint> mainClasses, Path repoDirectory, BuildTool buildTool, List<String> roles, List<String> authorities, String flag) {
         this.runTest = new RunTest(repoDirectory, buildTool, flag);
-        this.mutantGeneration = new MutantGeneration(amps);
+        this.mutantGeneration = new MutantGeneration(amps, flag);
         this.codeLoader = new CodeLoader(this.runTest);
         this.roles = roles;
         this.authorities = authorities;

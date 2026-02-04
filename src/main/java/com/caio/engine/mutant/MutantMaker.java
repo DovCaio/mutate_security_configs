@@ -147,7 +147,7 @@ public class MutantMaker {
             String value = values[i].trim();
             String mutatedValue = value.startsWith("NO_")
                     ? "" + value.substring(4)
-                    : "NO_" + value.substring(1);
+                    : value.substring(0, 1) + "NO_" + value.substring(1);
             
             mutatedValues[i] = mutatedValue;
             
@@ -182,7 +182,7 @@ public class MutantMaker {
 
     private String removeInsideParentheses(Matcher matcher) {
         String str = matcher.group(0);
-        String mutant = str.replaceAll("\\(([^)]*)\\)", "()");
+        String mutant = str.replaceAll("\\(([^)]*)\\)", "(\'\')");
         return mutant;
     }
 

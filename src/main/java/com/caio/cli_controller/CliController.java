@@ -14,7 +14,6 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class CliController {
 
@@ -68,6 +67,7 @@ public class CliController {
         if (flag.equals("-v")){
             printSimpleListString("Roles encontradas", bca.getRoles());
             printSimpleListString("Authorities encontradas", bca.getAuthorities());
+            System.out.println("Possíveis pontos de mutação:");
             printMutationPoints(bca.getMutationsPoints());
 
         }
@@ -77,15 +77,6 @@ public class CliController {
         this.engine = new Engine(bca.getMutationsPoints(), bca.getmainClasses(), directoryScan.getDirectory(),
                 directoryScan.getBuildTool(), bca.getRoles(), bca.getAuthorities(), flag);
         engine.start();
-        if (flag.equals("-v")) {
-            System.out.println("Mutantes");
-            printMutationPoints(engine.getMutants());
-
-            List<String> allResults = engine.getTestsResults().stream().map(value -> value.toString())
-                    .collect(Collectors.toList());
-            ;
-            allResults.stream().forEach(value -> System.out.println(value));
-        }
     }
 
     private void generateReport() {

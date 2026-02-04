@@ -6,16 +6,28 @@ import java.util.List;
 import com.caio.exceptions.NoOnePossibleMutant;
 import com.caio.models.AnnotationMutationPoint;
 
+import static com.caio.util.Printers.printMutationPoints;
+
+
 import com.caio.engine.mutant.MutantMaker;
 
 public class MutantGeneration {
 
     private List<AnnotationMutationPoint> amps;
     private List<AnnotationMutationPoint> mutants;
+    private String flag;
+
+    public MutantGeneration(List<AnnotationMutationPoint> amps, String flag) {
+        this.amps = amps;
+        this.mutants = new ArrayList<>();
+        this.flag = flag;
+    }
+
 
     public MutantGeneration(List<AnnotationMutationPoint> amps) {
         this.amps = amps;
         this.mutants = new ArrayList<>();
+        this.flag = "";
     }
 
     public void createMutants(List<String> roles, List<String> authorities) throws Exception {
@@ -41,6 +53,11 @@ public class MutantGeneration {
         }
         if (this.mutants.isEmpty())
             throw new NoOnePossibleMutant();
+        if (flag.equals("-v")){
+            System.out.println("Mutantes");
+            printMutationPoints(this.mutants);
+
+        }
 
     }
     
