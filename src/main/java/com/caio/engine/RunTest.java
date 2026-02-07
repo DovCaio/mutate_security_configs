@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import com.caio.directory_scan.DirectoryScan;
 import com.caio.enums.BuildTool;
@@ -22,6 +23,8 @@ public class RunTest {
         private String command = "";
         private DirectoryScan directoryScan;
         private String flag;
+        private long startTestFirstExecutionTime;
+        private long endTestFirstExecutionTime;
 
         public RunTest(Path repoDirectory, BuildTool buildTool, String flag) {
                 this.repoDirectory = repoDirectory;
@@ -64,9 +67,19 @@ public class RunTest {
                 processBuilder.directory(repoDirectory.toFile());
                 processBuilder.command("sh", "-c", this.command);
 
+
+
                 Process process = processBuilder.start();
 
-                process.waitFor();
+                boolean finished = process.waitFor(5, TimeUnit.MINUTES); //Seria muito interessante que isso daqui fosse interativo.
+
+                if (!finished) {
+                        if (flag.equals("-v")) {
+                                System.out.println("Timeout atingido para execução dos testes. Processo será finalizado.");
+                        }
+                        process.destroyForcibly();
+                        process.waitFor();
+                }
 
                 BufferedReader stdOut = new BufferedReader(new InputStreamReader(process.getInputStream())); // Tem que
                                                                                                              // ser
@@ -79,6 +92,7 @@ public class RunTest {
                 TestExecutionReport testExecutionReport = readResult();
 
                 if (params == null) { // Execução inicial, sem mutations
+                        //endTestFirstExecutionTime = System.currentTimeMillis();
                         return new TestResult(testExecutionReport);
                 } else {
 
