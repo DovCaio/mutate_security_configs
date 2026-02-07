@@ -24,7 +24,9 @@ public class RunTest {
         private DirectoryScan directoryScan;
         private String flag;
         private long startTestFirstExecutionTime;
-        private long endTestFirstExecutionTime;
+        private long totalTestFirstExecutionTime = TimeUnit.MINUTES.toMillis(10); // Valor padrão, caso haja algum
+                                                                                  // problema na medição do tempo da
+                                                                                  // execução inicial dos testes.
 
         public RunTest(Path repoDirectory, BuildTool buildTool, String flag) {
                 this.repoDirectory = repoDirectory;
@@ -60,6 +62,16 @@ public class RunTest {
                 }
         }
 
+        private void defineTimeOut() {
+                long endTestFirstExecutionTime = System.currentTimeMillis();
+                long baseline = endTestFirstExecutionTime - this.startTestFirstExecutionTime;
+
+                long tolerance = TimeUnit.MINUTES.toMillis(2);
+                double factor = 1.5;
+
+                this.totalTestFirstExecutionTime = (long) (baseline * factor) + tolerance;
+        }
+
         private TestResult runAllTestsCorrect(ParamsForTestMutationApresentation params)
                         throws IOException, InterruptedException {
 
@@ -67,19 +79,13 @@ public class RunTest {
                 processBuilder.directory(repoDirectory.toFile());
                 processBuilder.command("sh", "-c", this.command);
 
-
+                if (params == null) {
+                        startTestFirstExecutionTime = System.currentTimeMillis();
+                }
 
                 Process process = processBuilder.start();
 
-                boolean finished = process.waitFor(5, TimeUnit.MINUTES); //Seria muito interessante que isso daqui fosse interativo.
-
-                if (!finished) {
-                        if (flag.equals("-v")) {
-                                System.out.println("Timeout atingido para execução dos testes. Processo será finalizado.");
-                        }
-                        process.destroyForcibly();
-                        process.waitFor();
-                }
+                boolean finished = process.waitFor(totalTestFirstExecutionTime, TimeUnit.MILLISECONDS);
 
                 BufferedReader stdOut = new BufferedReader(new InputStreamReader(process.getInputStream())); // Tem que
                                                                                                              // ser
@@ -89,10 +95,21 @@ public class RunTest {
                                                                                                              // processo
                 BufferedReader stdErr = new BufferedReader(new InputStreamReader(process.getErrorStream()));
 
+                if (!finished) {
+                        if (flag.equals("-v")) {
+                                System.out.println(
+                                                "Timeout atingido para execução dos testes. Processo será finalizado.");
+                        }
+                        process.destroyForcibly();
+                        process.waitFor();
+                }
+
+                
+
                 TestExecutionReport testExecutionReport = readResult();
 
                 if (params == null) { // Execução inicial, sem mutations
-                        //endTestFirstExecutionTime = System.currentTimeMillis();
+                        this.defineTimeOut();
                         return new TestResult(testExecutionReport);
                 } else {
 
