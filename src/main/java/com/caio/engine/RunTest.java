@@ -24,7 +24,7 @@ public class RunTest {
         private DirectoryScan directoryScan;
         private String flag;
         private long startTestFirstExecutionTime;
-        private long totalTestFirstExecutionTime = TimeUnit.MINUTES.toMillis(10); // Valor padrão, caso haja algum
+        private long totalTestFirstExecutionTime = TimeUnit.MINUTES.toMillis(5); // Valor padrão, caso haja algum
                                                                                   // problema na medição do tempo da
                                                                                   // execução inicial dos testes.
 
@@ -72,16 +72,12 @@ public class RunTest {
                 this.totalTestFirstExecutionTime = (long) (baseline * factor) + tolerance;
         }
 
-        private TestResult runAllTestsCorrect(ParamsForTestMutationApresentation params)
+        private TestExecutionReport runAllTestsCorrect()
                         throws IOException, InterruptedException {
 
                 ProcessBuilder processBuilder = new ProcessBuilder();
                 processBuilder.directory(repoDirectory.toFile());
                 processBuilder.command("sh", "-c", this.command);
-
-                if (params == null) {
-                        startTestFirstExecutionTime = System.currentTimeMillis();
-                }
 
                 Process process = processBuilder.start();
 
@@ -107,24 +103,14 @@ public class RunTest {
                 
 
                 TestExecutionReport testExecutionReport = readResult();
+                return testExecutionReport;
 
-                if (params == null) { // Execução inicial, sem mutations
-                        this.defineTimeOut();
-                        return new TestResult(testExecutionReport);
-                } else {
-
-                        TestResult testResult = new TestResult(testExecutionReport, params);
-
-                        if (flag.equals("-v")) {
-                                System.out.println(testResult.toString());
-                        }
-                        return testResult;
-                }
         }
 
         public TestResult executeTestForVerification() throws IOException, InterruptedException {
-
-                TestResult testResult = runAllTestsCorrect(null);
+                this.startTestFirstExecutionTime = System.currentTimeMillis();
+                TestResult testResult = new TestResult(runAllTestsCorrect());
+                this.defineTimeOut();
                 verifyTestResult = testResult;
                 if (testResult.getTotalTest() == testResult.getFailed())
                         throw new NoOneTestPasses();
@@ -134,7 +120,10 @@ public class RunTest {
 
         public TestResult executeTestForMutation(ParamsForTestMutationApresentation params)
                         throws IOException, InterruptedException {
-                TestResult testResult = runAllTestsCorrect(params);
+                TestResult testResult = new TestResult(runAllTestsCorrect(), params);
+                if (flag.equals("-v")) {
+                        System.out.println(testResult.toString());
+                }
                 this.testsResults.add(testResult);
                 return testResult;
         }
