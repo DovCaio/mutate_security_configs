@@ -24,41 +24,39 @@ class CodeAnalyzerTest {
         return file;
     }
 
-
     @Test
     void shouldDetectControllerWithPreAuthorize() throws Exception {
         String code = """
-            package com.test;
+                package com.test;
 
-            import org.springframework.web.bind.annotation.RestController;
-            import org.springframework.security.access.prepost.PreAuthorize;
+                import org.springframework.web.bind.annotation.RestController;
+                import org.springframework.security.access.prepost.PreAuthorize;
 
-            @RestController
-            public class UserController {
+                @RestController
+                public class UserController {
 
-                @PreAuthorize("hasRole('ADMIN')")
-                public void test() {}
-            }
-            """;
+                    @PreAuthorize("hasRole('ADMIN')")
+                    public void test() {}
+                }
+                """;
 
         Path file = createJavaFile("UserController.java", code);
 
         CodeAnalyzer analyzer = new CodeAnalyzer();
         analyzer.analyze(List.of(file));
 
-        assertEquals(1, analyzer.getControllers().size());
+        assertEquals(1, analyzer.getcodesMutables().size());
         assertEquals(1, analyzer.getMutationsPoints().size());
     }
-
 
     @Test
     void shouldRemoveControllerWithoutSecurityAnnotations() throws Exception {
         String code = """
-            @RestController
-            public class NoSecurityController {
-                public void test() {}
-            }
-            """;
+                @RestController
+                public class NoSecurityController {
+                    public void test() {}
+                }
+                """;
 
         Path file = createJavaFile("NoSecurityController.java", code);
 
@@ -68,19 +66,18 @@ class CodeAnalyzerTest {
                 () -> analyzer.analyze(List.of(file)));
     }
 
-
     @Test
     void shouldDetectClassLevelAnnotation() throws Exception {
         String code = """
-            package com.test;
+                package com.test;
 
-            @RestController
-            @PreAuthorize("hasRole('USER')")
-            public class ClassSecuredController {
+                @RestController
+                @PreAuthorize("hasRole('USER')")
+                public class ClassSecuredController {
 
-                public void test() {}
-            }
-            """;
+                    public void test() {}
+                }
+                """;
 
         Path file = createJavaFile("ClassSecuredController.java", code);
 
@@ -93,17 +90,16 @@ class CodeAnalyzerTest {
         assertEquals(AnnotationMutationPoint.TargetType.CLASS, mp.getTargetType());
     }
 
-
     @Test
     void shouldDetectPostAuthorize() throws Exception {
         String code = """
-            @Controller
-            public class PostController {
+                @Controller
+                public class PostController {
 
-                @PostAuthorize("hasAuthority('READ')")
-                public void run() {}
-            }
-            """;
+                    @PostAuthorize("hasAuthority('READ')")
+                    public void run() {}
+                }
+                """;
 
         Path file = createJavaFile("PostController.java", code);
 
@@ -113,20 +109,19 @@ class CodeAnalyzerTest {
         assertEquals(1, analyzer.getMutationsPoints().size());
     }
 
-
     @Test
     void shouldDetectMultipleAnnotations() throws Exception {
         String code = """
-            @RestController
-            public class MultiController {
+                @RestController
+                public class MultiController {
 
-                @PreAuthorize("hasRole('ADMIN')")
-                public void a(){}
+                    @PreAuthorize("hasRole('ADMIN')")
+                    public void a(){}
 
-                @PreAuthorize("hasRole('USER')")
-                public void b(){}
-            }
-            """;
+                    @PreAuthorize("hasRole('USER')")
+                    public void b(){}
+                }
+                """;
 
         Path file = createJavaFile("MultiController.java", code);
 
@@ -136,17 +131,16 @@ class CodeAnalyzerTest {
         assertEquals(2, analyzer.getMutationsPoints().size());
     }
 
-
     @Test
     void shouldExtractRolesCorrectly() throws Exception {
         String code = """
-            @RestController
-            public class RoleController {
+                @RestController
+                public class RoleController {
 
-                @PreAuthorize("hasAnyRole('ADMIN','USER','GUEST')")
-                public void run(){}
-            }
-            """;
+                    @PreAuthorize("hasAnyRole('ADMIN','USER','GUEST')")
+                    public void run(){}
+                }
+                """;
 
         Path file = createJavaFile("RoleController.java", code);
 
@@ -160,17 +154,16 @@ class CodeAnalyzerTest {
         assertTrue(roles.contains("GUEST"));
     }
 
-
     @Test
     void shouldExtractAuthoritiesCorrectly() throws Exception {
         String code = """
-            @RestController
-            public class AuthController {
+                @RestController
+                public class AuthController {
 
-                @PreAuthorize("hasAnyAuthority('READ','WRITE','DELETE')")
-                public void run(){}
-            }
-            """;
+                    @PreAuthorize("hasAnyAuthority('READ','WRITE','DELETE')")
+                    public void run(){}
+                }
+                """;
 
         Path file = createJavaFile("AuthController.java", code);
 
@@ -182,7 +175,6 @@ class CodeAnalyzerTest {
         assertEquals(3, auth.size());
         assertTrue(auth.contains("READ"));
     }
-
 
     @Test
     void shouldExtractPackageNameViaReflection() throws Exception {
@@ -197,16 +189,15 @@ class CodeAnalyzerTest {
         assertEquals("com.example.test", result);
     }
 
-
     @Test
     void shouldExtractMethodNameViaReflection() throws Exception {
         String code = """
-            public class X {
+                public class X {
 
-                @PreAuthorize("hasRole('ADMIN')")
-                public List<String> runTest() { return null; }
-            }
-            """;
+                    @PreAuthorize("hasRole('ADMIN')")
+                    public List<String> runTest() { return null; }
+                }
+                """;
 
         CodeAnalyzer analyzer = new CodeAnalyzer();
 
@@ -220,7 +211,6 @@ class CodeAnalyzerTest {
         assertEquals("runTest", method);
     }
 
-
     @Test
     void shouldThrowWhenAnalyzeNull() {
         CodeAnalyzer analyzer = new CodeAnalyzer();
@@ -229,32 +219,30 @@ class CodeAnalyzerTest {
                 () -> analyzer.analyze(null));
     }
 
-
     @Test
     void shouldAnalyzeMultipleFiles() throws Exception {
 
         Path a = createJavaFile("A.java", """
-            @RestController
-            public class A {
-                @PreAuthorize("hasRole('ADMIN')")
-                public void x(){}
-            }
-            """);
+                @RestController
+                public class A {
+                    @PreAuthorize("hasRole('ADMIN')")
+                    public void x(){}
+                }
+                """);
 
         Path b = createJavaFile("B.java", """
-            @RestController
-            public class B {
-                @PreAuthorize("hasRole('USER')")
-                public void y(){}
-            }
-            """);
+                @RestController
+                public class B {
+                    @PreAuthorize("hasRole('USER')")
+                    public void y(){}
+                }
+                """);
 
         CodeAnalyzer analyzer = new CodeAnalyzer();
         analyzer.analyze(List.of(a, b));
 
         assertEquals(2, analyzer.getMutationsPoints().size());
     }
-
 
     @Test
     void shouldAnalizeServices() throws Exception {
@@ -272,13 +260,12 @@ class CodeAnalyzerTest {
 
         assertEquals(1, analyzer.getMutationsPoints().size());
 
-
     }
 
     @Test
     void shouldAnalizeRepository() throws Exception {
 
-        Path repository = createJavaFile("Service.java", """
+        Path repository = createJavaFile("Repository.java", """
                 @Repository
                 public class Service {
                     @PreAuthorize("hasRole('USER')")
@@ -291,6 +278,46 @@ class CodeAnalyzerTest {
 
         assertEquals(1, analyzer.getMutationsPoints().size());
 
+    }
 
+    @Test
+    void shouldNotConsiderSimpleCommentsInAnnotations() throws Exception {
+        Path repository = createJavaFile("Service.java", """
+                @Repository
+                public class Service {
+                    // @PreAuthorize("hasRole('USER')")
+                    public void y(){}
+
+                    @PreAuthorize("hasRole('USER')")
+                    public void x(){}
+                }
+                """);
+
+        CodeAnalyzer analyzer = new CodeAnalyzer();
+        analyzer.analyze(List.of(repository));
+
+        assertEquals(1, analyzer.getMutationsPoints().size());
+    }
+
+    void shouldNotConsiderMultipleLineCommentsInAnnotations() throws Exception {
+        Path repository = createJavaFile("Service.java", """
+                @Repository
+                public class Service {
+                    /*
+                    
+                    @PreAuthorize("hasRole('USER')")
+
+                    */
+                    public void y(){}
+
+                    @PreAuthorize("hasRole('USER')")
+                    public void x(){}
+                }
+                """);
+
+        CodeAnalyzer analyzer = new CodeAnalyzer();
+        analyzer.analyze(List.of(repository));
+
+        assertEquals(1, analyzer.getMutationsPoints().size());
     }
 }

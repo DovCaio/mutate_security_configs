@@ -20,7 +20,7 @@ public class CodeAnalyzer {
 
     private List<AnnotationMutationPoint> mainClasses;
 
-    private Map<Path, String> controllers;
+    private Map<Path, String> codesMutables;
 
     public record AuthorizationOccurrence(String value, Integer lineNumber) {
 
@@ -29,12 +29,16 @@ public class CodeAnalyzer {
     public CodeAnalyzer() {
         this.mutationsPoints = new ArrayList<AnnotationMutationPoint>();
         this.mainClasses = new ArrayList<AnnotationMutationPoint>();
-        this.controllers = new HashMap<Path, String>();
+        this.codesMutables = new HashMap<Path, String>();
     }
 
     public void analyze(List<Path> classFilePath) throws IOException {
         analyzeClass(classFilePath);
-        analizeMutabelsControllers();
+        analizeMutabelsCode();
+    }
+
+    private static String removeComments(String code) {
+        return code.replaceAll("//.*|/\\*[\\s\\S]*?\\*/", "");
     }
 
     private void analyzeClass(List<Path> classFilePath) throws IOException {
@@ -45,7 +49,7 @@ public class CodeAnalyzer {
             String content = Files.readString(path);
 
             if (isMutableCode(content)) {
-                controllers.put(path, content);
+                codesMutables.put(path, removeComments(content));
             }
 
         }
@@ -132,24 +136,24 @@ public class CodeAnalyzer {
 
     }
 
-    private void analizeMutabelsControllers() {
-        if (controllers == null || controllers.isEmpty())
+    private void analizeMutabelsCode() {
+        if (codesMutables == null || codesMutables.isEmpty())
             throw new NoOneAnnotationMutableFinded();
 
-        Map<Path, String> aux = cloneControllersMap();
+        Map<Path, String> aux = clonecodesMutablesMap();
 
-        for (Map.Entry<Path, String> entry : controllers.entrySet()) {
+        for (Map.Entry<Path, String> entry : codesMutables.entrySet()) {
             processControllerEntry(entry, aux);
         }
 
         if (aux == null || aux.isEmpty())
             throw new NoOneAnnotationMutableFinded();
 
-        this.controllers = aux;
+        this.codesMutables = aux;
     }
 
-    private Map<Path, String> cloneControllersMap() {
-        return this.getControllers().entrySet().stream()
+    private Map<Path, String> clonecodesMutablesMap() {
+        return this.getcodesMutables().entrySet().stream()
                 .collect(HashMap::new, (m, e) -> m.put(e.getKey(), e.getValue()), HashMap::putAll);
     }
 
@@ -269,8 +273,8 @@ public class CodeAnalyzer {
         return authorities;
     }
 
-    public Map<Path, String> getControllers() {
-        return controllers;
+    public Map<Path, String> getcodesMutables() {
+        return codesMutables;
     }
 
     public List<AnnotationMutationPoint> getMutationsPoints() {
