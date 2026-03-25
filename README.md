@@ -1,4 +1,4 @@
-# 🧬 mutate_security_configs
+# 🧬 AutoSecMut 
 
 Ferramenta mutar configurações de segunrança do spring boot, permitindo analisar e mutar configurações de segurança de projetos Java.
 

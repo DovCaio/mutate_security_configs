@@ -29,7 +29,6 @@ import org.xml.sax.SAXException;
 import org.w3c.dom.Element;
 
 import com.sun.management.OperatingSystemMXBean;
-import java.lang.management.ManagementFactory;
 
 public class DirectoryScan{
 

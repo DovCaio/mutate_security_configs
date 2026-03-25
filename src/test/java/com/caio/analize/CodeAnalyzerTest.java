@@ -255,4 +255,42 @@ class CodeAnalyzerTest {
         assertEquals(2, analyzer.getMutationsPoints().size());
     }
 
+
+    @Test
+    void shouldAnalizeServices() throws Exception {
+
+        Path service = createJavaFile("Service.java", """
+                @Service
+                public class Service {
+                    @PreAuthorize("hasRole('USER')")
+                    public void y(){}
+                }
+                """);
+
+        CodeAnalyzer analyzer = new CodeAnalyzer();
+        analyzer.analyze(List.of(service));
+
+        assertEquals(1, analyzer.getMutationsPoints().size());
+
+
+    }
+
+    @Test
+    void shouldAnalizeRepository() throws Exception {
+
+        Path repository = createJavaFile("Service.java", """
+                @Repository
+                public class Service {
+                    @PreAuthorize("hasRole('USER')")
+                    public void y(){}
+                }
+                """);
+
+        CodeAnalyzer analyzer = new CodeAnalyzer();
+        analyzer.analyze(List.of(repository));
+
+        assertEquals(1, analyzer.getMutationsPoints().size());
+
+
+    }
 }

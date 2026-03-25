@@ -44,15 +44,15 @@ public class CodeAnalyzer {
         for (Path path : classFilePath) {
             String content = Files.readString(path);
 
-            if (isController(content)) {
+            if (isMutableCode(content)) {
                 controllers.put(path, content);
             }
 
         }
     }
 
-    private boolean isController(String content) throws IOException {
-        if (content.contains("@RestController") || content.contains("@Controller"))
+    private boolean isMutableCode(String content) throws IOException {
+        if (content.contains("@RestController") || content.contains("@Controller") || content.contains("@Service") || content.contains("@Repository"))
             return true;
         return false;
     }
