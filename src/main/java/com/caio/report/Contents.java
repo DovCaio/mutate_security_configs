@@ -96,6 +96,7 @@ th, td {
                     <tr>
                         <th>#</th>
                         <th>Package Name</th>
+                        <th>Nível Annotation</th>
                         <th>Class Name</th>
                         <th>Método</th>
                         <th>Valor original</th>
@@ -124,13 +125,14 @@ th, td {
                 <td>%s</td>
                 <td>%s</td>
                 <td>%s</td>
+                <td>%s</td>
                 <td>%d</td>
                 <td>%d</td>
                 <td>%d</td>
                 <td>%s</td>
                 <td>%s</td>
             </tr>
-        """, rowClass, index++, params.packageName, params.className, params.method,
+        """, rowClass, index++, params.packageName, params.method.equals("") ? "Classe" : "Método", params.className, params.method,
                 params.originalValue, params.mutatedValue,result.getTotalTest(), result.getSuccedded(),
                 result.getFailed(), result.getFailures(), capturedText));
     }

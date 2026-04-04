@@ -89,6 +89,12 @@ class MutantMakerTest {
         assertEquals("permitAll()", mutants.get(0));
     }
 
+    @Test
+    void shouldMutatehasPermition() throws Exception {
+        MutantMaker m = new MutantMaker(
+                "hasPermission('READ')", roles, auths);
+    }
+
 
     @Test
     void shouldReturnEmptyMutationWhenUnknown() throws Exception {
