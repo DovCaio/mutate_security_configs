@@ -25,8 +25,8 @@ public class RunTest {
         private String flag;
         private long startTestFirstExecutionTime;
         private long totalTestFirstExecutionTime = TimeUnit.MINUTES.toMillis(5); // Valor padrão, caso haja algum
-                                                                                  // problema na medição do tempo da
-                                                                                  // execução inicial dos testes.
+                                                                                 // problema na medição do tempo da
+                                                                                 // execução inicial dos testes.
 
         public RunTest(Path repoDirectory, BuildTool buildTool, String flag) {
                 this.repoDirectory = repoDirectory;
@@ -66,8 +66,12 @@ public class RunTest {
                 long endTestFirstExecutionTime = System.currentTimeMillis();
                 long baseline = endTestFirstExecutionTime - this.startTestFirstExecutionTime;
 
-                long tolerance = TimeUnit.MINUTES.toMillis(2);
-                double factor = 1.5;
+                if (flag.equals("-v")) {
+                        System.out.println("Tempo gasto para execução do primeiro test: " + baseline + " ms");
+                }
+
+                long tolerance = TimeUnit.MINUTES.toMillis(1);
+                double factor = 1.0;
 
                 this.totalTestFirstExecutionTime = (long) (baseline * factor) + tolerance;
         }
@@ -81,15 +85,29 @@ public class RunTest {
 
                 Process process = processBuilder.start();
 
+                new Thread(() -> {
+                        try (BufferedReader reader = new BufferedReader(
+                                        new InputStreamReader(process.getInputStream()))) {
+                                while (reader.readLine() != null) {
+                                }
+                        } catch (IOException e) {
+                                e.printStackTrace();
+                        }
+                }).start();
+
+                new Thread(() -> {
+                        try (BufferedReader reader = new BufferedReader(
+                                        new InputStreamReader(process.getErrorStream()))) {
+                                while (reader.readLine() != null) {
+                                }
+                        } catch (IOException e) {
+                                e.printStackTrace();
+                        }
+                }).start();
+
                 boolean finished = process.waitFor(totalTestFirstExecutionTime, TimeUnit.MILLISECONDS);
 
-                BufferedReader stdOut = new BufferedReader(new InputStreamReader(process.getInputStream())); // Tem que
-                                                                                                             // ser
-                                                                                                             // consumido
-                                                                                                             // para não
-                                                                                                             // travar o
-                                                                                                             // processo
-                BufferedReader stdErr = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+
 
                 if (!finished) {
                         if (flag.equals("-v")) {
@@ -99,8 +117,6 @@ public class RunTest {
                         process.destroyForcibly();
                         process.waitFor();
                 }
-
-                
 
                 TestExecutionReport testExecutionReport = readResult();
                 return testExecutionReport;
