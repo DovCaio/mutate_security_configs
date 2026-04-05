@@ -52,17 +52,19 @@ public class MutantMaker {
         boolean hasHasPermission = matcherHasPermissionCase.find();
         boolean hasHasPermissionCustom = matcherHasPermissionCustomCase.find();
 
-        if (!hasDenyAll && !hasPermitAll) { //Semântica
-            result.add("permitAll()");
+        if (!hasDenyAll && !hasPermitAll) { 
+            result.add("permitAll()");  
             result.add("denyAll");
         }
 
 
 
         if (hasSimple) {
+            result.add(addNegation(matcherSimpleCase.group(0)));
             result.addAll(mutateSimpleValue(matcherSimpleCase));
             result.add(removeInsideParentheses(matcherSimpleCase));
         } else if (hasCompost) {
+            result.add(addNegation(matcherCompostCase.group(0)));
             result.addAll(mutateCompositeValue(matcherCompostCase));
             result.add(removeInsideParentheses(matcherCompostCase));
             result.addAll(alterIntoQuantitiesOfParamsAndWhichParams(matcherCompostCase));
@@ -73,9 +75,12 @@ public class MutantMaker {
             result.addAll(muteDenyAll(matcherDenyCase));
 
         } else if (hasHasPermissionCustom) {
+            result.add(addNegation(matcherHasPermissionCustomCase.group(0)));
             matcherHasPermissionCustomCase.reset();
             result.addAll(muteHasPermissionCustom(matcherHasPermissionCustomCase));
         } else if (hasHasPermission) {
+            result.add(addNegation(matcherHasPermissionCase.group(0)));
+
             matcherHasPermissionCase.reset();
             result.addAll(muteHasPermission(matcherHasPermissionCase));
         } else {
@@ -85,8 +90,16 @@ public class MutantMaker {
         return result.stream().distinct().toList();
     }
 
+    private String addNegation(String str) {
+        if (str.startsWith("!")) {
+            return "";
+        }
+        return "!" + str;
+    }
+
     private List<String> mutateSimpleValue(Matcher matcher) {
         List<String> mutateOperators = new ArrayList<>();
+
 
         String insideQuotes = matcher.group(1);
         mutateOperators.add(value.replace(insideQuotes, "NO_" + insideQuotes));
@@ -228,10 +241,8 @@ public class MutantMaker {
 
         while (matcher.find()) { // 🔥 ESSENCIAL
 
-            String full = matcher.group(0);
             String args = matcher.group(1);
 
-            mutants.add(value.replace(full, "!" + full));
 
             String[] parts = args.split("\\s*,\\s*");
 
@@ -266,14 +277,9 @@ public class MutantMaker {
 
         while (matcher.find()) {
 
-            String fullExpression = matcher.group(0);
             String beanName = matcher.group(1);
             String params = matcher.group(2);
 
-            mutants.add(
-                    value.substring(0, matcher.start()) +
-                            "!" + fullExpression +
-                            value.substring(matcher.end()));
 
             String mutatedParams = params.replaceAll("'([^']+)'", "'MUTATED_$1'");
             mutants.add(
