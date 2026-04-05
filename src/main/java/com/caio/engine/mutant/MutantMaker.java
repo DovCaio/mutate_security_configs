@@ -52,13 +52,12 @@ public class MutantMaker {
         boolean hasHasPermission = matcherHasPermissionCase.find();
         boolean hasHasPermissionCustom = matcherHasPermissionCustomCase.find();
 
-        if (!hasDenyAll && !hasPermitAll) {
+        if (!hasDenyAll && !hasPermitAll) { //Semântica
             result.add("permitAll()");
             result.add("denyAll");
         }
 
-        result.add("true");
-        result.add("false");
+
 
         if (hasSimple) {
             result.addAll(mutateSimpleValue(matcherSimpleCase));

@@ -68,10 +68,9 @@ class MutantMakerTest {
 
         List<String> mutants = m.genAllMutants();
 
-        assertEquals(3, mutants.size());
+        assertEquals(1, mutants.size());
         assertTrue(mutants.stream().anyMatch(s -> s.equals("denyAll")));
-        assertTrue(mutants.stream().anyMatch(s -> s.equals("true")));
-        assertTrue(mutants.stream().anyMatch(s -> s.equals("false")));
+
     }
 
     @Test
@@ -82,11 +81,10 @@ class MutantMakerTest {
 
         List<String> mutants = m.genAllMutants();
 
-        assertEquals(3, mutants.size());
+        assertEquals(1, mutants.size());
 
         assertTrue(mutants.stream().anyMatch(s -> s.equals("permitAll()")));
-        assertTrue(mutants.stream().anyMatch(s -> s.equals("true")));
-        assertTrue(mutants.stream().anyMatch(s -> s.equals("false")));
+
 
     }
 
@@ -100,8 +98,7 @@ class MutantMakerTest {
         
 
         assertTrue(mutants.contains("!hasPermission(#id, 'DOC', 'READ')"));
-        assertTrue(mutants.contains("true"));
-        assertTrue(mutants.contains("false"));
+
         assertTrue(mutants.contains("hasPermission(#id, 'MUTATED_DOC', 'READ')"));
         assertTrue(mutants.contains("hasPermission(#id, 'DOC', 'MUTATED_READ')"));
 
@@ -115,8 +112,7 @@ class MutantMakerTest {
         List<String> mutants = m.genAllMutants();
 
         assertTrue(mutants.contains("!@cps.hasPermission('sys_dept_add')"));
-        assertTrue(mutants.contains("true"));
-        assertTrue(mutants.contains("false"));
+
         assertTrue(mutants.contains("permitAll()"));
         assertTrue(mutants.contains("denyAll"));
         assertTrue(mutants.stream().anyMatch(s -> s.equals("@cps.hasPermission('MUTATED_sys_dept_add')")));
