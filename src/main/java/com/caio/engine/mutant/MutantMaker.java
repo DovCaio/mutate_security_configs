@@ -1,4 +1,4 @@
-    package com.caio.engine.mutant;
+package com.caio.engine.mutant;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,22 +12,19 @@ public class MutantMaker {
     private final String regexPermitAll = "(?:permitAll())";
     private final String regexDenyAll = "(?:denyAll)";
 
+    private final String regexHasPermission = "(?<!\\.)hasPermission\\(([^)]*)\\)";
+    private final String regexHasPermissionCustom = "@(\\w+)\\.hasPermission\\s*\\(\\s*([^)]*)\\)";
+
     private String value;
-    private List<String> roles;
-    private List<String> authorities;
     private List<String> rolesAndAuthorities;
 
     public MutantMaker(String value, List<String> roles, List<String> authorities) {
 
         this.value = value;
-        this.roles = roles;
-        this.authorities = authorities;
-
 
         this.rolesAndAuthorities = new ArrayList<>();
         rolesAndAuthorities.addAll(roles);
         rolesAndAuthorities.addAll(authorities);
-
 
     }
 
@@ -38,22 +35,30 @@ public class MutantMaker {
         Pattern patternCompostCase = Pattern.compile(regexCompositeCases);
         Pattern patternPermitAll = Pattern.compile(regexPermitAll);
         Pattern patternDenyAll = Pattern.compile(regexDenyAll);
+        Pattern patternHasPermission = Pattern.compile(regexHasPermission);
+        Pattern patternHasPermissionCustom = Pattern.compile(regexHasPermissionCustom);
 
         Matcher matcherSimpleCase = patternSimpleCase.matcher(this.value);
         Matcher matcherCompostCase = patternCompostCase.matcher(this.value);
         Matcher matcherPermitAllCase = patternPermitAll.matcher(this.value);
         Matcher matcherDenyCase = patternDenyAll.matcher(this.value);
+        Matcher matcherHasPermissionCase = patternHasPermission.matcher(this.value);
+        Matcher matcherHasPermissionCustomCase = patternHasPermissionCustom.matcher(this.value);
 
         boolean hasSimple = matcherSimpleCase.find();
         boolean hasCompost = matcherCompostCase.find();
         boolean hasPermitAll = matcherPermitAllCase.find();
         boolean hasDenyAll = matcherDenyCase.find();
+        boolean hasHasPermission = matcherHasPermissionCase.find();
+        boolean hasHasPermissionCustom = matcherHasPermissionCustomCase.find();
 
         if (!hasDenyAll && !hasPermitAll) {
             result.add("permitAll()");
             result.add("denyAll");
         }
 
+        result.add("true");
+        result.add("false");
 
         if (hasSimple) {
             result.addAll(mutateSimpleValue(matcherSimpleCase));
@@ -68,11 +73,17 @@ public class MutantMaker {
         } else if (hasDenyAll) {
             result.addAll(muteDenyAll(matcherDenyCase));
 
+        } else if (hasHasPermissionCustom) {
+            matcherHasPermissionCustomCase.reset();
+            result.addAll(muteHasPermissionCustom(matcherHasPermissionCustomCase));
+        } else if (hasHasPermission) {
+            matcherHasPermissionCase.reset();
+            result.addAll(muteHasPermission(matcherHasPermissionCase));
         } else {
             result.add("");
         }
 
-        return result;
+        return result.stream().distinct().toList();
     }
 
     private List<String> mutateSimpleValue(Matcher matcher) {
@@ -86,7 +97,6 @@ public class MutantMaker {
         } else if (value.contains("hasRole")) {
             mutateOperators.add(value.replace("hasRole", "hasAuthority"));
         }
-
 
         for (String ra : rolesAndAuthorities) {
             if (!insideQuotes.equals(ra)) {
@@ -112,19 +122,19 @@ public class MutantMaker {
 
     private List<String> swapAuthenticationMethod(String fullExpression) {
         List<String> mutateOperators = new ArrayList<>();
-        
+
         if (fullExpression.contains("hasAnyAuthority")) {
             mutateOperators.add(fullExpression.replace("hasAnyAuthority", "hasAnyRole"));
         } else if (fullExpression.contains("hasAnyRole")) {
             mutateOperators.add(fullExpression.replace("hasAnyRole", "hasAnyAuthority"));
         }
-        
+
         return mutateOperators;
     }
 
     private List<String> addNewRoleOrAuthority(String fullExpression, String insideQuotes) {
         List<String> mutateOperators = new ArrayList<>();
-        
+
         for (String ra : rolesAndAuthorities) {
             if (!insideQuotes.contains(ra)) {
                 String mutatedInsideQuotes = insideQuotes + ", " + ra;
@@ -132,31 +142,31 @@ public class MutantMaker {
                 mutateOperators.add(mutatedExpression);
             }
         }
-        
+
         return mutateOperators;
     }
 
     private List<String> mutateEachValue(String fullExpression, String insideQuotes) {
         List<String> mutateOperators = new ArrayList<>();
-        
+
         String[] values = insideQuotes.split(",");
-        
+
         for (int i = 0; i < values.length; i++) {
             String[] mutatedValues = values.clone();
-            
+
             String value = values[i].trim();
             String mutatedValue = value.startsWith("NO_")
                     ? "" + value.substring(4)
                     : value.substring(0, 1) + "NO_" + value.substring(1);
-            
+
             mutatedValues[i] = mutatedValue;
-            
+
             String mutatedInsideQuotes = String.join(", ", mutatedValues);
             String mutatedExpression = fullExpression.replace(insideQuotes, mutatedInsideQuotes);
-            
+
             mutateOperators.add(mutatedExpression);
         }
-        
+
         return mutateOperators;
     }
 
@@ -188,15 +198,13 @@ public class MutantMaker {
 
     private List<String> alterIntoQuantitiesOfParamsAndWhichParams(Matcher matcher) {
 
-        List<String> ra = matcher.group(1) != null ?
-                List.of(matcher.group(1).split(",")) : new ArrayList<>();
+        List<String> ra = matcher.group(1) != null ? List.of(matcher.group(1).split(",")) : new ArrayList<>();
 
         List<String> result = new ArrayList<>();
 
-
-        for (int i = 0 ; i < ra.size(); i++) {
+        for (int i = 0; i < ra.size(); i++) {
             StringBuilder sb = new StringBuilder();
-            for (int j = 0 ; j < ra.size(); j++) {
+            for (int j = 0; j < ra.size(); j++) {
                 if (i != j) {
                     if (sb.length() > 0) {
                         sb.append(", ");
@@ -211,6 +219,76 @@ public class MutantMaker {
         }
 
         return result;
+    }
+
+
+
+    private List<String> muteHasPermission(Matcher matcher) {
+
+        List<String> mutants = new ArrayList<>();
+
+        while (matcher.find()) { // 🔥 ESSENCIAL
+
+            String full = matcher.group(0);
+            String args = matcher.group(1);
+
+            mutants.add(value.replace(full, "!" + full));
+
+            String[] parts = args.split("\\s*,\\s*");
+
+
+            for (int i = 0; i < parts.length; i++) {
+
+                if (parts[i].startsWith("'") && parts[i].endsWith("'")) {
+
+                    String original = parts[i];
+                    String innerValue = original.substring(1, original.length() - 1);
+
+                    parts[i] = "'MUTATED_" + innerValue + "'";
+
+                    String newArgs = String.join(", ", parts);
+
+                    mutants.add(
+                            value.substring(0, matcher.start()) +
+                                    "hasPermission(" + newArgs + ")" +
+                                    value.substring(matcher.end()));
+
+                    parts[i] = original;
+                }
+            }
+        }
+
+        return mutants;
+    }
+
+    private List<String> muteHasPermissionCustom(Matcher matcher) {
+
+        List<String> mutants = new ArrayList<>();
+
+        while (matcher.find()) {
+
+            String fullExpression = matcher.group(0);
+            String beanName = matcher.group(1);
+            String params = matcher.group(2);
+
+            mutants.add(
+                    value.substring(0, matcher.start()) +
+                            "!" + fullExpression +
+                            value.substring(matcher.end()));
+
+            String mutatedParams = params.replaceAll("'([^']+)'", "'MUTATED_$1'");
+            mutants.add(
+                    value.substring(0, matcher.start()) +
+                            "@" + beanName + ".hasPermission(" + mutatedParams + ")" +
+                            value.substring(matcher.end()));
+
+            mutants.add(
+                    value.substring(0, matcher.start()) +
+                            "@" + beanName + ".hasPermition(" + params + ")" +
+                            value.substring(matcher.end()));
+        }
+
+        return mutants;
     }
 
 }

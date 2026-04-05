@@ -11,7 +11,6 @@ class MutantMakerTest {
     private List<String> roles = List.of("ADMIN", "USER");
     private List<String> auths = List.of("READ", "WRITE");
 
-
     @Test
     void shouldMutateSimpleRole() throws Exception {
 
@@ -26,7 +25,6 @@ class MutantMakerTest {
         assertTrue(mutants.stream().anyMatch(s -> s.contains("hasAuthority")));
     }
 
-
     @Test
     void shouldMutateSimpleAuthority() throws Exception {
 
@@ -37,7 +35,6 @@ class MutantMakerTest {
 
         assertTrue(mutants.stream().anyMatch(s -> s.contains("hasRole")));
     }
-
 
     @Test
     void shouldMutateCompositeRole() throws Exception {
@@ -52,7 +49,6 @@ class MutantMakerTest {
         assertTrue(mutants.size() > 3);
     }
 
-
     @Test
     void shouldMutateCompositeAuthority() throws Exception {
 
@@ -64,7 +60,6 @@ class MutantMakerTest {
         assertTrue(mutants.stream().anyMatch(s -> s.contains("hasAnyRole")));
     }
 
-
     @Test
     void shouldMutatePermitAll() throws Exception {
 
@@ -73,10 +68,11 @@ class MutantMakerTest {
 
         List<String> mutants = m.genAllMutants();
 
-        assertEquals(1, mutants.size());
-        assertEquals("denyAll", mutants.get(0));
+        assertEquals(3, mutants.size());
+        assertTrue(mutants.stream().anyMatch(s -> s.equals("denyAll")));
+        assertTrue(mutants.stream().anyMatch(s -> s.equals("true")));
+        assertTrue(mutants.stream().anyMatch(s -> s.equals("false")));
     }
-
 
     @Test
     void shouldMutateDenyAll() throws Exception {
@@ -86,15 +82,45 @@ class MutantMakerTest {
 
         List<String> mutants = m.genAllMutants();
 
-        assertEquals("permitAll()", mutants.get(0));
+        assertEquals(3, mutants.size());
+
+        assertTrue(mutants.stream().anyMatch(s -> s.equals("permitAll()")));
+        assertTrue(mutants.stream().anyMatch(s -> s.equals("true")));
+        assertTrue(mutants.stream().anyMatch(s -> s.equals("false")));
+
     }
 
     @Test
-    void shouldMutatehasPermition() throws Exception {
+    void shouldMutateHasPermissionWithMultipleArgs() throws Exception {
         MutantMaker m = new MutantMaker(
-                "hasPermission('READ')", roles, auths);
+                "hasPermission(#id, 'DOC', 'READ')", roles, auths);
+
+        List<String> mutants = m.genAllMutants();
+
+        
+
+        assertTrue(mutants.contains("!hasPermission(#id, 'DOC', 'READ')"));
+        assertTrue(mutants.contains("true"));
+        assertTrue(mutants.contains("false"));
+        assertTrue(mutants.contains("hasPermission(#id, 'MUTATED_DOC', 'READ')"));
+        assertTrue(mutants.contains("hasPermission(#id, 'DOC', 'MUTATED_READ')"));
+
     }
 
+    @Test
+    void shouldMutateCustomHasPermission() throws Exception {
+        MutantMaker m = new MutantMaker(
+                "@cps.hasPermission('sys_dept_add')", roles, auths);
+
+        List<String> mutants = m.genAllMutants();
+
+        assertTrue(mutants.contains("!@cps.hasPermission('sys_dept_add')"));
+        assertTrue(mutants.contains("true"));
+        assertTrue(mutants.contains("false"));
+        assertTrue(mutants.contains("permitAll()"));
+        assertTrue(mutants.contains("denyAll"));
+        assertTrue(mutants.stream().anyMatch(s -> s.equals("@cps.hasPermission('MUTATED_sys_dept_add')")));
+    }
 
     @Test
     void shouldReturnEmptyMutationWhenUnknown() throws Exception {
