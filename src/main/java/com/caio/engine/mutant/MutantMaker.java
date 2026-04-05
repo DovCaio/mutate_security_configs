@@ -6,8 +6,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class MutantMaker {
-    private final String regexSimpleCases = "(?:hasAuthority|hasRole)\\(['\"]([^'\"]+)['\"]\\)";
-    private final String regexCompositeCases = "(?:hasAnyRole|hasAnyAuthority)\\s*\\(\\s*([^)]*)\\s*\\)";
+    private final String regexSimpleCases = "(!?)(?:hasAuthority|hasRole)\\(['\"]([^'\"]+)['\"]\\)";
+    private final String regexCompositeCases = "(!?)(?:hasAnyRole|hasAnyAuthority)\\s*\\(\\s*([^)]*)\\s*\\)";
 
     private final String regexPermitAll = "(?:permitAll())";
     private final String regexDenyAll = "(?:denyAll)";
@@ -17,7 +17,7 @@ public class MutantMaker {
 
     private final String regexLogicalOperators = "\\b(and|or)\\b";
 
-    private final String regexAllPredicates = "(hasRole\\([^)]*\\)|hasAuthority\\([^)]*\\)|hasAnyRole\\([^)]*\\)|hasAnyAuthority\\([^)]*\\)|hasPermission\\([^)]*\\)|@\\w+\\.hasPermission\\([^)]*\\))";
+    private final String regexAllPredicates = "(!?)(hasRole\\([^)]*\\)|hasAuthority\\([^)]*\\)|hasAnyRole\\([^)]*\\)|hasAnyAuthority\\([^)]*\\)|hasPermission\\([^)]*\\)|@\\w+\\.hasPermission\\([^)]*\\))";
 
     private String value;
     private List<String> rolesAndAuthorities;
@@ -169,7 +169,7 @@ public class MutantMaker {
     private List<String> mutateSimpleValue(Matcher matcher) {
         List<String> mutateOperators = new ArrayList<>();
 
-        String insideQuotes = matcher.group(1);
+        String insideQuotes = matcher.group(2);
         mutateOperators.add(value.replace(insideQuotes, "NO_" + insideQuotes));
 
         if (value.contains("hasAuthority")) {
@@ -191,7 +191,7 @@ public class MutantMaker {
         List<String> mutateOperators = new ArrayList<>();
 
         String fullExpression = matcher.group(0); // hasAnyRole("User", "Admin", "Guest")
-        String insideQuotes = matcher.group(1); // "User", "Admin", "Guest"
+        String insideQuotes = matcher.group(2); // "User", "Admin", "Guest"
 
         mutateOperators.addAll(swapAuthenticationMethod(fullExpression));
         mutateOperators.addAll(addNewRoleOrAuthority(fullExpression, insideQuotes));
@@ -278,7 +278,7 @@ public class MutantMaker {
 
     private List<String> alterIntoQuantitiesOfParamsAndWhichParams(Matcher matcher) {
 
-        List<String> ra = matcher.group(1) != null ? List.of(matcher.group(1).split(",")) : new ArrayList<>();
+        List<String> ra = matcher.group(2) != null ? List.of(matcher.group(2).split(",")) : new ArrayList<>();
 
         List<String> result = new ArrayList<>();
 
@@ -294,7 +294,7 @@ public class MutantMaker {
             }
             String mutatedInsideQuotes = sb.toString();
             String fullExpression = matcher.group(0);
-            String mutatedExpression = fullExpression.replace(matcher.group(1), mutatedInsideQuotes);
+            String mutatedExpression = fullExpression.replace(matcher.group(2), mutatedInsideQuotes);
             result.add(mutatedExpression);
         }
 

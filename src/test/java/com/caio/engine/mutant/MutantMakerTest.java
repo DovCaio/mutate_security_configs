@@ -19,7 +19,6 @@ class MutantMakerTest {
 
         List<String> mutants = m.genAllMutants();
 
-
         assertEquals(9, mutants.size());
         assertTrue(mutants.contains("permitAll()"));
         assertTrue(mutants.contains("hasRole('')"));
@@ -31,6 +30,27 @@ class MutantMakerTest {
         assertTrue(mutants.contains("hasRole('READ')"));
         assertTrue(mutants.contains("hasRole('WRITE')"));
         assertTrue(mutants.contains("hasAuthority('ADMIN')"));
+    }
+
+    @Test
+    void shouldMutateNegatedSimpleRole() throws Exception {
+
+        MutantMaker m = new MutantMaker(
+                "!hasRole('ADMIN')", roles, auths);
+
+        List<String> mutants = m.genAllMutants();
+
+        assertTrue(mutants.contains("hasRole('ADMIN')"));
+        assertTrue(mutants.contains("!hasRole('NO_ADMIN')"));
+        assertTrue(mutants.contains("!hasRole('USER')"));
+        assertTrue(mutants.contains("!hasRole('READ')"));
+        assertTrue(mutants.contains("!hasRole('WRITE')"));
+        assertTrue(mutants.contains("!hasAuthority('ADMIN')"));
+
+        assertTrue(mutants.contains("permitAll()"));
+        assertTrue(mutants.contains("denyAll"));
+
+        assertFalse(mutants.contains("!!hasRole('ADMIN')"));
     }
 
     @Test
@@ -53,12 +73,33 @@ class MutantMakerTest {
     }
 
     @Test
+    void shouldMutateNegatedSimpleAuthority() throws Exception {
+
+        MutantMaker m = new MutantMaker(
+                "!hasAuthority('READ')", roles, auths);
+
+        List<String> mutants = m.genAllMutants();
+
+        assertTrue(mutants.contains("hasAuthority('READ')"));
+        assertTrue(mutants.contains("!hasAuthority('WRITE')"));
+        assertTrue(mutants.contains("!hasAuthority('ADMIN')"));
+        assertTrue(mutants.contains("!hasAuthority('USER')"));
+        assertTrue(mutants.contains("!hasRole('READ')"));
+
+        assertTrue(mutants.contains("permitAll()"));
+        assertTrue(mutants.contains("denyAll"));
+
+        assertFalse(mutants.contains("!!hasAuthority('READ')"));
+    }
+
+    @Test
     void shouldMutateCompositeRole() throws Exception {
 
         MutantMaker m = new MutantMaker(
                 "hasAnyRole('ADMIN','USER')", roles, auths);
 
         List<String> mutants = m.genAllMutants();
+
 
 
         assertEquals(mutants.size(), 11);
@@ -76,14 +117,36 @@ class MutantMakerTest {
     }
 
     @Test
+    void shouldMutateNegatedCompositeRole() throws Exception {
+
+        MutantMaker m = new MutantMaker(
+                "!hasAnyRole('ADMIN','USER')", roles, auths);
+
+        List<String> mutants = m.genAllMutants();
+
+
+        assertTrue(mutants.contains("hasAnyRole('ADMIN','USER')")); 
+        assertTrue(mutants.contains("!hasAnyAuthority('ADMIN','USER')"));
+
+        assertTrue(mutants.contains("!hasAnyRole('NO_ADMIN', 'USER')"));
+        assertTrue(mutants.contains("!hasAnyRole('ADMIN', 'NO_USER')"));
+
+        assertTrue(mutants.contains("!hasAnyRole('ADMIN','USER', 'READ')"));
+        assertTrue(mutants.contains("!hasAnyRole('ADMIN','USER', 'WRITE')"));
+
+        assertTrue(mutants.contains("permitAll()"));
+        assertTrue(mutants.contains("denyAll"));
+
+        assertFalse(mutants.contains("!!hasAnyRole('ADMIN','USER')"));
+    }
+
+    @Test
     void shouldMutateCompositeAuthority() throws Exception {
 
         MutantMaker m = new MutantMaker(
                 "hasAnyAuthority('READ','WRITE')", roles, auths);
 
         List<String> mutants = m.genAllMutants();
-
-        mutants.forEach(System.out::println);
 
         assertEquals(mutants.size(), 11);
         assertTrue(mutants.contains("hasAnyRole('READ','WRITE')"));
