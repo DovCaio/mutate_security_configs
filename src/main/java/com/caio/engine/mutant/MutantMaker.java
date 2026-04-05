@@ -115,8 +115,8 @@ public class MutantMaker {
         hasLogicalOperators;
 
         if (!hasAnyPattern) {
-    throw new Exception("No recognizable pattern found in the input value.");
-}
+            throw new Exception("No recognizable pattern found in the input value.");
+        }
 
         return result.stream().distinct().toList();
     }
@@ -151,6 +151,12 @@ public class MutantMaker {
 
                 String mutant = value.substring(0, matcher.start()) +
                         "!" + expr +
+                        value.substring(matcher.end());
+
+                mutants.add(mutant);
+            }else {
+                String mutant = value.substring(0, matcher.start()) +
+                        expr.substring(1) +
                         value.substring(matcher.end());
 
                 mutants.add(mutant);
@@ -211,7 +217,7 @@ public class MutantMaker {
 
         for (String ra : rolesAndAuthorities) {
             if (!insideQuotes.contains(ra)) {
-                String mutatedInsideQuotes = insideQuotes + ", " + ra;
+                String mutatedInsideQuotes = insideQuotes + ", " + "'" +ra + "'";
                 String mutatedExpression = fullExpression.replace(insideQuotes, mutatedInsideQuotes);
                 mutateOperators.add(mutatedExpression);
             }
