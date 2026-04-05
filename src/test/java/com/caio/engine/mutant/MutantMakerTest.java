@@ -37,7 +37,13 @@ class MutantMakerTest {
 
         List<String> mutants = m.genAllMutants();
 
-        assertTrue(mutants.stream().anyMatch(s -> s.contains("hasRole")));
+        assertTrue(mutants.contains("hasRole('READ')"));
+        assertTrue(mutants.contains("!hasAuthority('READ')"));
+        assertTrue(mutants.contains("permitAll()"));
+        assertTrue(mutants.contains("denyAll"));
+        assertTrue(mutants.contains("hasAuthority('WRITE')"));
+        assertTrue(mutants.contains("hasAuthority('ADMIN')"));
+        assertTrue(mutants.contains("hasAuthority('USER')"));
     }
 
     @Test
