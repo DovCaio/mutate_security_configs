@@ -19,14 +19,19 @@ class MutantMakerTest {
 
         List<String> mutants = m.genAllMutants();
 
+        mutants.stream().forEach(System.out::println);
+
+        assertEquals(9, mutants.size());
         assertTrue(mutants.contains("permitAll()"));
+        assertTrue(mutants.contains("hasRole('')"));
         assertTrue(mutants.contains("denyAll"));
-        assertTrue(mutants.stream().anyMatch(s -> s.equals("hasRole('NO_ADMIN')")));
-        assertTrue(mutants.stream().anyMatch(s -> s.equals("!hasRole('ADMIN')")));
-        assertTrue(mutants.stream().anyMatch(s -> s.equals("hasRole('USER')")));
-        assertTrue(mutants.stream().anyMatch(s -> s.equals("hasRole('READ')")));
-        assertTrue(mutants.stream().anyMatch(s -> s.equals("hasRole('WRITE')")));
-        assertTrue(mutants.stream().anyMatch(s -> s.equals("hasAuthority('ADMIN')")));
+        assertTrue(mutants.contains("permitAll()"));
+        assertTrue(mutants.contains("hasRole('NO_ADMIN')"));
+        assertTrue(mutants.contains("!hasRole('ADMIN')"));
+        assertTrue(mutants.contains("hasRole('USER')"));
+        assertTrue(mutants.contains("hasRole('READ')"));
+        assertTrue(mutants.contains("hasRole('WRITE')"));
+        assertTrue(mutants.contains("hasAuthority('ADMIN')"));
     }
 
     @Test
