@@ -89,7 +89,6 @@ class MutantMakerTest {
 
         assertTrue(mutants.stream().anyMatch(s -> s.equals("permitAll()")));
 
-
     }
 
     @Test
@@ -98,8 +97,6 @@ class MutantMakerTest {
                 "hasPermission(#id, 'DOC', 'READ')", roles, auths);
 
         List<String> mutants = m.genAllMutants();
-
-        
 
         assertTrue(mutants.contains("!hasPermission(#id, 'DOC', 'READ')"));
 
@@ -123,14 +120,38 @@ class MutantMakerTest {
     }
 
     @Test
+    void shouldMutateLogicalOperatorsWithOneOperator() throws Exception {
+        MutantMaker m = new MutantMaker(
+                "hasRole('ADMIN') and hasAuthority('READ')", roles, auths);
+
+        List<String> mutants = m.genAllMutants();
+
+        assertTrue(mutants.contains("hasRole('ADMIN') or hasAuthority('READ')"));
+        assertTrue(mutants.contains("!hasRole('ADMIN') and hasAuthority('READ')"));
+        assertTrue(mutants.contains("hasRole('ADMIN') and !hasAuthority('READ')"));
+    }
+
+    @Test
+    void shouldMutateLogicalOperatorsWithMultipleOperators() throws Exception {
+        MutantMaker m = new MutantMaker(
+                "hasRole('ADMIN') and hasAuthority('READ') or hasRole('USER')", roles, auths);
+
+        List<String> mutants = m.genAllMutants();
+        assertTrue(mutants.contains("hasRole('ADMIN') or hasAuthority('READ') or hasRole('USER')"));
+        assertTrue(mutants.contains("hasRole('ADMIN') and hasAuthority('READ') and hasRole('USER')"));
+    }
+
+    @Test
     void shouldReturnEmptyMutationWhenUnknown() throws Exception {
 
         MutantMaker m = new MutantMaker(
                 "someOtherExpression()", roles, auths);
 
-        List<String> mutants = m.genAllMutants();
+        Exception exception = assertThrows(Exception.class, () -> {
+            m.genAllMutants();
+        });
 
-        assertTrue(mutants.contains(""));
+        assertEquals("No recognizable pattern found in the input value.", exception.getMessage());
     }
 
 }
