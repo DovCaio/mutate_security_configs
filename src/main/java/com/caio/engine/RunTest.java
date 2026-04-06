@@ -70,8 +70,8 @@ public class RunTest {
                         System.out.println("Tempo gasto para execução do primeiro test: " + baseline + " ms");
                 }
 
-                long tolerance = TimeUnit.MINUTES.toMillis(1);
-                double factor = 1.0;
+                long tolerance = TimeUnit.MINUTES.toMillis(2);
+                double factor = 1.7;
 
                 this.totalTestFirstExecutionTime = (long) (baseline * factor) + tolerance;
         }
@@ -106,8 +106,6 @@ public class RunTest {
                 }).start();
 
                 boolean finished = process.waitFor(totalTestFirstExecutionTime, TimeUnit.MILLISECONDS);
-
-
 
                 if (!finished) {
                         if (flag.equals("-v")) {
