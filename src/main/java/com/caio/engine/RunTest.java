@@ -91,7 +91,9 @@ public class RunTest {
                                 while (reader.readLine() != null) {
                                 }
                         } catch (IOException e) {
-                                e.printStackTrace();
+                                if (flag.equals("-v")) {
+                                        System.out.println("Erro ao ler a saída do processo: " + e.getMessage());
+                                }
                         }
                 }).start();
 
@@ -101,7 +103,9 @@ public class RunTest {
                                 while (reader.readLine() != null) {
                                 }
                         } catch (IOException e) {
-                                e.printStackTrace();
+                                if (flag.equals("-v")) {
+                                        System.out.println("Erro ao ler a saída do processo: " + e.getMessage());
+                                }
                         }
                 }).start();
 
