@@ -266,11 +266,13 @@ class MutantMakerTest {
         MutantMaker m = new MutantMaker(
                 "someOtherExpression()", roles, auths);
 
-        Exception exception = assertThrows(Exception.class, () -> {
-            m.genAllMutants();
-        });
+        List<String> mutants = m.genAllMutants();
 
-        assertEquals("No recognizable pattern found in the input value.", exception.getMessage());
+        assertEquals(3, mutants.size());
+        assertTrue(mutants.contains("!someOtherExpression()"));
+        assertTrue(mutants.contains("permitAll()"));
+        assertTrue(mutants.contains("denyAll"));
+
     }
 
 }

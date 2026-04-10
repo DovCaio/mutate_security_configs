@@ -104,18 +104,17 @@ public class MutantMaker {
             result.addAll(muteHasPermission(matcherHasPermissionCase));
         }
 
-
-        boolean hasAnyPattern =
-        hasSimple ||
-        hasCompost ||
-        hasPermitAll ||
-        hasDenyAll ||
-        hasHasPermission ||
-        hasHasPermissionCustom ||
-        hasLogicalOperators;
+        boolean hasAnyPattern = hasSimple ||
+                hasCompost ||
+                hasPermitAll ||
+                hasDenyAll ||
+                hasHasPermission ||
+                hasHasPermissionCustom ||
+                hasLogicalOperators;
 
         if (!hasAnyPattern) {
-            throw new Exception("No recognizable pattern found in the input value.");
+            result.add(wildcardMutation(value));
+
         }
 
         return result.stream().distinct().toList();
@@ -154,7 +153,7 @@ public class MutantMaker {
                         value.substring(matcher.end());
 
                 mutants.add(mutant);
-            }else {
+            } else {
                 String mutant = value.substring(0, matcher.start()) +
                         expr.substring(1) +
                         value.substring(matcher.end());
@@ -217,7 +216,7 @@ public class MutantMaker {
 
         for (String ra : rolesAndAuthorities) {
             if (!insideQuotes.contains(ra)) {
-                String mutatedInsideQuotes = insideQuotes + ", " + "'" +ra + "'";
+                String mutatedInsideQuotes = insideQuotes + ", " + "'" + ra + "'";
                 String mutatedExpression = fullExpression.replace(insideQuotes, mutatedInsideQuotes);
                 mutateOperators.add(mutatedExpression);
             }
@@ -357,6 +356,10 @@ public class MutantMaker {
         }
 
         return mutants;
+    }
+
+    private String wildcardMutation(String str) {
+        return "!" + str;
     }
 
 }

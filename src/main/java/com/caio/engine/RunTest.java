@@ -20,7 +20,7 @@ public class RunTest {
         private TestResult verifyTestResult;
         private Path repoDirectory;
         private BuildTool buildTool;
-        private String command = "";
+        private String[] command = new String[] {};
         private DirectoryScan directoryScan;
         private String flag;
         private long startTestFirstExecutionTime;
@@ -37,12 +37,14 @@ public class RunTest {
 
                 switch (this.buildTool) {
                         case MAVEN:
-                                this.command = "mvn -U clean test";
+                                this.command = new String[] { "mvn", "clean", "test", "-U", "-DreuseForks=false",
+                                                "-DforkCount=1" };
                                 dir = dir + "/target/surefire-reports";
                                 break;
                         case GRADLE:
                         case GRADLE_WRAPPER:
-                                this.command = "./gradlew test --no-daemon --rerun-tasks --no-build-cache";
+                                this.command = new String[] { "./gradlew", "test", "--no-daemon", "--rerun-tasks",
+                                                "--no-build-cache" };
                                 dir = dir + "/build/test-results/test";
                                 break;
 
@@ -76,19 +78,11 @@ public class RunTest {
                 this.totalTestFirstExecutionTime = (long) (baseline * factor) + tolerance;
         }
 
-        private TestExecutionReport runAllTestsCorrect()
-                        throws IOException, InterruptedException {
-
-                ProcessBuilder processBuilder = new ProcessBuilder();
-                processBuilder.directory(repoDirectory.toFile());
-                processBuilder.command("sh", "-c", this.command);
-
-                Process process = processBuilder.start();
-
+        private void consumeBuffers(Process process) {
                 new Thread(() -> {
                         try (BufferedReader reader = new BufferedReader(
                                         new InputStreamReader(process.getInputStream()))) {
-                                while (reader.readLine() != null) {
+                                while ((reader.readLine()) != null) {
                                 }
                         } catch (IOException e) {
                                 if (flag.equals("-v")) {
@@ -108,6 +102,18 @@ public class RunTest {
                                 }
                         }
                 }).start();
+        }
+
+        private TestExecutionReport runAllTestsCorrect()
+                        throws IOException, InterruptedException {
+
+                ProcessBuilder processBuilder = new ProcessBuilder();
+                processBuilder.directory(repoDirectory.toFile());
+                processBuilder.command(this.command);
+
+                Process process = processBuilder.start();
+
+                consumeBuffers(process);
 
                 boolean finished = process.waitFor(totalTestFirstExecutionTime, TimeUnit.MILLISECONDS);
 

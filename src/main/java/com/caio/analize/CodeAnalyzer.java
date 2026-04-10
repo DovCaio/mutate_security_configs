@@ -56,7 +56,11 @@ public class CodeAnalyzer {
     }
 
     private boolean isMutableCode(String content) throws IOException {
-        if (content.contains("@RestController") || content.contains("@Controller") || content.contains("@Service") || content.contains("@Repository"))
+        String contentLower = content.toLowerCase();
+
+        if (contentLower.contains("restcontroller") || contentLower.contains("controller")
+                || contentLower.contains("service")
+                || contentLower.contains("repository") || contentLower.contains("service"))
             return true;
         return false;
     }
@@ -174,7 +178,8 @@ public class CodeAnalyzer {
         }
     }
 
-    private void addMutationPointFromOccurrence(String content, Path path, AuthorizationOccurrence occurrence, boolean containsPre, boolean containsPost) {
+    private void addMutationPointFromOccurrence(String content, Path path, AuthorizationOccurrence occurrence,
+            boolean containsPre, boolean containsPost) {
         String originalValue = occurrence.value;
         String mutatedValue = "";
         String packageName = extractPackageName(content);
@@ -212,7 +217,6 @@ public class CodeAnalyzer {
         Pattern outer = Pattern.compile("(hasRole|hasAnyRole)\\s*\\(([^)]*)\\)");
         Pattern inner = Pattern.compile("['\"]([^'\"]+)['\"]");
 
-        
         for (AnnotationMutationPoint amp : this.mutationsPoints) {
             String originalValue = amp.getOriginalValue();
 
@@ -227,7 +231,6 @@ public class CodeAnalyzer {
                 while (innerMatcher.find()) {
 
                     String role = innerMatcher.group(1);
-
 
                     if (!roles.contains(role)) {
                         roles.add(role);
@@ -261,7 +264,6 @@ public class CodeAnalyzer {
                 while (innerMatcher.find()) {
 
                     String authority = innerMatcher.group(1);
-
 
                     if (!authorities.contains(authority)) {
                         authorities.add(authority);
