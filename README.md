@@ -50,6 +50,8 @@ Example:
 11-06-2026-14-30-45
 ```
 
+# The experimental environment
+
 The experimental environment was automatically configured using a Bash script. The script installed Eclipse Temurin JDK 21, Git, Maven, and Gradle through the Debian package manager and the Adoptium repository. It also configured the JAVA\_HOME environment variable and updated the system PATH accordingly. After installation, the script collected information about the software and hardware environment, including Java, Maven, and Gradle versions, operating system details, CPU specifications, and memory configuration. The environment setup script was executed using the following commands:
 
 chmod +x setup.sh
