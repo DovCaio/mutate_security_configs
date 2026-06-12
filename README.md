@@ -75,3 +75,29 @@ For comparison with PIT, the mutation analysis was executed using the following 
 The PIT dependency was added to each project before execution. The execution time was collected using the same procedure adopted for AutoMutSec.
 
 Code coverage metrics were obtained from JaCoCo reports generated during test execution whenever JaCoCo was already configured as a project dependency. The instruction and line coverage values reported by JaCoCo were used in the analysis.
+
+## Subject Systems
+
+The following repositories were used as subject systems in the experimental evaluation:
+
+| System | Repository | KLOC |
+|--------|------------|------|
+| System A | [books](https://github.com/aidanwhiteley/books.git) | 7.793 |
+| System B | [gymstock](https://github.com/asafeorneles/gymstock.git) | 5.223 |
+| System C | [rest-secure-spring-boot-starter](https://github.com/42BV/rest-secure-spring-boot-starter.git) | 3.097 |
+| System D | [saas-backend-starter](https://github.com/urosengineer/saas-backend-starter.git) | 4.288 |
+| System E | Private repository | 10.062 |
+
+## KLOC Calculation
+
+The KLOC values were calculated using `cloc` by counting only files related to the main application layers (controllers, services, and repositories).
+
+Install `cloc` before running the command:
+
+```bash
+sudo apt install cloc
+```
+Then execute: 
+```bash
+cloc $(grep -rliE "(RestController|Controller|Service|Repository)" src/)
+```
