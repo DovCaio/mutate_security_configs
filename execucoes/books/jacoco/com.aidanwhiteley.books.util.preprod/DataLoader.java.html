@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DataLoader.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Books Microservice</a> &gt; <a href="index.source.html" class="el_package">com.aidanwhiteley.books.util.preprod</a> &gt; <span class="el_source">DataLoader.java</span></div><h1>DataLoader.java</h1><pre class="source lang-java linenums">package com.aidanwhiteley.books.util.preprod;
+
+import com.aidanwhiteley.books.domain.Book;
+import org.bson.Document;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Profile;
+import org.springframework.core.env.Environment;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.index.TextIndexDefinition;
+import org.springframework.stereotype.Component;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.List;
+
+
+@Component
+public class DataLoader {
+
+    private static final String BOOKS_COLLECTION = &quot;book&quot;;
+    private static final String USERS_COLLECTION = &quot;user&quot;;
+    private static final String BOOKS_API_SEARCH_COLLECTION = &quot;googleBookSearch&quot;;
+<span class="fc" id="L32">    private static final Logger LOGGER = LoggerFactory.getLogger(DataLoader.class);</span>
+    private static final String AUTO_LOGON_ID = &quot;Dummy12345678&quot;;
+    private static final String IN_MEMORY_MONGODB_SPRING_PROFILE = &quot;mongo-java-server&quot;;
+
+    private final MongoTemplate template;
+    private final PreProdWarnings preProdWarnings;
+    private final Environment environment;
+
+    @Value(&quot;${books.reload.development.data}&quot;)
+    private boolean reloadDevelopmentData;
+
+    @Value(&quot;${books.autoAuthUser}&quot;)
+    private boolean autoAuthUser;
+
+<span class="fc" id="L46">    public DataLoader(MongoTemplate mongoTemplate, PreProdWarnings preProdWarnings, Environment environment) {</span>
+<span class="fc" id="L47">        this.template = mongoTemplate;</span>
+<span class="fc" id="L48">        this.preProdWarnings = preProdWarnings;</span>
+<span class="fc" id="L49">        this.environment = environment;</span>
+<span class="fc" id="L50">    }</span>
+
+
+    /**
+     * Reload data for development and integration tests. Whether this runs or
+     * not is also controlled by the books.reload.development.data config
+     * setting.
+     * &lt;p&gt;
+     * Reads from files where each line is expected to be a valid JSON object but
+     * the whole file itself isn't a valid JSON object (hence the .data extension rather than .json).
+     * &lt;p&gt;
+     * &quot;Fail safe&quot; checking for required Spring profile being active and the config switch setting.
+     */
+    @Bean
+    @Profile({&quot;dev-mongo-java-server&quot;, &quot;dev-mongo-java-server-no-auth&quot;, &quot;dev-mongodb-no-auth&quot;, &quot;dev-mongodb&quot;, &quot;ci&quot;})
+    public CommandLineRunner populateDummyData() {
+<span class="fc" id="L66">        return args -&gt; {</span>
+
+<span class="pc bpc" id="L68" title="1 of 2 branches missed.">            if (reloadDevelopmentData) {</span>
+
+<span class="fc" id="L70">                preProdWarnings.displayDataReloadWarningMessage();</span>
+<span class="fc" id="L71">                loadBooksData();</span>
+<span class="fc" id="L72">                loadUserData();</span>
+<span class="fc" id="L73">                createFullTextIndex();</span>
+
+            } else {
+<span class="nc" id="L76">                LOGGER.info(&quot;Development data not reloaded due to config settings&quot;);</span>
+            }
+<span class="fc" id="L78">        };</span>
+    }
+
+    private void loadBooksData() throws IOException {
+        List&lt;String&gt; jsons;
+<span class="fc" id="L83">        ClassPathResource classPathResource = new ClassPathResource(&quot;sample_data/books.data&quot;);</span>
+<span class="fc" id="L84">        try (InputStream resource = classPathResource.getInputStream();</span>
+<span class="fc" id="L85">             InputStreamReader inputStreamReader = new InputStreamReader(resource, StandardCharsets.UTF_8);</span>
+<span class="fc" id="L86">             BufferedReader bufferedReader = new BufferedReader(inputStreamReader)) {</span>
+
+            // Clearing and loading data into books collection. We do this _after_ checking for the
+            // existence of the file that holds the test data.
+<span class="fc" id="L90">            LOGGER.info(&quot;Clearing books collection and loading development data for books project&quot;);</span>
+<span class="pc bpc" id="L91" title="1 of 2 branches missed.">            if (template.collectionExists(BOOKS_COLLECTION)) {</span>
+<span class="nc" id="L92">                template.dropCollection(BOOKS_COLLECTION);</span>
+            }
+
+<span class="fc" id="L95">            jsons = bufferedReader.lines().toList();</span>
+<span class="fc" id="L96">            jsons.stream().map(Document::parse).forEach(i -&gt; template.insert(i, BOOKS_COLLECTION));</span>
+
+            // Clearing books search collection.
+<span class="fc" id="L99">            LOGGER.info(&quot;Clearing books search cache collection&quot;);</span>
+<span class="pc bpc" id="L100" title="1 of 2 branches missed.">            if (template.collectionExists(BOOKS_API_SEARCH_COLLECTION)) {</span>
+<span class="nc" id="L101">                template.dropCollection(BOOKS_API_SEARCH_COLLECTION);</span>
+            }
+        }
+<span class="fc" id="L104">    }</span>
+
+    private void loadUserData() throws IOException {
+        List&lt;String&gt; jsons;
+<span class="fc" id="L108">        ClassPathResource classPathResource = new ClassPathResource(&quot;sample_data/users.data&quot;);</span>
+<span class="fc" id="L109">        try (InputStream resource = classPathResource.getInputStream();</span>
+<span class="fc" id="L110">             InputStreamReader inputStreamReader = new InputStreamReader(resource, StandardCharsets.UTF_8);</span>
+<span class="fc" id="L111">             BufferedReader bufferedReader = new BufferedReader(inputStreamReader)) {</span>
+
+            // Clearing and loading data into user collection - happens after user creation file found and loaded
+<span class="fc" id="L114">            LOGGER.info(&quot;Clearing users collection and loading development data for books project&quot;);</span>
+<span class="fc bfc" id="L115" title="All 2 branches covered.">            if (template.collectionExists(USERS_COLLECTION)) {</span>
+<span class="fc" id="L116">                template.dropCollection(USERS_COLLECTION);</span>
+            }
+
+<span class="fc" id="L119">            jsons = bufferedReader.lines().toList();</span>
+        }
+<span class="fc" id="L121">        jsons.stream().map(Document::parse).forEach(i -&gt; {</span>
+<span class="fc" id="L122">            boolean autoAuthUserServiceId = i.get(&quot;authenticationServiceId&quot;).toString().contains(AUTO_LOGON_ID);</span>
+            // Only insert the user data for the &quot;auto logon&quot; user if the config says to
+<span class="fc bfc" id="L124" title="All 4 branches covered.">            if (!autoAuthUserServiceId || autoAuthUser) {</span>
+<span class="fc" id="L125">                template.insert(i, USERS_COLLECTION);</span>
+            }
+<span class="fc" id="L127">        });</span>
+<span class="fc" id="L128">    }</span>
+
+    /**
+     * The creation of indexes for the MongoDb is outside of the application code to allow
+     * better tweaking of those indexes over time.
+     * Almost all tests run fine without indexes in place - the test data isn't large.
+     * The exception is the tests that require a full text index to be in place for &quot;search&quot; to work.
+     * Therefore, we run in the full text index below when loading test data - but not
+     * when the Spring profile means we are running against the in memory mongo-java-server
+     * as that false Mongo doesn't support full text indexes currently.
+     * &lt;p&gt;
+     * The real application index creation commands are in
+     * /src/main/resources/indexes/books.data
+     * It does not matter much if the index below gets out of step with the real index - in terms
+     * of the field weightings at least!
+     */
+    private void createFullTextIndex() {
+
+<span class="pc bpc" id="L146" title="1 of 2 branches missed.">        if (Arrays.stream(this.environment.getActiveProfiles()).noneMatch(s -&gt; s.contains(IN_MEMORY_MONGODB_SPRING_PROFILE))) {</span>
+<span class="nc" id="L147">            TextIndexDefinition textIndex = new TextIndexDefinition.TextIndexDefinitionBuilder()</span>
+<span class="nc" id="L148">                    .onField(&quot;title&quot;, 10F)</span>
+<span class="nc" id="L149">                    .onField(&quot;author&quot;, 10F)</span>
+<span class="nc" id="L150">                    .onField(&quot;genre&quot;, 5F)</span>
+<span class="nc" id="L151">                    .onField(&quot;summary&quot;, 4F)</span>
+<span class="nc" id="L152">                    .onField(&quot;comments.comment&quot;, 3F)</span>
+<span class="nc" id="L153">                    .onField(&quot;googleBookDetails.volumeInfo.description&quot;, 1F)</span>
+<span class="nc" id="L154">                    .named(&quot;fullTextIndexForTests&quot;)</span>
+<span class="nc" id="L155">                    .build();</span>
+<span class="nc" id="L156">            template.indexOps(Book.class).createIndex(textIndex);</span>
+        }
+<span class="fc" id="L158">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

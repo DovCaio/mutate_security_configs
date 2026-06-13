@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+    <link rel="stylesheet" type="text/css" href="../style.css">
+</head>
+<body>
+
+
+<h1>AbstractUserDetailsService.java</h1>
+
+<table class="src">
+
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@11cd86bd_1'/>
+1
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@11cd86bd_1'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>package nl._42.restsecure.autoconfigure.authentication;</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@11cd86bd_2'/>
+2
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@11cd86bd_2'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@11cd86bd_3'/>
+3
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@11cd86bd_3'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>import org.springframework.context.ApplicationContext;</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@11cd86bd_4'/>
+4
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@11cd86bd_4'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>import org.springframework.context.annotation.Bean;</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@11cd86bd_5'/>
+5
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@11cd86bd_5'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>import org.springframework.security.core.userdetails.UserDetailsService;</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@11cd86bd_6'/>
+6
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@11cd86bd_6'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>import org.springframework.security.core.userdetails.UsernameNotFoundException;</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@11cd86bd_7'/>
+7
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@11cd86bd_7'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@11cd86bd_8'/>
+8
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@11cd86bd_8'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>/**</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@11cd86bd_9'/>
+9
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@11cd86bd_9'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''> * Implement this abstract class to configure for local user authentication storage.</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@11cd86bd_10'/>
+10
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@11cd86bd_10'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''> * Add your implementation as {@link Bean} to the {@link ApplicationContext}.</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@11cd86bd_11'/>
+11
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@11cd86bd_11'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''> *</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@11cd86bd_12'/>
+12
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@11cd86bd_12'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''> * @param &#60;T&#62; the user type that implements {@link RegisteredUser}.</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@11cd86bd_13'/>
+13
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@11cd86bd_13'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''> */</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@11cd86bd_14'/>
+14
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@11cd86bd_14'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>public abstract class AbstractUserDetailsService&#60;T extends RegisteredUser&#62; implements UserDetailsService {</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@11cd86bd_15'/>
+15
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@11cd86bd_15'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    </span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@11cd86bd_16'/>
+16
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@11cd86bd_16'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    protected abstract T findUserByUsername(String username);</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@11cd86bd_17'/>
+17
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@11cd86bd_17'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    </span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@11cd86bd_18'/>
+18
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@11cd86bd_18'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    @Override</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@11cd86bd_19'/>
+19
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@11cd86bd_19'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    public UserDetailsAdapter&#60;T&#62; loadUserByUsername(String username) throws UsernameNotFoundException {</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@11cd86bd_20'/>
+20
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@11cd86bd_20'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>        T user = findUserByUsername(username);</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@11cd86bd_21'/>
+21
+</td>
+<td class='killed'>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@11cd86bd_21'>1</a>
+<span>
+1. loadUserByUsername : negated conditional &rarr; KILLED<br/>
+
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class='killed'>        if (user == null) {</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@11cd86bd_22'/>
+22
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@11cd86bd_22'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>            throw new UsernameNotFoundException(&#34;Username: &#39;&#34; + username + &#34;&#39; not found.&#34;);</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@11cd86bd_23'/>
+23
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@11cd86bd_23'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>        }</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@11cd86bd_24'/>
+24
+</td>
+<td class='killed'>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@11cd86bd_24'>1</a>
+<span>
+1. loadUserByUsername : replaced return value with null for nl/_42/restsecure/autoconfigure/authentication/AbstractUserDetailsService::loadUserByUsername &rarr; KILLED<br/>
+
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class='killed'>        return new UserDetailsAdapter&#60;&#62;(user);</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@11cd86bd_25'/>
+25
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@11cd86bd_25'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    }</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@11cd86bd_26'/>
+26
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@11cd86bd_26'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@11cd86bd_27'/>
+27
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@11cd86bd_27'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>}</span></pre></td></tr>
+
+
+
+<tr><td></td><td></td><td><h2>Mutations</h2></td></tr>
+
+<tr>
+<td><a href='#org.pitest.mutationtest.report.html.SourceFile@11cd86bd_21'>21</a></td> 
+<td></td>
+<td>
+
+<a name='grouporg.pitest.mutationtest.report.html.SourceFile@11cd86bd_21'/> 
+
+<p class='KILLED'><span class='pop'>1.<span><b>1</b><br/><b>Location : </b>loadUserByUsername<br/><b>Killed by : </b>nl._42.restsecure.autoconfigure.authentication.UserDetailServiceTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.authentication.UserDetailServiceTest]/[method:loadUserByUsername_shouldSucceed()]</span></span> negated conditional &rarr; KILLED</p> 
+</td>
+</tr>
+<tr>
+<td><a href='#org.pitest.mutationtest.report.html.SourceFile@11cd86bd_24'>24</a></td> 
+<td></td>
+<td>
+
+<a name='grouporg.pitest.mutationtest.report.html.SourceFile@11cd86bd_24'/> 
+
+<p class='KILLED'><span class='pop'>1.<span><b>1</b><br/><b>Location : </b>loadUserByUsername<br/><b>Killed by : </b>nl._42.restsecure.autoconfigure.authentication.UserDetailServiceTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.authentication.UserDetailServiceTest]/[method:loadUserByUsername_shouldSucceed()]</span></span> replaced return value with null for nl/_42/restsecure/autoconfigure/authentication/AbstractUserDetailsService::loadUserByUsername &rarr; KILLED</p> 
+</td>
+</tr>
+
+</table>
+
+
+<h2>Active mutators</h2>
+<ul>
+<li class='mutator'>CONDITIONALS_BOUNDARY</li>
+<li class='mutator'>EMPTY_RETURNS</li>
+<li class='mutator'>FALSE_RETURNS</li>
+<li class='mutator'>INCREMENTS</li>
+<li class='mutator'>INVERT_NEGS</li>
+<li class='mutator'>MATH</li>
+<li class='mutator'>NEGATE_CONDITIONALS</li>
+<li class='mutator'>NULL_RETURNS</li>
+<li class='mutator'>PRIMITIVE_RETURNS</li>
+<li class='mutator'>TRUE_RETURNS</li>
+<li class='mutator'>VOID_METHOD_CALLS</li>
+
+</ul>
+
+<h2>Tests examined</h2>
+<ul>
+<li>nl._42.restsecure.autoconfigure.authentication.UserDetailServiceTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.authentication.UserDetailServiceTest]/[method:loadUserByUsername_shouldSucceed()] (0 ms)</li><li>nl._42.restsecure.autoconfigure.authentication.mfa.MfaAuthenticationProviderTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.authentication.mfa.MfaAuthenticationProviderTest]/[nested-class:additionalAuthenticationChecks]/[nested-class:mfaDisabledNonMandatory]/[method:shouldThrowForBadCredentials()] (2 ms)</li><li>nl._42.restsecure.autoconfigure.authentication.mfa.MfaAuthenticationProviderTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.authentication.mfa.MfaAuthenticationProviderTest]/[nested-class:additionalAuthenticationChecks]/[nested-class:mfaEnabled]/[method:shouldThrowIfCodeMissing()] (1 ms)</li><li>nl._42.restsecure.autoconfigure.authentication.mfa.MfaAuthenticationProviderTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.authentication.mfa.MfaAuthenticationProviderTest]/[nested-class:additionalAuthenticationChecks]/[nested-class:mfaDisabledNonMandatory]/[method:shouldLoginWithUsernameAndPassword()] (0 ms)</li><li>nl._42.restsecure.autoconfigure.authentication.mfa.MfaAuthenticationProviderTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.authentication.mfa.MfaAuthenticationProviderTest]/[nested-class:additionalAuthenticationChecks]/[nested-class:mfaDisabledMandatory]/[method:shouldIndicateSetupRequiredWithMfaCode()] (0 ms)</li><li>nl._42.restsecure.autoconfigure.authentication.mfa.MfaAuthenticationProviderTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.authentication.mfa.MfaAuthenticationProviderTest]/[nested-class:additionalAuthenticationChecks]/[nested-class:mfaDisabledMandatory]/[method:shouldIndicateSetupRequiredWithoutMfaCode()] (1 ms)</li><li>nl._42.restsecure.autoconfigure.authentication.mfa.MfaAuthenticationProviderTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.authentication.mfa.MfaAuthenticationProviderTest]/[nested-class:additionalAuthenticationChecks]/[nested-class:otherVerificationChecks]/[method:shouldStop_ifCheckThrows()] (1 ms)</li><li>nl._42.restsecure.autoconfigure.authentication.mfa.MfaAuthenticationProviderTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.authentication.mfa.MfaAuthenticationProviderTest]/[nested-class:additionalAuthenticationChecks]/[nested-class:mfaEnabled]/[method:shouldThrowIfCodeInvalid()] (4 ms)</li><li>nl._42.restsecure.autoconfigure.authentication.mfa.MfaAuthenticationProviderTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.authentication.mfa.MfaAuthenticationProviderTest]/[nested-class:additionalAuthenticationChecks]/[nested-class:mfaEnabled]/[method:shouldAuthenticateValidCode_mfaNotMandatory()] (2 ms)</li><li>nl._42.restsecure.autoconfigure.authentication.mfa.MfaAuthenticationProviderTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.authentication.mfa.MfaAuthenticationProviderTest]/[nested-class:additionalAuthenticationChecks]/[nested-class:mfaEnabled]/[method:shouldAuthenticateValidCode_mfaMandatory()] (3 ms)</li><li>nl._42.restsecure.autoconfigure.authentication.mfa.MfaAuthenticationProviderTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.authentication.mfa.MfaAuthenticationProviderTest]/[nested-class:additionalAuthenticationChecks]/[nested-class:otherVerificationChecks]/[method:shouldStop_ifCheckReturnsTrue()] (3 ms)</li><li>nl._42.restsecure.autoconfigure.authentication.mfa.MfaAuthenticationProviderTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.authentication.mfa.MfaAuthenticationProviderTest]/[nested-class:additionalAuthenticationChecks]/[nested-class:otherVerificationChecks]/[method:shouldInsertTotpCheckAtGivenPosition()] (2 ms)</li><li>nl._42.restsecure.autoconfigure.authentication.mfa.MfaAuthenticationProviderTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.authentication.mfa.MfaAuthenticationProviderTest]/[nested-class:additionalAuthenticationChecks]/[nested-class:otherVerificationChecks]/[method:shouldContinue_ifCheckReturnsFalse()] (3 ms)</li><li>nl._42.restsecure.autoconfigure.authentication.AuthenticationControllerTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.authentication.AuthenticationControllerTest]/[method:authenticate_shouldSucceed_withCorrectCredentials()] (178 ms)</li><li>nl._42.restsecure.autoconfigure.authentication.AuthenticationControllerTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.authentication.AuthenticationControllerTest]/[method:authenticate_shouldFail_withAccountLocked()] (186 ms)</li><li>nl._42.restsecure.autoconfigure.authentication.AuthenticationControllerTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.authentication.AuthenticationControllerTest]/[method:successHandler_shouldNotBeCalled_afterFailedAuthentication()] (199 ms)</li><li>nl._42.restsecure.autoconfigure.authentication.AuthenticationControllerTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.authentication.AuthenticationControllerTest]/[method:rememberMe_shouldFail_afterFailedAuthentication()] (218 ms)</li><li>nl._42.restsecure.autoconfigure.authentication.AuthenticationControllerTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.authentication.AuthenticationControllerTest]/[method:authenticate_shouldFail_withAccountExpired()] (235 ms)</li><li>nl._42.restsecure.autoconfigure.authentication.AuthenticationControllerTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.authentication.AuthenticationControllerTest]/[method:authenticate_shouldFail_withAuthenticationExceptionInSubsequentFilter()] (235 ms)</li><li>nl._42.restsecure.autoconfigure.authentication.AuthenticationControllerTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.authentication.AuthenticationControllerTest]/[method:successHandler_shouldBeCalled_afterSuccessfulAuthentication()] (232 ms)</li><li>nl._42.restsecure.autoconfigure.authentication.AuthenticationControllerTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.authentication.AuthenticationControllerTest]/[method:authenticate_shouldChangeSessionId_toPreventSessionFixationAttack()] (317 ms)</li><li>nl._42.restsecure.autoconfigure.authentication.AuthenticationControllerTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.authentication.AuthenticationControllerTest]/[method:rememberMe_shouldSucceed_afterSuccessfulAuthentication()] (332 ms)</li><li>nl._42.restsecure.autoconfigure.authentication.AuthenticationControllerTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.authentication.AuthenticationControllerTest]/[method:authenticate_shouldFail_withCorrectCredentials_butBcryptPasswordEncoder()] (407 ms)</li><li>nl._42.restsecure.autoconfigure.WebSecurityAutoConfigTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.WebSecurityAutoConfigTest]/[method:autoConfig_shouldConfigureSecurity_withServiceAndMfaProvider_shouldNotGenerateDaoAuthenticationProvider()] (451 ms)</li><li>nl._42.restsecure.autoconfigure.WebSecurityAutoConfigTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.WebSecurityAutoConfigTest]/[method:autoConfig_shouldConfigureSecurity_withService()] (460 ms)</li><li>nl._42.restsecure.autoconfigure.authentication.AuthenticationControllerTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.authentication.AuthenticationControllerTest]/[method:authenticate_shouldFail_withCredentialsExpired()] (496 ms)</li><li>nl._42.restsecure.autoconfigure.authentication.UserDetailServiceTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.authentication.UserDetailServiceTest]/[method:loadUserByUsername_unknownUser_shouldFail()] (2 ms)</li><li>nl._42.restsecure.autoconfigure.authentication.mfa.MfaAuthenticationProviderTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.authentication.mfa.MfaAuthenticationProviderTest]/[nested-class:additionalAuthenticationChecks]/[nested-class:otherUserTypes]/[method:shouldDoNothingForOtherUsers()] (4 ms)</li>
+</ul>
+
+<br/>
+
+Report generated by <a href='https://pitest.org'>PIT</a> 1.15.0
+
+</body>
+</html>

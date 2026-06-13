@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>RestAuthenticationFilter.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">42 REST Secure Spring Boot Starter</a> &gt; <a href="index.source.html" class="el_package">nl._42.restsecure.autoconfigure</a> &gt; <span class="el_source">RestAuthenticationFilter.java</span></div><h1>RestAuthenticationFilter.java</h1><pre class="source lang-java linenums">package nl._42.restsecure.autoconfigure;
+
+import static org.springframework.http.HttpMethod.POST;
+
+import java.io.IOException;
+
+import jakarta.servlet.Filter;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
+import nl._42.restsecure.autoconfigure.authentication.mfa.MfaAuthenticationToken;
+import nl._42.restsecure.autoconfigure.errorhandling.LogUtil;
+import nl._42.restsecure.autoconfigure.errorhandling.LoginAuthenticationExceptionHandler;
+import nl._42.restsecure.autoconfigure.form.FormValues;
+import nl._42.restsecure.autoconfigure.form.LoginForm;
+import nl._42.restsecure.autoconfigure.utils.FormUtil;
+
+import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AbstractAuthenticationToken;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.context.SecurityContextHolderStrategy;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.NullRememberMeServices;
+import org.springframework.security.web.authentication.RememberMeServices;
+import org.springframework.security.web.authentication.session.NullAuthenticatedSessionStrategy;
+import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
+import org.springframework.security.web.context.DelegatingSecurityContextRepository;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
+import org.springframework.security.web.context.RequestAttributeSecurityContextRepository;
+import org.springframework.security.web.context.SecurityContextRepository;
+import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
+import org.springframework.web.filter.OncePerRequestFilter;
+
+/**
+ * Handles the login POST request. Tries to Authenticate the given user credentials using the auto configured {@link AuthenticationManager}.
+ * Expects the request body to contain json like:
+ * &lt;code&gt;{ username: 'user@email.com', password: 'secret' }&lt;/code&gt;
+ * After a successful login, sets the read json as request attribute. This to enable subsequent {@link Filter}'s to obtain this information.
+ */
+@Setter
+<span class="fc" id="L48">@Slf4j</span>
+@RequiredArgsConstructor
+public class RestAuthenticationFilter extends OncePerRequestFilter {
+
+    public static final String LOGIN_FORM_JSON = &quot;loginFormJson&quot;;
+    // NEW (Spring Security 7)
+<span class="fc" id="L54">    private static final PathPatternRequestMatcher DEFAULT_MATCHER =</span>
+<span class="fc" id="L55">            PathPatternRequestMatcher.withDefaults().matcher(POST, &quot;/authentication&quot;);</span>
+
+    private final LoginAuthenticationExceptionHandler loginExceptionHandler;
+    private final AuthenticationManager authenticationManager;
+
+    private SecurityContextRepository securityContextRepository = new DelegatingSecurityContextRepository(new RequestAttributeSecurityContextRepository(), new HttpSessionSecurityContextRepository());
+    private RememberMeServices rememberMeServices = new NullRememberMeServices();
+<span class="fc" id="L62">    private AuthenticationSuccessHandler successHandler = (request, response, authentication) -&gt; {};</span>
+    private SessionAuthenticationStrategy sessionStrategy = new NullAuthenticatedSessionStrategy();
+    private SecurityContextHolderStrategy securityContextHolderStrategy = SecurityContextHolder.getContextHolderStrategy();
+
+    @Override
+    public void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
+<span class="fc bfc" id="L68" title="All 2 branches covered.">        if (DEFAULT_MATCHER.matches(request)) {</span>
+<span class="fc" id="L69">            doLogin(request, response, chain);</span>
+        } else {
+<span class="fc" id="L71">            chain.doFilter(request, response);</span>
+        }
+<span class="fc" id="L73">    }</span>
+
+    private void doLogin(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
+<span class="fc" id="L76">        FormValues&lt;LoginForm&gt; formValues = FormUtil.getFormFromRequest(request, LoginForm.class);</span>
+<span class="fc" id="L77">        LoginForm form = formValues.form();</span>
+<span class="fc" id="L78">        AbstractAuthenticationToken token = new MfaAuthenticationToken(form.username, form.password, form.verificationCode);</span>
+        try {
+<span class="fc" id="L80">            log.info(&quot;Authenticating user: {}&quot;, form.username);</span>
+<span class="fc" id="L81">            Authentication authentication = authenticationManager.authenticate(token);</span>
+<span class="fc" id="L82">            onAuthenticationSuccess(request, response, authentication, formValues);</span>
+<span class="fc" id="L83">            chain.doFilter(request, response);</span>
+<span class="fc" id="L84">        } catch (AuthenticationException ex) {</span>
+<span class="fc" id="L85">            onAuthenticationFail(request, response, ex, form);</span>
+<span class="fc" id="L86">        }</span>
+<span class="fc" id="L87">    }</span>
+
+    private void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication, FormValues&lt;LoginForm&gt; formValues)
+            throws IOException, ServletException {
+<span class="fc" id="L91">        securityContextHolderStrategy.getContext().setAuthentication(authentication);</span>
+<span class="fc" id="L92">        securityContextRepository.saveContext(securityContextHolderStrategy.getContext(), request, response);</span>
+<span class="fc" id="L93">        sessionStrategy.onAuthentication(authentication, request, response);</span>
+<span class="fc" id="L94">        request.setAttribute(LOGIN_FORM_JSON, formValues.formJson());</span>
+<span class="fc" id="L95">        successHandler.onAuthenticationSuccess(request, response, authentication);</span>
+<span class="fc bfc" id="L96" title="All 2 branches covered.">        if (formValues.form().rememberMe) {</span>
+<span class="fc" id="L97">            rememberMeServices.loginSuccess(request, response, authentication);</span>
+        }
+<span class="fc" id="L99">    }</span>
+
+    private void onAuthenticationFail(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception, LoginForm form) throws IOException {
+<span class="fc" id="L102">        LogUtil.logAuthenticationFailure(log, form, exception);</span>
+<span class="fc" id="L103">        securityContextHolderStrategy.clearContext();</span>
+<span class="fc" id="L104">        loginExceptionHandler.handle(request, response, exception);</span>
+<span class="fc" id="L105">        rememberMeServices.loginFail(request, response);</span>
+<span class="fc" id="L106">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

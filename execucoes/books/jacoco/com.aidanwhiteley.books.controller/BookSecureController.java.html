@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>BookSecureController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Books Microservice</a> &gt; <a href="index.source.html" class="el_package">com.aidanwhiteley.books.controller</a> &gt; <span class="el_source">BookSecureController.java</span></div><h1>BookSecureController.java</h1><pre class="source lang-java linenums">package com.aidanwhiteley.books.controller;
+
+import com.aidanwhiteley.books.controller.aspect.LimitDataVisibility;
+import com.aidanwhiteley.books.controller.dtos.CommentRec;
+import com.aidanwhiteley.books.controller.exceptions.NotAuthorisedException;
+import com.aidanwhiteley.books.domain.Book;
+import com.aidanwhiteley.books.domain.Comment;
+import com.aidanwhiteley.books.domain.Owner;
+import com.aidanwhiteley.books.domain.User;
+import com.aidanwhiteley.books.domain.googlebooks.BookSearchResult;
+import com.aidanwhiteley.books.domain.googlebooks.Item;
+import com.aidanwhiteley.books.repository.BookRepository;
+import com.aidanwhiteley.books.repository.GoogleBooksDaoAsync;
+import com.aidanwhiteley.books.repository.GoogleBooksDaoSync;
+import com.aidanwhiteley.books.repository.dtos.BooksByReader;
+import com.aidanwhiteley.books.util.JwtAuthenticationUtils;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import org.springframework.web.util.HtmlUtils;
+
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.security.Principal;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.Optional;
+
+import static com.aidanwhiteley.books.util.LogDetaint.logMessageDetaint;
+
+@LimitDataVisibility
+@RestController
+@RequestMapping(&quot;/secure/api&quot;)
+@PreAuthorize(&quot;hasAnyRole('ROLE_EDITOR', 'ROLE_ADMIN')&quot;)
+public class BookSecureController {
+
+<span class="fc" id="L48">    private static final Logger LOGGER = LoggerFactory.getLogger(BookSecureController.class);</span>
+
+    private final BookRepository bookRepository;
+
+    private final GoogleBooksDaoSync googleBooksDaoSync;
+
+    private final GoogleBooksDaoAsync googleBooksDaoAsync;
+
+    private final JwtAuthenticationUtils authUtils;
+
+    @Value(&quot;${books.users.max.page.size}&quot;)
+    private int maxPageSize;
+
+    public BookSecureController(BookRepository bookRepository, GoogleBooksDaoSync googleBooksDaoSync,
+<span class="fc" id="L62">                                GoogleBooksDaoAsync googleBooksDaoAsync, JwtAuthenticationUtils jwtAuthenticationUtils) {</span>
+<span class="fc" id="L63">        this.bookRepository = bookRepository;</span>
+<span class="fc" id="L64">        this.googleBooksDaoSync = googleBooksDaoSync;</span>
+<span class="fc" id="L65">        this.googleBooksDaoAsync = googleBooksDaoAsync;</span>
+<span class="fc" id="L66">        this.authUtils = jwtAuthenticationUtils;</span>
+<span class="fc" id="L67">    }</span>
+
+    protected static Book mergeUpdatesOntoExistingBook(Book currentBookState, Book book) {
+
+        // Set the fields the owner / admin is allowed to manually update
+<span class="fc" id="L72">        currentBookState.setSummary(book.getSummary());</span>
+<span class="fc" id="L73">        currentBookState.setGenre(book.getGenre());</span>
+<span class="fc" id="L74">        currentBookState.setTitle(book.getTitle());</span>
+<span class="fc" id="L75">        currentBookState.setSummary(book.getSummary());</span>
+<span class="fc" id="L76">        currentBookState.setGoogleBookId(book.getGoogleBookId());</span>
+<span class="fc" id="L77">        currentBookState.setRating(book.getRating());</span>
+<span class="fc" id="L78">        currentBookState.setAuthor(book.getAuthor());</span>
+
+<span class="fc" id="L80">        return currentBookState;</span>
+    }
+
+    @PostMapping(value = &quot;/books&quot;)
+    public ResponseEntity&lt;Book&gt; createBook(@Valid @RequestBody Book book, Principal principal) throws MalformedURLException, URISyntaxException {
+
+<span class="fc" id="L86">        LOGGER.debug(&quot;createBook in BookSecureController called&quot;);</span>
+
+<span class="fc" id="L88">        Optional&lt;User&gt; user = authUtils.extractUserFromPrincipal(principal, false);</span>
+<span class="pc bpc" id="L89" title="1 of 2 branches missed.">        if (user.isPresent()) {</span>
+
+<span class="fc" id="L91">            Book insertedBook = bookRepository.insert(book);</span>
+
+            // If there were Google Book details specified, call an async method to
+            // go and get the full details from Google and then update the Mongo document for the book
+<span class="pc bpc" id="L95" title="3 of 4 branches missed.">            if (book.getGoogleBookId() != null &amp;&amp; !book.getGoogleBookId().isEmpty()) {</span>
+<span class="nc" id="L96">                googleBooksDaoAsync.updateBookWithGoogleBookDetails(insertedBook, book.getGoogleBookId());</span>
+            }
+
+<span class="fc" id="L99">            URI location = ServletUriComponentsBuilder.fromCurrentRequest().path(&quot;/{id}&quot;)</span>
+<span class="fc" id="L100">                    .buildAndExpand(insertedBook.getId()).toUri();</span>
+
+            // Basic GET of book details are not on a secure API
+<span class="fc" id="L103">            location = new URI(location.toURL().toString().replace(&quot;/secure&quot;, &quot;&quot;));</span>
+<span class="fc" id="L104">            LOGGER.debug(&quot;createBook existed. New Book created in store - accessible at {}&quot;, location);</span>
+<span class="fc" id="L105">            return ResponseEntity.created(location).build();</span>
+        } else {
+<span class="nc bnc" id="L107" title="All 2 branches missed.">            if (LOGGER.isErrorEnabled()) {</span>
+<span class="nc" id="L108">                LOGGER.error(&quot;Couldn't create a book as user to own book not found! Principal: {}&quot;, logMessageDetaint(principal));</span>
+            }
+<span class="nc" id="L110">            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();</span>
+        }
+    }
+
+    @PutMapping(value = &quot;/books&quot;)
+    public ResponseEntity&lt;Book&gt; updateBook(@Valid @RequestBody Book book, Principal principal) {
+
+<span class="fc" id="L117">        Optional&lt;User&gt; user = authUtils.extractUserFromPrincipal(principal, false);</span>
+<span class="pc bpc" id="L118" title="1 of 2 branches missed.">        if (user.isPresent()) {</span>
+<span class="fc" id="L119">            Book currentBookState = bookRepository.findById(book.getId())</span>
+<span class="pc" id="L120">                    .orElseThrow(() -&gt; new IllegalArgumentException(&quot;Didn't find book to update&quot;));</span>
+
+<span class="pc bpc" id="L122" title="1 of 4 branches missed.">            if (currentBookState.isOwner(user.get()) || user.get().getRoles().contains(User.Role.ROLE_ADMIN)) {</span>
+
+<span class="pc bpc" id="L124" title="1 of 4 branches missed.">                boolean inputHasGoogleBookId = book.getGoogleBookId() != null &amp;&amp; (!book.getGoogleBookId().isEmpty());</span>
+<span class="fc bfc" id="L125" title="All 2 branches covered.">                boolean currentBookHasGoogleBookId = currentBookState.getGoogleBookId() != null &amp;&amp;</span>
+<span class="pc bpc" id="L126" title="1 of 2 branches missed.">                        (!currentBookState.getGoogleBookId().isEmpty());</span>
+
+<span class="pc bpc" id="L128" title="1 of 4 branches missed.">                if (inputHasGoogleBookId &amp;&amp; (currentBookHasGoogleBookId &amp;&amp;</span>
+<span class="fc bfc" id="L129" title="All 2 branches covered.">                        !currentBookState.getGoogleBookId().equalsIgnoreCase(book.getGoogleBookId()))</span>
+                ) {
+                    // Retrieve and update Google Book details synchronously
+<span class="fc" id="L132">                    Item item = googleBooksDaoSync.searchGoogleBooksByGoogleBookId(book.getGoogleBookId());</span>
+<span class="fc" id="L133">                    currentBookState.setGoogleBookDetails(item);</span>
+<span class="pc bpc" id="L134" title="1 of 4 branches missed.">                } else if (book.getGoogleBookId() == null || book.getGoogleBookId().isEmpty()) {</span>
+<span class="fc" id="L135">                    currentBookState.setGoogleBookDetails(null);</span>
+                }
+
+<span class="fc" id="L138">                Book mergedBook = mergeUpdatesOntoExistingBook(currentBookState, book);</span>
+
+<span class="fc" id="L140">                bookRepository.save(mergedBook);</span>
+<span class="fc" id="L141">                return ResponseEntity.noContent().build();</span>
+            } else {
+<span class="nc" id="L143">                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();</span>
+            }
+        } else {
+<span class="nc" id="L146">            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();</span>
+        }
+    }
+
+    @DeleteMapping(value = &quot;/books/{id}&quot;)
+    public ResponseEntity&lt;Book&gt; deleteBookById(@PathVariable String id, Principal principal) {
+
+<span class="fc" id="L153">        Optional&lt;User&gt; user = authUtils.extractUserFromPrincipal(principal, false);</span>
+<span class="pc bpc" id="L154" title="1 of 2 branches missed.">        if (user.isPresent()) {</span>
+<span class="fc" id="L155">            Book currentBookState = bookRepository.findById(id)</span>
+<span class="pc" id="L156">                    .orElseThrow(() -&gt; new IllegalArgumentException(&quot;Couldn't find book to delete&quot;));</span>
+
+<span class="pc bpc" id="L158" title="3 of 4 branches missed.">            if (currentBookState.isOwner(user.get()) || user.get().getRoles().contains(User.Role.ROLE_ADMIN)) {</span>
+<span class="fc" id="L159">                bookRepository.deleteById(id);</span>
+<span class="fc" id="L160">                return ResponseEntity.noContent().build();</span>
+            } else {
+<span class="nc" id="L162">                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();</span>
+            }
+        } else {
+<span class="nc" id="L165">            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();</span>
+        }
+    }
+
+    @PostMapping(value = &quot;/books/{id}/comments&quot;)
+    public Book addCommentToBook(@PathVariable String id, @Valid @RequestBody CommentRec commentRec,
+                                 Principal principal) {
+
+<span class="fc" id="L173">        Optional&lt;User&gt; user = authUtils.extractUserFromPrincipal(principal, false);</span>
+<span class="pc bpc" id="L174" title="1 of 2 branches missed.">        if (user.isPresent()) {</span>
+<span class="fc" id="L175">            Comment comment = new Comment(commentRec.commentText(), new Owner(user.get()));</span>
+<span class="fc" id="L176">            return bookRepository.addCommentToBook(id, comment);</span>
+        } else {
+<span class="nc" id="L178">            return null;</span>
+        }
+    }
+
+    @DeleteMapping(value = &quot;/books/{id}/comments/{commentId}&quot;)
+    public Book removeCommentFromBook(@PathVariable String id, @PathVariable String commentId,
+                                      Principal principal) {
+
+<span class="fc" id="L186">        Optional&lt;User&gt; user = authUtils.extractUserFromPrincipal(principal, false);</span>
+
+<span class="pc bpc" id="L188" title="1 of 2 branches missed.">        if (user.isPresent()) {</span>
+<span class="fc" id="L189">            Book currentBook = bookRepository.findById(id)</span>
+<span class="pc" id="L190">                    .orElseThrow(() -&gt; new IllegalArgumentException(&quot;Unable to find book to delete comment from&quot;));</span>
+<span class="fc" id="L191">            Comment comment = currentBook.getComments().stream().filter(c -&gt; c.getId().equals(commentId)).findFirst()</span>
+<span class="fc" id="L192">                    .orElse(null);</span>
+<span class="pc bpc" id="L193" title="1 of 2 branches missed.">            if (comment == null) {</span>
+<span class="nc" id="L194">                throw new IllegalArgumentException(&quot;Unknown commentId supplied&quot;);</span>
+            }
+
+<span class="pc bpc" id="L197" title="3 of 4 branches missed.">            if (comment.isOwner(user.get()) || user.get().getRoles().contains(User.Role.ROLE_ADMIN)) {</span>
+<span class="fc" id="L198">                return bookRepository.removeCommentFromBook(id, commentId, user.get().getFullName());</span>
+            } else {
+<span class="nc" id="L200">                throw new NotAuthorisedException(&quot;Not owner of comment or admin&quot;);</span>
+            }
+        } else {
+<span class="nc" id="L203">            return null;</span>
+        }
+    }
+
+    /**
+     * This method is secured so that it cant be called to try and find out who
+     * has been reviewing books if you are not an authorised user i.e. with at
+     * least ROLE_EDITOR
+     */
+    @GetMapping(value = {&quot;/books&quot;, &quot;/books/&quot;})
+    public Page&lt;Book&gt; findByReader(@RequestParam String reader, @RequestParam(defaultValue = &quot;0&quot;) int page,
+                                   @RequestParam(defaultValue = &quot;5&quot;) int size, Principal principal) {
+
+<span class="pc bpc" id="L216" title="1 of 4 branches missed.">        if (null == reader || reader.trim().isEmpty()) {</span>
+<span class="fc" id="L217">            throw new IllegalArgumentException(&quot;Reader parameter cannot be empty&quot;);</span>
+        }
+
+<span class="fc bfc" id="L220" title="All 2 branches covered.">        if (size &gt; maxPageSize) {</span>
+<span class="fc" id="L221">            throw new IllegalArgumentException(&quot;Cannot request a page of data containing more that %s elements&quot;.formatted(maxPageSize));</span>
+        }
+
+<span class="fc" id="L224">        PageRequest pageObj = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, &quot;createdDateTime&quot;));</span>
+<span class="fc" id="L225">        return bookRepository.findByReaderOrderByCreatedDateTimeDesc(pageObj, reader);</span>
+    }
+
+    @GetMapping(value = {&quot;/googlebooks&quot;, &quot;googlebooks/&quot;}, params = {&quot;title&quot;, &quot;author&quot;})
+    public BookSearchResult findGoogleBooksByTitleAndAuthor(@RequestParam String title, @RequestParam String author) {
+<span class="nc" id="L230">        return googleBooksDaoSync.searchGoogleBooksByTitleAndAuthor(title, author);</span>
+    }
+
+    @GetMapping(value = &quot;/books/readers&quot;)
+    public List&lt;BooksByReader&gt; findBookReaders() {
+<span class="fc" id="L235">        return bookRepository.countBooksByReader();</span>
+    }
+
+    @GetMapping(value = &quot;/debugheaders&quot;)
+    @PreAuthorize(&quot;hasRole('ROLE_ADMIN')&quot;)
+    public String debugRequestHeaders(Principal principal, HttpServletRequest request) {
+
+<span class="fc" id="L242">        Enumeration&lt;String&gt; headers = request.getHeaderNames();</span>
+<span class="fc" id="L243">        StringBuilder headersOut = new StringBuilder();</span>
+<span class="fc bfc" id="L244" title="All 2 branches covered.">        while (headers.hasMoreElements()) {</span>
+<span class="fc" id="L245">            String headerName = headers.nextElement();</span>
+<span class="fc" id="L246">            headersOut.append(HtmlUtils.htmlEscape(headerName)).</span>
+<span class="fc" id="L247">                    append(&quot;: &quot;).append(HtmlUtils.htmlEscape(request.getHeader(headerName))).append(&quot;\r\n&quot;);</span>
+<span class="fc" id="L248">        }</span>
+
+<span class="fc" id="L250">        return &quot;Scheme was: &quot; + HtmlUtils.htmlEscape(request.getScheme()) +</span>
+<span class="fc" id="L251">                &quot; servername was: &quot; + HtmlUtils.htmlEscape(request.getServerName())</span>
+<span class="fc" id="L252">                + &quot; and protocol was: &quot; + HtmlUtils.htmlEscape(request.getProtocol()) +</span>
+                &quot;\r\n\r\nheaders:\r\n&quot; + headersOut;
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

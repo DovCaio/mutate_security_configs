@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SetupService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">gymstock</a> &gt; <a href="index.source.html" class="el_package">com.asafeorneles.gymstock.security</a> &gt; <span class="el_source">SetupService.java</span></div><h1>SetupService.java</h1><pre class="source lang-java linenums">package com.asafeorneles.gymstock.security;
+
+import com.asafeorneles.gymstock.dtos.auth.FirstAdminRequest;
+import com.asafeorneles.gymstock.entities.Role;
+import com.asafeorneles.gymstock.entities.User;
+import com.asafeorneles.gymstock.enums.RoleName;
+import com.asafeorneles.gymstock.exceptions.BusinessConflictException;
+import com.asafeorneles.gymstock.exceptions.ResourceNotFoundException;
+import com.asafeorneles.gymstock.repositories.RoleRepository;
+import com.asafeorneles.gymstock.repositories.UserRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Set;
+
+@Service
+@RequiredArgsConstructor
+public class SetupService {
+
+    final UserRepository userRepository;
+    final RoleRepository roleRepository;
+    final PasswordEncoder passwordEncoder;
+
+    @Transactional
+    public void createFirstAdmin(FirstAdminRequest firstAdminRequest) {
+
+<span class="fc bfc" id="L29" title="All 2 branches covered.">        if (userRepository.existsByRoles_Name(RoleName.ROLE_ADMIN.name())){</span>
+<span class="fc" id="L30">            throw new BusinessConflictException(&quot;There is already an admin in the system.&quot;);</span>
+        }
+
+<span class="fc" id="L33">        Role roleAdmin = roleRepository.findByName(RoleName.ROLE_ADMIN.name())</span>
+<span class="pc" id="L34">                .orElseThrow(() -&gt; new ResourceNotFoundException(&quot;Role not found&quot;));</span>
+
+<span class="fc" id="L36">        User firstAdmin = User.builder()</span>
+<span class="fc" id="L37">                .username(firstAdminRequest.username())</span>
+<span class="fc" id="L38">                .password(passwordEncoder.encode(firstAdminRequest.password()))</span>
+<span class="fc" id="L39">                .roles(Set.of(roleAdmin))</span>
+<span class="fc" id="L40">                .build();</span>
+
+<span class="fc" id="L42">        firstAdmin.activity();</span>
+
+<span class="fc" id="L44">        userRepository.save(firstAdmin);</span>
+<span class="fc" id="L45">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

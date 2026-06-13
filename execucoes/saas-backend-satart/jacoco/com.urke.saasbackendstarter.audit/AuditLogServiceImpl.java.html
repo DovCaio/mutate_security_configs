@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AuditLogServiceImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">SaaS Backend Starter</a> &gt; <a href="index.source.html" class="el_package">com.urke.saasbackendstarter.audit</a> &gt; <span class="el_source">AuditLogServiceImpl.java</span></div><h1>AuditLogServiceImpl.java</h1><pre class="source lang-java linenums">package com.urke.saasbackendstarter.audit;
+
+import com.urke.saasbackendstarter.domain.Organization;
+import com.urke.saasbackendstarter.security.CurrentUserProvider;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
+
+@Service
+@RequiredArgsConstructor
+public class AuditLogServiceImpl implements AuditLogService {
+
+    private final AuditLogRepository auditLogRepository;
+    private final CurrentUserProvider currentUserProvider;
+
+    @Override
+    @Transactional
+    public void log(String action, String entityType, Long entityId, String message, String actorEmail) {
+<span class="nc bnc" id="L23" title="All 6 branches missed.">        if (action == null || entityType == null || actorEmail == null) {</span>
+<span class="nc" id="L24">            throw new IllegalArgumentException(&quot;Action, entityType, and actorEmail must not be null.&quot;);</span>
+        }
+<span class="nc" id="L26">        AuditLog log = AuditLog.builder()</span>
+<span class="nc" id="L27">                .action(action)</span>
+<span class="nc" id="L28">                .entityType(entityType)</span>
+<span class="nc" id="L29">                .entityId(entityId)</span>
+<span class="nc" id="L30">                .message(message)</span>
+<span class="nc" id="L31">                .timestamp(LocalDateTime.now())</span>
+<span class="nc" id="L32">                .actorEmail(actorEmail)</span>
+<span class="nc" id="L33">                .organization(currentUserProvider.getCurrentOrganization())</span>
+<span class="nc" id="L34">                .build();</span>
+<span class="nc" id="L35">        auditLogRepository.save(log);</span>
+<span class="nc" id="L36">    }</span>
+
+    @Override
+    public Page&lt;AuditLog&gt; findPagedFiltered(String action, String entityType, Pageable pageable) {
+<span class="nc" id="L40">        Organization org = currentUserProvider.getCurrentOrganization();</span>
+
+<span class="nc bnc" id="L42" title="All 4 branches missed.">        if (action != null &amp;&amp; !action.isBlank()) {</span>
+<span class="nc" id="L43">            return auditLogRepository.findByOrganizationAndActionContainingIgnoreCase(org, action, pageable);</span>
+<span class="nc bnc" id="L44" title="All 4 branches missed.">        } else if (entityType != null &amp;&amp; !entityType.isBlank()) {</span>
+<span class="nc" id="L45">            return auditLogRepository.findByOrganizationAndEntityTypeContainingIgnoreCase(org, entityType, pageable);</span>
+        } else {
+<span class="nc" id="L47">            return auditLogRepository.findByOrganization(org, pageable);</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

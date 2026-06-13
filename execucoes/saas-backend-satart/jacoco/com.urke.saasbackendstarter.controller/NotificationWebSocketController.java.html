@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>NotificationWebSocketController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">SaaS Backend Starter</a> &gt; <a href="index.source.html" class="el_package">com.urke.saasbackendstarter.controller</a> &gt; <span class="el_source">NotificationWebSocketController.java</span></div><h1>NotificationWebSocketController.java</h1><pre class="source lang-java linenums">package com.urke.saasbackendstarter.controller;
+
+import com.urke.saasbackendstarter.dto.NotificationMessage;
+import lombok.RequiredArgsConstructor;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.web.bind.annotation.RestController;
+
+/**
+ * WebSocket controller for sending real-time notifications.
+ */
+@RestController
+@RequiredArgsConstructor
+public class NotificationWebSocketController {
+
+    private final SimpMessagingTemplate messagingTemplate;
+
+    /**
+     * Receives a notification from the client and broadcasts it to all subscribers.
+     * Endpoint: /app/notify → /topic/notifications
+     *
+     * @param message notification message from client
+     * @return the same message, broadcast to all
+     */
+    @MessageMapping(&quot;/notify&quot;)
+    @SendTo(&quot;/topic/notifications&quot;)
+    public NotificationMessage sendNotification(NotificationMessage message) {
+<span class="nc" id="L29">        return message;</span>
+    }
+
+    /**
+     * Sends a notification to a specific user (private queue).
+     * Can be called from any service.
+     *
+     * @param userId  recipient user ID
+     * @param content notification message content
+     */
+    public void sendNotificationToUser(Long userId, String content) {
+<span class="nc" id="L40">        messagingTemplate.convertAndSend(&quot;/queue/user-&quot; + userId, new NotificationMessage(content));</span>
+<span class="nc" id="L41">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

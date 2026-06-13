@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Relatório de Mutação</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+    <header>
+        <h1>Relatório de Mutação</h1>
+        <p>Gerado em: 09/04/2026 00:40:00</p>
+    </header>
+
+    <section class="summary">
+        <h2>Resumo Geral</h2>
+        <ul>
+            <li><strong>Total de Mutantes:</strong> 6</li>
+            <li><strong>Capturados:</strong> 0</li>
+            <li><strong>Sobreviveram:</strong> 6</li>
+            <li><strong>Taxa de Captura:</strong> 0.00%</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>Detalhes por Mutante</h2>
+        <table>
+            <tr>
+                <th>#</th>
+                <th>Package Name</th>
+                <th>Nível Annotation</th>
+                <th>Class Name</th>
+                <th>Método</th>
+                <th>Valor original</th>
+                <th>Mutação</th>
+                <th>Total</th>
+                <th>Sucesso</th>
+                <th>Falhas</th>
+                <th>Log&apos;s</th>
+                <th>Capturado</th>
+            </tr>
+    <tr class="survived">
+        <td>1</td>
+        <td>nl._42.restsecure.autoconfigure.errorhandling</td>
+        <td>Método</td>
+        <td>TestController</td>
+        <td>restrictedMethod</td>
+        <td>hasRole('ROLE_UNKNOWN')</td>
+        <td>!hasRole('ROLE_UNKNOWN')</td>
+        <td>78</td>
+        <td>78</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>2</td>
+        <td>nl._42.restsecure.autoconfigure.errorhandling</td>
+        <td>Método</td>
+        <td>TestController</td>
+        <td>restrictedMethod</td>
+        <td>hasRole('ROLE_UNKNOWN')</td>
+        <td>permitAll()</td>
+        <td>78</td>
+        <td>78</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>3</td>
+        <td>nl._42.restsecure.autoconfigure.errorhandling</td>
+        <td>Método</td>
+        <td>TestController</td>
+        <td>restrictedMethod</td>
+        <td>hasRole('ROLE_UNKNOWN')</td>
+        <td>denyAll</td>
+        <td>78</td>
+        <td>78</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>4</td>
+        <td>nl._42.restsecure.autoconfigure.errorhandling</td>
+        <td>Método</td>
+        <td>TestController</td>
+        <td>restrictedMethod</td>
+        <td>hasRole('ROLE_UNKNOWN')</td>
+        <td>hasRole('NO_ROLE_UNKNOWN')</td>
+        <td>78</td>
+        <td>78</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>5</td>
+        <td>nl._42.restsecure.autoconfigure.errorhandling</td>
+        <td>Método</td>
+        <td>TestController</td>
+        <td>restrictedMethod</td>
+        <td>hasRole('ROLE_UNKNOWN')</td>
+        <td>hasAuthority('ROLE_UNKNOWN')</td>
+        <td>78</td>
+        <td>78</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>6</td>
+        <td>nl._42.restsecure.autoconfigure.errorhandling</td>
+        <td>Método</td>
+        <td>TestController</td>
+        <td>restrictedMethod</td>
+        <td>hasRole('ROLE_UNKNOWN')</td>
+        <td>hasRole('')</td>
+        <td>78</td>
+        <td>78</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+            </table>
+        </section>
+    </body>
+    </html>

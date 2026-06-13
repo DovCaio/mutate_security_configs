@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Owner.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Books Microservice</a> &gt; <a href="index.source.html" class="el_package">com.aidanwhiteley.books.domain</a> &gt; <span class="el_source">Owner.java</span></div><h1>Owner.java</h1><pre class="source lang-java linenums">package com.aidanwhiteley.books.domain;
+
+import lombok.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.Serial;
+import java.io.Serializable;
+
+import static com.aidanwhiteley.books.domain.User.Role.*;
+
+@Getter
+@AllArgsConstructor
+@NoArgsConstructor
+@EqualsAndHashCode
+@ToString
+/*
+ * A cut down copy of the User object that can be embedded in Book and Comment
+ * objects to nest basic details about who created the Book or Comment.
+ *
+ * Some of the data in instances of this object will go stale over time. That's
+ * understood - it is being used to record details of the user at the point in
+ * time Book or Comment is created - a trade-off between accuracy at all times
+ * (and disk space) and performance.
+ */
+public class Owner implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
+
+<span class="fc" id="L31">    private static final Logger LOGGER = LoggerFactory.getLogger(Owner.class);</span>
+
+    private String authenticationServiceId;
+
+    private String firstName;
+
+    private String lastName;
+
+    private String fullName;
+
+    private String email;
+
+    private String link;
+
+    private String picture;
+
+    private User.AuthenticationProvider authProvider;
+
+<span class="fc" id="L49">    public Owner(User user) {</span>
+<span class="fc" id="L50">        this.authenticationServiceId = user.getAuthenticationServiceId();</span>
+<span class="fc" id="L51">        this.firstName = user.getFirstName();</span>
+<span class="fc" id="L52">        this.lastName = user.getLastName();</span>
+<span class="fc" id="L53">        this.fullName = user.getFullName();</span>
+<span class="fc" id="L54">        this.email = user.getEmail();</span>
+<span class="fc" id="L55">        this.link = user.getLink();</span>
+<span class="fc" id="L56">        this.picture = user.getPicture();</span>
+<span class="fc" id="L57">        this.authProvider = user.getAuthProvider();</span>
+<span class="fc" id="L58">    }</span>
+
+    public void setPermissionsAndContentForUser(User user) {
+
+<span class="fc bfc" id="L62" title="All 4 branches covered.">        if (null == user || user.getHighestRole() == ROLE_USER) {</span>
+<span class="fc" id="L63">            this.authenticationServiceId = &quot;&quot;;</span>
+<span class="fc" id="L64">            this.firstName = &quot;&quot;;</span>
+<span class="fc" id="L65">            this.lastName = &quot;&quot;;</span>
+<span class="fc" id="L66">            this.fullName = &quot;&quot;;</span>
+<span class="fc" id="L67">            this.email = &quot;&quot;;</span>
+<span class="fc" id="L68">            this.link = &quot;&quot;;</span>
+<span class="fc" id="L69">            this.picture = &quot;&quot;;</span>
+<span class="fc" id="L70">            this.authProvider = null;</span>
+<span class="fc bfc" id="L71" title="All 2 branches covered.">        } else if (user.getHighestRole() == ROLE_EDITOR) {</span>
+<span class="fc" id="L72">            this.authenticationServiceId = &quot;&quot;;</span>
+<span class="fc" id="L73">            this.email = &quot;&quot;;</span>
+<span class="fc" id="L74">            this.authProvider = null;</span>
+        } else //noinspection StatementWithEmptyBody
+<span class="pc bpc" id="L76" title="1 of 2 branches missed.">            if (user.getHighestRole() == ROLE_ADMIN) {</span>
+                // Return all
+            } else {
+<span class="nc" id="L79">                LOGGER.error(&quot;Unexpected user role found. This is a code logic error&quot;);</span>
+<span class="nc" id="L80">                throw new IllegalStateException(&quot;Unable to set owner data in a Book appropriate for user&quot;);</span>
+            }
+<span class="fc" id="L82">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

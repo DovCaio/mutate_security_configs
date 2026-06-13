@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>HttpCookieOAuth2AuthorizationRequestRepository.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Books Microservice</a> &gt; <a href="index.source.html" class="el_package">com.aidanwhiteley.books.controller.config</a> &gt; <span class="el_source">HttpCookieOAuth2AuthorizationRequestRepository.java</span></div><h1>HttpCookieOAuth2AuthorizationRequestRepository.java</h1><pre class="source lang-java linenums">package com.aidanwhiteley.books.controller.config;
+
+import com.aidanwhiteley.books.controller.exceptions.JwtAuthAuzException;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.oauth2.client.web.AuthorizationRequestRepository;
+import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
+
+import java.util.Base64;
+import java.util.Optional;
+
+/**
+ * Based on &lt;a href=&quot;https://stackoverflow.com/questions/49095383/spring-security-5-stateless-oauth2-login-how-to-implement-cookies-based-author&quot;&gt;...&lt;/a&gt;
+ */
+class HttpCookieOAuth2AuthorizationRequestRepository implements AuthorizationRequestRepository&lt;OAuth2AuthorizationRequest&gt; {
+
+    public static final String COOKIE_NAME = &quot;cloudy-oauth2-auth&quot;;
+<span class="fc" id="L24">    private static final Logger LOGGER = LoggerFactory.getLogger(HttpCookieOAuth2AuthorizationRequestRepository.class);</span>
+    private final ObjectMapper authRequestJsonMapper;
+    @Value(&quot;${books.oauth2.cookieOverHttpsOnly}&quot;)
+    private boolean cookieOverHttpsOnly;
+
+<span class="fc" id="L29">    public HttpCookieOAuth2AuthorizationRequestRepository(ObjectMapper authRequestJsonMapper) {</span>
+<span class="fc" id="L30">        this.authRequestJsonMapper = authRequestJsonMapper;</span>
+<span class="fc" id="L31">    }</span>
+
+    @Override
+    public OAuth2AuthorizationRequest loadAuthorizationRequest(HttpServletRequest request) {
+<span class="fc" id="L35">        return fetchCookie(request)</span>
+<span class="fc" id="L36">                .map(this::toOAuth2AuthorizationRequest)</span>
+<span class="fc" id="L37">                .orElse(null);</span>
+    }
+
+    @Override
+    public void saveAuthorizationRequest(OAuth2AuthorizationRequest authorizationRequest, HttpServletRequest request,
+                                         HttpServletResponse response) {
+
+<span class="fc bfc" id="L44" title="All 2 branches covered.">        if (authorizationRequest == null) {</span>
+<span class="fc" id="L45">            deleteCookie(request, response);</span>
+<span class="fc" id="L46">            return;</span>
+        }
+
+<span class="fc" id="L49">        Cookie cookie = new Cookie(COOKIE_NAME, fromAuthorizationRequest(authorizationRequest));</span>
+<span class="fc" id="L50">        cookie.setPath(&quot;/&quot;);</span>
+<span class="fc" id="L51">        cookie.setHttpOnly(true);</span>
+<span class="fc" id="L52">        cookie.setSecure(cookieOverHttpsOnly);</span>
+<span class="fc" id="L53">        cookie.setMaxAge(-1);   // Expire when browser closed - bug in API means explicit removal not possible</span>
+<span class="fc" id="L54">        response.addCookie(cookie);     // lgtm[java/insecure-cookie]</span>
+<span class="fc" id="L55">    }</span>
+
+    @Override
+    public OAuth2AuthorizationRequest removeAuthorizationRequest(HttpServletRequest request, HttpServletResponse response) {
+<span class="nc" id="L59">        deleteCookie(request, response);</span>
+<span class="nc" id="L60">        return loadAuthorizationRequest(request);</span>
+    }
+
+    private String fromAuthorizationRequest(OAuth2AuthorizationRequest authorizationRequest) {
+        try {
+<span class="fc" id="L65">            return Base64.getEncoder().encodeToString(authRequestJsonMapper.writeValueAsString(authorizationRequest).getBytes());</span>
+<span class="fc" id="L66">        } catch (JacksonException jspe) {</span>
+<span class="fc" id="L67">            var msg = &quot;Failed to serialise OAuth auth to JSON&quot;;</span>
+<span class="fc" id="L68">            LOGGER.error(msg, jspe);</span>
+<span class="fc" id="L69">            throw new JwtAuthAuzException(msg);</span>
+        }
+    }
+
+    private void deleteCookie(HttpServletRequest request, HttpServletResponse response) {
+<span class="fc" id="L74">        fetchCookie(request).ifPresent(cookie -&gt; {</span>
+            // Delete the cookie from the response while leaving it in the request
+<span class="fc" id="L76">            Cookie responseCookie = new Cookie(COOKIE_NAME, &quot;&quot;);</span>
+<span class="fc" id="L77">            responseCookie.setPath(&quot;/&quot;);</span>
+<span class="fc" id="L78">            responseCookie.setMaxAge(0);</span>
+<span class="fc" id="L79">            responseCookie.setSecure(cookieOverHttpsOnly);</span>
+<span class="fc" id="L80">            responseCookie.setHttpOnly(true);</span>
+<span class="fc" id="L81">            response.addCookie(responseCookie);     // lgtm[java/insecure-cookie]</span>
+<span class="fc" id="L82">        });</span>
+<span class="fc" id="L83">    }</span>
+
+    private Optional&lt;Cookie&gt; fetchCookie(HttpServletRequest request) {
+
+<span class="fc" id="L87">        Cookie[] cookies = request.getCookies();</span>
+
+<span class="pc bpc" id="L89" title="1 of 2 branches missed.">        if (cookies != null) {</span>
+<span class="pc bpc" id="L90" title="1 of 2 branches missed.">            for (Cookie cookie : cookies) {</span>
+<span class="pc bpc" id="L91" title="1 of 2 branches missed.">                if (cookie.getName().equals(COOKIE_NAME)) {</span>
+<span class="fc" id="L92">                    return Optional.of(cookie);</span>
+                }
+            }
+        }
+
+<span class="nc" id="L97">        return Optional.empty();</span>
+    }
+
+    private OAuth2AuthorizationRequest toOAuth2AuthorizationRequest(Cookie cookie) {
+        try {
+<span class="fc" id="L102">            return authRequestJsonMapper.readValue(new String(Base64.getDecoder().decode(cookie.getValue())),</span>
+                    OAuth2AuthorizationRequest.class);
+<span class="fc" id="L104">        } catch (JacksonException je) {</span>
+<span class="fc" id="L105">            var msg = &quot;Failed to deserialise OAuth auth from JSON&quot;;</span>
+<span class="fc" id="L106">            LOGGER.error(msg, je);</span>
+<span class="fc" id="L107">            throw new JwtAuthAuzException(msg);</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

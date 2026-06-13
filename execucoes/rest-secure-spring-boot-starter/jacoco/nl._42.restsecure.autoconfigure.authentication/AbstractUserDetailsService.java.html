@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AbstractUserDetailsService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">42 REST Secure Spring Boot Starter</a> &gt; <a href="index.source.html" class="el_package">nl._42.restsecure.autoconfigure.authentication</a> &gt; <span class="el_source">AbstractUserDetailsService.java</span></div><h1>AbstractUserDetailsService.java</h1><pre class="source lang-java linenums">package nl._42.restsecure.autoconfigure.authentication;
+
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Bean;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+
+/**
+ * Implement this abstract class to configure for local user authentication storage.
+ * Add your implementation as {@link Bean} to the {@link ApplicationContext}.
+ *
+ * @param &lt;T&gt; the user type that implements {@link RegisteredUser}.
+ */
+<span class="fc" id="L14">public abstract class AbstractUserDetailsService&lt;T extends RegisteredUser&gt; implements UserDetailsService {</span>
+    
+    protected abstract T findUserByUsername(String username);
+    
+    @Override
+    public UserDetailsAdapter&lt;T&gt; loadUserByUsername(String username) throws UsernameNotFoundException {
+<span class="fc" id="L20">        T user = findUserByUsername(username);</span>
+<span class="fc bfc" id="L21" title="All 2 branches covered.">        if (user == null) {</span>
+<span class="fc" id="L22">            throw new UsernameNotFoundException(&quot;Username: '&quot; + username + &quot;' not found.&quot;);</span>
+        }
+<span class="fc" id="L24">        return new UserDetailsAdapter&lt;&gt;(user);</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

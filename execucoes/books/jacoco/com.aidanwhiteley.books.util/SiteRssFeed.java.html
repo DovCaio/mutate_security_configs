@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SiteRssFeed.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Books Microservice</a> &gt; <a href="index.source.html" class="el_package">com.aidanwhiteley.books.util</a> &gt; <span class="el_source">SiteRssFeed.java</span></div><h1>SiteRssFeed.java</h1><pre class="source lang-java linenums">package com.aidanwhiteley.books.util;
+
+import com.aidanwhiteley.books.domain.Book;
+import com.aidanwhiteley.books.repository.BookRepository;
+import com.rometools.rome.feed.rss.Channel;
+import com.rometools.rome.feed.rss.Content;
+import com.rometools.rome.feed.rss.Guid;
+import com.rometools.rome.feed.rss.Item;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.stereotype.Component;
+
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.Date;
+
+@Component
+public class SiteRssFeed {
+
+    private static final String FEED_TYPE_RSS_2_0 = &quot;rss_2.0&quot;;
+    private final BookRepository bookRepository;
+    @Value(&quot;${books.feeds.maxentries}&quot;)
+    private int booksFeedsMaxEntries;
+    @Value(&quot;${books.feeds.title}&quot;)
+    private String booksFeedsTitles;
+    @Value(&quot;${books.feeds.domain}&quot;)
+    private String booksFeedsDomain;
+    @Value(&quot;${books.feeds.description}&quot;)
+    private String booksFeedsDescription;
+
+<span class="fc" id="L32">    public SiteRssFeed(BookRepository bookRepository) {</span>
+<span class="fc" id="L33">        this.bookRepository = bookRepository;</span>
+<span class="fc" id="L34">    }</span>
+
+    public Channel createSiteRssFeed() {
+<span class="fc" id="L37">        PageRequest pageObj = PageRequest.of(0, booksFeedsMaxEntries);</span>
+<span class="fc" id="L38">        Page&lt;Book&gt; recentBooks = bookRepository.findAllByOrderByCreatedDateTimeDesc(pageObj);</span>
+
+<span class="fc" id="L40">        Channel channel = new Channel(FEED_TYPE_RSS_2_0);</span>
+<span class="fc" id="L41">        channel.setTitle(booksFeedsTitles);</span>
+<span class="fc" id="L42">        channel.setLink(booksFeedsDomain);</span>
+<span class="fc" id="L43">        channel.setDescription(booksFeedsDescription);</span>
+<span class="fc" id="L44">        channel.setPubDate(new Date());</span>
+
+<span class="fc" id="L46">        channel.setItems(recentBooks.stream().map(b -&gt; {</span>
+<span class="fc" id="L47">            Item item = new Item();</span>
+<span class="fc" id="L48">            item.setTitle(b.getTitle() + &quot; by &quot; + b.getAuthor());</span>
+<span class="fc" id="L49">            item.setLink(booksFeedsDomain + &quot;bookreview?bookId=&quot; + b.getId());</span>
+
+<span class="fc" id="L51">            Guid guid = new Guid();</span>
+<span class="fc" id="L52">            guid.setPermaLink(false);</span>
+<span class="fc" id="L53">            guid.setValue(b.getId());</span>
+<span class="fc" id="L54">            item.setGuid(guid);</span>
+
+<span class="fc" id="L56">            ZonedDateTime zdt = b.getCreatedDateTime().atZone(ZoneId.systemDefault());</span>
+<span class="fc" id="L57">            item.setPubDate(Date.from(zdt.toInstant()));</span>
+
+<span class="fc" id="L59">            Content content = new Content();</span>
+<span class="fc" id="L60">            content.setType(&quot;text/html&quot;);</span>
+<span class="fc" id="L61">            content.setValue(b.getSummary() + &quot;\r\n \r\nRating: &quot; + b.getRating());</span>
+
+<span class="fc" id="L63">            item.setContent(content);</span>
+
+<span class="fc" id="L65">            return item;</span>
+<span class="fc" id="L66">        }).toList());</span>
+
+<span class="fc" id="L68">        return channel;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

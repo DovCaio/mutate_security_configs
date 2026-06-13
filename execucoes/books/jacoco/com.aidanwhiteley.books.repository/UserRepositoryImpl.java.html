@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>UserRepositoryImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Books Microservice</a> &gt; <a href="index.source.html" class="el_package">com.aidanwhiteley.books.repository</a> &gt; <span class="el_source">UserRepositoryImpl.java</span></div><h1>UserRepositoryImpl.java</h1><pre class="source lang-java linenums">package com.aidanwhiteley.books.repository;
+
+import com.aidanwhiteley.books.controller.dtos.ClientRoles;
+import com.aidanwhiteley.books.domain.User;
+import com.mongodb.client.result.UpdateResult;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
+import org.springframework.stereotype.Repository;
+
+import java.util.ArrayList;
+import java.util.List;
+
+@Repository
+public class UserRepositoryImpl implements UserRepositoryCustomMethods {
+
+<span class="fc" id="L20">    private static final Logger LOGGER = LoggerFactory.getLogger(UserRepositoryImpl.class);</span>
+
+    private final MongoTemplate mongoTemplate;
+
+<span class="fc" id="L24">    public UserRepositoryImpl(MongoTemplate mongoTemplate) {</span>
+<span class="fc" id="L25">        this.mongoTemplate = mongoTemplate;</span>
+<span class="fc" id="L26">    }</span>
+
+    @Override
+    public long updateUserRoles(ClientRoles clientRoles) {
+
+<span class="fc" id="L31">        List&lt;User.Role&gt; roles = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L32" title="All 2 branches covered.">        if (clientRoles.isAdmin()) {</span>
+<span class="fc" id="L33">            roles.add(User.Role.ROLE_ADMIN);</span>
+        }
+<span class="fc bfc" id="L35" title="All 2 branches covered.">        if (clientRoles.isEditor()) {</span>
+<span class="fc" id="L36">            roles.add(User.Role.ROLE_EDITOR);</span>
+        }
+
+<span class="fc" id="L39">        Query query = new Query(Criteria.where(&quot;id&quot;).is(clientRoles.getId()));</span>
+<span class="fc" id="L40">        Update update = new Update();</span>
+<span class="fc" id="L41">        update.set(&quot;roles&quot;, roles);</span>
+
+<span class="fc" id="L43">        UpdateResult result = mongoTemplate.updateFirst(query, update, User.class);</span>
+
+<span class="fc" id="L45">        return result.getModifiedCount();</span>
+    }
+
+    @Override
+    public void updateUserAdminNotified(User user) {
+<span class="fc" id="L50">        Query query = new Query(Criteria.where(&quot;id&quot;).is(user.getId()));</span>
+<span class="fc" id="L51">        Update update = new Update();</span>
+<span class="fc" id="L52">        update.set(&quot;adminEmailedAboutSignup&quot;, true);</span>
+
+<span class="fc" id="L54">        UpdateResult result = mongoTemplate.updateFirst(query, update, User.class);</span>
+
+<span class="pc bpc" id="L56" title="1 of 2 branches missed.">        if (result.getModifiedCount() != 1) {</span>
+<span class="nc" id="L57">            LOGGER.error(&quot;Expected 1 update to adminEmailedAboutSignup for user {} but saw {}&quot;,</span>
+<span class="nc" id="L58">                    user, result.getModifiedCount());</span>
+        }
+
+<span class="fc" id="L61">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

@@ -1,0 +1,1598 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Relatório de Mutação</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+    <header>
+        <h1>Relatório de Mutação</h1>
+        <p>Gerado em: 11/04/2026 22:03:12</p>
+    </header>
+
+    <section class="summary">
+        <h2>Resumo Geral</h2>
+        <ul>
+            <li><strong>Total de Mutantes:</strong> 111</li>
+            <li><strong>Capturados:</strong> 0</li>
+            <li><strong>Sobreviveram:</strong> 111</li>
+            <li><strong>Taxa de Captura:</strong> 0.00%</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>Detalhes por Mutante</h2>
+        <table>
+            <tr>
+                <th>#</th>
+                <th>Package Name</th>
+                <th>Nível Annotation</th>
+                <th>Class Name</th>
+                <th>Método</th>
+                <th>Valor original</th>
+                <th>Mutação</th>
+                <th>Total</th>
+                <th>Sucesso</th>
+                <th>Falhas</th>
+                <th>Log&apos;s</th>
+                <th>Capturado</th>
+            </tr>
+    <tr class="survived">
+        <td>1</td>
+        <td>com.urke.saasbackendstarter.controller</td>
+        <td>Classe</td>
+        <td>UserController</td>
+        <td></td>
+        <td>hasAuthority('USER_VIEW_ALL') or hasRole('ADMIN')</td>
+        <td>!hasAuthority('USER_VIEW_ALL') or hasRole('ADMIN')</td>
+        <td>45</td>
+        <td>45</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>2</td>
+        <td>com.urke.saasbackendstarter.controller</td>
+        <td>Classe</td>
+        <td>UserController</td>
+        <td></td>
+        <td>hasAuthority('USER_VIEW_ALL') or hasRole('ADMIN')</td>
+        <td>hasAuthority('USER_VIEW_ALL') or !hasRole('ADMIN')</td>
+        <td>45</td>
+        <td>45</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>3</td>
+        <td>com.urke.saasbackendstarter.controller</td>
+        <td>Classe</td>
+        <td>UserController</td>
+        <td></td>
+        <td>hasAuthority('USER_VIEW_ALL') or hasRole('ADMIN')</td>
+        <td>permitAll()</td>
+        <td>45</td>
+        <td>45</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>4</td>
+        <td>com.urke.saasbackendstarter.controller</td>
+        <td>Classe</td>
+        <td>UserController</td>
+        <td></td>
+        <td>hasAuthority('USER_VIEW_ALL') or hasRole('ADMIN')</td>
+        <td>denyAll</td>
+        <td>45</td>
+        <td>45</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>5</td>
+        <td>com.urke.saasbackendstarter.controller</td>
+        <td>Classe</td>
+        <td>UserController</td>
+        <td></td>
+        <td>hasAuthority('USER_VIEW_ALL') or hasRole('ADMIN')</td>
+        <td>hasAuthority('USER_VIEW_ALL') and hasRole('ADMIN')</td>
+        <td>45</td>
+        <td>45</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>6</td>
+        <td>com.urke.saasbackendstarter.controller</td>
+        <td>Classe</td>
+        <td>UserController</td>
+        <td></td>
+        <td>hasAuthority('USER_VIEW_ALL') or hasRole('ADMIN')</td>
+        <td>hasAuthority('NO_USER_VIEW_ALL') or hasRole('ADMIN')</td>
+        <td>45</td>
+        <td>45</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>7</td>
+        <td>com.urke.saasbackendstarter.controller</td>
+        <td>Classe</td>
+        <td>UserController</td>
+        <td></td>
+        <td>hasAuthority('USER_VIEW_ALL') or hasRole('ADMIN')</td>
+        <td>hasRole('USER_VIEW_ALL') or hasRole('ADMIN')</td>
+        <td>45</td>
+        <td>45</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>8</td>
+        <td>com.urke.saasbackendstarter.controller</td>
+        <td>Classe</td>
+        <td>UserController</td>
+        <td></td>
+        <td>hasAuthority('USER_VIEW_ALL') or hasRole('ADMIN')</td>
+        <td>hasAuthority('ADMIN') or hasRole('ADMIN')</td>
+        <td>45</td>
+        <td>45</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>9</td>
+        <td>com.urke.saasbackendstarter.controller</td>
+        <td>Classe</td>
+        <td>UserController</td>
+        <td></td>
+        <td>hasAuthority('USER_VIEW_ALL') or hasRole('ADMIN')</td>
+        <td>hasAuthority('USER_UPDATE_SELF') or hasRole('ADMIN')</td>
+        <td>45</td>
+        <td>45</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>10</td>
+        <td>com.urke.saasbackendstarter.controller</td>
+        <td>Classe</td>
+        <td>UserController</td>
+        <td></td>
+        <td>hasAuthority('USER_VIEW_ALL') or hasRole('ADMIN')</td>
+        <td>hasAuthority('USER_DELETE') or hasRole('ADMIN')</td>
+        <td>45</td>
+        <td>45</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>11</td>
+        <td>com.urke.saasbackendstarter.controller</td>
+        <td>Classe</td>
+        <td>UserController</td>
+        <td></td>
+        <td>hasAuthority('USER_VIEW_ALL') or hasRole('ADMIN')</td>
+        <td>hasAuthority('')</td>
+        <td>45</td>
+        <td>45</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>12</td>
+        <td>com.urke.saasbackendstarter.controller</td>
+        <td>Classe</td>
+        <td>UserController</td>
+        <td></td>
+        <td>hasAuthority('USER_UPDATE_SELF') or hasRole('ADMIN')</td>
+        <td>!hasAuthority('USER_UPDATE_SELF') or hasRole('ADMIN')</td>
+        <td>45</td>
+        <td>45</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>13</td>
+        <td>com.urke.saasbackendstarter.controller</td>
+        <td>Classe</td>
+        <td>UserController</td>
+        <td></td>
+        <td>hasAuthority('USER_UPDATE_SELF') or hasRole('ADMIN')</td>
+        <td>hasAuthority('USER_UPDATE_SELF') or !hasRole('ADMIN')</td>
+        <td>45</td>
+        <td>45</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>14</td>
+        <td>com.urke.saasbackendstarter.controller</td>
+        <td>Classe</td>
+        <td>UserController</td>
+        <td></td>
+        <td>hasAuthority('USER_UPDATE_SELF') or hasRole('ADMIN')</td>
+        <td>permitAll()</td>
+        <td>45</td>
+        <td>45</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>15</td>
+        <td>com.urke.saasbackendstarter.controller</td>
+        <td>Classe</td>
+        <td>UserController</td>
+        <td></td>
+        <td>hasAuthority('USER_UPDATE_SELF') or hasRole('ADMIN')</td>
+        <td>denyAll</td>
+        <td>45</td>
+        <td>45</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>16</td>
+        <td>com.urke.saasbackendstarter.controller</td>
+        <td>Classe</td>
+        <td>UserController</td>
+        <td></td>
+        <td>hasAuthority('USER_UPDATE_SELF') or hasRole('ADMIN')</td>
+        <td>hasAuthority('USER_UPDATE_SELF') and hasRole('ADMIN')</td>
+        <td>45</td>
+        <td>45</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>17</td>
+        <td>com.urke.saasbackendstarter.controller</td>
+        <td>Classe</td>
+        <td>UserController</td>
+        <td></td>
+        <td>hasAuthority('USER_UPDATE_SELF') or hasRole('ADMIN')</td>
+        <td>hasAuthority('NO_USER_UPDATE_SELF') or hasRole('ADMIN')</td>
+        <td>45</td>
+        <td>45</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>18</td>
+        <td>com.urke.saasbackendstarter.controller</td>
+        <td>Classe</td>
+        <td>UserController</td>
+        <td></td>
+        <td>hasAuthority('USER_UPDATE_SELF') or hasRole('ADMIN')</td>
+        <td>hasRole('USER_UPDATE_SELF') or hasRole('ADMIN')</td>
+        <td>45</td>
+        <td>45</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>19</td>
+        <td>com.urke.saasbackendstarter.controller</td>
+        <td>Classe</td>
+        <td>UserController</td>
+        <td></td>
+        <td>hasAuthority('USER_UPDATE_SELF') or hasRole('ADMIN')</td>
+        <td>hasAuthority('ADMIN') or hasRole('ADMIN')</td>
+        <td>45</td>
+        <td>45</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>20</td>
+        <td>com.urke.saasbackendstarter.controller</td>
+        <td>Classe</td>
+        <td>UserController</td>
+        <td></td>
+        <td>hasAuthority('USER_UPDATE_SELF') or hasRole('ADMIN')</td>
+        <td>hasAuthority('USER_VIEW_ALL') or hasRole('ADMIN')</td>
+        <td>45</td>
+        <td>45</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>21</td>
+        <td>com.urke.saasbackendstarter.controller</td>
+        <td>Classe</td>
+        <td>UserController</td>
+        <td></td>
+        <td>hasAuthority('USER_UPDATE_SELF') or hasRole('ADMIN')</td>
+        <td>hasAuthority('USER_DELETE') or hasRole('ADMIN')</td>
+        <td>45</td>
+        <td>45</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>22</td>
+        <td>com.urke.saasbackendstarter.controller</td>
+        <td>Classe</td>
+        <td>UserController</td>
+        <td></td>
+        <td>hasAuthority('USER_UPDATE_SELF') or hasRole('ADMIN')</td>
+        <td>hasAuthority('')</td>
+        <td>45</td>
+        <td>45</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>23</td>
+        <td>com.urke.saasbackendstarter.controller</td>
+        <td>Classe</td>
+        <td>UserController</td>
+        <td></td>
+        <td>hasAuthority('USER_VIEW_ALL') or hasRole('ADMIN') or hasAuthority('USER_UPDATE_SELF')</td>
+        <td>!hasAuthority('USER_VIEW_ALL') or hasRole('ADMIN') or hasAuthority('USER_UPDATE_SELF')</td>
+        <td>45</td>
+        <td>45</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>24</td>
+        <td>com.urke.saasbackendstarter.controller</td>
+        <td>Classe</td>
+        <td>UserController</td>
+        <td></td>
+        <td>hasAuthority('USER_VIEW_ALL') or hasRole('ADMIN') or hasAuthority('USER_UPDATE_SELF')</td>
+        <td>hasAuthority('USER_VIEW_ALL') or !hasRole('ADMIN') or hasAuthority('USER_UPDATE_SELF')</td>
+        <td>45</td>
+        <td>45</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>25</td>
+        <td>com.urke.saasbackendstarter.controller</td>
+        <td>Classe</td>
+        <td>UserController</td>
+        <td></td>
+        <td>hasAuthority('USER_VIEW_ALL') or hasRole('ADMIN') or hasAuthority('USER_UPDATE_SELF')</td>
+        <td>hasAuthority('USER_VIEW_ALL') or hasRole('ADMIN') or !hasAuthority('USER_UPDATE_SELF')</td>
+        <td>45</td>
+        <td>45</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>26</td>
+        <td>com.urke.saasbackendstarter.controller</td>
+        <td>Classe</td>
+        <td>UserController</td>
+        <td></td>
+        <td>hasAuthority('USER_VIEW_ALL') or hasRole('ADMIN') or hasAuthority('USER_UPDATE_SELF')</td>
+        <td>permitAll()</td>
+        <td>45</td>
+        <td>45</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>27</td>
+        <td>com.urke.saasbackendstarter.controller</td>
+        <td>Classe</td>
+        <td>UserController</td>
+        <td></td>
+        <td>hasAuthority('USER_VIEW_ALL') or hasRole('ADMIN') or hasAuthority('USER_UPDATE_SELF')</td>
+        <td>denyAll</td>
+        <td>45</td>
+        <td>45</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>28</td>
+        <td>com.urke.saasbackendstarter.controller</td>
+        <td>Classe</td>
+        <td>UserController</td>
+        <td></td>
+        <td>hasAuthority('USER_VIEW_ALL') or hasRole('ADMIN') or hasAuthority('USER_UPDATE_SELF')</td>
+        <td>hasAuthority('USER_VIEW_ALL') and hasRole('ADMIN') or hasAuthority('USER_UPDATE_SELF')</td>
+        <td>45</td>
+        <td>45</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>29</td>
+        <td>com.urke.saasbackendstarter.controller</td>
+        <td>Classe</td>
+        <td>UserController</td>
+        <td></td>
+        <td>hasAuthority('USER_VIEW_ALL') or hasRole('ADMIN') or hasAuthority('USER_UPDATE_SELF')</td>
+        <td>hasAuthority('USER_VIEW_ALL') or hasRole('ADMIN') and hasAuthority('USER_UPDATE_SELF')</td>
+        <td>45</td>
+        <td>45</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>30</td>
+        <td>com.urke.saasbackendstarter.controller</td>
+        <td>Classe</td>
+        <td>UserController</td>
+        <td></td>
+        <td>hasAuthority('USER_VIEW_ALL') or hasRole('ADMIN') or hasAuthority('USER_UPDATE_SELF')</td>
+        <td>hasAuthority('NO_USER_VIEW_ALL') or hasRole('ADMIN') or hasAuthority('USER_UPDATE_SELF')</td>
+        <td>45</td>
+        <td>45</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>31</td>
+        <td>com.urke.saasbackendstarter.controller</td>
+        <td>Classe</td>
+        <td>UserController</td>
+        <td></td>
+        <td>hasAuthority('USER_VIEW_ALL') or hasRole('ADMIN') or hasAuthority('USER_UPDATE_SELF')</td>
+        <td>hasRole('USER_VIEW_ALL') or hasRole('ADMIN') or hasRole('USER_UPDATE_SELF')</td>
+        <td>45</td>
+        <td>45</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>32</td>
+        <td>com.urke.saasbackendstarter.controller</td>
+        <td>Classe</td>
+        <td>UserController</td>
+        <td></td>
+        <td>hasAuthority('USER_VIEW_ALL') or hasRole('ADMIN') or hasAuthority('USER_UPDATE_SELF')</td>
+        <td>hasAuthority('ADMIN') or hasRole('ADMIN') or hasAuthority('USER_UPDATE_SELF')</td>
+        <td>45</td>
+        <td>45</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>33</td>
+        <td>com.urke.saasbackendstarter.controller</td>
+        <td>Classe</td>
+        <td>UserController</td>
+        <td></td>
+        <td>hasAuthority('USER_VIEW_ALL') or hasRole('ADMIN') or hasAuthority('USER_UPDATE_SELF')</td>
+        <td>hasAuthority('USER_UPDATE_SELF') or hasRole('ADMIN') or hasAuthority('USER_UPDATE_SELF')</td>
+        <td>45</td>
+        <td>45</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>34</td>
+        <td>com.urke.saasbackendstarter.controller</td>
+        <td>Classe</td>
+        <td>UserController</td>
+        <td></td>
+        <td>hasAuthority('USER_VIEW_ALL') or hasRole('ADMIN') or hasAuthority('USER_UPDATE_SELF')</td>
+        <td>hasAuthority('USER_DELETE') or hasRole('ADMIN') or hasAuthority('USER_UPDATE_SELF')</td>
+        <td>45</td>
+        <td>45</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>35</td>
+        <td>com.urke.saasbackendstarter.controller</td>
+        <td>Classe</td>
+        <td>UserController</td>
+        <td></td>
+        <td>hasAuthority('USER_VIEW_ALL') or hasRole('ADMIN') or hasAuthority('USER_UPDATE_SELF')</td>
+        <td>hasAuthority('')</td>
+        <td>45</td>
+        <td>45</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>36</td>
+        <td>com.urke.saasbackendstarter.controller</td>
+        <td>Classe</td>
+        <td>UserController</td>
+        <td></td>
+        <td>hasAuthority('USER_DELETE') or hasRole('ADMIN')</td>
+        <td>!hasAuthority('USER_DELETE') or hasRole('ADMIN')</td>
+        <td>45</td>
+        <td>45</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>37</td>
+        <td>com.urke.saasbackendstarter.controller</td>
+        <td>Classe</td>
+        <td>UserController</td>
+        <td></td>
+        <td>hasAuthority('USER_DELETE') or hasRole('ADMIN')</td>
+        <td>hasAuthority('USER_DELETE') or !hasRole('ADMIN')</td>
+        <td>45</td>
+        <td>45</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>38</td>
+        <td>com.urke.saasbackendstarter.controller</td>
+        <td>Classe</td>
+        <td>UserController</td>
+        <td></td>
+        <td>hasAuthority('USER_DELETE') or hasRole('ADMIN')</td>
+        <td>permitAll()</td>
+        <td>45</td>
+        <td>45</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>39</td>
+        <td>com.urke.saasbackendstarter.controller</td>
+        <td>Classe</td>
+        <td>UserController</td>
+        <td></td>
+        <td>hasAuthority('USER_DELETE') or hasRole('ADMIN')</td>
+        <td>denyAll</td>
+        <td>45</td>
+        <td>45</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>40</td>
+        <td>com.urke.saasbackendstarter.controller</td>
+        <td>Classe</td>
+        <td>UserController</td>
+        <td></td>
+        <td>hasAuthority('USER_DELETE') or hasRole('ADMIN')</td>
+        <td>hasAuthority('USER_DELETE') and hasRole('ADMIN')</td>
+        <td>45</td>
+        <td>45</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>41</td>
+        <td>com.urke.saasbackendstarter.controller</td>
+        <td>Classe</td>
+        <td>UserController</td>
+        <td></td>
+        <td>hasAuthority('USER_DELETE') or hasRole('ADMIN')</td>
+        <td>hasAuthority('NO_USER_DELETE') or hasRole('ADMIN')</td>
+        <td>45</td>
+        <td>45</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>42</td>
+        <td>com.urke.saasbackendstarter.controller</td>
+        <td>Classe</td>
+        <td>UserController</td>
+        <td></td>
+        <td>hasAuthority('USER_DELETE') or hasRole('ADMIN')</td>
+        <td>hasRole('USER_DELETE') or hasRole('ADMIN')</td>
+        <td>45</td>
+        <td>45</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>43</td>
+        <td>com.urke.saasbackendstarter.controller</td>
+        <td>Classe</td>
+        <td>UserController</td>
+        <td></td>
+        <td>hasAuthority('USER_DELETE') or hasRole('ADMIN')</td>
+        <td>hasAuthority('ADMIN') or hasRole('ADMIN')</td>
+        <td>45</td>
+        <td>45</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>44</td>
+        <td>com.urke.saasbackendstarter.controller</td>
+        <td>Classe</td>
+        <td>UserController</td>
+        <td></td>
+        <td>hasAuthority('USER_DELETE') or hasRole('ADMIN')</td>
+        <td>hasAuthority('USER_VIEW_ALL') or hasRole('ADMIN')</td>
+        <td>45</td>
+        <td>45</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>45</td>
+        <td>com.urke.saasbackendstarter.controller</td>
+        <td>Classe</td>
+        <td>UserController</td>
+        <td></td>
+        <td>hasAuthority('USER_DELETE') or hasRole('ADMIN')</td>
+        <td>hasAuthority('USER_UPDATE_SELF') or hasRole('ADMIN')</td>
+        <td>45</td>
+        <td>45</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>46</td>
+        <td>com.urke.saasbackendstarter.controller</td>
+        <td>Classe</td>
+        <td>UserController</td>
+        <td></td>
+        <td>hasAuthority('USER_DELETE') or hasRole('ADMIN')</td>
+        <td>hasAuthority('')</td>
+        <td>45</td>
+        <td>45</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>47</td>
+        <td>com.urke.saasbackendstarter.controller</td>
+        <td>Classe</td>
+        <td>UserController</td>
+        <td></td>
+        <td>hasAuthority('USER_VIEW_ALL') or hasRole('ADMIN')</td>
+        <td>!hasAuthority('USER_VIEW_ALL') or hasRole('ADMIN')</td>
+        <td>45</td>
+        <td>45</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>48</td>
+        <td>com.urke.saasbackendstarter.controller</td>
+        <td>Classe</td>
+        <td>UserController</td>
+        <td></td>
+        <td>hasAuthority('USER_VIEW_ALL') or hasRole('ADMIN')</td>
+        <td>hasAuthority('USER_VIEW_ALL') or !hasRole('ADMIN')</td>
+        <td>45</td>
+        <td>45</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>49</td>
+        <td>com.urke.saasbackendstarter.controller</td>
+        <td>Classe</td>
+        <td>UserController</td>
+        <td></td>
+        <td>hasAuthority('USER_VIEW_ALL') or hasRole('ADMIN')</td>
+        <td>permitAll()</td>
+        <td>45</td>
+        <td>45</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>50</td>
+        <td>com.urke.saasbackendstarter.controller</td>
+        <td>Classe</td>
+        <td>UserController</td>
+        <td></td>
+        <td>hasAuthority('USER_VIEW_ALL') or hasRole('ADMIN')</td>
+        <td>denyAll</td>
+        <td>45</td>
+        <td>45</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>51</td>
+        <td>com.urke.saasbackendstarter.controller</td>
+        <td>Classe</td>
+        <td>UserController</td>
+        <td></td>
+        <td>hasAuthority('USER_VIEW_ALL') or hasRole('ADMIN')</td>
+        <td>hasAuthority('USER_VIEW_ALL') and hasRole('ADMIN')</td>
+        <td>45</td>
+        <td>45</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>52</td>
+        <td>com.urke.saasbackendstarter.controller</td>
+        <td>Classe</td>
+        <td>UserController</td>
+        <td></td>
+        <td>hasAuthority('USER_VIEW_ALL') or hasRole('ADMIN')</td>
+        <td>hasAuthority('NO_USER_VIEW_ALL') or hasRole('ADMIN')</td>
+        <td>45</td>
+        <td>45</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>53</td>
+        <td>com.urke.saasbackendstarter.controller</td>
+        <td>Classe</td>
+        <td>UserController</td>
+        <td></td>
+        <td>hasAuthority('USER_VIEW_ALL') or hasRole('ADMIN')</td>
+        <td>hasRole('USER_VIEW_ALL') or hasRole('ADMIN')</td>
+        <td>45</td>
+        <td>45</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>54</td>
+        <td>com.urke.saasbackendstarter.controller</td>
+        <td>Classe</td>
+        <td>UserController</td>
+        <td></td>
+        <td>hasAuthority('USER_VIEW_ALL') or hasRole('ADMIN')</td>
+        <td>hasAuthority('ADMIN') or hasRole('ADMIN')</td>
+        <td>45</td>
+        <td>45</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>55</td>
+        <td>com.urke.saasbackendstarter.controller</td>
+        <td>Classe</td>
+        <td>UserController</td>
+        <td></td>
+        <td>hasAuthority('USER_VIEW_ALL') or hasRole('ADMIN')</td>
+        <td>hasAuthority('USER_UPDATE_SELF') or hasRole('ADMIN')</td>
+        <td>45</td>
+        <td>45</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>56</td>
+        <td>com.urke.saasbackendstarter.controller</td>
+        <td>Classe</td>
+        <td>UserController</td>
+        <td></td>
+        <td>hasAuthority('USER_VIEW_ALL') or hasRole('ADMIN')</td>
+        <td>hasAuthority('USER_DELETE') or hasRole('ADMIN')</td>
+        <td>45</td>
+        <td>45</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>57</td>
+        <td>com.urke.saasbackendstarter.controller</td>
+        <td>Classe</td>
+        <td>UserController</td>
+        <td></td>
+        <td>hasAuthority('USER_VIEW_ALL') or hasRole('ADMIN')</td>
+        <td>hasAuthority('')</td>
+        <td>45</td>
+        <td>45</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>58</td>
+        <td>com.urke.saasbackendstarter.audit</td>
+        <td>Classe</td>
+        <td>AuditLogController</td>
+        <td></td>
+        <td>hasRole('ADMIN')</td>
+        <td>!hasRole('ADMIN')</td>
+        <td>45</td>
+        <td>45</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>59</td>
+        <td>com.urke.saasbackendstarter.audit</td>
+        <td>Classe</td>
+        <td>AuditLogController</td>
+        <td></td>
+        <td>hasRole('ADMIN')</td>
+        <td>permitAll()</td>
+        <td>45</td>
+        <td>45</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>60</td>
+        <td>com.urke.saasbackendstarter.audit</td>
+        <td>Classe</td>
+        <td>AuditLogController</td>
+        <td></td>
+        <td>hasRole('ADMIN')</td>
+        <td>denyAll</td>
+        <td>45</td>
+        <td>45</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>61</td>
+        <td>com.urke.saasbackendstarter.audit</td>
+        <td>Classe</td>
+        <td>AuditLogController</td>
+        <td></td>
+        <td>hasRole('ADMIN')</td>
+        <td>hasRole('NO_ADMIN')</td>
+        <td>45</td>
+        <td>45</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>62</td>
+        <td>com.urke.saasbackendstarter.audit</td>
+        <td>Classe</td>
+        <td>AuditLogController</td>
+        <td></td>
+        <td>hasRole('ADMIN')</td>
+        <td>hasAuthority('ADMIN')</td>
+        <td>45</td>
+        <td>45</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>63</td>
+        <td>com.urke.saasbackendstarter.audit</td>
+        <td>Classe</td>
+        <td>AuditLogController</td>
+        <td></td>
+        <td>hasRole('ADMIN')</td>
+        <td>hasRole('USER_VIEW_ALL')</td>
+        <td>45</td>
+        <td>45</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>64</td>
+        <td>com.urke.saasbackendstarter.audit</td>
+        <td>Classe</td>
+        <td>AuditLogController</td>
+        <td></td>
+        <td>hasRole('ADMIN')</td>
+        <td>hasRole('USER_UPDATE_SELF')</td>
+        <td>45</td>
+        <td>45</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>65</td>
+        <td>com.urke.saasbackendstarter.audit</td>
+        <td>Classe</td>
+        <td>AuditLogController</td>
+        <td></td>
+        <td>hasRole('ADMIN')</td>
+        <td>hasRole('USER_DELETE')</td>
+        <td>45</td>
+        <td>45</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>66</td>
+        <td>com.urke.saasbackendstarter.audit</td>
+        <td>Classe</td>
+        <td>AuditLogController</td>
+        <td></td>
+        <td>hasRole('ADMIN')</td>
+        <td>hasRole('')</td>
+        <td>45</td>
+        <td>45</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>67</td>
+        <td>com.urke.saasbackendstarter.controller</td>
+        <td>Classe</td>
+        <td>PermissionController</td>
+        <td></td>
+        <td>hasRole('ADMIN')</td>
+        <td>!hasRole('ADMIN')</td>
+        <td>45</td>
+        <td>45</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>68</td>
+        <td>com.urke.saasbackendstarter.controller</td>
+        <td>Classe</td>
+        <td>PermissionController</td>
+        <td></td>
+        <td>hasRole('ADMIN')</td>
+        <td>permitAll()</td>
+        <td>45</td>
+        <td>45</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>69</td>
+        <td>com.urke.saasbackendstarter.controller</td>
+        <td>Classe</td>
+        <td>PermissionController</td>
+        <td></td>
+        <td>hasRole('ADMIN')</td>
+        <td>denyAll</td>
+        <td>45</td>
+        <td>45</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>70</td>
+        <td>com.urke.saasbackendstarter.controller</td>
+        <td>Classe</td>
+        <td>PermissionController</td>
+        <td></td>
+        <td>hasRole('ADMIN')</td>
+        <td>hasRole('NO_ADMIN')</td>
+        <td>45</td>
+        <td>45</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>71</td>
+        <td>com.urke.saasbackendstarter.controller</td>
+        <td>Classe</td>
+        <td>PermissionController</td>
+        <td></td>
+        <td>hasRole('ADMIN')</td>
+        <td>hasAuthority('ADMIN')</td>
+        <td>45</td>
+        <td>45</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>72</td>
+        <td>com.urke.saasbackendstarter.controller</td>
+        <td>Classe</td>
+        <td>PermissionController</td>
+        <td></td>
+        <td>hasRole('ADMIN')</td>
+        <td>hasRole('USER_VIEW_ALL')</td>
+        <td>45</td>
+        <td>45</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>73</td>
+        <td>com.urke.saasbackendstarter.controller</td>
+        <td>Classe</td>
+        <td>PermissionController</td>
+        <td></td>
+        <td>hasRole('ADMIN')</td>
+        <td>hasRole('USER_UPDATE_SELF')</td>
+        <td>45</td>
+        <td>45</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>74</td>
+        <td>com.urke.saasbackendstarter.controller</td>
+        <td>Classe</td>
+        <td>PermissionController</td>
+        <td></td>
+        <td>hasRole('ADMIN')</td>
+        <td>hasRole('USER_DELETE')</td>
+        <td>45</td>
+        <td>45</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>75</td>
+        <td>com.urke.saasbackendstarter.controller</td>
+        <td>Classe</td>
+        <td>PermissionController</td>
+        <td></td>
+        <td>hasRole('ADMIN')</td>
+        <td>hasRole('')</td>
+        <td>45</td>
+        <td>45</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>76</td>
+        <td>com.urke.saasbackendstarter.controller</td>
+        <td>Classe</td>
+        <td>PermissionController</td>
+        <td></td>
+        <td>hasRole('ADMIN')</td>
+        <td>!hasRole('ADMIN')</td>
+        <td>45</td>
+        <td>45</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>77</td>
+        <td>com.urke.saasbackendstarter.controller</td>
+        <td>Classe</td>
+        <td>PermissionController</td>
+        <td></td>
+        <td>hasRole('ADMIN')</td>
+        <td>permitAll()</td>
+        <td>45</td>
+        <td>45</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>78</td>
+        <td>com.urke.saasbackendstarter.controller</td>
+        <td>Classe</td>
+        <td>PermissionController</td>
+        <td></td>
+        <td>hasRole('ADMIN')</td>
+        <td>denyAll</td>
+        <td>45</td>
+        <td>45</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>79</td>
+        <td>com.urke.saasbackendstarter.controller</td>
+        <td>Classe</td>
+        <td>PermissionController</td>
+        <td></td>
+        <td>hasRole('ADMIN')</td>
+        <td>hasRole('NO_ADMIN')</td>
+        <td>45</td>
+        <td>45</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>80</td>
+        <td>com.urke.saasbackendstarter.controller</td>
+        <td>Classe</td>
+        <td>PermissionController</td>
+        <td></td>
+        <td>hasRole('ADMIN')</td>
+        <td>hasAuthority('ADMIN')</td>
+        <td>45</td>
+        <td>45</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>81</td>
+        <td>com.urke.saasbackendstarter.controller</td>
+        <td>Classe</td>
+        <td>PermissionController</td>
+        <td></td>
+        <td>hasRole('ADMIN')</td>
+        <td>hasRole('USER_VIEW_ALL')</td>
+        <td>45</td>
+        <td>45</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>82</td>
+        <td>com.urke.saasbackendstarter.controller</td>
+        <td>Classe</td>
+        <td>PermissionController</td>
+        <td></td>
+        <td>hasRole('ADMIN')</td>
+        <td>hasRole('USER_UPDATE_SELF')</td>
+        <td>45</td>
+        <td>45</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>83</td>
+        <td>com.urke.saasbackendstarter.controller</td>
+        <td>Classe</td>
+        <td>PermissionController</td>
+        <td></td>
+        <td>hasRole('ADMIN')</td>
+        <td>hasRole('USER_DELETE')</td>
+        <td>45</td>
+        <td>45</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>84</td>
+        <td>com.urke.saasbackendstarter.controller</td>
+        <td>Classe</td>
+        <td>PermissionController</td>
+        <td></td>
+        <td>hasRole('ADMIN')</td>
+        <td>hasRole('')</td>
+        <td>45</td>
+        <td>45</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>85</td>
+        <td>com.urke.saasbackendstarter.controller</td>
+        <td>Classe</td>
+        <td>RoleController</td>
+        <td></td>
+        <td>hasRole('ADMIN')</td>
+        <td>!hasRole('ADMIN')</td>
+        <td>45</td>
+        <td>45</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>86</td>
+        <td>com.urke.saasbackendstarter.controller</td>
+        <td>Classe</td>
+        <td>RoleController</td>
+        <td></td>
+        <td>hasRole('ADMIN')</td>
+        <td>permitAll()</td>
+        <td>45</td>
+        <td>45</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>87</td>
+        <td>com.urke.saasbackendstarter.controller</td>
+        <td>Classe</td>
+        <td>RoleController</td>
+        <td></td>
+        <td>hasRole('ADMIN')</td>
+        <td>denyAll</td>
+        <td>45</td>
+        <td>45</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>88</td>
+        <td>com.urke.saasbackendstarter.controller</td>
+        <td>Classe</td>
+        <td>RoleController</td>
+        <td></td>
+        <td>hasRole('ADMIN')</td>
+        <td>hasRole('NO_ADMIN')</td>
+        <td>45</td>
+        <td>45</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>89</td>
+        <td>com.urke.saasbackendstarter.controller</td>
+        <td>Classe</td>
+        <td>RoleController</td>
+        <td></td>
+        <td>hasRole('ADMIN')</td>
+        <td>hasAuthority('ADMIN')</td>
+        <td>45</td>
+        <td>45</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>90</td>
+        <td>com.urke.saasbackendstarter.controller</td>
+        <td>Classe</td>
+        <td>RoleController</td>
+        <td></td>
+        <td>hasRole('ADMIN')</td>
+        <td>hasRole('USER_VIEW_ALL')</td>
+        <td>45</td>
+        <td>45</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>91</td>
+        <td>com.urke.saasbackendstarter.controller</td>
+        <td>Classe</td>
+        <td>RoleController</td>
+        <td></td>
+        <td>hasRole('ADMIN')</td>
+        <td>hasRole('USER_UPDATE_SELF')</td>
+        <td>45</td>
+        <td>45</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>92</td>
+        <td>com.urke.saasbackendstarter.controller</td>
+        <td>Classe</td>
+        <td>RoleController</td>
+        <td></td>
+        <td>hasRole('ADMIN')</td>
+        <td>hasRole('USER_DELETE')</td>
+        <td>45</td>
+        <td>45</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>93</td>
+        <td>com.urke.saasbackendstarter.controller</td>
+        <td>Classe</td>
+        <td>RoleController</td>
+        <td></td>
+        <td>hasRole('ADMIN')</td>
+        <td>hasRole('')</td>
+        <td>45</td>
+        <td>45</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>94</td>
+        <td>com.urke.saasbackendstarter.controller</td>
+        <td>Classe</td>
+        <td>RoleController</td>
+        <td></td>
+        <td>hasRole('ADMIN')</td>
+        <td>!hasRole('ADMIN')</td>
+        <td>45</td>
+        <td>45</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>95</td>
+        <td>com.urke.saasbackendstarter.controller</td>
+        <td>Classe</td>
+        <td>RoleController</td>
+        <td></td>
+        <td>hasRole('ADMIN')</td>
+        <td>permitAll()</td>
+        <td>45</td>
+        <td>45</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>96</td>
+        <td>com.urke.saasbackendstarter.controller</td>
+        <td>Classe</td>
+        <td>RoleController</td>
+        <td></td>
+        <td>hasRole('ADMIN')</td>
+        <td>denyAll</td>
+        <td>45</td>
+        <td>45</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>97</td>
+        <td>com.urke.saasbackendstarter.controller</td>
+        <td>Classe</td>
+        <td>RoleController</td>
+        <td></td>
+        <td>hasRole('ADMIN')</td>
+        <td>hasRole('NO_ADMIN')</td>
+        <td>45</td>
+        <td>45</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>98</td>
+        <td>com.urke.saasbackendstarter.controller</td>
+        <td>Classe</td>
+        <td>RoleController</td>
+        <td></td>
+        <td>hasRole('ADMIN')</td>
+        <td>hasAuthority('ADMIN')</td>
+        <td>45</td>
+        <td>45</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>99</td>
+        <td>com.urke.saasbackendstarter.controller</td>
+        <td>Classe</td>
+        <td>RoleController</td>
+        <td></td>
+        <td>hasRole('ADMIN')</td>
+        <td>hasRole('USER_VIEW_ALL')</td>
+        <td>45</td>
+        <td>45</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>100</td>
+        <td>com.urke.saasbackendstarter.controller</td>
+        <td>Classe</td>
+        <td>RoleController</td>
+        <td></td>
+        <td>hasRole('ADMIN')</td>
+        <td>hasRole('USER_UPDATE_SELF')</td>
+        <td>45</td>
+        <td>45</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>101</td>
+        <td>com.urke.saasbackendstarter.controller</td>
+        <td>Classe</td>
+        <td>RoleController</td>
+        <td></td>
+        <td>hasRole('ADMIN')</td>
+        <td>hasRole('USER_DELETE')</td>
+        <td>45</td>
+        <td>45</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>102</td>
+        <td>com.urke.saasbackendstarter.controller</td>
+        <td>Classe</td>
+        <td>RoleController</td>
+        <td></td>
+        <td>hasRole('ADMIN')</td>
+        <td>hasRole('')</td>
+        <td>45</td>
+        <td>45</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>103</td>
+        <td>com.urke.saasbackendstarter.controller</td>
+        <td>Método</td>
+        <td>OrganizationController</td>
+        <td>deleteOrganization</td>
+        <td>hasRole('ADMIN')</td>
+        <td>!hasRole('ADMIN')</td>
+        <td>45</td>
+        <td>45</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>104</td>
+        <td>com.urke.saasbackendstarter.controller</td>
+        <td>Método</td>
+        <td>OrganizationController</td>
+        <td>deleteOrganization</td>
+        <td>hasRole('ADMIN')</td>
+        <td>permitAll()</td>
+        <td>45</td>
+        <td>45</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>105</td>
+        <td>com.urke.saasbackendstarter.controller</td>
+        <td>Método</td>
+        <td>OrganizationController</td>
+        <td>deleteOrganization</td>
+        <td>hasRole('ADMIN')</td>
+        <td>denyAll</td>
+        <td>45</td>
+        <td>45</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>106</td>
+        <td>com.urke.saasbackendstarter.controller</td>
+        <td>Método</td>
+        <td>OrganizationController</td>
+        <td>deleteOrganization</td>
+        <td>hasRole('ADMIN')</td>
+        <td>hasRole('NO_ADMIN')</td>
+        <td>45</td>
+        <td>45</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>107</td>
+        <td>com.urke.saasbackendstarter.controller</td>
+        <td>Método</td>
+        <td>OrganizationController</td>
+        <td>deleteOrganization</td>
+        <td>hasRole('ADMIN')</td>
+        <td>hasAuthority('ADMIN')</td>
+        <td>45</td>
+        <td>45</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>108</td>
+        <td>com.urke.saasbackendstarter.controller</td>
+        <td>Método</td>
+        <td>OrganizationController</td>
+        <td>deleteOrganization</td>
+        <td>hasRole('ADMIN')</td>
+        <td>hasRole('USER_VIEW_ALL')</td>
+        <td>45</td>
+        <td>45</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>109</td>
+        <td>com.urke.saasbackendstarter.controller</td>
+        <td>Método</td>
+        <td>OrganizationController</td>
+        <td>deleteOrganization</td>
+        <td>hasRole('ADMIN')</td>
+        <td>hasRole('USER_UPDATE_SELF')</td>
+        <td>45</td>
+        <td>45</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>110</td>
+        <td>com.urke.saasbackendstarter.controller</td>
+        <td>Método</td>
+        <td>OrganizationController</td>
+        <td>deleteOrganization</td>
+        <td>hasRole('ADMIN')</td>
+        <td>hasRole('USER_DELETE')</td>
+        <td>45</td>
+        <td>45</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>111</td>
+        <td>com.urke.saasbackendstarter.controller</td>
+        <td>Método</td>
+        <td>OrganizationController</td>
+        <td>deleteOrganization</td>
+        <td>hasRole('ADMIN')</td>
+        <td>hasRole('')</td>
+        <td>45</td>
+        <td>45</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+            </table>
+        </section>
+    </body>
+    </html>

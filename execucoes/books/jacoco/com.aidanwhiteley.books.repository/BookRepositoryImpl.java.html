@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>BookRepositoryImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Books Microservice</a> &gt; <a href="index.source.html" class="el_package">com.aidanwhiteley.books.repository</a> &gt; <span class="el_source">BookRepositoryImpl.java</span></div><h1>BookRepositoryImpl.java</h1><pre class="source lang-java linenums">package com.aidanwhiteley.books.repository;
+
+import com.aidanwhiteley.books.domain.Book;
+import com.aidanwhiteley.books.domain.Comment;
+import com.aidanwhiteley.books.domain.googlebooks.Item;
+import com.aidanwhiteley.books.repository.dtos.BooksByAuthor;
+import com.aidanwhiteley.books.repository.dtos.BooksByGenre;
+import com.aidanwhiteley.books.repository.dtos.BooksByRating;
+import com.aidanwhiteley.books.repository.dtos.BooksByReader;
+import com.aidanwhiteley.books.repository.exceptions.CommentsStorageException;
+import com.mongodb.client.result.UpdateResult;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.aggregation.Aggregation;
+import org.springframework.data.mongodb.core.aggregation.AggregationResults;
+import org.springframework.data.mongodb.core.query.*;
+import org.springframework.data.support.PageableExecutionUtils;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+
+import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
+
+@Repository
+public class BookRepositoryImpl implements BookRepositoryCustomMethods {
+
+<span class="fc" id="L31">    private static final Logger LOGGER = LoggerFactory.getLogger(BookRepositoryImpl.class);</span>
+
+    private static final String COUNT_OF_BOOKS = &quot;countOfBooks&quot;;
+    private static final String AUTHOR = &quot;author&quot;;
+    private static final String READER = &quot;reader&quot;;
+    private static final String GENRE = &quot;genre&quot;;
+    private static final String RATING = &quot;rating&quot;;
+    private static final String COMMENTS = &quot;comments&quot;;
+
+    private final MongoTemplate mongoTemplate;
+
+<span class="fc" id="L42">    public BookRepositoryImpl(MongoTemplate mongoTemplate) {</span>
+<span class="fc" id="L43">        this.mongoTemplate = mongoTemplate;</span>
+<span class="fc" id="L44">    }</span>
+
+    @Override
+    public List&lt;BooksByGenre&gt; countBooksByGenre() {
+<span class="fc" id="L48">        Aggregation agg = newAggregation(</span>
+<span class="fc" id="L49">                group(GENRE).count().as(COUNT_OF_BOOKS),</span>
+<span class="fc" id="L50">                project(COUNT_OF_BOOKS).and(GENRE).previousOperation(),</span>
+<span class="fc" id="L51">                sort(Sort.Direction.DESC, COUNT_OF_BOOKS));</span>
+
+        //Convert the aggregation result into a List
+<span class="fc" id="L54">        AggregationResults&lt;BooksByGenre&gt; groupResults</span>
+<span class="fc" id="L55">                = mongoTemplate.aggregate(agg, Book.class, BooksByGenre.class);</span>
+<span class="fc" id="L56">        return groupResults.getMappedResults();</span>
+    }
+
+    @Override
+    public List&lt;BooksByRating&gt; countBooksByRating() {
+<span class="fc" id="L61">        Aggregation agg = newAggregation(</span>
+<span class="fc" id="L62">                group(RATING).count().as(COUNT_OF_BOOKS),</span>
+<span class="fc" id="L63">                project(COUNT_OF_BOOKS).and(RATING).previousOperation(),</span>
+<span class="fc" id="L64">                sort(Sort.Direction.DESC, COUNT_OF_BOOKS));</span>
+
+<span class="fc" id="L66">        AggregationResults&lt;BooksByRating&gt; groupResults</span>
+<span class="fc" id="L67">                = mongoTemplate.aggregate(agg, Book.class, BooksByRating.class);</span>
+<span class="fc" id="L68">        return groupResults.getMappedResults();</span>
+    }
+
+    @Override
+    public List&lt;BooksByAuthor&gt; countBooksByAuthor() {
+<span class="fc" id="L73">        Aggregation agg = newAggregation(</span>
+<span class="fc" id="L74">                group(AUTHOR).count().as(COUNT_OF_BOOKS),</span>
+<span class="fc" id="L75">                project(COUNT_OF_BOOKS).and(AUTHOR).previousOperation(),</span>
+<span class="fc" id="L76">                sort(Sort.Direction.ASC, AUTHOR));</span>
+
+<span class="fc" id="L78">        AggregationResults&lt;BooksByAuthor&gt; groupResults</span>
+<span class="fc" id="L79">                = mongoTemplate.aggregate(agg, Book.class, BooksByAuthor.class);</span>
+<span class="fc" id="L80">        return groupResults.getMappedResults();</span>
+    }
+
+    @Override
+    public List&lt;BooksByReader&gt; countBooksByReader() {
+<span class="fc" id="L85">        Aggregation agg = newAggregation(</span>
+<span class="fc" id="L86">                group(&quot;createdBy.fullName&quot;).count().as(COUNT_OF_BOOKS),</span>
+<span class="fc" id="L87">                project(COUNT_OF_BOOKS).and(READER).previousOperation(),</span>
+<span class="fc" id="L88">                sort(Sort.Direction.ASC, READER));</span>
+
+<span class="fc" id="L90">        AggregationResults&lt;BooksByReader&gt; groupResults</span>
+<span class="fc" id="L91">                = mongoTemplate.aggregate(agg, Book.class, BooksByReader.class);</span>
+<span class="fc" id="L92">        return groupResults.getMappedResults();</span>
+    }
+
+    @Override
+    public Book findCommentsForBook(String bookId) {
+<span class="fc" id="L97">        Query query = new Query(Criteria.where(&quot;id&quot;).is(bookId));</span>
+<span class="fc" id="L98">        query.fields().include(&quot;_id&quot;).include(COMMENTS);</span>
+<span class="fc" id="L99">        return mongoTemplate.find(query, Book.class).getFirst();</span>
+    }
+
+    @Override
+    public Book addCommentToBook(String bookId, Comment comment) {
+<span class="fc" id="L104">        UpdateResult updateResult = mongoTemplate.updateFirst(</span>
+<span class="fc" id="L105">                Query.query(Criteria.where(&quot;id&quot;).is(bookId)),</span>
+<span class="fc" id="L106">                new Update().push(COMMENTS, comment), Book.class);</span>
+
+<span class="pc bpc" id="L108" title="1 of 2 branches missed.">        if (updateResult.getMatchedCount() != 1) {</span>
+<span class="nc" id="L109">            LOGGER.error(&quot;Failed to add a comment to bookId {}. UpdateResult: {} &quot;, bookId, updateResult);</span>
+<span class="nc" id="L110">            throw new CommentsStorageException(&quot;Failed to add a comment&quot;);</span>
+        }
+<span class="fc" id="L112">        return findCommentsForBook(bookId);</span>
+    }
+
+    @Override
+    public void addGoogleBookItemToBook(String bookId, Item item) {
+<span class="fc" id="L117">        Query query = new Query(Criteria.where(&quot;id&quot;).is(bookId));</span>
+<span class="fc" id="L118">        Update update = new Update();</span>
+<span class="fc" id="L119">        update.set(&quot;googleBookDetails&quot;, item);</span>
+
+<span class="fc" id="L121">        UpdateResult result = mongoTemplate.updateFirst(query, update, Book.class);</span>
+
+<span class="pc bpc" id="L123" title="1 of 2 branches missed.">        if (result.getModifiedCount() != 1) {</span>
+<span class="nc" id="L124">            LOGGER.error(&quot;Expected 1 update for googleBookDetails in a Book for bookId {} but saw {}&quot;,</span>
+<span class="nc" id="L125">                    bookId, result.getModifiedCount());</span>
+        }
+<span class="fc" id="L127">    }</span>
+
+    @Override
+    public Book removeCommentFromBook(String bookId, String commentId, String removerName) {
+
+<span class="fc" id="L132">        UpdateResult updateResult = mongoTemplate.updateFirst(</span>
+<span class="fc" id="L133">                Query.query(Criteria.where(&quot;id&quot;).is(bookId).and(&quot;comments.id&quot;).is(commentId)),</span>
+<span class="fc" id="L134">                new Update().set(&quot;comments.$.commentText&quot;, &quot;&quot;).set(&quot;comments.$.deleted&quot;, true).set(&quot;comments.$.deletedBy&quot;, removerName),</span>
+                Book.class);
+
+<span class="pc bpc" id="L137" title="1 of 2 branches missed.">        if (updateResult.getMatchedCount() != 1) {</span>
+<span class="nc" id="L138">            LOGGER.error(&quot;Failed to remove commentId {} from bookId {}. UpdateResult: {} &quot;, commentId, bookId, updateResult);</span>
+<span class="nc" id="L139">            throw new CommentsStorageException(&quot;Failed to remove a comment&quot;);</span>
+        }
+<span class="fc" id="L141">        return findCommentsForBook(bookId);</span>
+    }
+
+    @Override
+    public Page&lt;Book&gt; searchForBooks(String searchPhrase, Pageable pageable) {
+
+<span class="fc" id="L147">        TextCriteria criteria = TextCriteria.forDefaultLanguage()</span>
+<span class="fc" id="L148">                .matching(searchPhrase);</span>
+<span class="fc" id="L149">        Query query = TextQuery.queryText(criteria)</span>
+<span class="fc" id="L150">                .sortByScore().with(pageable);</span>
+
+<span class="nc" id="L152">        List&lt;Book&gt; books = mongoTemplate.find(query, Book.class);</span>
+
+<span class="nc" id="L154">        Query countQuery = TextQuery.queryText(criteria);</span>
+
+<span class="nc" id="L156">        return PageableExecutionUtils.getPage(</span>
+                books,
+                pageable,
+<span class="nc" id="L159">                () -&gt; mongoTemplate.count(countQuery, Book.class));</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

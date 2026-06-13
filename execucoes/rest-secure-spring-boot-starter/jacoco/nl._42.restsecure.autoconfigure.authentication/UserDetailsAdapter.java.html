@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>UserDetailsAdapter.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">42 REST Secure Spring Boot Starter</a> &gt; <a href="index.source.html" class="el_package">nl._42.restsecure.autoconfigure.authentication</a> &gt; <span class="el_source">UserDetailsAdapter.java</span></div><h1>UserDetailsAdapter.java</h1><pre class="source lang-java linenums">package nl._42.restsecure.autoconfigure.authentication;
+
+import static java.util.stream.Collectors.toSet;
+
+import java.util.Collection;
+
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.userdetails.UserDetails;
+
+/**
+ * Wraps the custom user object and will be available as principal on the {@link Authentication} in the {@link SecurityContext}.
+ *
+ * @param &lt;T&gt; the type of the custom user.
+ */
+<span class="fc" id="L18">public record UserDetailsAdapter&lt;T extends RegisteredUser&gt;(T user) implements UserDetails {</span>
+
+    @Override
+    public Collection&lt;? extends GrantedAuthority&gt; getAuthorities() {
+<span class="fc" id="L22">        return user.getAuthorities().stream()</span>
+<span class="fc" id="L23">                .map(SimpleGrantedAuthority::new)</span>
+<span class="fc" id="L24">                .collect(toSet());</span>
+    }
+
+    @Override
+    public String getPassword() {
+<span class="fc" id="L29">        return user.getPassword();</span>
+    }
+
+    @Override
+    public String getUsername() {
+<span class="fc" id="L34">        return user.getUsername();</span>
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+<span class="fc bfc" id="L39" title="All 2 branches covered.">        return !user.isAccountExpired();</span>
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+<span class="fc bfc" id="L44" title="All 2 branches covered.">        return !user.isAccountLocked();</span>
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+<span class="fc bfc" id="L49" title="All 2 branches covered.">        return !user.isCredentialsExpired();</span>
+    }
+
+    @Override
+    public boolean isEnabled() {
+<span class="fc" id="L54">        return user.isEnabled();</span>
+    }
+
+    public boolean isMfaConfigured() {
+<span class="fc" id="L58">        return user.isMfaConfigured();</span>
+    }
+
+    public boolean isMfaMandatory() {
+<span class="fc" id="L62">        return user.isMfaMandatory();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

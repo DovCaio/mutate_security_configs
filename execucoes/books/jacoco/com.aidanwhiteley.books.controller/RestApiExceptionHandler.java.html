@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>RestApiExceptionHandler.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Books Microservice</a> &gt; <a href="index.source.html" class="el_package">com.aidanwhiteley.books.controller</a> &gt; <span class="el_source">RestApiExceptionHandler.java</span></div><h1>RestApiExceptionHandler.java</h1><pre class="source lang-java linenums">package com.aidanwhiteley.books.controller;
+
+import com.aidanwhiteley.books.controller.dtos.ApiExceptionData;
+import com.aidanwhiteley.books.controller.exceptions.JwtAuthAuzException;
+import com.aidanwhiteley.books.controller.exceptions.NotAuthorisedException;
+import com.aidanwhiteley.books.controller.exceptions.NotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.context.request.ServletWebRequest;
+import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
+
+import static org.springframework.http.HttpStatus.*;
+
+@SuppressWarnings(&quot;NullableProblems&quot;)
+/*
+  This is the central advice that handles exceptions for the REST API part of the application.
+  The HTMX controllers (implementing BookControllerHtmxExceptionHandling) handles exceptions locally within those controllers.
+ */
+@RestControllerAdvice
+<span class="fc" id="L31">public class RestApiExceptionHandler extends ResponseEntityExceptionHandler {</span>
+
+    public static final String MESSAGE_NOT_FOUND = &quot;Sorry - the resource your tried to access cannot be found&quot;;
+    public static final String MESSAGE_ILLEGAL_ARGUMENT = &quot;Sorry - you supplied an invalid input parameter value. Please check and try again&quot;;
+    private static final String MESSAGE_FORBIDDEN = &quot;Sorry - you do not have access to the URL you requested&quot;;
+    private static final String MESSAGE_DENIED = &quot;Sorry - you must be logged on&quot;;
+    private static final String MESSAGE_UNEXPECTED_EXCEPTION = &quot;Sorry - an unexpected problem happened - please try later&quot;;
+
+<span class="fc" id="L39">    private static final Logger API_LOGGER = LoggerFactory.getLogger(RestApiExceptionHandler.class);</span>
+
+    @ExceptionHandler({AccessDeniedException.class})
+    @ResponseStatus(FORBIDDEN)
+    public ApiExceptionData handleAccessForbiddenException(Exception ex, WebRequest request) {
+<span class="nc" id="L44">        return new ApiExceptionData(FORBIDDEN.value(), FORBIDDEN.getReasonPhrase(),</span>
+<span class="nc" id="L45">                MESSAGE_FORBIDDEN + &quot; : &quot; + ex.getLocalizedMessage(), getPath(request));</span>
+    }
+
+    @ExceptionHandler({NotAuthorisedException.class})
+    @ResponseStatus(UNAUTHORIZED)
+    public ApiExceptionData handleAccessDeniedException(Exception ex, WebRequest request) {
+<span class="fc" id="L51">        return new ApiExceptionData(UNAUTHORIZED.value(), UNAUTHORIZED.getReasonPhrase(),</span>
+<span class="fc" id="L52">                MESSAGE_DENIED + &quot; : &quot; + ex.getLocalizedMessage(), getPath(request));</span>
+    }
+
+    @ExceptionHandler({NotFoundException.class})
+    @ResponseStatus(NOT_FOUND)
+    public ApiExceptionData handleNotFoundException(Exception ex, WebRequest request) {
+
+<span class="fc" id="L59">        return new ApiExceptionData(NOT_FOUND.value(), NOT_FOUND.getReasonPhrase(),</span>
+<span class="fc" id="L60">                MESSAGE_NOT_FOUND + &quot; : &quot; + ex.getLocalizedMessage(), getPath(request));</span>
+    }
+
+    @ExceptionHandler({IllegalArgumentException.class, NumberFormatException.class,
+            MethodArgumentTypeMismatchException.class})
+    @ResponseStatus(BAD_REQUEST)
+    public ApiExceptionData handleIllegalArgumentException(Exception ex, WebRequest request) {
+
+<span class="fc" id="L68">        return new ApiExceptionData(BAD_REQUEST.value(), BAD_REQUEST.getReasonPhrase(),</span>
+<span class="fc" id="L69">                MESSAGE_ILLEGAL_ARGUMENT + &quot; : &quot; + ex.getLocalizedMessage(), getPath(request));</span>
+    }
+
+    @ExceptionHandler({JwtAuthAuzException.class})
+    @ResponseStatus(INTERNAL_SERVER_ERROR)
+    public ApiExceptionData handleJwtAuthAuzException(Exception ex, WebRequest request) {
+
+<span class="nc" id="L76">        return new ApiExceptionData(INTERNAL_SERVER_ERROR.value(), INTERNAL_SERVER_ERROR.getReasonPhrase(),</span>
+<span class="nc" id="L77">                MESSAGE_UNEXPECTED_EXCEPTION + &quot; : &quot; + ex.getLocalizedMessage(), getPath(request));</span>
+    }
+
+    @Override
+    protected ResponseEntity&lt;Object&gt; handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
+                                                                  HttpHeaders headers, HttpStatusCode status, WebRequest request) {
+
+<span class="fc" id="L84">        return new ResponseEntity&lt;&gt;(</span>
+<span class="fc" id="L85">                new ApiExceptionData(BAD_REQUEST.value(), BAD_REQUEST.getReasonPhrase(),</span>
+                        MESSAGE_ILLEGAL_ARGUMENT + &quot; : &quot;
+<span class="pc bpc" id="L87" title="1 of 2 branches missed.">                                + (ex.getBindingResult().toString() != null ? ex.getBindingResult().toString()</span>
+<span class="pc" id="L88">                                : ex.getMessage()),</span>
+<span class="fc" id="L89">                        getPath(request)),</span>
+                new HttpHeaders(), BAD_REQUEST);
+    }
+
+    /**
+     * Error handler of last resort.
+     * &lt;p&gt;
+     * It also logs the exception. The other exception handlers expect the problem
+     * to have been logged close to where it was initially caught. In this case, it
+     * is likely that the exception may not have already been logged so it is logged
+     * here.
+     */
+    @ExceptionHandler({Exception.class})
+    @ResponseStatus(INTERNAL_SERVER_ERROR)
+    public ApiExceptionData handleDefaultExceptions(Exception ex, WebRequest request) {
+
+<span class="fc" id="L105">        API_LOGGER.error(&quot;An unhandled exception was caught, logged and HTTP status 500 returned to the client.&quot;, ex);</span>
+
+<span class="fc" id="L107">        return new ApiExceptionData(INTERNAL_SERVER_ERROR.value(), INTERNAL_SERVER_ERROR.getReasonPhrase(),</span>
+<span class="fc" id="L108">                MESSAGE_UNEXPECTED_EXCEPTION, getPath(request));</span>
+    }
+
+    @Override
+    protected ResponseEntity&lt;Object&gt; handleExceptionInternal(Exception ex, Object body, HttpHeaders headers,
+                                                             HttpStatusCode status, WebRequest request) {
+
+<span class="pc bpc" id="L115" title="1 of 2 branches missed.">        if (ex instanceof NoResourceFoundException) {</span>
+<span class="fc" id="L116">            API_LOGGER.info(&quot;Resource not found. This may well be expected: {}&quot;, ex.getMessage());</span>
+<span class="fc" id="L117">            return new ResponseEntity&lt;&gt;(HttpStatusCode.valueOf(NOT_FOUND.value()));</span>
+        }
+
+<span class="nc" id="L120">        API_LOGGER.error(</span>
+<span class="nc" id="L121">                &quot;The Spring framework rather than the application handled the following exception: {}&quot;, ex.getMessage(),</span>
+                ex);
+<span class="nc" id="L123">        return super.handleExceptionInternal(ex, body, headers, status, request);</span>
+    }
+
+    private String getPath(WebRequest webRequest) {
+<span class="fc bfc" id="L127" title="All 2 branches covered.">        if (webRequest instanceof ServletWebRequest servletWebRequest) {</span>
+<span class="fc" id="L128">            return servletWebRequest.getRequest().getServletPath();</span>
+        } else {
+<span class="fc" id="L130">            return &quot;&quot;;</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

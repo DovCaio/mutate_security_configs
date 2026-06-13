@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>RoleController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">SaaS Backend Starter</a> &gt; <a href="index.source.html" class="el_package">com.urke.saasbackendstarter.controller</a> &gt; <span class="el_source">RoleController.java</span></div><h1>RoleController.java</h1><pre class="source lang-java linenums">package com.urke.saasbackendstarter.controller;
+
+import com.urke.saasbackendstarter.dto.role.RoleDTO;
+import com.urke.saasbackendstarter.dto.role.RoleCreateRequest;
+import com.urke.saasbackendstarter.dto.role.RoleUpdateRequest;
+import com.urke.saasbackendstarter.mapper.RoleMapper;
+import com.urke.saasbackendstarter.repository.PermissionRepository;
+import com.urke.saasbackendstarter.repository.OrganizationRepository;
+import com.urke.saasbackendstarter.domain.Permission;
+import com.urke.saasbackendstarter.domain.Role;
+import com.urke.saasbackendstarter.domain.Organization;
+import com.urke.saasbackendstarter.service.RoleService;
+import com.urke.saasbackendstarter.exception.PermissionNotFoundException;
+import com.urke.saasbackendstarter.exception.OrganizationNotFoundException;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+
+import jakarta.validation.Valid;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+/**
+ * REST controller for managing user roles and permissions per organization (tenant).
+ */
+@Tag(
+    name = &quot;Roles&quot;,
+    description = &quot;Endpoints for listing and managing user roles per organization.&quot;
+)
+<span class="fc" id="L40">@Slf4j</span>
+@RestController
+@RequestMapping(&quot;/api/v1/roles&quot;)
+@RequiredArgsConstructor
+public class RoleController {
+
+    private final RoleService roleService;
+    private final PermissionRepository permissionRepository;
+    private final OrganizationRepository organizationRepository;
+
+    @Operation(
+        summary = &quot;Get all roles for an organization&quot;,
+        description = &quot;Retrieve all user roles for a given organization (tenant).&quot;,
+        security = @SecurityRequirement(name = &quot;bearerAuth&quot;),
+        responses = {
+            @ApiResponse(responseCode = &quot;200&quot;, description = &quot;Roles listed successfully&quot;),
+            @ApiResponse(responseCode = &quot;401&quot;, description = &quot;Unauthorized&quot;),
+            @ApiResponse(responseCode = &quot;403&quot;, description = &quot;Forbidden&quot;)
+        }
+    )
+    @GetMapping(&quot;/organization/{organizationId}&quot;)
+    @PreAuthorize(&quot;hasRole('ADMIN')&quot;)
+    public ResponseEntity&lt;List&lt;RoleDTO&gt;&gt; getAllRolesForOrganization(
+            @PathVariable Long organizationId) {
+<span class="fc" id="L64">        List&lt;Role&gt; roles = roleService.findAllByOrganizationId(organizationId);</span>
+<span class="fc" id="L65">        List&lt;RoleDTO&gt; roleDTOs = roles.stream()</span>
+<span class="fc" id="L66">                .map(RoleMapper::toDTO)</span>
+<span class="fc" id="L67">                .collect(Collectors.toList());</span>
+<span class="fc" id="L68">        return ResponseEntity.ok(roleDTOs);</span>
+    }
+
+    @Operation(
+        summary = &quot;Create a new role for an organization&quot;,
+        description = &quot;Create a new user role for a specific organization.&quot;,
+        security = @SecurityRequirement(name = &quot;bearerAuth&quot;),
+        responses = {
+            @ApiResponse(responseCode = &quot;200&quot;, description = &quot;Role created successfully&quot;),
+            @ApiResponse(responseCode = &quot;400&quot;, description = &quot;Invalid input&quot;),
+            @ApiResponse(responseCode = &quot;401&quot;, description = &quot;Unauthorized&quot;),
+            @ApiResponse(responseCode = &quot;403&quot;, description = &quot;Forbidden&quot;),
+            @ApiResponse(responseCode = &quot;409&quot;, description = &quot;Role already exists&quot;)
+        }
+    )
+    @PostMapping
+    @PreAuthorize(&quot;hasRole('ADMIN')&quot;)
+    public ResponseEntity&lt;RoleDTO&gt; createRole(
+            @Valid @RequestBody RoleCreateRequest request) {
+<span class="fc" id="L87">        Organization organization = organizationRepository.findById(request.getOrganizationId())</span>
+<span class="pc" id="L88">                .orElseThrow(() -&gt; new OrganizationNotFoundException(&quot;Organization not found: &quot; + request.getOrganizationId()));</span>
+
+<span class="fc" id="L90">        Set&lt;Permission&gt; permissions = new HashSet&lt;&gt;();</span>
+<span class="pc bpc" id="L91" title="2 of 4 branches missed.">        if (request.getPermissionIds() != null &amp;&amp; !request.getPermissionIds().isEmpty()) {</span>
+<span class="fc" id="L92">            permissions = request.getPermissionIds().stream()</span>
+<span class="fc" id="L93">                .map(pid -&gt; permissionRepository.findById(pid)</span>
+<span class="pc" id="L94">                    .orElseThrow(() -&gt; new PermissionNotFoundException(&quot;Permission not found: &quot; + pid)))</span>
+<span class="fc" id="L95">                .collect(Collectors.toSet());</span>
+        }
+
+<span class="fc" id="L98">        Role role = Role.builder()</span>
+<span class="fc" id="L99">                .name(request.getName())</span>
+<span class="fc" id="L100">                .permissions(permissions)</span>
+<span class="fc" id="L101">                .organization(organization)</span>
+<span class="fc" id="L102">                .build();</span>
+
+<span class="fc" id="L104">        Role saved = roleService.save(role);</span>
+<span class="fc" id="L105">        return ResponseEntity.ok(RoleMapper.toDTO(saved));</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

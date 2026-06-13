@@ -1,0 +1,538 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>BookSecureControllerHtmx.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Books Microservice</a> &gt; <a href="index.source.html" class="el_package">com.aidanwhiteley.books.controller</a> &gt; <span class="el_source">BookSecureControllerHtmx.java</span></div><h1>BookSecureControllerHtmx.java</h1><pre class="source lang-java linenums">package com.aidanwhiteley.books.controller;
+
+import com.aidanwhiteley.books.controller.dtos.BookForm;
+import com.aidanwhiteley.books.controller.dtos.ClientRoles;
+import com.aidanwhiteley.books.controller.dtos.CommentForm;
+import com.aidanwhiteley.books.controller.exceptions.NotAuthorisedException;
+import com.aidanwhiteley.books.controller.exceptions.NotFoundException;
+import com.aidanwhiteley.books.domain.Book;
+import com.aidanwhiteley.books.domain.Comment;
+import com.aidanwhiteley.books.domain.Owner;
+import com.aidanwhiteley.books.domain.User;
+import com.aidanwhiteley.books.repository.BookRepository;
+import com.aidanwhiteley.books.repository.UserRepository;
+import com.aidanwhiteley.books.repository.dtos.BooksByAuthor;
+import com.aidanwhiteley.books.repository.dtos.BooksByGenre;
+import com.aidanwhiteley.books.repository.dtos.BooksByReader;
+import com.aidanwhiteley.books.service.GoogleBookSearchService;
+import com.aidanwhiteley.books.service.dtos.GoogleBookSearchResult;
+import com.aidanwhiteley.books.util.JwtAuthenticationUtils;
+import com.aidanwhiteley.books.util.LogDetaint;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
+
+import java.security.Principal;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+import static com.aidanwhiteley.books.util.LogDetaint.logMessageDetaint;
+
+@PreAuthorize(&quot;hasAnyRole('ROLE_EDITOR', 'ROLE_ADMIN')&quot;)
+@Controller
+public class BookSecureControllerHtmx implements BookControllerHtmxExceptionHandling {
+
+<span class="fc" id="L47">    private static final Logger LOGGER = LoggerFactory.getLogger(BookSecureControllerHtmx.class);</span>
+    public static final String HX_TRIGGER_AFTER_SWAP = &quot;HX-Trigger-After-Swap&quot;;
+    public static final String HX_RETARGET = &quot;HX-Retarget&quot;;
+    private static final String NO_VALUE_SELECTED = &quot;NO_VALUE_SELECTED&quot;;
+    public static final String BOOK_FORM = &quot;bookForm&quot;;
+    public static final String GENRES = &quot;genres&quot;;
+    public static final String GOOGLE_BOOK_SEARCH_RESULT = &quot;googleBookSearchResult&quot;;
+    public static final String BOOKTITLE = &quot;booktitle&quot;;
+    public static final String AUTHOR = &quot;author&quot;;
+    public static final String INDEX = &quot;index&quot;;
+    public static final String ISCREATE = &quot;iscreate&quot;;
+    public static final String ISUPDATE = &quot;isupdate&quot;;
+    public static final String ACTION_URL = &quot;actionUrl&quot;;
+    public static final String USERS = &quot;users&quot;;
+    public static final String HX_PUSH_URL = &quot;HX-Push-Url&quot;;
+    public static final String USERS_TABLE = &quot;#users-table&quot;;
+    public static final String USER_ADMIN_CLOUDY_USER_ADMIN_TABLE = &quot;user-admin :: cloudy-user-admin-table&quot;;
+    public static final String COMMENT_FORM = &quot;commentForm&quot;;
+
+    private final BookRepository bookRepository;
+    private final JwtAuthenticationUtils authUtils;
+    private final GoogleBookSearchService googleBookSearchService;
+    private final BookControllerHtmx bookControllerHtmx;
+    private final UserRepository userRepository;
+    @Value(&quot;${books.users.default.page.size}&quot;)
+    private int defaultPageSize;
+
+    public BookSecureControllerHtmx(BookRepository bookRepository, JwtAuthenticationUtils jwtAuthenticationUtils,
+                                    GoogleBookSearchService googleBookSearchService,
+                                    BookControllerHtmx bookControllerHtmx,
+<span class="fc" id="L77">                                    UserRepository userRepository) {</span>
+<span class="fc" id="L78">        this.bookRepository = bookRepository;</span>
+<span class="fc" id="L79">        this.authUtils = jwtAuthenticationUtils;</span>
+<span class="fc" id="L80">        this.googleBookSearchService = googleBookSearchService;</span>
+<span class="fc" id="L81">        this.bookControllerHtmx = bookControllerHtmx;</span>
+<span class="fc" id="L82">        this.userRepository = userRepository;</span>
+<span class="fc" id="L83">    }</span>
+
+    @GetMapping(value = {&quot;/createreview&quot;})
+    public String createBookReview(Model model, Principal principal) {
+
+<span class="fc" id="L88">        model.addAttribute(BOOK_FORM, new BookForm());</span>
+<span class="fc" id="L89">        model.addAttribute(GENRES, getGenres());</span>
+<span class="fc" id="L90">        model.addAttribute(INDEX, -1);</span>
+<span class="fc" id="L91">        model.addAttribute(ISCREATE, true);</span>
+<span class="fc" id="L92">        model.addAttribute(ISUPDATE, false);</span>
+<span class="fc" id="L93">        model.addAttribute(ACTION_URL, &quot;/createreview&quot;);</span>
+<span class="fc" id="L94">        addUserToModel(principal, model);</span>
+
+<span class="fc" id="L96">        return &quot;create-update-review&quot;;</span>
+    }
+
+    @GetMapping(value = &quot;/updatereview/{bookId}&quot;)
+    public String updateBookReview(@PathVariable String bookId, Model model, Principal principal) {
+
+<span class="fc" id="L102">        var book = bookRepository.findById(bookId);</span>
+<span class="fc" id="L103">        var bookForm = BookForm.getBookFormFromBook(</span>
+<span class="fc" id="L104">                book.orElseThrow(() -&gt; new NotFoundException(&quot;Book id &quot; + bookId + &quot; not found&quot;)));</span>
+
+        // Get a list of matching books into cache - we are not using the return value here!
+<span class="fc" id="L107">        googleBookSearchService.getGoogleBooks(bookForm.getTitle(), bookForm.getAuthor(), 0);</span>
+
+<span class="fc" id="L109">        var googleBookSearchresult = bookForm.getGoogleBookSearchResult();</span>
+<span class="fc" id="L110">        googleBookSearchresult.setHasMore(true);</span>
+
+<span class="fc" id="L112">        model.addAttribute(BOOK_FORM, bookForm);</span>
+<span class="fc" id="L113">        model.addAttribute(GOOGLE_BOOK_SEARCH_RESULT, googleBookSearchresult);</span>
+<span class="fc" id="L114">        model.addAttribute(GENRES, getGenres());</span>
+<span class="fc" id="L115">        model.addAttribute(BOOKTITLE, bookForm.getTitle());</span>
+<span class="fc" id="L116">        model.addAttribute(AUTHOR, bookForm.getAuthor());</span>
+<span class="fc" id="L117">        model.addAttribute(INDEX, 0);</span>
+<span class="fc" id="L118">        model.addAttribute(ISCREATE, false);</span>
+<span class="fc" id="L119">        model.addAttribute(ISUPDATE, true);</span>
+<span class="fc" id="L120">        model.addAttribute(ACTION_URL, &quot;/updatereview&quot;);</span>
+<span class="fc" id="L121">        addUserToModel(principal, model);</span>
+
+<span class="fc" id="L123">        return &quot;create-update-review&quot;;</span>
+    }
+
+    @PostMapping(value = {&quot;/createreview&quot;})
+    public String createBookReviewForm(@Valid @ModelAttribute BookForm bookForm, BindingResult bindingResult,
+                                       HttpServletResponse response, Model model, Principal principal) {
+
+<span class="pc bpc" id="L130" title="1 of 2 branches missed.">        if (bookForm.getRating().equals(NO_VALUE_SELECTED)) {</span>
+<span class="nc" id="L131">            bindingResult.rejectValue(&quot;rating&quot;, &quot;error.rating&quot;, &quot;You must select your rating for the book&quot;);</span>
+        }
+
+<span class="fc bfc" id="L134" title="All 2 branches covered.">        if (bindingResult.hasErrors()) {</span>
+<span class="pc bpc" id="L135" title="1 of 2 branches missed.">            if (LOGGER.isDebugEnabled()) {</span>
+<span class="nc" id="L136">                LOGGER.debug(&quot;Following create form validation errors occurred: {}&quot;, bindingResult);</span>
+            }
+
+<span class="fc" id="L139">            model.addAttribute(BOOK_FORM, bookForm);</span>
+<span class="fc" id="L140">            model.addAttribute(GENRES, getGenres());</span>
+<span class="fc" id="L141">            model.addAttribute(INDEX, -1);</span>
+<span class="fc" id="L142">            model.addAttribute(ISCREATE, true);</span>
+<span class="fc" id="L143">            model.addAttribute(ISUPDATE, false);</span>
+<span class="fc" id="L144">            model.addAttribute(ACTION_URL, &quot;/createreview&quot;);</span>
+<span class="fc" id="L145">            addUserToModel(principal, model);</span>
+<span class="pc bpc" id="L146" title="1 of 2 branches missed.">            if (bookForm.getIndex() != -1) {</span>
+                // Ignoring the view string return value - just want the data added to the Model
+<span class="fc" id="L148">                findGoogleBooksByTitleAndAuthor(bookForm.getTitle(), bookForm.getAuthor(), bookForm.getIndex(), model, principal);</span>
+            }
+<span class="fc" id="L150">            response.addHeader(HX_TRIGGER_AFTER_SWAP, &quot;{ \&quot;showFlashMessage\&quot;: {\&quot;level\&quot;: \&quot;warn\&quot;, \&quot;message\&quot;: \&quot;Please check and correct the highlighted form fields\&quot;}}&quot;);</span>
+
+<span class="fc" id="L152">            return &quot;create-update-review :: cloudy-book-review-form&quot;;</span>
+        }
+
+<span class="fc" id="L155">        Optional&lt;User&gt; user = authUtils.extractUserFromPrincipal(principal, false);</span>
+<span class="pc bpc" id="L156" title="1 of 2 branches missed.">        if (user.isPresent()) {</span>
+
+<span class="fc" id="L158">            Book aBook = bookRepository.insert(bookForm.getBookFromBookForm());</span>
+
+            // If there were Google Book details specified, go and get the full details from Google (or the local cache)
+            // and then update the Mongo document for the book
+<span class="pc bpc" id="L162" title="2 of 4 branches missed.">            if (bookForm.getGoogleBookId() != null &amp;&amp; !bookForm.getGoogleBookId().isEmpty()) {</span>
+<span class="fc" id="L163">                googleBookSearchService.updateBookWithGoogleBookDetails(aBook, bookForm.getTitle(), bookForm.getAuthor(), bookForm.getIndex());</span>
+            }
+
+<span class="fc" id="L166">            model.addAttribute(&quot;book&quot;, aBook);</span>
+<span class="fc" id="L167">            model.addAttribute(COMMENT_FORM, new CommentForm());</span>
+<span class="fc" id="L168">            addUserToModel(principal, model);</span>
+<span class="fc" id="L169">            response.addHeader(HX_TRIGGER_AFTER_SWAP, &quot;{ \&quot;showFlashMessage\&quot;: {\&quot;level\&quot;: \&quot;info\&quot;, \&quot;message\&quot;: \&quot;Your book review was &quot; +</span>
+                    &quot;successfully created\&quot;}}&quot;);
+<span class="fc" id="L171">            response.setHeader(HX_PUSH_URL, &quot;/bookreview?bookId=&quot; + aBook.getId());</span>
+<span class="fc" id="L172">            return &quot;book-review :: cloudy-book-review&quot;;</span>
+        } else {
+<span class="nc" id="L174">            LOGGER.error(&quot;Couldn't create a book as user to own book not found! Principal: {}&quot;, logMessageDetaint(principal));</span>
+<span class="nc" id="L175">            throw new NotAuthorisedException(&quot;User trying to create a book review not found in user data store!&quot;);</span>
+        }
+    }
+
+    @PostMapping(value = {&quot;/updatereview&quot;})
+    public String updateBookReviewForm(@Valid @ModelAttribute BookForm bookForm, BindingResult bindingResult,
+                                       Model model, Principal principal, HttpServletRequest request, HttpServletResponse response) {
+
+<span class="pc bpc" id="L183" title="1 of 2 branches missed.">        if (bookForm.getRating().equals(NO_VALUE_SELECTED)) {</span>
+<span class="nc" id="L184">            bindingResult.rejectValue(&quot;rating&quot;, &quot;error.rating&quot;, &quot;You must select your rating for the book&quot;);</span>
+        }
+
+<span class="fc bfc" id="L187" title="All 2 branches covered.">        if (bindingResult.hasErrors()) {</span>
+<span class="pc bpc" id="L188" title="1 of 2 branches missed.">            if (LOGGER.isDebugEnabled()) {</span>
+<span class="nc" id="L189">                LOGGER.debug(&quot;Following update form validation errors occurred: {}&quot;, bindingResult);</span>
+            }
+
+<span class="fc" id="L192">            model.addAttribute(BOOK_FORM, bookForm);</span>
+<span class="fc" id="L193">            model.addAttribute(GOOGLE_BOOK_SEARCH_RESULT, bookForm.getGoogleBookSearchResult());</span>
+<span class="fc" id="L194">            model.addAttribute(GENRES, getGenres());</span>
+<span class="fc" id="L195">            model.addAttribute(BOOKTITLE, bookForm.getTitle());</span>
+<span class="fc" id="L196">            model.addAttribute(AUTHOR, bookForm.getAuthor());</span>
+<span class="fc" id="L197">            model.addAttribute(INDEX, 0);</span>
+<span class="fc" id="L198">            model.addAttribute(ISCREATE, false);</span>
+<span class="fc" id="L199">            model.addAttribute(ISUPDATE, true);</span>
+<span class="fc" id="L200">            model.addAttribute(ACTION_URL, &quot;/updatereview&quot;);</span>
+<span class="fc" id="L201">            addUserToModel(principal, model);</span>
+
+<span class="pc bpc" id="L203" title="1 of 2 branches missed.">            if (bookForm.getIndex() != -1) {</span>
+                // Ignoring the view string return value - just want the data added to the Model
+<span class="fc" id="L205">                findGoogleBooksByTitleAndAuthor(bookForm.getTitle(), bookForm.getAuthor(), bookForm.getIndex(), model, principal);</span>
+            }
+<span class="fc" id="L207">            response.addHeader(HX_TRIGGER_AFTER_SWAP, &quot;{ \&quot;showFlashMessage\&quot;: {\&quot;level\&quot;: \&quot;warn\&quot;, \&quot;message\&quot;: \&quot;Please check and correct the highlighted form fields\&quot;}}&quot;);</span>
+
+<span class="fc" id="L209">            return &quot;create-update-review :: cloudy-book-review-form&quot;;</span>
+        }
+
+<span class="fc" id="L212">        Optional&lt;User&gt; user = authUtils.extractUserFromPrincipal(principal, false);</span>
+<span class="pc bpc" id="L213" title="1 of 2 branches missed.">        if (user.isPresent()) {</span>
+
+            Book aBook;
+
+<span class="fc" id="L217">            Book currentBookState = bookRepository.findById(bookForm.getBookId())</span>
+<span class="pc" id="L218">                    .orElseThrow(() -&gt; new IllegalArgumentException(&quot;Didn't find book with id '&quot; + bookForm.getBookId() + &quot;' to update&quot;));</span>
+<span class="pc bpc" id="L219" title="1 of 4 branches missed.">            if (currentBookState.isOwner(user.get()) || user.get().getRoles().contains(User.Role.ROLE_ADMIN)) {</span>
+<span class="fc" id="L220">                Book inputBook = bookForm.getBookFromBookForm();</span>
+<span class="fc" id="L221">                Book mergedBook = BookSecureController.mergeUpdatesOntoExistingBook(currentBookState, inputBook);</span>
+<span class="fc" id="L222">                aBook = bookRepository.save(mergedBook);</span>
+<span class="fc" id="L223">            } else {</span>
+<span class="fc" id="L224">                LOGGER.error(&quot;An attempt to update book id {} was made by {} without the necessary permissions&quot;,</span>
+<span class="fc" id="L225">                        bookForm.getBookId(), user.get().getFullName());</span>
+<span class="fc" id="L226">                throw new NotAuthorisedException(&quot;User did not have the permission required to update a book review&quot;);</span>
+            }
+
+            // If there were Google Book details specified, go and get the full details from Google (or the local cache)
+            // and then update the Mongo document for the book
+<span class="pc bpc" id="L231" title="2 of 4 branches missed.">            if (bookForm.getGoogleBookId() != null &amp;&amp; !bookForm.getGoogleBookId().isEmpty()) {</span>
+<span class="fc" id="L232">                googleBookSearchService.updateBookWithGoogleBookDetails(aBook, bookForm.getTitle(), bookForm.getAuthor(), bookForm.getIndex());</span>
+            }
+
+<span class="fc" id="L235">            model.addAttribute(&quot;book&quot;, aBook);</span>
+<span class="fc" id="L236">            model.addAttribute(COMMENT_FORM, new CommentForm());</span>
+<span class="fc" id="L237">            addUserToModel(principal, model);</span>
+<span class="fc" id="L238">            response.addHeader(HX_TRIGGER_AFTER_SWAP, &quot;{ \&quot;showFlashMessage\&quot;: {\&quot;level\&quot;: \&quot;info\&quot;, \&quot;message\&quot;: \&quot;The book review was &quot; +</span>
+                    &quot;successfully updated\&quot;}}&quot;);
+<span class="fc" id="L240">            response.setHeader(HX_PUSH_URL, &quot;/bookreview?bookId=&quot; + bookForm.getBookId());</span>
+<span class="fc" id="L241">            return &quot;book-review :: cloudy-book-review&quot;;</span>
+        } else {
+<span class="nc" id="L243">            LOGGER.error(&quot;Couldn't update a book as user to own book not found! Principal: {}&quot;, logMessageDetaint(principal));</span>
+<span class="nc" id="L244">            throw new NotAuthorisedException(&quot;User trying to update a book review not found in user data store!&quot;);</span>
+        }
+    }
+
+    @GetMapping(value = {&quot;/googlebooks&quot;}, params = {&quot;title&quot;, AUTHOR, INDEX})
+    public String findGoogleBooksByTitleAndAuthor(@RequestParam String title, @RequestParam String author,
+                                                  @RequestParam int index, Model model, Principal principal) {
+
+<span class="pc bpc" id="L252" title="1 of 2 branches missed.">        if (LOGGER.isDebugEnabled()) {</span>
+<span class="nc" id="L253">            LOGGER.debug(&quot;Calling Google Book Search API with title '{}', author '{}' and index '{}'&quot;,</span>
+<span class="nc" id="L254">                    LogDetaint.logMessageDetaint(title),</span>
+<span class="nc" id="L255">                    LogDetaint.logMessageDetaint(author),</span>
+<span class="nc" id="L256">                    LogDetaint.logMessageDetaint(index));</span>
+        }
+<span class="fc" id="L258">        GoogleBookSearchResult result = googleBookSearchService.getGoogleBooks(title, author, index);</span>
+
+<span class="fc" id="L260">        model.addAttribute(GOOGLE_BOOK_SEARCH_RESULT, result);</span>
+<span class="fc" id="L261">        model.addAttribute(BOOKTITLE, title);</span>
+<span class="fc" id="L262">        model.addAttribute(AUTHOR, author);</span>
+<span class="fc" id="L263">        model.addAttribute(INDEX, index);</span>
+<span class="pc bpc" id="L264" title="1 of 2 branches missed.">        if (result.getItem() != null) {</span>
+<span class="fc" id="L265">            model.addAttribute(&quot;googleBookId&quot;, result.getItem().getId());</span>
+        } else {
+<span class="nc" id="L267">            model.addAttribute(&quot;googleBookId&quot;, &quot;&quot;);</span>
+        }
+<span class="fc" id="L269">        addUserToModel(principal, model);</span>
+
+<span class="fc" id="L271">        return &quot;create-update-review :: cloudy-google-book-candidates&quot;;</span>
+    }
+
+
+    @DeleteMapping(value = &quot;/deletereview/{id}&quot;)
+    public String deleteBookReview(@PathVariable String id, Model model, Principal principal,
+                                   HttpServletResponse response) {
+
+<span class="fc" id="L279">        Optional&lt;User&gt; user = authUtils.extractUserFromPrincipal(principal, false);</span>
+<span class="pc bpc" id="L280" title="1 of 2 branches missed.">        if (user.isPresent()) {</span>
+<span class="fc" id="L281">            Book currentBookState = bookRepository.findById(id)</span>
+<span class="pc" id="L282">                    .orElseThrow(() -&gt; new IllegalArgumentException(&quot;Couldn't find book id &quot; + id + &quot; to delete&quot;));</span>
+
+<span class="pc bpc" id="L284" title="1 of 4 branches missed.">            if (currentBookState.isOwner(user.get()) || user.get().getRoles().contains(User.Role.ROLE_ADMIN)) {</span>
+<span class="fc" id="L285">                bookRepository.deleteById(id);</span>
+
+                // This call is to populate the model variable - we don't use the return string
+<span class="fc" id="L288">                bookControllerHtmx.recentlyReviewed(model, principal);</span>
+
+<span class="fc" id="L290">                response.addHeader(HX_TRIGGER_AFTER_SWAP, &quot;{ \&quot;showFlashMessage\&quot;: {\&quot;level\&quot;: \&quot;info\&quot;, \&quot;message\&quot;: \&quot;The review of '&quot; +</span>
+<span class="fc" id="L291">                        currentBookState.getTitle() + &quot;' by &quot; + currentBookState.getAuthor() +</span>
+                        &quot; was successfully deleted\&quot;}}&quot;);
+
+<span class="fc" id="L294">                response.addHeader(HX_PUSH_URL, &quot;recent&quot;);</span>
+<span class="fc" id="L295">                return &quot;recently-reviewed :: cloudy-recently-reviewed&quot;;</span>
+            } else {
+<span class="fc" id="L297">                LOGGER.warn(&quot;User {} {} tried to delete book id {} '{}' without the necessary permissions&quot;, user.get().getFullName(),</span>
+<span class="fc" id="L298">                        user.get().getId(), currentBookState.getId(), currentBookState.getTitle());</span>
+<span class="fc" id="L299">                throw new AccessDeniedException(&quot;User tried to delete book without necessary permissions&quot;);</span>
+            }
+        } else {
+<span class="nc" id="L302">            LOGGER.error(&quot;A user that doesn't exist in the database tried to delete book id {}&quot;,</span>
+<span class="nc" id="L303">                    LogDetaint.logMessageDetaint(id));</span>
+<span class="nc" id="L304">            throw new NotFoundException(&quot;User not found when trying to delete a book review&quot;);</span>
+        }
+    }
+
+    @PostMapping(value = &quot;/addcomment&quot;)
+    public String addCommentToBook(@Valid @ModelAttribute CommentForm commentForm,
+                                   BindingResult bindingResult, Model model, Principal principal,
+                                   HttpServletResponse response) {
+
+<span class="fc bfc" id="L313" title="All 2 branches covered.">        if (bindingResult.hasErrors()) {</span>
+<span class="pc bpc" id="L314" title="1 of 2 branches missed.">            if (LOGGER.isDebugEnabled()) {</span>
+<span class="nc" id="L315">                LOGGER.debug(&quot;Following comment creation validation errors occurred: {}&quot;, bindingResult);</span>
+            }
+<span class="fc" id="L317">            Book theBook = bookRepository.findById(commentForm.getBookId())</span>
+<span class="pc" id="L318">                    .orElseThrow(() -&gt; new IllegalArgumentException(&quot;Couldn't find book id &quot; + commentForm.getBookId() +</span>
+                            &quot; for new comment error message&quot;));
+
+<span class="fc" id="L321">            model.addAttribute(COMMENT_FORM, commentForm);</span>
+<span class="fc" id="L322">            model.addAttribute(&quot;book&quot;, theBook);</span>
+<span class="fc" id="L323">            addUserToModel(principal, model);</span>
+<span class="fc" id="L324">            response.addHeader(HX_TRIGGER_AFTER_SWAP, &quot;{ \&quot;showFlashMessage\&quot;: {\&quot;level\&quot;: \&quot;warn\&quot;, \&quot;message\&quot;: \&quot;Please check and correct your comment\&quot;}}&quot;);</span>
+<span class="fc" id="L325">            return &quot;book-review :: cloudy-book-comment-form&quot;;</span>
+        }
+
+<span class="fc" id="L328">        Optional&lt;User&gt; user = authUtils.extractUserFromPrincipal(principal, false);</span>
+<span class="pc bpc" id="L329" title="1 of 2 branches missed.">        if (user.isPresent()) {</span>
+<span class="fc" id="L330">            Comment comment = new Comment(commentForm.getComment(), new Owner(user.get()));</span>
+<span class="fc" id="L331">            Book updatedBook = bookRepository.addCommentToBook(commentForm.getBookId(), comment);</span>
+
+<span class="fc" id="L333">            model.addAttribute(COMMENT_FORM, new CommentForm());</span>
+<span class="fc" id="L334">            model.addAttribute(&quot;book&quot;, updatedBook);</span>
+<span class="fc" id="L335">            addUserToModel(principal, model);</span>
+<span class="fc" id="L336">            response.addHeader(HX_TRIGGER_AFTER_SWAP, &quot;{ \&quot;showFlashMessage\&quot;: {\&quot;level\&quot;: \&quot;info\&quot;, \&quot;message\&quot;: \&quot;Your comment on the book review was &quot; +</span>
+                    &quot;successfully created\&quot;}}&quot;);
+<span class="fc" id="L338">            return &quot;book-review :: cloudy-book-comment-form&quot;;</span>
+        } else {
+<span class="nc" id="L340">            LOGGER.error(&quot;A user that doesnt exist in the database tried to create a book review comment&quot;);</span>
+<span class="nc" id="L341">            throw new NotFoundException(&quot;User not found when trying to create a book review comment&quot;);</span>
+        }
+    }
+
+    @DeleteMapping(value = &quot;/deletecomment/&quot;, params = {&quot;bookId&quot;, &quot;commentId&quot;})
+    public String deleteCommentFromBook(@RequestParam String bookId, @RequestParam String commentId,
+                                      Principal principal, Model model, HttpServletResponse response) {
+
+<span class="pc bpc" id="L349" title="2 of 8 branches missed.">        if (bookId == null || bookId.isBlank() || commentId == null || commentId.isBlank()) {</span>
+<span class="fc" id="L350">            throw new IllegalArgumentException(&quot;Missing parameters when trying to delete a book review comment&quot;);</span>
+        }
+
+<span class="fc" id="L353">        Optional&lt;User&gt; user = authUtils.extractUserFromPrincipal(principal, false);</span>
+
+<span class="pc bpc" id="L355" title="1 of 2 branches missed.">        if (user.isPresent()) {</span>
+<span class="fc" id="L356">            Book currentBook = bookRepository.findById(bookId)</span>
+<span class="pc" id="L357">                    .orElseThrow(() -&gt; new IllegalArgumentException(&quot;Unable to find book to delete comment from&quot;));</span>
+<span class="fc" id="L358">            Comment comment = currentBook.getComments().stream().filter(c -&gt; c.getId().equals(commentId)).findFirst()</span>
+<span class="fc" id="L359">                    .orElse(null);</span>
+<span class="pc bpc" id="L360" title="1 of 2 branches missed.">            if (comment == null) {</span>
+<span class="nc" id="L361">                throw new IllegalArgumentException(&quot;Unknown commentId supplied to deleteCommentFromBook&quot;);</span>
+            }
+
+<span class="pc bpc" id="L364" title="3 of 4 branches missed.">            if (comment.isOwner(user.get()) || user.get().getRoles().contains(User.Role.ROLE_ADMIN)) {</span>
+<span class="fc" id="L365">                Book book = bookRepository.removeCommentFromBook(bookId, commentId, user.get().getFullName());</span>
+<span class="fc" id="L366">                model.addAttribute(&quot;book&quot;, book);</span>
+<span class="fc" id="L367">                addUserToModel(principal, model);</span>
+<span class="fc" id="L368">                response.addHeader(HX_TRIGGER_AFTER_SWAP, &quot;{ \&quot;showFlashMessage\&quot;: {\&quot;level\&quot;: \&quot;info\&quot;, \&quot;message\&quot;: \&quot;Your comment on the '&quot; + currentBook.getTitle() +</span>
+                                &quot;' book review was successfully deleted\&quot;}}&quot;);
+<span class="fc" id="L370">                return &quot;book-review :: cloudy-book-comments-list&quot;;</span>
+
+            } else {
+<span class="nc" id="L373">                throw new NotAuthorisedException(&quot;Attempt to delete a comment but the user is not owner of comment or admin&quot;);</span>
+            }
+        } else {
+<span class="nc" id="L376">            throw new NotAuthorisedException(&quot;Attempt to delete a comment but the user not found!&quot;);</span>
+        }
+    }
+
+    @Override
+    public void addUserToModel(Principal principal, Model model) {
+
+<span class="fc" id="L383">        Optional&lt;User&gt; user = authUtils.extractUserFromPrincipal(principal, false);</span>
+<span class="fc bfc" id="L384" title="All 2 branches covered.">        if (user.isPresent()) {</span>
+<span class="fc" id="L385">            model.addAttribute(&quot;user&quot;, user.get());</span>
+<span class="fc" id="L386">            model.addAttribute(&quot;highestRole&quot;, user.get().getHighestRole().getShortName());</span>
+        } else {
+<span class="fc" id="L388">            model.addAttribute(&quot;user&quot;, null);</span>
+<span class="fc" id="L389">            model.addAttribute(&quot;highestRole&quot;, null);</span>
+        }
+<span class="fc" id="L391">    }</span>
+
+
+    @GetMapping(value = {&quot;/find&quot;}, params = {&quot;reviewer&quot;, &quot;pagenum&quot;})
+    public String findByReviewer(Model model, Principal principal, @RequestParam String reviewer, @RequestParam int pagenum,
+                                 HttpServletResponse response,
+                                 @RequestHeader(value = &quot;HX-Request&quot;, required = false) boolean hxRequest) {
+
+<span class="pc bpc" id="L399" title="2 of 4 branches missed.">        if (reviewer == null || reviewer.trim().isEmpty()) {</span>
+<span class="nc" id="L400">            throw new IllegalArgumentException(&quot;Reviewer parameter cannot be empty&quot;);</span>
+        }
+
+<span class="pc bpc" id="L403" title="1 of 2 branches missed.">        if (pagenum &lt; 1) {</span>
+<span class="nc" id="L404">            throw new IllegalArgumentException(&quot;Cannot request a page less than 1&quot;);</span>
+        }
+
+<span class="fc" id="L407">        PageRequest pageObj = PageRequest.of(pagenum - 1, defaultPageSize);</span>
+<span class="fc" id="L408">        Page&lt;Book&gt; books = bookRepository.findByReaderOrderByCreatedDateTimeDesc(pageObj, reviewer);</span>
+<span class="fc" id="L409">        model.addAttribute(&quot;pageOfBooks&quot;, books);</span>
+<span class="fc" id="L410">        model.addAttribute(&quot;ratings&quot;, BookControllerHtmx.getRatings(&quot;&quot;));</span>
+<span class="fc" id="L411">        model.addAttribute(&quot;authors&quot;, getAuthors());</span>
+<span class="fc" id="L412">        model.addAttribute(GENRES, getGenres());</span>
+<span class="fc" id="L413">        model.addAttribute(&quot;reviewers&quot;, getReviewers(principal));</span>
+<span class="fc" id="L414">        addUserToModel(principal, model);</span>
+<span class="fc" id="L415">        model.addAttribute(&quot;paginationLink&quot;, &quot;find?reviewer=&quot; + reviewer);</span>
+
+<span class="pc bpc" id="L417" title="1 of 2 branches missed.">        if (hxRequest) {</span>
+<span class="nc" id="L418">            response.addHeader(HX_TRIGGER_AFTER_SWAP, &quot;clearSelectReviewer&quot;);</span>
+<span class="nc" id="L419">            return &quot;find-reviews :: cloudy-find-by-results&quot;;</span>
+        } else {
+<span class="fc" id="L421">            return &quot;find-reviews&quot;;</span>
+        }
+    }
+
+    @GetMapping(value = {&quot;/useradmin&quot;})
+    @PreAuthorize(&quot;hasRole('ROLE_ADMIN')&quot;)
+    public String userAdmin(Model model, Principal principal) {
+
+<span class="fc" id="L429">        model.addAttribute( USERS, userRepository.findAll());</span>
+<span class="fc" id="L430">        addUserToModel(principal, model);</span>
+
+<span class="fc" id="L432">        return &quot;user-admin&quot;;</span>
+    }
+
+    @DeleteMapping(value = &quot;/deleteuser/{id}&quot;)
+    @PreAuthorize(&quot;hasRole('ROLE_ADMIN')&quot;)
+    public String deleteUserById(@PathVariable String id, Principal principal, Model model,
+                                 HttpServletResponse response) {
+
+<span class="fc" id="L440">        Optional&lt;User&gt; user = authUtils.extractUserFromPrincipal(principal, false);</span>
+<span class="pc bpc" id="L441" title="1 of 2 branches missed.">        if (user.isPresent()) {</span>
+<span class="fc bfc" id="L442" title="All 2 branches covered.">            if (user.get().getId().equals(id)) {</span>
+<span class="fc" id="L443">                LOGGER.info(&quot;User {} on {} attempted to delete themselves. This isn't allowed&quot;,</span>
+<span class="fc" id="L444">                        user.get().getFullName(), user.get().getAuthProvider());</span>
+
+<span class="fc" id="L446">                model.addAttribute(USERS, userRepository.findAll());</span>
+<span class="fc" id="L447">                addUserToModel(principal, model);</span>
+<span class="fc" id="L448">                response.addHeader(HX_TRIGGER_AFTER_SWAP, &quot;{ \&quot;showFlashMessage\&quot;: {\&quot;level\&quot;: \&quot;warn\&quot;, \&quot;message\&quot;: \&quot;You cannot delete your own logged on user\&quot;}}&quot;);</span>
+<span class="fc" id="L449">                response.addHeader(HX_RETARGET, USERS_TABLE);</span>
+<span class="fc" id="L450">                return USER_ADMIN_CLOUDY_USER_ADMIN_TABLE;</span>
+            }
+
+<span class="fc" id="L453">            userRepository.deleteById(id);</span>
+
+<span class="fc" id="L455">            model.addAttribute(USERS, userRepository.findAll());</span>
+<span class="fc" id="L456">            addUserToModel(principal, model);</span>
+<span class="fc" id="L457">            response.addHeader(HX_TRIGGER_AFTER_SWAP, &quot;{ \&quot;showFlashMessage\&quot;: {\&quot;level\&quot;: \&quot;info\&quot;, \&quot;message\&quot;: \&quot;Selected user successfully deleted\&quot;}}&quot;);</span>
+<span class="fc" id="L458">            response.addHeader(&quot;HX-Trigger-After-Settle&quot;, &quot;refreshSimpleDataTables&quot;);</span>
+
+        } else {
+<span class="nc" id="L461">            model.addAttribute(USERS, userRepository.findAll());</span>
+<span class="nc" id="L462">            addUserToModel(principal, model);</span>
+<span class="nc" id="L463">            response.addHeader(HX_TRIGGER_AFTER_SWAP, &quot;{ \&quot;showFlashMessage\&quot;: {\&quot;level\&quot;: \&quot;warn\&quot;, \&quot;message\&quot;: \&quot;Your userid no longer found in the data store!\&quot;}}&quot;);</span>
+<span class="nc" id="L464">            response.addHeader(HX_RETARGET, USERS_TABLE);</span>
+        }
+<span class="fc" id="L466">        return  USER_ADMIN_CLOUDY_USER_ADMIN_TABLE;</span>
+    }
+
+    @PutMapping(value = &quot;/updateuserrole/{id}&quot;, params = {&quot;role&quot;})
+    @PreAuthorize(&quot;hasRole('ROLE_ADMIN')&quot;)
+    public String updateUserRoles(@PathVariable String id, @RequestParam String role,
+                                  Principal principal, Model model,
+                                  HttpServletResponse response) {
+
+<span class="fc" id="L475">        Optional&lt;User&gt; user = authUtils.extractUserFromPrincipal(principal, false);</span>
+<span class="pc bpc" id="L476" title="1 of 2 branches missed.">        if (user.isPresent()) {</span>
+<span class="fc bfc" id="L477" title="All 2 branches covered.">            if (user.get().getId().equals(id)) {</span>
+<span class="fc" id="L478">                LOGGER.info(&quot;User {} on {} attempted to change their own roles. This isn't allowed&quot;,</span>
+<span class="fc" id="L479">                        user.get().getFullName(), user.get().getAuthProvider());</span>
+<span class="fc" id="L480">                model.addAttribute(USERS, userRepository.findAll());</span>
+<span class="fc" id="L481">                addUserToModel(principal, model);</span>
+<span class="fc" id="L482">                response.addHeader(HX_TRIGGER_AFTER_SWAP, &quot;{ \&quot;showFlashMessage\&quot;: {\&quot;level\&quot;: \&quot;warn\&quot;, \&quot;message\&quot;: \&quot;Your cannot change the role for you own logged on user!\&quot;}}&quot;);</span>
+<span class="fc" id="L483">                response.addHeader(HX_RETARGET, USERS_TABLE);</span>
+<span class="fc" id="L484">                return USER_ADMIN_CLOUDY_USER_ADMIN_TABLE;</span>
+            }
+
+<span class="fc" id="L487">            ClientRoles roles = new ClientRoles();</span>
+<span class="fc" id="L488">            roles.setId(id);</span>
+<span class="pc bpc" id="L489" title="1 of 2 branches missed.">            if (role.equalsIgnoreCase(&quot;ROLE_ADMIN&quot;)) {</span>
+<span class="nc" id="L490">                roles.setAdmin(true);</span>
+<span class="nc" id="L491">                roles.setEditor(true);</span>
+<span class="pc bpc" id="L492" title="1 of 2 branches missed.">            } else if (role.equalsIgnoreCase(&quot;ROLE_EDITOR&quot;)) {</span>
+<span class="nc" id="L493">                roles.setAdmin(false);</span>
+<span class="nc" id="L494">                roles.setEditor(true);</span>
+            } else {
+<span class="fc" id="L496">                roles.setAdmin(false);</span>
+<span class="fc" id="L497">                roles.setEditor(false);</span>
+            }
+<span class="fc" id="L499">            userRepository.updateUserRoles(roles);</span>
+<span class="fc" id="L500">            User updatedUser = userRepository.findById(id).orElseThrow(() -&gt;</span>
+<span class="nc" id="L501">                    new IllegalArgumentException(&quot;Didn't find the user being updated&quot;));</span>
+
+<span class="fc" id="L503">            List&lt;User&gt; singleUser = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L504">            singleUser.add(updatedUser);</span>
+<span class="fc" id="L505">            model.addAttribute(USERS, singleUser);</span>
+<span class="fc" id="L506">            addUserToModel(principal, model);</span>
+<span class="fc" id="L507">            response.addHeader(HX_TRIGGER_AFTER_SWAP, &quot;{ \&quot;showFlashMessage\&quot;: {\&quot;level\&quot;: \&quot;info\&quot;, \&quot;message\&quot;: \&quot;&quot; + updatedUser.getFullName() + &quot;'s role updated OK\&quot;}}&quot;);</span>
+<span class="fc" id="L508">            return &quot;user-admin :: cloudy-user-admin-row&quot;;</span>
+
+        } else {
+<span class="nc" id="L511">            model.addAttribute(USERS, userRepository.findAll());</span>
+<span class="nc" id="L512">            addUserToModel(principal, model);</span>
+<span class="nc" id="L513">            response.addHeader(HX_TRIGGER_AFTER_SWAP, &quot;{ \&quot;showFlashMessage\&quot;: {\&quot;level\&quot;: \&quot;warn\&quot;, \&quot;message\&quot;: \&quot;Your userid no longer found in the data store!\&quot;}}&quot;);</span>
+<span class="nc" id="L514">            response.addHeader(HX_RETARGET, USERS_TABLE);</span>
+<span class="nc" id="L515">            return USER_ADMIN_CLOUDY_USER_ADMIN_TABLE;</span>
+        }
+    }
+
+    private List&lt;BooksByReader&gt; getReviewers(Principal principal) {
+<span class="fc" id="L520">        Optional&lt;User&gt; user = authUtils.extractUserFromPrincipal(principal, false);</span>
+<span class="pc bpc" id="L521" title="2 of 4 branches missed.">        if (user.isPresent() &amp;&amp; user.get().getHighestRole().getRoleNumber() &gt;= User.Role.ROLE_EDITOR.getRoleNumber()) {</span>
+<span class="fc" id="L522">            return bookRepository.countBooksByReader();</span>
+        } else {
+<span class="nc" id="L524">            LOGGER.warn(&quot;A Principal (user) should be present for this method to have been called&quot;);</span>
+<span class="nc" id="L525">            return new ArrayList&lt;&gt;();</span>
+        }
+    }
+
+    private List&lt;BooksByGenre&gt; getGenres() {
+<span class="fc" id="L530">        return bookRepository.countBooksByGenre();</span>
+    }
+
+    private List&lt;BooksByAuthor&gt; getAuthors() {
+<span class="fc" id="L534">        return bookRepository.countBooksByAuthor();</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

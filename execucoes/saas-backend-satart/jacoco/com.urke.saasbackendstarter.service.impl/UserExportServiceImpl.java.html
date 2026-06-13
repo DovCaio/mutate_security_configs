@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>UserExportServiceImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">SaaS Backend Starter</a> &gt; <a href="index.source.html" class="el_package">com.urke.saasbackendstarter.service.impl</a> &gt; <span class="el_source">UserExportServiceImpl.java</span></div><h1>UserExportServiceImpl.java</h1><pre class="source lang-java linenums">package com.urke.saasbackendstarter.service.impl;
+
+import com.urke.saasbackendstarter.domain.Organization;
+import com.urke.saasbackendstarter.domain.User;
+import com.urke.saasbackendstarter.repository.UserRepository;
+import com.urke.saasbackendstarter.service.UserExportService;
+import lombok.RequiredArgsConstructor;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+import org.springframework.web.server.ResponseStatusException;
+import com.lowagie.text.*;
+import com.lowagie.text.Font;
+import com.lowagie.text.pdf.PdfPCell;
+import com.lowagie.text.pdf.PdfPTable;
+import com.lowagie.text.pdf.PdfWriter;
+
+import java.io.ByteArrayOutputStream;
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Service
+@RequiredArgsConstructor
+public class UserExportServiceImpl implements UserExportService {
+
+    private final UserRepository userRepository;
+
+    @Override
+    public List&lt;User&gt; findExportUsers(Organization org, String email) {
+<span class="fc bfc" id="L32" title="All 2 branches covered.">        if (StringUtils.hasText(email)) {</span>
+<span class="fc" id="L33">            return userRepository.findAllByOrganizationAndDeletedFalse(org).stream()</span>
+<span class="fc" id="L34">                    .filter(u -&gt; u.getEmail().toLowerCase().contains(email.toLowerCase()))</span>
+<span class="fc" id="L35">                    .collect(Collectors.toList());</span>
+        }
+<span class="fc" id="L37">        return userRepository.findAllByOrganizationAndDeletedFalse(org);</span>
+    }
+
+    @Override
+    public byte[] exportToExcel(List&lt;User&gt; users) {
+<span class="fc" id="L42">        try (Workbook workbook = new XSSFWorkbook(); ByteArrayOutputStream out = new ByteArrayOutputStream()) {</span>
+<span class="fc" id="L43">            Sheet sheet = workbook.createSheet(&quot;Users&quot;);</span>
+<span class="fc" id="L44">            Row header = sheet.createRow(0);</span>
+<span class="fc" id="L45">            header.createCell(0).setCellValue(&quot;ID&quot;);</span>
+<span class="fc" id="L46">            header.createCell(1).setCellValue(&quot;Email&quot;);</span>
+<span class="fc" id="L47">            header.createCell(2).setCellValue(&quot;Full Name&quot;);</span>
+<span class="fc" id="L48">            header.createCell(3).setCellValue(&quot;Roles&quot;);</span>
+<span class="fc" id="L49">            int rowIdx = 1;</span>
+<span class="fc bfc" id="L50" title="All 2 branches covered.">            for (User user : users) {</span>
+<span class="fc" id="L51">                Row row = sheet.createRow(rowIdx++);</span>
+<span class="fc" id="L52">                row.createCell(0).setCellValue(user.getId());</span>
+<span class="fc" id="L53">                row.createCell(1).setCellValue(user.getEmail());</span>
+<span class="fc" id="L54">                row.createCell(2).setCellValue(user.getFullName());</span>
+<span class="fc" id="L55">                row.createCell(3).setCellValue(</span>
+<span class="fc" id="L56">                        user.getRoles().stream().map(r -&gt; r.getName()).collect(Collectors.joining(&quot;, &quot;))</span>
+                );
+<span class="fc" id="L58">            }</span>
+<span class="fc" id="L59">            workbook.write(out);</span>
+<span class="fc" id="L60">            return out.toByteArray();</span>
+<span class="nc" id="L61">        } catch (Exception e) {</span>
+<span class="nc" id="L62">            throw new ResponseStatusException(org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR, &quot;Excel export failed&quot;, e);</span>
+        }
+    }
+
+    @Override
+    public byte[] exportToPdf(List&lt;User&gt; users) {
+<span class="fc" id="L68">        try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {</span>
+<span class="fc" id="L69">            Document document = new Document();</span>
+<span class="fc" id="L70">            PdfWriter.getInstance(document, out);</span>
+<span class="fc" id="L71">            document.open();</span>
+
+<span class="fc" id="L73">            Font titleFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 16);</span>
+<span class="fc" id="L74">            Font headFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 12);</span>
+
+<span class="fc" id="L76">            Paragraph title = new Paragraph(&quot;Users Export&quot;, titleFont);</span>
+<span class="fc" id="L77">            title.setAlignment(Element.ALIGN_CENTER);</span>
+<span class="fc" id="L78">            document.add(title);</span>
+<span class="fc" id="L79">            document.add(Chunk.NEWLINE);</span>
+
+<span class="fc" id="L81">            PdfPTable table = new PdfPTable(4);</span>
+<span class="fc" id="L82">            table.setWidthPercentage(100f);</span>
+<span class="fc" id="L83">            table.setWidths(new int[]{1, 4, 4, 3});</span>
+<span class="fc" id="L84">            table.setSpacingBefore(10);</span>
+
+<span class="fc" id="L86">            String[] headers = {&quot;ID&quot;, &quot;Email&quot;, &quot;Full Name&quot;, &quot;Roles&quot;};</span>
+<span class="fc bfc" id="L87" title="All 2 branches covered.">            for (String h : headers) {</span>
+<span class="fc" id="L88">                PdfPCell cell = new PdfPCell(new Phrase(h, headFont));</span>
+<span class="fc" id="L89">                cell.setHorizontalAlignment(Element.ALIGN_CENTER);</span>
+<span class="fc" id="L90">                table.addCell(cell);</span>
+            }
+
+<span class="fc bfc" id="L93" title="All 2 branches covered.">            for (User user : users) {</span>
+<span class="fc" id="L94">                table.addCell(String.valueOf(user.getId()));</span>
+<span class="fc" id="L95">                table.addCell(user.getEmail());</span>
+<span class="fc" id="L96">                table.addCell(user.getFullName());</span>
+<span class="fc" id="L97">                table.addCell(user.getRoles().stream().map(r -&gt; r.getName()).collect(Collectors.joining(&quot;, &quot;)));</span>
+<span class="fc" id="L98">            }</span>
+
+<span class="fc" id="L100">            document.add(table);</span>
+<span class="fc" id="L101">            document.close();</span>
+<span class="fc" id="L102">            return out.toByteArray();</span>
+<span class="nc" id="L103">        } catch (Exception e) {</span>
+<span class="nc" id="L104">            throw new ResponseStatusException(org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR, &quot;PDF export failed&quot;, e);</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

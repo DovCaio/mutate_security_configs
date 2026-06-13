@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MfaSetupRequiredFilter.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">42 REST Secure Spring Boot Starter</a> &gt; <a href="index.source.html" class="el_package">nl._42.restsecure.autoconfigure.authentication.mfa</a> &gt; <span class="el_source">MfaSetupRequiredFilter.java</span></div><h1>MfaSetupRequiredFilter.java</h1><pre class="source lang-java linenums">package nl._42.restsecure.autoconfigure.authentication.mfa;
+
+import static nl._42.restsecure.autoconfigure.authentication.mfa.MfaAuthenticationProvider.DETAILS_MFA_SETUP_REQUIRED;
+import static org.springframework.http.HttpStatus.FORBIDDEN;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.BiFunction;
+
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.Getter;
+import lombok.Setter;
+import tools.jackson.databind.ObjectMapper;
+
+import org.springframework.http.ProblemDetail;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.util.matcher.RequestMatcher;
+import org.springframework.util.Assert;
+import org.springframework.web.filter.GenericFilterBean;
+
+/**
+ * A {@link GenericFilterBean} that denies requests when the user is obliged to set up MFA but hasn't done so.
+ */
+<span class="fc" id="L32">public class MfaSetupRequiredFilter extends GenericFilterBean {</span>
+
+    private static final String SERVER_MFA_SETUP_REQUIRED_ERROR = &quot;SERVER.MFA_SETUP_REQUIRED_ERROR&quot;;
+
+<span class="fc" id="L36">    @Getter</span>
+    private final List&lt;RequestMatcher&gt; excludedRequests = new ArrayList&lt;&gt;();
+
+<span class="fc" id="L39">    @Getter</span>
+    private final List&lt;BiFunction&lt;ServletRequest, ServletResponse, Boolean&gt;&gt; exclusionChecks = new ArrayList&lt;&gt;();
+
+    @Setter
+    private ObjectMapper objectMapper;
+
+    @Override
+    public void afterPropertiesSet() throws ServletException {
+<span class="fc" id="L47">        super.afterPropertiesSet();</span>
+<span class="fc" id="L48">        Assert.notNull(this.objectMapper, &quot;A ObjectMapper must be set&quot;);</span>
+<span class="fc" id="L49">    }</span>
+
+    @Override
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) {
+<span class="fc" id="L53">        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();</span>
+        // We only perform this filter if the authentication contains the correct details.
+<span class="pc bpc" id="L55" title="1 of 4 branches missed.">        if (authentication == null || !DETAILS_MFA_SETUP_REQUIRED.equals(authentication.getDetails())) {</span>
+<span class="fc" id="L56">            continueWithFilterChain(request, response, chain);</span>
+<span class="fc" id="L57">            return;</span>
+        }
+
+        // Required to allow access to public endpoints or endpoints mandatory to load the MFA setup page.
+<span class="fc bfc" id="L61" title="All 2 branches covered.">        if (excludedRequests.stream().anyMatch(r -&gt; r.matches(((HttpServletRequest) request)))) {</span>
+<span class="fc" id="L62">            continueWithFilterChain(request, response, chain);</span>
+<span class="fc" id="L63">            return;</span>
+        }
+
+        // If any other check indicates that the MFA setup should not be performed, do not send the error.
+<span class="fc bfc" id="L67" title="All 2 branches covered.">        if (exclusionChecks.stream().anyMatch(exclusion -&gt; exclusion.apply(request, response))) {</span>
+<span class="fc" id="L68">            continueWithFilterChain(request, response, chain);</span>
+<span class="fc" id="L69">            return;</span>
+        }
+
+<span class="fc" id="L72">        sendMfaSetupRequiredError(response);</span>
+<span class="fc" id="L73">    }</span>
+
+    private void sendMfaSetupRequiredError(ServletResponse response) {
+        try {
+            // Return access denied status with &quot;mfa not setup&quot; as the reason.
+<span class="fc" id="L78">            HttpServletResponse httpServletResponse = (HttpServletResponse) response;</span>
+
+<span class="fc" id="L80">            httpServletResponse.setStatus(FORBIDDEN.value());</span>
+<span class="fc" id="L81">            response.setContentType(APPLICATION_JSON_VALUE);</span>
+<span class="fc" id="L82">            ProblemDetail pd = ProblemDetail.forStatusAndDetail(FORBIDDEN, &quot;MFA setup incorrect&quot;);</span>
+<span class="fc" id="L83">            pd.setProperty(&quot;errorCode&quot;, SERVER_MFA_SETUP_REQUIRED_ERROR);</span>
+<span class="fc" id="L84">            objectMapper.writeValue(httpServletResponse.getWriter(), pd);</span>
+<span class="fc" id="L85">            httpServletResponse.getWriter().flush();</span>
+<span class="nc" id="L86">        } catch (IOException exception) {</span>
+<span class="nc" id="L87">            throw new IllegalStateException(exception);</span>
+<span class="fc" id="L88">        }</span>
+<span class="fc" id="L89">    }</span>
+
+    private void continueWithFilterChain(ServletRequest request, ServletResponse response, FilterChain chain) {
+        try {
+<span class="fc" id="L93">            chain.doFilter(request, response);</span>
+<span class="nc" id="L94">        } catch (IOException | ServletException exception) {</span>
+<span class="nc" id="L95">            throw new IllegalStateException(exception);</span>
+<span class="fc" id="L96">        }</span>
+<span class="fc" id="L97">    }</span>
+}
+
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

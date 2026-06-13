@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>RestAccessDeniedHandler.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">42 REST Secure Spring Boot Starter</a> &gt; <a href="index.source.html" class="el_package">nl._42.restsecure.autoconfigure.errorhandling</a> &gt; <span class="el_source">RestAccessDeniedHandler.java</span></div><h1>RestAccessDeniedHandler.java</h1><pre class="source lang-java linenums">package nl._42.restsecure.autoconfigure.errorhandling;
+
+import static org.springframework.http.HttpStatus.FORBIDDEN;
+import static org.springframework.http.HttpStatus.UNAUTHORIZED;
+
+import java.io.IOException;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
+import lombok.extern.slf4j.Slf4j;
+import nl._42.restsecure.autoconfigure.form.FormValues;
+import nl._42.restsecure.autoconfigure.form.LoginForm;
+import nl._42.restsecure.autoconfigure.utils.FormUtil;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.security.web.access.AccessDeniedHandler;
+import org.springframework.stereotype.Component;
+
+/**
+ * Handles all authentication- and authorization exceptions that can occur in the http web environment.
+ */
+<span class="fc" id="L26">@Slf4j</span>
+@Component
+public class RestAccessDeniedHandler implements AccessDeniedHandler, AuthenticationEntryPoint {
+
+    public static final String SERVER_AUTHENTICATE_ERROR = &quot;SERVER.AUTHENTICATE_ERROR&quot;;
+    public static final String SERVER_ACCESS_DENIED_ERROR = &quot;SERVER.ACCESS_DENIED_ERROR&quot;;
+    public static final String SERVER_SESSION_INVALID_ERROR = &quot;SERVER.SESSION_TIMEOUT_ERROR&quot;;
+
+    private final GenericErrorHandler errorHandler;
+
+    @Autowired
+<span class="fc" id="L37">    public RestAccessDeniedHandler(GenericErrorHandler handler) {</span>
+<span class="fc" id="L38">        this.errorHandler = handler;</span>
+<span class="fc" id="L39">    }</span>
+
+    /**
+     * Handles URL authority matching failures.
+     * {@inheritDoc}
+     */
+    @Override
+    public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException exception) throws IOException {
+<span class="fc" id="L47">        FormValues&lt;LoginForm&gt; formValues = FormUtil.getFormFromRequest(request, LoginForm.class);</span>
+<span class="fc" id="L48">        LogUtil.logAuthenticationFailure(log, formValues.form(), exception);</span>
+<span class="fc" id="L49">        errorHandler.respond(response, FORBIDDEN, SERVER_ACCESS_DENIED_ERROR);</span>
+<span class="fc" id="L50">    }</span>
+
+    /**
+     * Handles authentication exception when trying to reach a restricted URL.
+     * {@inheritDoc}
+     */
+    @Override
+    public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException {
+<span class="fc" id="L58">        FormValues&lt;LoginForm&gt; formValues = FormUtil.getFormFromRequest(request, LoginForm.class);</span>
+<span class="fc" id="L59">        LogUtil.logAuthenticationFailure(log, formValues.form(), exception);</span>
+<span class="fc bfc" id="L60" title="All 2 branches covered.">        String errorCode = request.isRequestedSessionIdValid()</span>
+<span class="fc" id="L61">                ? SERVER_AUTHENTICATE_ERROR</span>
+<span class="fc" id="L62">                : SERVER_SESSION_INVALID_ERROR;</span>
+<span class="fc" id="L63">        errorHandler.respond(response, UNAUTHORIZED, errorCode);</span>
+<span class="fc" id="L64">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

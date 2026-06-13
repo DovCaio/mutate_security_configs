@@ -1,0 +1,23 @@
+Mockito is currently self-attaching to enable the inline-mock-maker. This will no longer work in future releases of the JDK. Please add Mockito as an agent to your build as described in Mockito's documentation: https://javadoc.io/doc/org.mockito/mockito-core/latest/org.mockito/org/mockito/Mockito.html#0.3
+OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+WARNING: A Java agent has been loaded dynamically (/home/caiojhonatanalvespereira/.m2/repository/net/bytebuddy/byte-buddy-agent/1.17.5/byte-buddy-agent-1.17.5.jar)
+WARNING: If a serviceability tool is in use, please run with -XX:+EnableDynamicAgentLoading to hide this warning
+WARNING: If a serviceability tool is not in use, please run with -Djdk.instrument.traceUsage for more information
+WARNING: Dynamic loading of agents will be disallowed by default in a future release
+8:41:31 PM PIT >> INFO : Verbose logging is disabled. If you encounter a problem, please enable it before reporting an issue.
+8:41:32 PM PIT >> INFO : Created 103 mutation test units in pre scan
+8:41:33 PM PIT >> INFO : Sending 128 test classes to minion
+8:41:33 PM PIT >> INFO : Sent tests to minion
+8:41:38 PM PIT >> INFO : MINION : Mockito is currently self-attaching to enable the inline-mock-maker. This will no longer work in future releases of the JDK. Please add Mockito as an agent to your build as described in Mockito's documentation: https://javadoc.io/doc/org.mockito/mockito-core/latest/org.mockito/org/mockito/Mockito.html#0.3
+8:41:38 PM PIT >> INFO : MINION : WARNING: A Java agent has been loaded dynamically (/home/caiojhonatanalvespereira/.m2/repository/net/bytebuddy/byte-buddy-agent/1.17.5/byte-buddy-agent-1.17.5.jar)
+8:41:38 PM PIT >> INFO : MINION : WARNING: If a serviceability tool is in use, please run with -XX:+EnableDynamicAgentLoading to hide this warning
+8:41:38 PM PIT >> INFO : MINION : WARNING: If a serviceability tool is not in use, please run with -Djdk.instrument.traceUsage for more information
+8:41:38 PM PIT >> INFO : MINION : WARNING: Dynamic loading of agents will be disallowed by default in a future release
+8:41:38 PM PIT >> INFO : MINION : OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+8:41:53 PM PIT >> INFO : Calculated coverage in 21 seconds.
+8:41:54 PM PIT >> INFO : Created 41 mutation test units
+8:46:02 PM PIT >> INFO : Completed in 271 seconds
+[0m
+real	5m18.700s
+user	9m44.102s
+sys	0m20.110s

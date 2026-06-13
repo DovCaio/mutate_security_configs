@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+    <link rel="stylesheet" type="text/css" href="../style.css">
+</head>
+<body>
+
+
+<h1>RestAuthenticationFilterConfigurer.java</h1>
+
+<table class="src">
+
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@127cbd8b_1'/>
+1
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@127cbd8b_1'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>package nl._42.restsecure.autoconfigure;</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@127cbd8b_2'/>
+2
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@127cbd8b_2'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@127cbd8b_3'/>
+3
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@127cbd8b_3'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>import lombok.RequiredArgsConstructor;</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@127cbd8b_4'/>
+4
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@127cbd8b_4'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@127cbd8b_5'/>
+5
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@127cbd8b_5'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>import org.springframework.security.config.annotation.web.HttpSecurityBuilder;</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@127cbd8b_6'/>
+6
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@127cbd8b_6'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@127cbd8b_7'/>
+7
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@127cbd8b_7'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>import org.springframework.security.web.authentication.AuthenticationSuccessHandler;</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@127cbd8b_8'/>
+8
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@127cbd8b_8'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>import org.springframework.security.web.authentication.RememberMeServices;</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@127cbd8b_9'/>
+9
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@127cbd8b_9'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@127cbd8b_10'/>
+10
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@127cbd8b_10'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>import org.springframework.security.web.context.SecurityContextRepository;</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@127cbd8b_11'/>
+11
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@127cbd8b_11'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@127cbd8b_12'/>
+12
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@127cbd8b_12'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>@RequiredArgsConstructor</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@127cbd8b_13'/>
+13
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@127cbd8b_13'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>public class RestAuthenticationFilterConfigurer&#60;H extends HttpSecurityBuilder&#60;H&#62;&#62;</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@127cbd8b_14'/>
+14
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@127cbd8b_14'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>        extends AbstractHttpConfigurer&#60;RestAuthenticationFilterConfigurer&#60;H&#62;, H&#62; {</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@127cbd8b_15'/>
+15
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@127cbd8b_15'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@127cbd8b_16'/>
+16
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@127cbd8b_16'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    private final RestAuthenticationFilter authenticationFilter;</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@127cbd8b_17'/>
+17
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@127cbd8b_17'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    private final RememberMeServices rememberMeServices;</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@127cbd8b_18'/>
+18
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@127cbd8b_18'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    private final AuthenticationSuccessHandler successHandler;</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@127cbd8b_19'/>
+19
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@127cbd8b_19'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@127cbd8b_20'/>
+20
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@127cbd8b_20'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    @Override</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@127cbd8b_21'/>
+21
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@127cbd8b_21'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    public void configure(H http) {</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@127cbd8b_22'/>
+22
+</td>
+<td class='killed'>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@127cbd8b_22'>1</a>
+<span>
+1. configure : negated conditional &rarr; KILLED<br/>
+
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class='killed'>        if (successHandler != null) {</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@127cbd8b_23'/>
+23
+</td>
+<td class='killed'>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@127cbd8b_23'>1</a>
+<span>
+1. configure : removed call to nl/_42/restsecure/autoconfigure/RestAuthenticationFilter::setSuccessHandler &rarr; KILLED<br/>
+
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class='killed'>            authenticationFilter.setSuccessHandler(successHandler);</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@127cbd8b_24'/>
+24
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@127cbd8b_24'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>        }</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@127cbd8b_25'/>
+25
+</td>
+<td class='killed'>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@127cbd8b_25'>1</a>
+<span>
+1. configure : negated conditional &rarr; KILLED<br/>
+
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class='killed'>        if (rememberMeServices != null) {</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@127cbd8b_26'/>
+26
+</td>
+<td class='killed'>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@127cbd8b_26'>1</a>
+<span>
+1. configure : removed call to nl/_42/restsecure/autoconfigure/RestAuthenticationFilter::setRememberMeServices &rarr; KILLED<br/>
+
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class='killed'>            authenticationFilter.setRememberMeServices(rememberMeServices);</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@127cbd8b_27'/>
+27
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@127cbd8b_27'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>        }</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@127cbd8b_28'/>
+28
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@127cbd8b_28'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>        SessionAuthenticationStrategy sessionAuthenticationStrategy = http</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@127cbd8b_29'/>
+29
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@127cbd8b_29'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>                .getSharedObject(SessionAuthenticationStrategy.class);</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@127cbd8b_30'/>
+30
+</td>
+<td class='killed'>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@127cbd8b_30'>1</a>
+<span>
+1. configure : negated conditional &rarr; KILLED<br/>
+
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class='killed'>        if (sessionAuthenticationStrategy != null) {</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@127cbd8b_31'/>
+31
+</td>
+<td class='killed'>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@127cbd8b_31'>1</a>
+<span>
+1. configure : removed call to nl/_42/restsecure/autoconfigure/RestAuthenticationFilter::setSessionStrategy &rarr; KILLED<br/>
+
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class='killed'>            authenticationFilter.setSessionStrategy(sessionAuthenticationStrategy);</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@127cbd8b_32'/>
+32
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@127cbd8b_32'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>        }</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@127cbd8b_33'/>
+33
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@127cbd8b_33'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>        SecurityContextRepository securityContextRepository = http.getSharedObject(SecurityContextRepository.class);</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@127cbd8b_34'/>
+34
+</td>
+<td class='survived'>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@127cbd8b_34'>1</a>
+<span>
+1. configure : negated conditional &rarr; SURVIVED<br/>
+
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class='survived'>        if (securityContextRepository != null) {</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@127cbd8b_35'/>
+35
+</td>
+<td class='survived'>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@127cbd8b_35'>1</a>
+<span>
+1. configure : removed call to nl/_42/restsecure/autoconfigure/RestAuthenticationFilter::setSecurityContextRepository &rarr; SURVIVED<br/>
+
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class='survived'>            authenticationFilter.setSecurityContextRepository(securityContextRepository);</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@127cbd8b_36'/>
+36
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@127cbd8b_36'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>        }</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@127cbd8b_37'/>
+37
+</td>
+<td class='survived'>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@127cbd8b_37'>1</a>
+<span>
+1. configure : removed call to nl/_42/restsecure/autoconfigure/RestAuthenticationFilter::setSecurityContextHolderStrategy &rarr; SURVIVED<br/>
+
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class='survived'>        authenticationFilter.setSecurityContextHolderStrategy(getSecurityContextHolderStrategy());</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@127cbd8b_38'/>
+38
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@127cbd8b_38'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>    }</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@127cbd8b_39'/>
+39
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@127cbd8b_39'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>}</span></pre></td></tr>
+
+
+
+<tr><td></td><td></td><td><h2>Mutations</h2></td></tr>
+
+<tr>
+<td><a href='#org.pitest.mutationtest.report.html.SourceFile@127cbd8b_22'>22</a></td> 
+<td></td>
+<td>
+
+<a name='grouporg.pitest.mutationtest.report.html.SourceFile@127cbd8b_22'/> 
+
+<p class='KILLED'><span class='pop'>1.<span><b>1</b><br/><b>Location : </b>configure<br/><b>Killed by : </b>nl._42.restsecure.autoconfigure.authentication.AuthenticationControllerTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.authentication.AuthenticationControllerTest]/[method:authenticate_shouldSucceed_withCorrectCredentials()]</span></span> negated conditional &rarr; KILLED</p> 
+</td>
+</tr>
+<tr>
+<td><a href='#org.pitest.mutationtest.report.html.SourceFile@127cbd8b_23'>23</a></td> 
+<td></td>
+<td>
+
+<a name='grouporg.pitest.mutationtest.report.html.SourceFile@127cbd8b_23'/> 
+
+<p class='KILLED'><span class='pop'>1.<span><b>1</b><br/><b>Location : </b>configure<br/><b>Killed by : </b>nl._42.restsecure.autoconfigure.authentication.AuthenticationControllerTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.authentication.AuthenticationControllerTest]/[method:successHandler_shouldBeCalled_afterSuccessfulAuthentication()]</span></span> removed call to nl/_42/restsecure/autoconfigure/RestAuthenticationFilter::setSuccessHandler &rarr; KILLED</p> 
+</td>
+</tr>
+<tr>
+<td><a href='#org.pitest.mutationtest.report.html.SourceFile@127cbd8b_25'>25</a></td> 
+<td></td>
+<td>
+
+<a name='grouporg.pitest.mutationtest.report.html.SourceFile@127cbd8b_25'/> 
+
+<p class='KILLED'><span class='pop'>1.<span><b>1</b><br/><b>Location : </b>configure<br/><b>Killed by : </b>nl._42.restsecure.autoconfigure.authentication.AuthenticationControllerTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.authentication.AuthenticationControllerTest]/[method:authenticate_shouldFail_withAccountLocked()]</span></span> negated conditional &rarr; KILLED</p> 
+</td>
+</tr>
+<tr>
+<td><a href='#org.pitest.mutationtest.report.html.SourceFile@127cbd8b_26'>26</a></td> 
+<td></td>
+<td>
+
+<a name='grouporg.pitest.mutationtest.report.html.SourceFile@127cbd8b_26'/> 
+
+<p class='KILLED'><span class='pop'>1.<span><b>1</b><br/><b>Location : </b>configure<br/><b>Killed by : </b>nl._42.restsecure.autoconfigure.authentication.AuthenticationControllerTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.authentication.AuthenticationControllerTest]/[method:rememberMe_shouldFail_afterFailedAuthentication()]</span></span> removed call to nl/_42/restsecure/autoconfigure/RestAuthenticationFilter::setRememberMeServices &rarr; KILLED</p> 
+</td>
+</tr>
+<tr>
+<td><a href='#org.pitest.mutationtest.report.html.SourceFile@127cbd8b_30'>30</a></td> 
+<td></td>
+<td>
+
+<a name='grouporg.pitest.mutationtest.report.html.SourceFile@127cbd8b_30'/> 
+
+<p class='KILLED'><span class='pop'>1.<span><b>1</b><br/><b>Location : </b>configure<br/><b>Killed by : </b>nl._42.restsecure.autoconfigure.authentication.AuthenticationControllerTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.authentication.AuthenticationControllerTest]/[method:authenticate_shouldChangeSessionId_toPreventSessionFixationAttack()]</span></span> negated conditional &rarr; KILLED</p> 
+</td>
+</tr>
+<tr>
+<td><a href='#org.pitest.mutationtest.report.html.SourceFile@127cbd8b_31'>31</a></td> 
+<td></td>
+<td>
+
+<a name='grouporg.pitest.mutationtest.report.html.SourceFile@127cbd8b_31'/> 
+
+<p class='KILLED'><span class='pop'>1.<span><b>1</b><br/><b>Location : </b>configure<br/><b>Killed by : </b>nl._42.restsecure.autoconfigure.authentication.AuthenticationControllerTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.authentication.AuthenticationControllerTest]/[method:authenticate_shouldChangeSessionId_toPreventSessionFixationAttack()]</span></span> removed call to nl/_42/restsecure/autoconfigure/RestAuthenticationFilter::setSessionStrategy &rarr; KILLED</p> 
+</td>
+</tr>
+<tr>
+<td><a href='#org.pitest.mutationtest.report.html.SourceFile@127cbd8b_34'>34</a></td> 
+<td></td>
+<td>
+
+<a name='grouporg.pitest.mutationtest.report.html.SourceFile@127cbd8b_34'/> 
+
+<p class='SURVIVED'><span class='pop'>1.<span><b>1</b><br/><b>Location : </b>configure<br/><b>Killed by : </b>none</span></span> negated conditional &rarr; SURVIVED</p> 
+</td>
+</tr>
+<tr>
+<td><a href='#org.pitest.mutationtest.report.html.SourceFile@127cbd8b_35'>35</a></td> 
+<td></td>
+<td>
+
+<a name='grouporg.pitest.mutationtest.report.html.SourceFile@127cbd8b_35'/> 
+
+<p class='SURVIVED'><span class='pop'>1.<span><b>1</b><br/><b>Location : </b>configure<br/><b>Killed by : </b>none</span></span> removed call to nl/_42/restsecure/autoconfigure/RestAuthenticationFilter::setSecurityContextRepository &rarr; SURVIVED</p> 
+</td>
+</tr>
+<tr>
+<td><a href='#org.pitest.mutationtest.report.html.SourceFile@127cbd8b_37'>37</a></td> 
+<td></td>
+<td>
+
+<a name='grouporg.pitest.mutationtest.report.html.SourceFile@127cbd8b_37'/> 
+
+<p class='SURVIVED'><span class='pop'>1.<span><b>1</b><br/><b>Location : </b>configure<br/><b>Killed by : </b>none</span></span> removed call to nl/_42/restsecure/autoconfigure/RestAuthenticationFilter::setSecurityContextHolderStrategy &rarr; SURVIVED</p> 
+</td>
+</tr>
+
+</table>
+
+
+<h2>Active mutators</h2>
+<ul>
+<li class='mutator'>CONDITIONALS_BOUNDARY</li>
+<li class='mutator'>EMPTY_RETURNS</li>
+<li class='mutator'>FALSE_RETURNS</li>
+<li class='mutator'>INCREMENTS</li>
+<li class='mutator'>INVERT_NEGS</li>
+<li class='mutator'>MATH</li>
+<li class='mutator'>NEGATE_CONDITIONALS</li>
+<li class='mutator'>NULL_RETURNS</li>
+<li class='mutator'>PRIMITIVE_RETURNS</li>
+<li class='mutator'>TRUE_RETURNS</li>
+<li class='mutator'>VOID_METHOD_CALLS</li>
+
+</ul>
+
+<h2>Tests examined</h2>
+<ul>
+<li>nl._42.restsecure.autoconfigure.errorhandling.WebMvcErrorHandlingTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.errorhandling.WebMvcErrorHandlingTest]/[method:forbiddenEndpoint_shouldFail_whenAdmin()] (143 ms)</li><li>nl._42.restsecure.autoconfigure.errorhandling.AccessDeniedHandlerTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.errorhandling.AccessDeniedHandlerTest]/[method:forbiddenEndpoint_shouldFail_whenAdmin()] (142 ms)</li><li>nl._42.restsecure.autoconfigure.authentication.mfa.MfaSetupRequiredFilterTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.authentication.mfa.MfaSetupRequiredFilterTest]/[nested-class:afterPropertiesSet]/[method:shouldThrowForMissingObjectMapper()] (146 ms)</li><li>nl._42.restsecure.autoconfigure.errorhandling.AccessDeniedHandlerTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.errorhandling.AccessDeniedHandlerTest]/[method:currentUser_shouldFail_withInvalidSession_whenNotLoggedIn()] (153 ms)</li><li>nl._42.restsecure.autoconfigure.authentication.UserControllerTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.authentication.UserControllerTest]/[method:optional_shouldSucceed_whenNotLoggedIn()] (154 ms)</li><li>nl._42.restsecure.autoconfigure.errorhandling.AccessDeniedHandlerTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.errorhandling.AccessDeniedHandlerTest]/[method:forbiddenEndpoint_shouldFail_andNotThrowExceptions_whenIllegalRequestContentSent()] (153 ms)</li><li>nl._42.restsecure.autoconfigure.authentication.UserControllerTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.authentication.UserControllerTest]/[method:me_shouldSucceed_whenLoggedIn()] (155 ms)</li><li>nl._42.restsecure.autoconfigure.errorhandling.AccessDeniedHandlerTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.errorhandling.AccessDeniedHandlerTest]/[method:currentUser_shouldFail_withValidSession_whenNotLoggedIn()] (159 ms)</li><li>nl._42.restsecure.autoconfigure.authentication.UserControllerTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.authentication.UserControllerTest]/[method:custom_shouldSucceed_whenNotLoggedIn()] (162 ms)</li><li>nl._42.restsecure.autoconfigure.authentication.mfa.MfaSetupRequiredFilterTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.authentication.mfa.MfaSetupRequiredFilterTest]/[nested-class:filter]/[method:shouldDenyRequest_whenNotExcludedAndMfaConfigurationIsInvalid()] (156 ms)</li><li>nl._42.restsecure.autoconfigure.authentication.AuthenticationControllerTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.authentication.AuthenticationControllerTest]/[method:currentUser_shouldFail_whenNotLoggedIn()] (166 ms)</li><li>nl._42.restsecure.autoconfigure.authentication.mfa.MfaSetupRequiredFilterTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.authentication.mfa.MfaSetupRequiredFilterTest]/[nested-class:filter]/[method:shouldAllowRequest_whenExcludedByLogicCheck()] (156 ms)</li><li>nl._42.restsecure.autoconfigure.authentication.mfa.MfaSetupRequiredFilterTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.authentication.mfa.MfaSetupRequiredFilterTest]/[nested-class:filter]/[method:shouldAllowRequest_withValidMfaConfiguration()] (159 ms)</li><li>nl._42.restsecure.autoconfigure.authentication.AuthenticationControllerTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.authentication.AuthenticationControllerTest]/[method:authenticate_shouldSucceed_withCorrectCredentials()] (178 ms)</li><li>nl._42.restsecure.autoconfigure.authentication.AuthenticationControllerTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.authentication.AuthenticationControllerTest]/[method:authenticate_shouldFail_withAccountLocked()] (186 ms)</li><li>nl._42.restsecure.autoconfigure.authentication.AuthenticationControllerTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.authentication.AuthenticationControllerTest]/[method:successHandler_shouldNotBeCalled_afterFailedAuthentication()] (199 ms)</li><li>nl._42.restsecure.autoconfigure.authentication.mfa.MfaSetupRequiredFilterTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.authentication.mfa.MfaSetupRequiredFilterTest]/[nested-class:filter]/[method:shouldAllowRequest_whenExcludedByUrl()] (193 ms)</li><li>nl._42.restsecure.autoconfigure.authentication.UserControllerTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.authentication.UserControllerTest]/[method:me_shouldError_whenNotLoggedIn()] (211 ms)</li><li>nl._42.restsecure.autoconfigure.authentication.AuthenticationControllerTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.authentication.AuthenticationControllerTest]/[method:currentUser_shouldSucceed_whenNotLoggedIn_andCustomWebSecurity()] (214 ms)</li><li>nl._42.restsecure.autoconfigure.authentication.AuthenticationControllerTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.authentication.AuthenticationControllerTest]/[method:rememberMe_shouldFail_afterFailedAuthentication()] (218 ms)</li><li>nl._42.restsecure.autoconfigure.authentication.AuthenticationControllerTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.authentication.AuthenticationControllerTest]/[method:authenticate_shouldFail_withAccountExpired()] (235 ms)</li><li>nl._42.restsecure.autoconfigure.authentication.AuthenticationControllerTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.authentication.AuthenticationControllerTest]/[method:authenticate_shouldFail_withAuthenticationExceptionInSubsequentFilter()] (235 ms)</li><li>nl._42.restsecure.autoconfigure.authentication.AuthenticationControllerTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.authentication.AuthenticationControllerTest]/[method:currentUser_shouldReturnCustomAuthenticationResult_withCustomAuthenticationResultProvider()] (244 ms)</li><li>nl._42.restsecure.autoconfigure.authentication.AuthenticationControllerTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.authentication.AuthenticationControllerTest]/[method:successHandler_shouldBeCalled_afterSuccessfulAuthentication()] (232 ms)</li><li>nl._42.restsecure.autoconfigure.authentication.AuthenticationControllerTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.authentication.AuthenticationControllerTest]/[method:currentUser_shouldSucceed_whenLoggedIn()] (264 ms)</li><li>nl._42.restsecure.autoconfigure.authentication.AuthenticationControllerTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.authentication.AuthenticationControllerTest]/[method:authenticate_shouldChangeSessionId_toPreventSessionFixationAttack()] (317 ms)</li><li>nl._42.restsecure.autoconfigure.authentication.AuthenticationControllerTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.authentication.AuthenticationControllerTest]/[method:rememberMe_shouldSucceed_afterSuccessfulAuthentication()] (332 ms)</li><li>nl._42.restsecure.autoconfigure.WebSecurityAutoConfigTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.WebSecurityAutoConfigTest]/[method:autoConfig_shouldConfigureSecurity_withProvider()] (391 ms)</li><li>nl._42.restsecure.autoconfigure.authentication.AuthenticationControllerTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.authentication.AuthenticationControllerTest]/[method:authenticate_shouldFail_withCorrectCredentials_butBcryptPasswordEncoder()] (407 ms)</li><li>nl._42.restsecure.autoconfigure.WebSecurityAutoConfigTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.WebSecurityAutoConfigTest]/[method:autoConfig_shouldConfigureSecurity_withServiceAndMfaProvider_shouldNotGenerateDaoAuthenticationProvider()] (451 ms)</li><li>nl._42.restsecure.autoconfigure.WebSecurityAutoConfigTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.WebSecurityAutoConfigTest]/[method:autoConfig_shouldConfigureSecurity_withService()] (460 ms)</li><li>nl._42.restsecure.autoconfigure.MethodSecurityTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.MethodSecurityTest]/[method:admin_shouldFail_whenAnonymous()] (478 ms)</li><li>nl._42.restsecure.autoconfigure.MethodSecurityTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.MethodSecurityTest]/[method:authenticated_shouldSucceed_whenLoggedIn()] (497 ms)</li><li>nl._42.restsecure.autoconfigure.authentication.AuthenticationControllerTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.authentication.AuthenticationControllerTest]/[method:authenticate_shouldFail_withCredentialsExpired()] (496 ms)</li><li>nl._42.restsecure.autoconfigure.MfaSecurityAutoConfigTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.MfaSecurityAutoConfigTest]/[method:autoConfig_shouldConfigureMfaServices()] (536 ms)</li><li>nl._42.restsecure.autoconfigure.MethodSecurityTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.MethodSecurityTest]/[method:admin_shouldSucceed_whenAdmin()] (573 ms)</li><li>nl._42.restsecure.autoconfigure.MethodSecurityTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.MethodSecurityTest]/[method:authenticated_shouldFail_whenAnonymous()] (619 ms)</li><li>nl._42.restsecure.autoconfigure.MethodSecurityTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.MethodSecurityTest]/[method:admin_shouldFail_whenUser()] (813 ms)</li><li>nl._42.restsecure.autoconfigure.MethodSecurityTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.MethodSecurityTest]/[method:everybody_shouldSucceed()] (3719 ms)</li>
+</ul>
+
+<br/>
+
+Report generated by <a href='https://pitest.org'>PIT</a> 1.15.0
+
+</body>
+</html>

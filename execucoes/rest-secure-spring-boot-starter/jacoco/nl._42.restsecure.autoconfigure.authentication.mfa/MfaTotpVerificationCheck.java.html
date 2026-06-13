@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MfaTotpVerificationCheck.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">42 REST Secure Spring Boot Starter</a> &gt; <a href="index.source.html" class="el_package">nl._42.restsecure.autoconfigure.authentication.mfa</a> &gt; <span class="el_source">MfaTotpVerificationCheck.java</span></div><h1>MfaTotpVerificationCheck.java</h1><pre class="source lang-java linenums">package nl._42.restsecure.autoconfigure.authentication.mfa;
+
+import nl._42.restsecure.autoconfigure.authentication.RegisteredUser;
+import nl._42.restsecure.autoconfigure.errorhandling.DefaultLoginAuthenticationExceptionHandler;
+
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.AuthenticationException;
+
+public class MfaTotpVerificationCheck implements MfaVerificationCheck {
+
+    private final MfaValidationService mfaValidationService;
+
+<span class="fc" id="L13">    public MfaTotpVerificationCheck(MfaValidationService mfaValidationService) {</span>
+<span class="fc" id="L14">        this.mfaValidationService = mfaValidationService;</span>
+<span class="fc" id="L15">    }</span>
+
+    @Override
+    public boolean validate(RegisteredUser user, MfaAuthenticationToken authenticationToken) throws AuthenticationException {
+        // If no pre-authorized code assigned, validate the code supplied against the currently-valid TOTP code.
+<span class="fc bfc" id="L20" title="All 2 branches covered.">        if (!mfaValidationService.verifyMfaCode(user.getMfaSecretKey(), authenticationToken.getVerificationCode())) {</span>
+<span class="fc" id="L21">            throw new BadCredentialsException(DefaultLoginAuthenticationExceptionHandler.SERVER_LOGIN_FAILED_ERROR);</span>
+        }
+
+<span class="fc" id="L24">        return true;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

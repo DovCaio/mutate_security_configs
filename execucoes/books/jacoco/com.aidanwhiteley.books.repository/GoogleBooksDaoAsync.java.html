@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GoogleBooksDaoAsync.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Books Microservice</a> &gt; <a href="index.source.html" class="el_package">com.aidanwhiteley.books.repository</a> &gt; <span class="el_source">GoogleBooksDaoAsync.java</span></div><h1>GoogleBooksDaoAsync.java</h1><pre class="source lang-java linenums">package com.aidanwhiteley.books.repository;
+
+import com.aidanwhiteley.books.domain.Book;
+import com.aidanwhiteley.books.domain.googlebooks.Item;
+import com.aidanwhiteley.books.domain.googlebooks.VolumeInfo;
+import com.aidanwhiteley.books.util.HtmlSanitiserUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.stereotype.Repository;
+import org.springframework.web.reactive.function.client.ExchangeFilterFunction;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
+
+import java.time.Duration;
+
+@Repository
+public class GoogleBooksDaoAsync extends GoogleBooksApiConfig {
+
+<span class="fc" id="L22">    private static final Logger LOGGER = LoggerFactory.getLogger(GoogleBooksDaoAsync.class);</span>
+
+    private static final String BOOKS_WEB_CLIENT = &quot;Books WebClient&quot;;
+
+    private final WebClient webClient;
+    private final BookRepository bookRepository;
+    private final GoogleBooksApiConfig googleBooksApiConfig;
+
+<span class="fc" id="L30">    public GoogleBooksDaoAsync(BookRepository bookRepository, GoogleBooksApiConfig googleBooksApiConfig) {</span>
+<span class="fc" id="L31">        this.webClient = WebClient.builder()</span>
+<span class="fc" id="L32">                .defaultHeader(HttpHeaders.USER_AGENT, BOOKS_WEB_CLIENT)</span>
+<span class="fc" id="L33">                .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)</span>
+<span class="fc" id="L34">                .filter(logRequest())</span>
+<span class="fc" id="L35">                .filter(logResponseStatus())</span>
+<span class="fc" id="L36">                .build();</span>
+<span class="fc" id="L37">        this.bookRepository = bookRepository;</span>
+<span class="fc" id="L38">        this.googleBooksApiConfig = googleBooksApiConfig;</span>
+<span class="fc" id="L39">    }</span>
+
+    /**
+     * The use of the Spring 5 WebClient in this code is more out of a desire to experiment
+     * with it rather than for any performance gains.
+     * &lt;p&gt;
+     * We are calling block() on the Mono so the thread is going to be blocked until
+     * the full response from Google Books API has been received. So that will
+     * negate any of the usual non-blocking benefits of the WebClient usage.
+     * &lt;p&gt;
+     * We're also continuing to use the blocking Mongo driver in this method.
+     * &lt;p&gt;
+     * The real benefit to this method is that it is @Async and, therefore, the
+     * calling users HTTP call isn't blocked waiting while we go and get / store
+     * details from the Google Books API.
+     *
+     * @param book         Details of the book to update
+     * @param googleBookId The Google Books API book id to retrieve.
+     */
+    @Async(&quot;threadPoolExecutor&quot;)
+    public void updateBookWithGoogleBookDetails(Book book, String googleBookId) {
+
+<span class="fc" id="L61">        LOGGER.debug(&quot;Entered updateBookWithGoogleBookDetails&quot;);</span>
+
+        try {
+<span class="fc" id="L64">            Mono&lt;Item&gt; monoItem = this.webClient.</span>
+<span class="fc" id="L65">                    get().</span>
+<span class="fc" id="L66">                    uri(googleBooksApiConfig.getGetByIdUrl() + googleBookId + &quot;/?&quot; + googleBooksApiConfig.getCountryCode()).</span>
+<span class="fc" id="L67">                    retrieve().</span>
+<span class="fc" id="L68">                    bodyToMono(Item.class);</span>
+<span class="fc" id="L69">            LOGGER.debug(&quot;Mono created&quot;);</span>
+
+<span class="fc" id="L71">            Item item = monoItem.block(Duration.ofSeconds(googleBooksApiConfig.getReadTimeout()));</span>
+<span class="fc" id="L72">            LOGGER.debug(&quot;Block completed&quot;);</span>
+
+            // Google Books API data _should_ be safe from CSRF attacks but lets make sure before storing the
+            // description text in the database!
+<span class="pc bpc" id="L76" title="1 of 2 branches missed.">            VolumeInfo vlInfo = item != null ? item.getVolumeInfo() : null;</span>
+<span class="pc bpc" id="L77" title="2 of 4 branches missed.">            if (vlInfo != null &amp;&amp; vlInfo.getDescription() != null) {</span>
+<span class="fc" id="L78">                vlInfo.setDescription(HtmlSanitiserUtils.allowBasicTextFormattingOnly(vlInfo.getDescription()));</span>
+<span class="fc" id="L79">                item.setVolumeInfo(vlInfo);</span>
+            }
+
+<span class="fc" id="L82">            bookRepository.addGoogleBookItemToBook(book.getId(), item);</span>
+<span class="fc" id="L83">            LOGGER.debug(&quot;Google Books details added to Mongo for {}&quot;, book.getId());</span>
+
+<span class="nc" id="L85">        } catch (RuntimeException re) {</span>
+<span class="nc" id="L86">            LOGGER.error(&quot;Error retrieving or storing Google Book details for {}&quot;, googleBookId, re);</span>
+<span class="fc" id="L87">        }</span>
+<span class="fc" id="L88">    }</span>
+
+    private ExchangeFilterFunction logRequest() {
+<span class="fc" id="L91">        return (clientRequest, next) -&gt; {</span>
+<span class="pc bpc" id="L92" title="1 of 2 branches missed.">            if (LOGGER.isInfoEnabled()) {</span>
+<span class="nc" id="L93">                LOGGER.info(&quot;Request: {} {}&quot;, clientRequest.method(), clientRequest.url());</span>
+<span class="nc" id="L94">                clientRequest.headers()</span>
+<span class="nc" id="L95">                        .forEach((name, values) -&gt; values.forEach(value -&gt; LOGGER.info(&quot;{}={}&quot;, name, value)));</span>
+            }
+<span class="fc" id="L97">            return next.exchange(clientRequest);</span>
+        };
+    }
+
+    private ExchangeFilterFunction logResponseStatus() {
+<span class="fc" id="L102">        return ExchangeFilterFunction.ofResponseProcessor(clientResponse -&gt; {</span>
+<span class="fc" id="L103">            LOGGER.info(&quot;Response Status {}&quot;, clientResponse.statusCode());</span>
+<span class="fc" id="L104">            return Mono.just(clientResponse);</span>
+        });
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

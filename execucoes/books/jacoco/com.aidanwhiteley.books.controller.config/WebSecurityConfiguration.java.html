@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>WebSecurityConfiguration.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Books Microservice</a> &gt; <a href="index.source.html" class="el_package">com.aidanwhiteley.books.controller.config</a> &gt; <span class="el_source">WebSecurityConfiguration.java</span></div><h1>WebSecurityConfiguration.java</h1><pre class="source lang-java linenums">package com.aidanwhiteley.books.controller.config;
+
+import com.aidanwhiteley.books.controller.jwt.JwtAuthenticationFilter;
+import com.aidanwhiteley.books.controller.jwt.JwtAuthenticationService;
+import com.aidanwhiteley.books.domain.User;
+import com.aidanwhiteley.books.service.UserService;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.actuate.info.InfoEndpoint;
+import org.springframework.boot.health.actuate.endpoint.HealthEndpoint;
+import org.springframework.boot.jackson.autoconfigure.JsonMapperBuilderCustomizer;
+import org.springframework.boot.security.autoconfigure.actuate.web.servlet.EndpointRequest;
+import org.springframework.boot.web.server.Cookie;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.jackson.CoreJacksonModule;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
+import org.springframework.security.oauth2.client.jackson.OAuth2ClientJacksonModule;
+import org.springframework.security.oauth2.client.web.AuthorizationRequestRepository;
+import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.logout.CookieClearingLogoutHandler;
+import org.springframework.security.web.authentication.logout.HeaderWriterLogoutHandler;
+import org.springframework.security.web.authentication.logout.LogoutFilter;
+import org.springframework.security.web.authentication.session.NullAuthenticatedSessionStrategy;
+import org.springframework.security.web.csrf.*;
+import org.springframework.security.web.header.writers.ClearSiteDataHeaderWriter;
+import org.springframework.security.web.servlet.support.csrf.CsrfRequestDataValueProcessor;
+import org.springframework.util.StringUtils;
+import org.springframework.web.servlet.support.RequestDataValueProcessor;
+import tools.jackson.databind.DeserializationFeature;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
+
+import java.io.IOException;
+import java.util.function.Supplier;
+
+import static com.aidanwhiteley.books.domain.User.Role.ROLE_ACTUATOR;
+
+@Configuration
+@EnableMethodSecurity
+public class WebSecurityConfiguration {
+
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+
+    private final JwtAuthenticationService jwtAuthenticationService;
+
+    private final UserService userService;
+
+    @Value(&quot;${books.client.postLogonUrl}&quot;)
+    private String postLogonUrl;
+
+    @Value(&quot;${books.xsrf.cookieOverHttpsOnly}&quot;)
+    private boolean xsrfCookieOverHttpsOnly;
+
+    public WebSecurityConfiguration(JwtAuthenticationFilter jwtAuthenticationFilter, JwtAuthenticationService jwtAuthenticationService,
+<span class="fc" id="L66">                                    UserService userService) {</span>
+
+<span class="fc" id="L68">        this.jwtAuthenticationFilter = jwtAuthenticationFilter;</span>
+<span class="fc" id="L69">        this.jwtAuthenticationService = jwtAuthenticationService;</span>
+<span class="fc" id="L70">        this.userService = userService;</span>
+<span class="fc" id="L71">    }</span>
+
+    /**
+     * The Spring Security set up is driven by the following considerations
+     * &lt;ul&gt;
+     *     &lt;li&gt;The original, main purpose of this demo application was to build a &quot;microservice&quot; with no HTTP Session state.
+     *     This was to promote &quot;scalability&quot; :-) and avoid the need for sticky sessions etc. And just to see
+     *     how to do it.&lt;/li&gt;
+     *     &lt;li&gt;For better or worse, we are using a JWT to hold the session logon token. No use of refresh tokens
+     *     given that this is a limited demo&lt;/li&gt;
+     *     &lt;li&gt;Anyone can register on the site via Google or Facebook. This gives no additional privileges compared
+     *     to &quot;not logged on&quot; but means that the Spring Security default of &quot;must be authenticated&quot; brings no
+     *     benefit in this case - so we don't use it&lt;/li&gt;
+     *     &lt;li&gt;As of 2025, we are no longer supporting CORS. For SPA client development, stick a &quot;middleware proxy&quot; or something
+     *     similar in your SPA config. For production, get a reverse proxy or API gateway. In any case, the
+     *     &quot;out of the box&quot; default front end for the microservice is now an HTMX Thymeleaf UI included in the project and,
+     *     therefore, on the same protocol/domain/port&lt;/li&gt;
+     *     &lt;li&gt;CSRF protection should now always be on and should be working&lt;/li&gt;
+     *     &lt;li&gt;We use very little &quot;request level&quot; security (a bit for Actuator end points). Instead, we make
+     *     heavy use of &quot;method level&quot; security. We apply this at the controller level which may not fully align
+     *     with Spring Security best practise, but we can live with this.&lt;/li&gt;
+     *     &lt;li&gt;While the SPA facing APIs follow consistent URL patterns (/api and /secure/api) that could be
+     *     handled with &quot;request level security&quot; (albeit with more granular role checking for /secure/api required),
+     *     the URLs for HTMX/Thymeleaf SSR UI are much more &quot;human friendly&quot; and follow no consistent pattern.
+     *     The HTMX promoted &quot;locality of behaviour&quot; pattern might also be another argument for preferring
+     *     method level security on the controllers&lt;/li&gt;
+     * &lt;/ul&gt;
+     *
+     * @param http The HTTPSecurity that is being configured
+     * @return The Spring SecurityChainFilter
+     * @throws Exception See Spring docs
+     */
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+
+        // We want a new XSRF cookie to be sent on every request/response. See &quot;Opt-out of Deferred CSRF Tokens&quot; at
+        // https://docs.spring.io/spring-security/reference/servlet/exploits/csrf.html#deferred-csrf-token
+<span class="fc" id="L108">        XorCsrfTokenRequestAttributeHandler requestHandler = new XorCsrfTokenRequestAttributeHandler();</span>
+        // Set the name of the attribute the CsrfToken will be populated on to cause the CsrfToken to be loaded on every request.
+<span class="fc" id="L110">        requestHandler.setCsrfRequestAttributeName(null);</span>
+
+<span class="fc" id="L112">        final CookieCsrfTokenRepository cookieCsrfTokenRepository = CookieCsrfTokenRepository.withHttpOnlyFalse();</span>
+<span class="fc" id="L113">        cookieCsrfTokenRepository.setCookieCustomizer(x -&gt;</span>
+<span class="fc" id="L114">                x.sameSite(Cookie.SameSite.STRICT.attributeValue()).secure(xsrfCookieOverHttpsOnly));</span>
+
+<span class="fc" id="L116">        CookieClearingLogoutHandler jwtCookie = new CookieClearingLogoutHandler(JwtAuthenticationService.JWT_COOKIE_NAME);</span>
+<span class="fc" id="L117">        HeaderWriterLogoutHandler clearSiteData = new HeaderWriterLogoutHandler(new ClearSiteDataHeaderWriter(ClearSiteDataHeaderWriter.Directive.COOKIES));</span>
+
+<span class="fc" id="L119">        http</span>
+<span class="fc" id="L120">                .sessionManagement(management -&gt; management.sessionCreationPolicy(SessionCreationPolicy.STATELESS)</span>
+<span class="fc" id="L121">                        .enableSessionUrlRewriting(false))</span>
+<span class="fc" id="L122">                .csrf(csrf -&gt; csrf</span>
+<span class="fc" id="L123">                        .csrfTokenRepository(cookieCsrfTokenRepository)</span>
+                        // With our JWT in a cookie, every time a request with that cookie hits the server an authentication
+                        // process takes place and this would trigger a new CSRF token (meaning token checking frequently fails).
+                        // See https://github.com/spring-projects/spring-security/issues/5669#issuecomment-855757197
+<span class="fc" id="L127">                        .sessionAuthenticationStrategy(new NullAuthenticatedSessionStrategy())</span>
+<span class="fc" id="L128">                        .csrfTokenRequestHandler(new SpaCsrfTokenRequestHandler()))</span>
+<span class="fc" id="L129">                .formLogin(AbstractHttpConfigurer::disable)</span>
+<span class="fc" id="L130">                .httpBasic(AbstractHttpConfigurer::disable)</span>
+<span class="fc" id="L131">                .addFilterAfter(jwtAuthenticationFilter, LogoutFilter.class)</span>
+<span class="fc" id="L132">                .oauth2Login(login -&gt; login</span>
+<span class="fc" id="L133">                        .authorizationEndpoint(endpoint -&gt; endpoint.baseUri(&quot;/login&quot;)</span>
+<span class="fc" id="L134">                                .authorizationRequestRepository(cookieBasedAuthorizationRequestRepository()))</span>
+<span class="fc" id="L135">                        .successHandler(new Oauth2AuthenticationSuccessHandler()))</span>
+<span class="fc" id="L136">                .authorizeHttpRequests(authz -&gt;</span>
+                        authz
+                        // Actuator endpoints are the only ones protected by request level security - everything else by method level security
+<span class="fc" id="L139">                        .requestMatchers(EndpointRequest.toAnyEndpoint().excluding(HealthEndpoint.class).excluding(InfoEndpoint.class)).</span>
+<span class="fc" id="L140">                        hasRole(ROLE_ACTUATOR.getShortName())</span>
+                        // We permitAll here - see the method level Javadocs for why we do this
+<span class="fc" id="L142">                        .anyRequest().permitAll()</span>
+                )
+<span class="fc" id="L144">                .logout(logout -&gt; logout.addLogoutHandler(jwtCookie).addLogoutHandler(clearSiteData)</span>
+<span class="fc" id="L145">                        .logoutSuccessUrl(&quot;/&quot;));</span>
+                // We deliberately leave most of the security related header writing to the front end reverse proxy / API gateway
+                // to ensure consistency of approach across microservices
+
+<span class="fc" id="L149">        return http.build();</span>
+    }
+
+    @Bean
+    public AuthorizationRequestRepository&lt;OAuth2AuthorizationRequest&gt; cookieBasedAuthorizationRequestRepository() {
+        // Using cookie based repository to avoid data being put into HTTP session
+<span class="fc" id="L155">        return new HttpCookieOAuth2AuthorizationRequestRepository(getAuthRequestJsonMapper());</span>
+    }
+
+    public static ObjectMapper getAuthRequestJsonMapper() {
+<span class="fc" id="L159">        return JsonMapper.builder()</span>
+<span class="fc" id="L160">                .changeDefaultVisibility(vc -&gt; vc</span>
+<span class="fc" id="L161">                        .withFieldVisibility(JsonAutoDetect.Visibility.ANY)</span>
+<span class="fc" id="L162">                        .withGetterVisibility(JsonAutoDetect.Visibility.ANY)</span>
+<span class="fc" id="L163">                        .withSetterVisibility(JsonAutoDetect.Visibility.ANY)</span>
+<span class="fc" id="L164">                        .withCreatorVisibility(JsonAutoDetect.Visibility.ANY))</span>
+<span class="fc" id="L165">                .addModule(new OAuth2ClientJacksonModule())</span>
+<span class="fc" id="L166">                .addModule(new CoreJacksonModule())</span>
+<span class="fc" id="L167">                .build();</span>
+    }
+
+    @Bean
+    public JsonMapperBuilderCustomizer customizer() {
+<span class="fc" id="L172">        return builder -&gt; builder</span>
+<span class="fc" id="L173">                .disable(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES);</span>
+    }
+
+    /**
+     * This is where we trigger the work to store local details for the user after they have successfully
+     * authenticated with the OAuth2 authentication provider.
+     */
+<span class="fc" id="L180">    class Oauth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {</span>
+        @Override
+        public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
+                                            Authentication authentication) throws IOException, ServletException {
+
+<span class="fc" id="L185">            OAuth2AuthenticationToken auth2 = (OAuth2AuthenticationToken) authentication;</span>
+<span class="fc" id="L186">            User user = userService.createOrUpdateUser(auth2);</span>
+<span class="fc" id="L187">            jwtAuthenticationService.setAuthenticationData(response, user);</span>
+<span class="fc" id="L188">            super.setDefaultTargetUrl(postLogonUrl);</span>
+<span class="fc" id="L189">            super.onAuthenticationSuccess(request, response, authentication);</span>
+<span class="fc" id="L190">        }</span>
+    }
+
+    // See https://docs.spring.io/spring-security/reference/servlet/exploits/csrf.html#csrf-integration-javascript-spa-configuration
+<span class="fc" id="L194">    static final class SpaCsrfTokenRequestHandler implements CsrfTokenRequestHandler {</span>
+<span class="fc" id="L195">        private final CsrfTokenRequestHandler plain = new CsrfTokenRequestAttributeHandler();</span>
+<span class="fc" id="L196">        private final XorCsrfTokenRequestAttributeHandler xor = new XorCsrfTokenRequestAttributeHandler();</span>
+
+        @Override
+        public void handle(HttpServletRequest request, HttpServletResponse response, Supplier&lt;CsrfToken&gt; csrfToken) {
+            /*
+             * Always use XorCsrfTokenRequestAttributeHandler to provide BREACH protection of
+             * the CsrfToken when it is rendered in the response body.
+             */
+<span class="fc" id="L204">            this.xor.setCsrfRequestAttributeName(null);</span>
+<span class="fc" id="L205">            this.xor.handle(request, response, csrfToken);</span>
+            /*
+             * Render the token value to a cookie by causing the deferred token to be loaded.
+             */
+<span class="fc" id="L209">            csrfToken.get();</span>
+<span class="fc" id="L210">        }</span>
+
+        @Override
+        public String resolveCsrfTokenValue(HttpServletRequest request, CsrfToken csrfToken) {
+<span class="fc" id="L214">            String headerValue = request.getHeader(csrfToken.getHeaderName());</span>
+            /*
+             * If the request contains a request header, use CsrfTokenRequestAttributeHandler
+             * to resolve the CsrfToken. This applies when a single-page application includes
+             * the header value automatically, which was obtained via a cookie containing the
+             * raw CsrfToken.
+             *
+             * In all other cases (e.g. if the request contains a request parameter), use
+             * XorCsrfTokenRequestAttributeHandler to resolve the CsrfToken. This applies
+             * when a server-side rendered form includes the _csrf request parameter as a
+             * hidden input.
+             */
+<span class="fc bfc" id="L226" title="All 2 branches covered.">            if (StringUtils.hasText(headerValue)) {</span>
+<span class="fc" id="L227">                return this.plain.resolveCsrfTokenValue(request, csrfToken);</span>
+            } else {
+<span class="fc" id="L229">                return this.xor.resolveCsrfTokenValue(request, csrfToken);</span>
+            }
+        }
+    }
+
+    // For adding CSRF tokens to be added to Thymeleaf templates
+    @Bean(&quot;csrfRequestDatavalueprocessor&quot;)
+    public RequestDataValueProcessor requestDataValueProcessor() {
+<span class="fc" id="L237">        return new CsrfRequestDataValueProcessor();</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

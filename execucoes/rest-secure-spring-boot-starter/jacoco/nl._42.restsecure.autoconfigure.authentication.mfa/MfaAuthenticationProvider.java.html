@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MfaAuthenticationProvider.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">42 REST Secure Spring Boot Starter</a> &gt; <a href="index.source.html" class="el_package">nl._42.restsecure.autoconfigure.authentication.mfa</a> &gt; <span class="el_source">MfaAuthenticationProvider.java</span></div><h1>MfaAuthenticationProvider.java</h1><pre class="source lang-java linenums">package nl._42.restsecure.autoconfigure.authentication.mfa;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import nl._42.restsecure.autoconfigure.authentication.RegisteredUser;
+import nl._42.restsecure.autoconfigure.authentication.UserDetailsAdapter;
+
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.util.Assert;
+
+/**
+ * An {@link DaoAuthenticationProvider} that supports Multi-Factor authentication (MFA, 2FA) using Time-based One-Time-Password (TOTP).
+ */
+public class MfaAuthenticationProvider extends DaoAuthenticationProvider {
+
+    public static final String SERVER_MFA_CODE_REQUIRED_ERROR = &quot;SERVER.MFA_CODE_REQUIRED_ERROR&quot;;
+    public static final String DETAILS_MFA_SETUP_REQUIRED = &quot;DETAILS.MFA_SETUP_REQUIRED&quot;;
+
+<span class="fc" id="L24">    private boolean customVerificationStepsRegistered = false;</span>
+    private List&lt;MfaVerificationCheck&gt; verificationChecks;
+
+    private final MfaValidationService mfaValidationService;
+
+    public MfaAuthenticationProvider(UserDetailsService userDetailsService, MfaValidationService mfaValidationService) {
+<span class="fc" id="L30">        super(userDetailsService);</span>
+<span class="fc" id="L31">        this.mfaValidationService = mfaValidationService;</span>
+<span class="fc" id="L32">    }</span>
+
+    public void setVerificationChecks(List&lt;MfaVerificationCheck&gt; verificationChecks) {
+<span class="fc" id="L35">        this.customVerificationStepsRegistered = true;</span>
+<span class="fc" id="L36">        this.verificationChecks = verificationChecks;</span>
+<span class="fc" id="L37">    }</span>
+
+    @Override
+    protected void doAfterPropertiesSet() {
+<span class="fc" id="L41">        super.doAfterPropertiesSet();</span>
+<span class="fc" id="L42">        Assert.notNull(this.mfaValidationService, &quot;A MfaValidationService must be set&quot;);</span>
+<span class="fc bfc" id="L43" title="All 2 branches covered.">        if (!this.customVerificationStepsRegistered) {</span>
+<span class="fc" id="L44">            this.verificationChecks = List.of(new MfaTotpVerificationCheck(mfaValidationService));</span>
+        } else {
+<span class="fc bfc" id="L46" title="All 4 branches covered.">            Assert.isTrue(this.verificationChecks != null &amp;&amp; !this.verificationChecks.isEmpty(), &quot;At least one verification check must be provided&quot;);</span>
+<span class="fc bfc" id="L47" title="All 2 branches covered.">            if (verificationChecks.stream().noneMatch(MfaTotpVerificationCheck.class::isInstance)) {</span>
+<span class="fc" id="L48">                verificationChecks = new ArrayList&lt;&gt;(verificationChecks); // Ensure we are a mutable list.</span>
+<span class="fc" id="L49">                verificationChecks.add(new MfaTotpVerificationCheck(mfaValidationService));</span>
+            }
+        }
+<span class="fc" id="L52">    }</span>
+
+    @Override
+    protected void additionalAuthenticationChecks(UserDetails userDetails, UsernamePasswordAuthenticationToken authentication) throws AuthenticationException {
+<span class="fc" id="L56">        super.additionalAuthenticationChecks(userDetails, authentication);</span>
+
+<span class="fc bfc" id="L58" title="All 2 branches covered.">        if (userDetails instanceof UserDetailsAdapter&lt;? extends RegisteredUser&gt; userDetailsAdapter) {</span>
+<span class="fc bfc" id="L59" title="All 2 branches covered.">            if (userDetailsAdapter.isMfaConfigured()) {</span>
+<span class="fc" id="L60">                executeMfaVerificationSteps((MfaAuthenticationToken) authentication, userDetailsAdapter);</span>
+<span class="fc bfc" id="L61" title="All 2 branches covered.">            } else if (userDetailsAdapter.isMfaMandatory()) {</span>
+<span class="fc" id="L62">                authentication.setDetails(DETAILS_MFA_SETUP_REQUIRED);</span>
+            }
+        }
+<span class="fc" id="L65">    }</span>
+
+    private void executeMfaVerificationSteps(MfaAuthenticationToken mfaAuthenticationToken, UserDetailsAdapter&lt;? extends RegisteredUser&gt; userDetailsAdapter) {
+        // If no code supplied, indicate a code is needed.
+<span class="fc bfc" id="L69" title="All 4 branches covered.">        if (mfaAuthenticationToken.getVerificationCode() == null || mfaAuthenticationToken.getVerificationCode().isEmpty()) {</span>
+<span class="fc" id="L70">            throw new MfaRequiredException(SERVER_MFA_CODE_REQUIRED_ERROR);</span>
+        }
+<span class="fc" id="L72">        boolean verificationSucceeded = false;</span>
+<span class="fc bfc" id="L73" title="All 2 branches covered.">        for (MfaVerificationCheck verificationCheck : verificationChecks) {</span>
+<span class="fc bfc" id="L74" title="All 2 branches covered.">            if (verificationCheck.validate(userDetailsAdapter.user(), mfaAuthenticationToken)) {</span>
+<span class="fc" id="L75">                verificationSucceeded = true;</span>
+<span class="fc" id="L76">                break;</span>
+            }
+<span class="fc" id="L78">        }</span>
+<span class="fc bfc" id="L79" title="All 2 branches covered.">        if (!verificationSucceeded) {</span>
+<span class="fc" id="L80">            throw new IllegalStateException(</span>
+                    &quot;At least one verification check must either have succeeded or thrown an AuthenticationException. Check the verifications passed to .setVerificationChecks() for any unmatched scenarios.&quot;);
+        }
+<span class="fc" id="L83">    }</span>
+
+    @Override
+    public boolean supports(Class&lt;?&gt; authentication) {
+<span class="nc" id="L87">        return MfaAuthenticationToken.class.isAssignableFrom(authentication);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

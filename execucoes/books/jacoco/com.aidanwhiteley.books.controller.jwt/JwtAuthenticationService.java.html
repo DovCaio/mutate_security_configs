@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JwtAuthenticationService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Books Microservice</a> &gt; <a href="index.source.html" class="el_package">com.aidanwhiteley.books.controller.jwt</a> &gt; <span class="el_source">JwtAuthenticationService.java</span></div><h1>JwtAuthenticationService.java</h1><pre class="source lang-java linenums">package com.aidanwhiteley.books.controller.jwt;
+
+import com.aidanwhiteley.books.domain.User;
+import io.jsonwebtoken.ExpiredJwtException;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.Setter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
+@Service
+public class JwtAuthenticationService {
+
+    // Changes made here would need to be replicated into
+    // any API gateway - to ensure that the API gateway fowards
+    // on any headers or cookies required on the application tier.
+    public static final String JWT_COOKIE_NAME = &quot;CLOUDY-JWT&quot;;
+    public static final String XSRF_HEADER_NAME = &quot;X-XSRF-TOKEN&quot;;
+    public static final String XSRF_COOKIE_NAME = &quot;XSRF-TOKEN&quot;;
+    private static final String JSESSIONID_COOKIE_NAME = &quot;JSESSIONID&quot;;
+<span class="fc" id="L24">    private static final Logger LOGGER = LoggerFactory.getLogger(JwtAuthenticationService.class);</span>
+
+    private final JwtUtils jwtUtils;
+
+    // Setters for testing support outside of a Spring context
+    @Setter
+    @Value(&quot;${books.jwt.cookieOverHttpsOnly}&quot;)
+    private boolean cookieOverHttpsOnly;
+
+    @Setter
+    @Value(&quot;${books.jwt.cookieAccessedByHttpOnly}&quot;)
+    private boolean cookieAccessedByHttpOnly;
+
+    @Setter
+    @Value(&quot;${books.jwt.cookiePath}&quot;)
+    private String jwtCookiePath;
+
+    @Setter
+    @Value(&quot;${books.jwt.cookieExpirySeconds}&quot;)
+    private int cookieExpirySeconds;
+
+<span class="fc" id="L45">    public JwtAuthenticationService(JwtUtils jwtUtils) {</span>
+<span class="fc" id="L46">        this.jwtUtils = jwtUtils;</span>
+<span class="fc" id="L47">    }</span>
+
+    public void setAuthenticationData(HttpServletResponse response, User user) {
+
+<span class="fc" id="L51">        String token = jwtUtils.createTokenForUser(user);</span>
+
+        // There is currently no functionality on the jakarta.servlet.http.Cookie class to set SameSite directly.
+<span class="fc" id="L54">        var cookie = new StringBuilder();</span>
+<span class="fc" id="L55">        cookie.append(JWT_COOKIE_NAME + &quot;=&quot;).append(token);</span>
+<span class="pc bpc" id="L56" title="1 of 2 branches missed.">        if (cookieAccessedByHttpOnly) {</span>
+<span class="fc" id="L57">            cookie.append(&quot;; HttpOnly&quot;);</span>
+        }
+<span class="pc bpc" id="L59" title="1 of 2 branches missed.">        if (cookieOverHttpsOnly) {</span>
+<span class="fc" id="L60">            cookie.append(&quot;; Secure&quot;);</span>
+        }
+<span class="fc" id="L62">        cookie.append(&quot;; Path=&quot;).append(jwtCookiePath);</span>
+<span class="fc" id="L63">        cookie.append(&quot;; Max-Age=&quot;).append(cookieExpirySeconds);</span>
+<span class="fc" id="L64">        cookie.append(&quot;; SameSite=Lax&quot;);</span>
+
+<span class="fc" id="L66">        response.addHeader(&quot;Set-Cookie&quot;, cookie.toString());</span>
+<span class="fc" id="L67">        LOGGER.debug(&quot;JWT cookie written for {}&quot;, user.getFullName());</span>
+<span class="fc" id="L68">    }</span>
+
+    public JwtAuthentication readAndValidateAuthenticationData(HttpServletRequest request,
+                                                               HttpServletResponse response) {
+
+<span class="fc" id="L73">        JwtAuthentication auth = null;</span>
+
+<span class="fc" id="L75">        Cookie[] cookies = request.getCookies();</span>
+
+<span class="fc bfc" id="L77" title="All 2 branches covered.">        if (cookies != null) {</span>
+<span class="fc bfc" id="L78" title="All 2 branches covered.">            for (Cookie cookie : cookies) {</span>
+<span class="fc" id="L79">                LOGGER.debug(&quot;Found cookie named: {}&quot;, cookie.getName());</span>
+<span class="pc bpc" id="L80" title="1 of 3 branches missed.">                switch (cookie.getName()) {</span>
+                    case JWT_COOKIE_NAME:
+<span class="fc" id="L82">                        String token = cookie.getValue();</span>
+<span class="pc bpc" id="L83" title="2 of 4 branches missed.">                        if (token == null || token.trim().isEmpty()) {</span>
+<span class="nc" id="L84">                            LOGGER.warn(&quot;JWT cookie found but was empty - we will look to remove this later&quot;);</span>
+                        } else {
+                            try {
+<span class="fc" id="L87">                                User user = jwtUtils.getUserFromToken(token);</span>
+
+                                // TODO - add support for interval based checking of whether the user is still in the database.
+                                //        Will require adding a &quot;lastChecked&quot; field to the JWT and calling the database appropriately.
+
+<span class="fc" id="L92">                                auth = new JwtAuthentication(user);</span>
+
+                                // If we got to here with no exceptions thrown
+                                // then we can assume we have a valid token
+<span class="fc" id="L96">                                auth.setAuthenticated(true);</span>
+<span class="fc" id="L97">                                LOGGER.debug(&quot;JWT found and validated - setting authentication true&quot;);</span>
+<span class="nc" id="L98">                            } catch (ExpiredJwtException eje) {</span>
+<span class="nc" id="L99">                                expireJwtCookie(response);</span>
+<span class="nc" id="L100">                                LOGGER.info(&quot;JWT expired so cookie deleted&quot;);</span>
+<span class="fc" id="L101">                            } catch (RuntimeException re) {</span>
+<span class="fc" id="L102">                                expireJwtCookie(response);</span>
+<span class="fc" id="L103">                                LOGGER.error(&quot;Error validating jwt token: {}. So cookie deleted&quot;, re.getMessage());</span>
+<span class="pc" id="L104">                            }</span>
+                        }
+<span class="fc" id="L106">                        break;</span>
+                    case JSESSIONID_COOKIE_NAME:
+                        // With the use of Spring Security Oauth2 and the custom
+                        // HttpCookieOAuth2AuthorizationRequestRepository there
+                        // should be no JSESSIONIDs being writtem
+<span class="nc" id="L111">                        LOGGER.warn(&quot;Unexpectedly found a JSESSIONID based cookie - killing it!&quot;);</span>
+<span class="nc" id="L112">                        expireJsessionIdCookie(response);</span>
+<span class="nc" id="L113">                        break;</span>
+                    default:
+<span class="fc" id="L115">                        LOGGER.debug(&quot;Found cookie named {}&quot;, cookie.getName());</span>
+                        break;
+                }
+            }
+        }
+
+<span class="fc" id="L121">        return auth;</span>
+    }
+
+    public void expireJwtCookie(HttpServletResponse response) {
+<span class="fc" id="L125">        Cookie emptyCookie = new Cookie(JWT_COOKIE_NAME, &quot;&quot;);</span>
+<span class="fc" id="L126">        expireCookie(response, emptyCookie, cookieAccessedByHttpOnly);</span>
+
+<span class="pc bpc" id="L128" title="1 of 2 branches missed.">        if (LOGGER.isDebugEnabled()) {</span>
+<span class="nc" id="L129">            LOGGER.debug(&quot;Expired JWT cookie&quot;);</span>
+        }
+<span class="fc" id="L131">    }</span>
+
+    public void expireXsrfCookie(HttpServletResponse response) {
+<span class="fc" id="L134">        Cookie emptyCookie = new Cookie(XSRF_COOKIE_NAME, &quot;&quot;);</span>
+<span class="fc" id="L135">        expireCookie(response, emptyCookie, false);</span>
+
+<span class="pc bpc" id="L137" title="1 of 2 branches missed.">        if (LOGGER.isDebugEnabled()) {</span>
+<span class="nc" id="L138">            LOGGER.debug(&quot;Expired Xsrf cookie&quot;);</span>
+        }
+<span class="fc" id="L140">    }</span>
+
+    public void expireJsessionIdCookie(HttpServletResponse response) {
+<span class="fc" id="L143">        Cookie emptyCookie = new Cookie(JSESSIONID_COOKIE_NAME, &quot;&quot;);</span>
+<span class="fc" id="L144">        expireCookie(response, emptyCookie, true);</span>
+<span class="fc" id="L145">    }</span>
+
+    private void expireCookie(HttpServletResponse response, Cookie emptyCookie, boolean httpOnly) {
+<span class="fc" id="L148">        emptyCookie.setMaxAge(0);</span>
+<span class="fc" id="L149">        emptyCookie.setHttpOnly(httpOnly);</span>
+<span class="fc" id="L150">        emptyCookie.setSecure(cookieOverHttpsOnly);</span>
+<span class="fc" id="L151">        emptyCookie.setPath(jwtCookiePath);</span>
+<span class="fc" id="L152">        response.addCookie(emptyCookie);            // lgtm[java/insecure-cookie]</span>
+<span class="fc" id="L153">    }</span>
+
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

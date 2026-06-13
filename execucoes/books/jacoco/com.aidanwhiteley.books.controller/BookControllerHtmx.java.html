@@ -1,0 +1,385 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>BookControllerHtmx.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Books Microservice</a> &gt; <a href="index.source.html" class="el_package">com.aidanwhiteley.books.controller</a> &gt; <span class="el_source">BookControllerHtmx.java</span></div><h1>BookControllerHtmx.java</h1><pre class="source lang-java linenums">package com.aidanwhiteley.books.controller;
+
+import com.aidanwhiteley.books.controller.dtos.CommentForm;
+import com.aidanwhiteley.books.controller.exceptions.NotFoundException;
+import com.aidanwhiteley.books.domain.Book;
+import com.aidanwhiteley.books.domain.User;
+import com.aidanwhiteley.books.repository.BookRepository;
+import com.aidanwhiteley.books.repository.dtos.BooksByAuthor;
+import com.aidanwhiteley.books.repository.dtos.BooksByGenre;
+import com.aidanwhiteley.books.repository.dtos.BooksByReader;
+import com.aidanwhiteley.books.service.StatsService;
+import com.aidanwhiteley.books.service.dtos.SummaryStats;
+import com.aidanwhiteley.books.util.JwtAuthenticationUtils;
+import jakarta.servlet.http.HttpServletResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import java.security.Principal;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+
+import static com.aidanwhiteley.books.domain.Book.Rating.GREAT;
+
+@Controller
+public class BookControllerHtmx implements BookControllerHtmxExceptionHandling {
+
+<span class="fc" id="L37">    private static final Logger LOGGER = LoggerFactory.getLogger(BookControllerHtmx.class);</span>
+    public static final String HX_TRIGGER_AFTER_SWAP = &quot;HX-Trigger-After-Swap&quot;;
+    public static final String PAGE_OF_BOOKS = &quot;pageOfBooks&quot;;
+    public static final String PAGINATION_LINK = &quot;paginationLink&quot;;
+    public static final String FIND_REVIEWS_CLOUDY_FIND_BY_RESULTS = &quot;find-reviews :: cloudy-find-by-results&quot;;
+    public static final String RATINGS = &quot;ratings&quot;;
+    public static final String AUTHORS = &quot;authors&quot;;
+    public static final String GENRES = &quot;genres&quot;;
+    public static final String REVIEWERS = &quot;reviewers&quot;;
+    public static final String FIND_REVIEWS = &quot;find-reviews&quot;;
+    public static final String HIGHEST_ROLE = &quot;highestRole&quot;;
+    public static final String IS_OWNER = &quot;isOwner&quot;;
+    public static final String COMMENT_FORM = &quot;commentForm&quot;;
+    public static final String HX_REQUEST = &quot;HX-Request&quot;;
+    private final BookRepository bookRepository;
+    private final JwtAuthenticationUtils authUtils;
+    private final StatsService statsService;
+    @Value(&quot;${books.users.default.page.size}&quot;)
+    private int defaultPageSize;
+
+    public BookControllerHtmx(BookRepository bookRepository, JwtAuthenticationUtils jwtAuthenticationUtils,
+<span class="fc" id="L58">                              StatsService statsService) {</span>
+<span class="fc" id="L59">        this.bookRepository = bookRepository;</span>
+<span class="fc" id="L60">        this.authUtils = jwtAuthenticationUtils;</span>
+<span class="fc" id="L61">        this.statsService = statsService;</span>
+<span class="fc" id="L62">    }</span>
+
+    protected static List&lt;Book.Rating&gt; getRatings(String prefix) {
+<span class="fc" id="L65">        List&lt;Book.Rating&gt; ratings = Arrays.stream(Book.Rating.values()).toList();</span>
+<span class="pc bpc" id="L66" title="1 of 2 branches missed.">        if (!prefix.isEmpty()) {</span>
+<span class="nc" id="L67">            ratings = ratings.stream().filter(s -&gt; s.name().startsWith(prefix)).toList();</span>
+        }
+<span class="fc" id="L69">        return ratings.reversed();</span>
+    }
+
+    @GetMapping(value = &quot;/&quot;)
+    public String index(Model model, Principal principal, HttpServletResponse response,
+                        @RequestHeader(value = HX_REQUEST, required = false) boolean hxRequest) {
+<span class="fc" id="L75">        PageRequest pageObj = PageRequest.of(0, 30);</span>
+<span class="fc" id="L76">        Page&lt;Book&gt; page = bookRepository.findByRatingOrderByCreatedDateTimeDesc(pageObj, GREAT);</span>
+
+<span class="fc" id="L78">        List&lt;Book&gt; books = getBooksWithRequiredImages(page);</span>
+<span class="fc" id="L79">        model.addAttribute(&quot;books&quot;, books.stream().toList());</span>
+<span class="fc" id="L80">        model.addAttribute(&quot;rating&quot;, &quot;great&quot;);</span>
+<span class="fc" id="L81">        addUserToModel(principal, model);</span>
+
+<span class="pc bpc" id="L83" title="1 of 2 branches missed.">        if (hxRequest) {</span>
+<span class="nc" id="L84">            response.addHeader(HX_TRIGGER_AFTER_SWAP, &quot;initSwiper&quot;);</span>
+        }
+
+<span class="fc" id="L87">        return &quot;home&quot;;</span>
+    }
+
+    @GetMapping(value = {&quot;/getBooksByRating&quot;}, params = {&quot;rating&quot;})
+    public String findByRating(Model model, @RequestParam String rating, Principal principal,
+                               HttpServletResponse response,
+                               @RequestHeader(value = HX_REQUEST, required = false) boolean hxRequest) {
+
+<span class="fc" id="L95">        Book.Rating ipRating = Book.Rating.getRatingByString(rating);</span>
+<span class="fc bfc" id="L96" title="All 2 branches covered.">        if (ipRating == null) {</span>
+<span class="fc" id="L97">            throw new IllegalArgumentException(&quot;Input rating &quot; + rating + &quot; not valid&quot;);</span>
+        }
+
+<span class="fc" id="L100">        PageRequest pageObj = PageRequest.of(0, 30);</span>
+<span class="fc" id="L101">        Page&lt;Book&gt; page = bookRepository.findByRatingOrderByCreatedDateTimeDesc(pageObj, ipRating);</span>
+
+<span class="fc" id="L103">        List&lt;Book&gt; books = getBooksWithRequiredImages(page);</span>
+<span class="fc" id="L104">        model.addAttribute(&quot;books&quot;, books.stream().toList());</span>
+<span class="fc" id="L105">        model.addAttribute(&quot;rating&quot;, rating);</span>
+<span class="fc" id="L106">        addUserToModel(principal, model);</span>
+
+<span class="pc bpc" id="L108" title="1 of 2 branches missed.">        if (hxRequest) {</span>
+<span class="fc" id="L109">            response.addHeader(HX_TRIGGER_AFTER_SWAP, &quot;initSwiper&quot;);</span>
+        }
+
+<span class="fc" id="L112">        return &quot;components/swiper :: cloudy-swiper-slides&quot;;</span>
+    }
+
+    @GetMapping(value = &quot;/recent&quot;)
+    public String recentlyReviewed(Model model, Principal principal) {
+<span class="fc" id="L117">        return recentlyReviewedByPage(1, model, principal, false);</span>
+    }
+
+    @GetMapping(value = &quot;/recent&quot;, params = {&quot;pagenum&quot;})
+    public String recentlyReviewedByPage(@RequestParam int pagenum, Model model, Principal principal,
+                                         @RequestHeader(value = HX_REQUEST, required = false) boolean hxRequest) {
+<span class="fc" id="L123">        PageRequest pageObj = PageRequest.of(pagenum - 1, 7);</span>
+<span class="fc" id="L124">        Page&lt;Book&gt; page = bookRepository.findAllByOrderByCreatedDateTimeDesc(pageObj);</span>
+
+<span class="fc" id="L126">        model.addAttribute(PAGE_OF_BOOKS, page);</span>
+<span class="fc" id="L127">        addUserToModel(principal, model);</span>
+<span class="fc" id="L128">        model.addAttribute(PAGINATION_LINK, &quot;/recent&quot;);</span>
+
+<span class="pc bpc" id="L130" title="1 of 2 branches missed.">        if (hxRequest) {</span>
+<span class="nc" id="L131">            return FIND_REVIEWS_CLOUDY_FIND_BY_RESULTS;</span>
+        } else {
+<span class="fc" id="L133">            return &quot;recently-reviewed&quot;;</span>
+        }
+    }
+
+    @GetMapping(value = &quot;/bookreview&quot;, params = {&quot;bookId&quot;})
+    public String bookReview(@RequestParam String bookId, Model model, Principal principal) {
+<span class="pc" id="L139">        Book aBook = bookRepository.findById(bookId).orElseThrow(() -&gt; new NotFoundException(&quot;Book id &quot; + bookId + &quot; not found&quot;));</span>
+
+<span class="fc" id="L141">        model.addAttribute(&quot;book&quot;, aBook);</span>
+<span class="fc" id="L142">        model.addAttribute(COMMENT_FORM, new CommentForm());</span>
+<span class="fc" id="L143">        addIsOwnerToModel(aBook, principal, model);</span>
+<span class="fc" id="L144">        addUserToModel(principal, model);</span>
+
+<span class="fc" id="L146">        return &quot;book-review&quot;;</span>
+    }
+
+    @GetMapping(value = &quot;/find&quot;)
+    public String findReviews(Model model, Principal principal) {
+<span class="fc" id="L151">        List&lt;Book.Rating&gt; ratings = getRatings(&quot;&quot;);</span>
+<span class="fc" id="L152">        model.addAttribute(RATINGS, ratings);</span>
+<span class="fc" id="L153">        model.addAttribute(AUTHORS, getAuthors());</span>
+<span class="fc" id="L154">        model.addAttribute(GENRES, getGenres());</span>
+<span class="fc" id="L155">        model.addAttribute(REVIEWERS, getReviewers(principal));</span>
+<span class="fc" id="L156">        addUserToModel(principal, model);</span>
+
+<span class="fc" id="L158">        return FIND_REVIEWS;</span>
+    }
+
+    @GetMapping(value = {&quot;/find&quot;}, params = {&quot;rating&quot;, &quot;pagenum&quot;})
+    public String findByRating(Model model, Principal principal, @RequestParam String rating, @RequestParam int pagenum,
+                               HttpServletResponse response,
+                               @RequestHeader(value = HX_REQUEST, required = false) boolean hxRequest) {
+
+<span class="pc bpc" id="L166" title="1 of 4 branches missed.">        if (null == rating || rating.trim().isEmpty()) {</span>
+<span class="fc" id="L167">            throw new IllegalArgumentException(&quot;Rating parameter cannot be empty&quot;);</span>
+        }
+
+<span class="fc" id="L170">        Book.Rating aRating = Book.Rating.getRatingByString(rating);</span>
+<span class="fc bfc" id="L171" title="All 2 branches covered.">        if (null == aRating) {</span>
+<span class="fc" id="L172">            throw new IllegalArgumentException(&quot;Supplied rating parameter not recognised&quot;);</span>
+        }
+
+<span class="fc bfc" id="L175" title="All 2 branches covered.">        if (pagenum &lt; 1) {</span>
+<span class="fc" id="L176">            throw new IllegalArgumentException(&quot;Cannot request a page less than 1&quot;);</span>
+        }
+
+<span class="fc" id="L179">        PageRequest pageObj = PageRequest.of(pagenum - 1, defaultPageSize);</span>
+<span class="fc" id="L180">        Page&lt;Book&gt; books = bookRepository.findByRatingOrderByCreatedDateTimeDesc(pageObj, aRating);</span>
+
+<span class="fc" id="L182">        model.addAttribute(PAGE_OF_BOOKS, books);</span>
+<span class="fc" id="L183">        model.addAttribute(RATINGS, getRatings(&quot;&quot;));</span>
+<span class="fc" id="L184">        model.addAttribute(AUTHORS, getAuthors());</span>
+<span class="fc" id="L185">        model.addAttribute(GENRES, getGenres());</span>
+<span class="fc" id="L186">        model.addAttribute(REVIEWERS, getReviewers(principal));</span>
+<span class="fc" id="L187">        addUserToModel(principal, model);</span>
+<span class="fc" id="L188">        model.addAttribute(PAGINATION_LINK, &quot;find?rating=&quot; + rating);</span>
+
+<span class="pc bpc" id="L190" title="1 of 2 branches missed.">        if (hxRequest) {</span>
+<span class="fc" id="L191">            response.addHeader(HX_TRIGGER_AFTER_SWAP, &quot;clearSelectRating&quot;);</span>
+<span class="fc" id="L192">            return FIND_REVIEWS_CLOUDY_FIND_BY_RESULTS;</span>
+        } else {
+<span class="nc" id="L194">            return FIND_REVIEWS;</span>
+        }
+    }
+
+    @GetMapping(value = {&quot;/find&quot;}, params = {&quot;author&quot;, &quot;pagenum&quot;})
+    public String findByAuthor(Model model, Principal principal, @RequestParam String author, @RequestParam int pagenum,
+                               HttpServletResponse response,
+                               @RequestHeader(value = HX_REQUEST, required = false) boolean hxRequest) {
+
+<span class="pc bpc" id="L203" title="1 of 4 branches missed.">        if (author == null || author.trim().isEmpty()) {</span>
+<span class="fc" id="L204">            throw new IllegalArgumentException(&quot;Author parameter cannot be empty&quot;);</span>
+        }
+
+<span class="fc bfc" id="L207" title="All 2 branches covered.">        if (pagenum &lt; 1) {</span>
+<span class="fc" id="L208">            throw new IllegalArgumentException(&quot;Cannot request a page less than 1&quot;);</span>
+        }
+
+<span class="fc" id="L211">        PageRequest pageObj = PageRequest.of(pagenum - 1, defaultPageSize);</span>
+<span class="fc" id="L212">        Page&lt;Book&gt; books = bookRepository.findAllByAuthorOrderByCreatedDateTimeDesc(pageObj, author);</span>
+<span class="fc" id="L213">        model.addAttribute(PAGE_OF_BOOKS, books);</span>
+<span class="fc" id="L214">        model.addAttribute(RATINGS, getRatings(&quot;&quot;));</span>
+<span class="fc" id="L215">        model.addAttribute(AUTHORS, getAuthors());</span>
+<span class="fc" id="L216">        model.addAttribute(REVIEWERS, getReviewers(principal));</span>
+<span class="fc" id="L217">        addUserToModel(principal, model);</span>
+<span class="fc" id="L218">        model.addAttribute(PAGINATION_LINK, &quot;find?author=&quot; + author);</span>
+<span class="pc bpc" id="L219" title="1 of 2 branches missed.">        if (hxRequest) {</span>
+<span class="fc" id="L220">            response.addHeader(HX_TRIGGER_AFTER_SWAP, &quot;clearSelectAuthor&quot;);</span>
+<span class="fc" id="L221">            return FIND_REVIEWS_CLOUDY_FIND_BY_RESULTS;</span>
+        } else {
+<span class="nc" id="L223">            return FIND_REVIEWS;</span>
+        }
+    }
+
+    @GetMapping(value = {&quot;/find&quot;}, params = {&quot;genre&quot;, &quot;pagenum&quot;})
+    public String findByGenre(Model model, Principal principal, @RequestParam String genre, @RequestParam int pagenum,
+                              HttpServletResponse response,
+                              @RequestHeader(value = HX_REQUEST, required = false) boolean hxRequest) {
+
+<span class="pc bpc" id="L232" title="1 of 4 branches missed.">        if (genre == null || genre.trim().isEmpty()) {</span>
+<span class="fc" id="L233">            throw new IllegalArgumentException(&quot;Genre parameter cannot be empty&quot;);</span>
+        }
+
+<span class="fc bfc" id="L236" title="All 2 branches covered.">        if (pagenum &lt; 1) {</span>
+<span class="fc" id="L237">            throw new IllegalArgumentException(&quot;Cannot request a page less than 1&quot;);</span>
+        }
+
+<span class="fc" id="L240">        PageRequest pageObj = PageRequest.of(pagenum - 1, defaultPageSize);</span>
+<span class="fc" id="L241">        Page&lt;Book&gt; books = bookRepository.findAllByGenreOrderByCreatedDateTimeDesc(pageObj, genre);</span>
+
+<span class="fc" id="L243">        model.addAttribute(PAGE_OF_BOOKS, books);</span>
+<span class="fc" id="L244">        model.addAttribute(RATINGS, getRatings(&quot;&quot;));</span>
+<span class="fc" id="L245">        model.addAttribute(AUTHORS, getAuthors());</span>
+<span class="fc" id="L246">        model.addAttribute(GENRES, getGenres());</span>
+<span class="fc" id="L247">        model.addAttribute(REVIEWERS, getReviewers(principal));</span>
+<span class="fc" id="L248">        addUserToModel(principal, model);</span>
+<span class="fc" id="L249">        model.addAttribute(PAGINATION_LINK, &quot;find?genre=&quot; + genre);</span>
+
+<span class="pc bpc" id="L251" title="1 of 2 branches missed.">        if (hxRequest) {</span>
+<span class="fc" id="L252">            response.addHeader(HX_TRIGGER_AFTER_SWAP, &quot;clearSelectGenre&quot;);</span>
+<span class="fc" id="L253">            return FIND_REVIEWS_CLOUDY_FIND_BY_RESULTS;</span>
+        } else {
+<span class="nc" id="L255">            return FIND_REVIEWS;</span>
+        }
+    }
+
+    @GetMapping(value = {&quot;/search&quot;}, params = {&quot;term&quot;})
+    public String findBySearchFullPage(Model model, Principal principal, @RequestParam String term) {
+<span class="nc" id="L261">        return findBySearch(model, principal, term, 1, false);</span>
+    }
+
+    @GetMapping(value = {&quot;/search&quot;}, params = {&quot;term&quot;, &quot;pagenum&quot;})
+    public String findBySearch(Model model, Principal principal, @RequestParam String term, @RequestParam int pagenum,
+                               @RequestHeader(value = HX_REQUEST, required = false) boolean hxRequest) {
+
+<span class="pc bpc" id="L268" title="1 of 4 branches missed.">        if (null == term || term.trim().isEmpty()) {</span>
+<span class="fc" id="L269">            throw new IllegalArgumentException(&quot;Search query string cannot be empty&quot;);</span>
+        }
+
+<span class="fc bfc" id="L272" title="All 2 branches covered.">        if (pagenum &lt; 1) {</span>
+<span class="fc" id="L273">            throw new IllegalArgumentException(&quot;Cannot request a page less than 1&quot;);</span>
+        }
+
+<span class="fc" id="L276">        PageRequest pageObj = PageRequest.of(pagenum - 1, defaultPageSize);</span>
+<span class="nc" id="L277">        Page&lt;Book&gt; books = bookRepository.searchForBooks(term, pageObj);</span>
+
+<span class="nc" id="L279">        model.addAttribute(PAGE_OF_BOOKS, books);</span>
+<span class="nc" id="L280">        addUserToModel(principal, model);</span>
+<span class="nc" id="L281">        model.addAttribute(PAGINATION_LINK, &quot;search?term=&quot; + term);</span>
+
+<span class="nc bnc" id="L283" title="All 2 branches missed.">        if (hxRequest) {</span>
+<span class="nc" id="L284">            return FIND_REVIEWS_CLOUDY_FIND_BY_RESULTS;</span>
+        } else {
+<span class="nc" id="L286">            return &quot;search-books&quot;;</span>
+        }
+    }
+
+    @GetMapping(value = {&quot;/statistics&quot;})
+    public String statistics(Model model, Principal principal) {
+
+<span class="fc" id="L293">        SummaryStats stats = statsService.getSummaryStats();</span>
+<span class="fc" id="L294">        model.addAttribute(&quot;countOfBooks&quot;, stats.getCount());</span>
+<span class="fc" id="L295">        model.addAttribute(&quot;bookByRating&quot;, stats.getBooksByRating());</span>
+<span class="fc" id="L296">        List&lt;BooksByGenre&gt; booksByGenre = stats.getBookByGenre();</span>
+<span class="fc" id="L297">        model.addAttribute(&quot;bookByGenre&quot;, booksByGenre.subList(0, Math.min(booksByGenre.size(), 10)));</span>
+<span class="fc" id="L298">        addUserToModel(principal, model);</span>
+
+<span class="fc" id="L300">        return &quot;book-stats&quot;;</span>
+    }
+
+    @GetMapping(value = {&quot;/log-on&quot;})
+    public String logon(Model model, Principal principal) {
+<span class="nc" id="L305">        addUserToModel(principal, model);</span>
+<span class="nc" id="L306">        return &quot;logon&quot;;</span>
+    }
+
+    @GetMapping(value = &quot;/tandcs&quot;)
+    public String helpAndTandCs(Model model, Principal principal) {
+<span class="nc" id="L311">        addUserToModel(principal, model);</span>
+<span class="nc" id="L312">        return &quot;helpandtandcs&quot;;</span>
+    }
+
+    @GetMapping(value = &quot;/privacy&quot;)
+    public String privacy(Model model, Principal principal) {
+<span class="nc" id="L317">        addUserToModel(principal, model);</span>
+<span class="nc" id="L318">        return &quot;privacy&quot;;</span>
+    }
+
+    @Override
+    public void addUserToModel(Principal principal, Model model) {
+
+<span class="fc bfc" id="L324" title="All 2 branches covered.">        if (principal == null) {</span>
+<span class="fc" id="L325">            LOGGER.debug(&quot;Principal passed to user method was null&quot;);</span>
+<span class="fc" id="L326">            model.addAttribute(&quot;user&quot;, null);</span>
+<span class="fc" id="L327">            model.addAttribute(HIGHEST_ROLE, null);</span>
+        } else {
+<span class="pc bpc" id="L329" title="1 of 2 branches missed.">            if (LOGGER.isDebugEnabled()) {</span>
+<span class="nc" id="L330">                LOGGER.debug(&quot;Principal passed in to user method is: {}&quot;, principal.toString().replaceAll(&quot;[\n\r\t]&quot;, &quot;_&quot;));</span>
+            }
+        }
+
+<span class="fc" id="L334">        Optional&lt;User&gt; user = authUtils.extractUserFromPrincipal(principal, true);</span>
+<span class="fc bfc" id="L335" title="All 2 branches covered.">        if (user.isPresent()) {</span>
+<span class="fc" id="L336">            model.addAttribute(&quot;user&quot;, user.get());</span>
+<span class="fc" id="L337">            model.addAttribute(HIGHEST_ROLE, user.get().getHighestRole().getShortName());</span>
+        } else {
+<span class="fc" id="L339">            model.addAttribute(&quot;user&quot;, null);</span>
+<span class="fc" id="L340">            model.addAttribute(HIGHEST_ROLE, null);</span>
+        }
+<span class="fc" id="L342">    }</span>
+
+    private void addIsOwnerToModel(Book aBook, Principal principal, Model model) {
+<span class="fc bfc" id="L345" title="All 2 branches covered.">        if (principal == null) {</span>
+<span class="fc" id="L346">            LOGGER.debug(&quot;Principal passed to addIsOwnerToModel method was null&quot;);</span>
+<span class="fc" id="L347">            model.addAttribute( IS_OWNER, false);</span>
+        } else {
+<span class="fc" id="L349">            Optional&lt;User&gt; user = authUtils.extractUserFromPrincipal(principal, true);</span>
+<span class="pc bpc" id="L350" title="2 of 4 branches missed.">            boolean isOwner = user.isPresent() &amp;&amp; aBook.isOwner(user.get());</span>
+<span class="fc" id="L351">            model.addAttribute(IS_OWNER, isOwner);</span>
+        }
+<span class="fc" id="L353">    }</span>
+
+
+    private List&lt;BooksByAuthor&gt; getAuthors() {
+<span class="fc" id="L357">        return bookRepository.countBooksByAuthor();</span>
+    }
+
+    private List&lt;BooksByGenre&gt; getGenres() {
+<span class="fc" id="L361">        return bookRepository.countBooksByGenre();</span>
+    }
+
+    private List&lt;Book&gt; getBooksWithRequiredImages(Page&lt;Book&gt; page) {
+<span class="fc" id="L365">        return page.getContent().stream().filter(b -&gt;</span>
+<span class="pc bpc" id="L366" title="1 of 2 branches missed.">                (b.getGoogleBookId() != null &amp;&amp;</span>
+<span class="pc bpc" id="L367" title="1 of 2 branches missed.">                        !b.getGoogleBookId().isBlank() &amp;&amp;</span>
+<span class="pc bpc" id="L368" title="1 of 2 branches missed.">                        (b.getGoogleBookDetails().getVolumeInfo().getImageLinks() != null) &amp;&amp;</span>
+<span class="pc bpc" id="L369" title="1 of 2 branches missed.">                        (b.getGoogleBookDetails().getVolumeInfo().getImageLinks().getThumbnail() != null) &amp;&amp;</span>
+<span class="pc bpc" id="L370" title="1 of 2 branches missed.">                        !b.getGoogleBookDetails().getVolumeInfo().getImageLinks().getThumbnail().isBlank()</span>
+<span class="fc" id="L371">                )).toList();</span>
+    }
+
+    private List&lt;BooksByReader&gt; getReviewers(Principal principal) {
+<span class="fc" id="L375">        Optional&lt;User&gt; user = authUtils.extractUserFromPrincipal(principal, false);</span>
+<span class="pc bpc" id="L376" title="3 of 4 branches missed.">        if (user.isPresent() &amp;&amp; user.get().getHighestRole().getRoleNumber() &gt;= User.Role.ROLE_EDITOR.getRoleNumber()) {</span>
+<span class="nc" id="L377">            return bookRepository.countBooksByReader();</span>
+        } else {
+<span class="fc" id="L379">            return new ArrayList&lt;&gt;();</span>
+        }
+    }
+
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

@@ -1,0 +1,1649 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+    <link rel="stylesheet" type="text/css" href="../style.css">
+</head>
+<body>
+
+
+<h1>JwtUtils.java</h1>
+
+<table class="src">
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@32333650_1'/>
+1
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@32333650_1'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>package com.aidanwhiteley.books.controller.jwt;</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@32333650_2'/>
+2
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@32333650_2'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@32333650_3'/>
+3
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@32333650_3'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>import com.aidanwhiteley.books.domain.User;</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@32333650_4'/>
+4
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@32333650_4'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>import io.jsonwebtoken.Claims;</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@32333650_5'/>
+5
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@32333650_5'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>import io.jsonwebtoken.Jwts;</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@32333650_6'/>
+6
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@32333650_6'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>import io.jsonwebtoken.io.Decoders;</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@32333650_7'/>
+7
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@32333650_7'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>import io.jsonwebtoken.io.Encoders;</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@32333650_8'/>
+8
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@32333650_8'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>import io.jsonwebtoken.security.Keys;</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@32333650_9'/>
+9
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@32333650_9'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>import lombok.Setter;</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@32333650_10'/>
+10
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@32333650_10'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>import org.slf4j.Logger;</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@32333650_11'/>
+11
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@32333650_11'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>import org.slf4j.LoggerFactory;</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@32333650_12'/>
+12
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@32333650_12'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>import org.springframework.beans.factory.annotation.Value;</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@32333650_13'/>
+13
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@32333650_13'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>import org.springframework.stereotype.Component;</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@32333650_14'/>
+14
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@32333650_14'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@32333650_15'/>
+15
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@32333650_15'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>import javax.crypto.SecretKey;</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@32333650_16'/>
+16
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@32333650_16'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>import java.util.ArrayList;</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@32333650_17'/>
+17
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@32333650_17'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>import java.util.Date;</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@32333650_18'/>
+18
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@32333650_18'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@32333650_19'/>
+19
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@32333650_19'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>@Component</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@32333650_20'/>
+20
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@32333650_20'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>public class JwtUtils {</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@32333650_21'/>
+21
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@32333650_21'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@32333650_22'/>
+22
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@32333650_22'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>    private static final Logger LOGGER = LoggerFactory.getLogger(JwtUtils.class);</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@32333650_23'/>
+23
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@32333650_23'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@32333650_24'/>
+24
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@32333650_24'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    private static final String AUTH_PROVIDER = &#34;provider&#34;;</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@32333650_25'/>
+25
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@32333650_25'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    private static final String FULL_NAME = &#34;name&#34;;</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@32333650_26'/>
+26
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@32333650_26'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    private static final String ROLES = &#34;roles&#34;;</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@32333650_27'/>
+27
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@32333650_27'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    private static final String ROLES_DELIMETER = &#34;,&#34;;</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@32333650_28'/>
+28
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@32333650_28'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@32333650_29'/>
+29
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@32333650_29'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>    @Setter</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@32333650_30'/>
+30
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@32333650_30'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    @Value(&#34;${books.jwt.expiryInMilliSeconds}&#34;)</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@32333650_31'/>
+31
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@32333650_31'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    private int expiryInMilliSeconds;</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@32333650_32'/>
+32
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@32333650_32'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@32333650_33'/>
+33
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@32333650_33'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    @Value(&#34;${books.jwt.actuatorExpiryInMilliSeconds}&#34;)</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@32333650_34'/>
+34
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@32333650_34'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    private long expiryInMilliSecondsActuator;</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@32333650_35'/>
+35
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@32333650_35'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@32333650_36'/>
+36
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@32333650_36'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>    @Setter</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@32333650_37'/>
+37
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@32333650_37'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    @Value(&#34;${books.jwt.secretKey}&#34;)</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@32333650_38'/>
+38
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@32333650_38'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    private String secretKey;</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@32333650_39'/>
+39
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@32333650_39'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@32333650_40'/>
+40
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@32333650_40'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>    @Setter</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@32333650_41'/>
+41
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@32333650_41'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    @Value(&#34;${books.jwt.issuer}&#34;)</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@32333650_42'/>
+42
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@32333650_42'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    private String issuer;</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@32333650_43'/>
+43
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@32333650_43'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@32333650_44'/>
+44
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@32333650_44'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    public static String createRandomBase64EncodedSecretKey() {</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@32333650_45'/>
+45
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@32333650_45'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>        SecretKey key = Jwts.SIG.HS512.key().build();</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@32333650_46'/>
+46
+</td>
+<td class='killed'>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@32333650_46'>1</a>
+<span>
+1. createRandomBase64EncodedSecretKey : replaced return value with &#34;&#34; for com/aidanwhiteley/books/controller/jwt/JwtUtils::createRandomBase64EncodedSecretKey &rarr; KILLED<br/>
+
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class='killed'>        return Encoders.BASE64.encode(key.getEncoded());</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@32333650_47'/>
+47
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@32333650_47'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    }</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@32333650_48'/>
+48
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@32333650_48'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@32333650_49'/>
+49
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@32333650_49'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    public User getUserFromToken(String token) {</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@32333650_50'/>
+50
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@32333650_50'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>        byte[] key = Decoders.BASE64.decode(secretKey);</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@32333650_51'/>
+51
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@32333650_51'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>        SecretKey secretKeyCrypto = Keys.hmacShaKeyFor(key);</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@32333650_52'/>
+52
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@32333650_52'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@32333650_53'/>
+53
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@32333650_53'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>        Claims claims = Jwts.parser()</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@32333650_54'/>
+54
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@32333650_54'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>                .verifyWith(secretKeyCrypto).build()</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@32333650_55'/>
+55
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@32333650_55'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>                .parseSignedClaims(token)</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@32333650_56'/>
+56
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@32333650_56'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>                .getPayload();</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@32333650_57'/>
+57
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@32333650_57'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@32333650_58'/>
+58
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@32333650_58'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>        String authenticationServiceId = claims.getSubject();</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@32333650_59'/>
+59
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@32333650_59'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>        String extractedIssuer = claims.getIssuer();</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@32333650_60'/>
+60
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@32333650_60'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>        String authProvider = (String) claims.get(AUTH_PROVIDER);</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@32333650_61'/>
+61
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@32333650_61'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>        String fullName = (String) claims.get(FULL_NAME);</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@32333650_62'/>
+62
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@32333650_62'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>        String roles = (String) claims.get(ROLES);</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@32333650_63'/>
+63
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@32333650_63'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@32333650_64'/>
+64
+</td>
+<td class='killed'>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@32333650_64'>2</a>
+<span>
+1. getUserFromToken : removed conditional - replaced equality check with true &rarr; KILLED<br/>
+2. getUserFromToken : removed conditional - replaced equality check with false &rarr; KILLED<br/>
+
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class='killed'>        if (!issuer.equals(extractedIssuer)) {</span></pre></td></tr>
+
+<tr>
+<td class='uncovered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@32333650_65'/>
+65
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@32333650_65'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='uncovered'><pre><span  class=''>            String errMsg = &#34;Expected token issuer of &#34; + issuer + &#34; but found &#34; + extractedIssuer;</span></pre></td></tr>
+
+<tr>
+<td class='uncovered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@32333650_66'/>
+66
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@32333650_66'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='uncovered'><pre><span  class=''>            LOGGER.error(errMsg);</span></pre></td></tr>
+
+<tr>
+<td class='uncovered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@32333650_67'/>
+67
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@32333650_67'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='uncovered'><pre><span  class=''>            throw new IllegalArgumentException(errMsg);</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@32333650_68'/>
+68
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@32333650_68'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>        }</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@32333650_69'/>
+69
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@32333650_69'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@32333650_70'/>
+70
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@32333650_70'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>        User user = User.builder().</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@32333650_71'/>
+71
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@32333650_71'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>                authenticationServiceId(authenticationServiceId).</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@32333650_72'/>
+72
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@32333650_72'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>                authProvider(User.AuthenticationProvider.valueOf(authProvider)).</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@32333650_73'/>
+73
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@32333650_73'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>                fullName(fullName).</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@32333650_74'/>
+74
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@32333650_74'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>                build();</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@32333650_75'/>
+75
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@32333650_75'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@32333650_76'/>
+76
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@32333650_76'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>        String[] rolesArray = roles.split(ROLES_DELIMETER);</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@32333650_77'/>
+77
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@32333650_77'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>        for (String s : rolesArray) {</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@32333650_78'/>
+78
+</td>
+<td class='killed'>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@32333650_78'>1</a>
+<span>
+1. getUserFromToken : removed call to com/aidanwhiteley/books/domain/User::addRole &rarr; KILLED<br/>
+
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class='killed'>            user.addRole(User.Role.getRole(Integer.parseInt(s)));</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@32333650_79'/>
+79
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@32333650_79'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>        }</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@32333650_80'/>
+80
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@32333650_80'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@32333650_81'/>
+81
+</td>
+<td class='killed'>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@32333650_81'>1</a>
+<span>
+1. getUserFromToken : replaced return value with null for com/aidanwhiteley/books/controller/jwt/JwtUtils::getUserFromToken &rarr; KILLED<br/>
+
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class='killed'>        return user;</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@32333650_82'/>
+82
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@32333650_82'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    }</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@32333650_83'/>
+83
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@32333650_83'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@32333650_84'/>
+84
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@32333650_84'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    public String createTokenForUser(User user) {</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@32333650_85'/>
+85
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@32333650_85'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@32333650_86'/>
+86
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@32333650_86'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>        ArrayList&#60;String&#62; roles = new ArrayList&#60;&#62;();</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@32333650_87'/>
+87
+</td>
+<td class='killed'>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@32333650_87'>1</a>
+<span>
+1. createTokenForUser : removed call to java/util/List::forEach &rarr; KILLED<br/>
+
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class='killed'>        user.getRoles().forEach(s -&#62; roles.add(String.valueOf(s.getRoleNumber())));</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@32333650_88'/>
+88
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@32333650_88'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@32333650_89'/>
+89
+</td>
+<td class='killed'>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@32333650_89'>4</a>
+<span>
+1. createTokenForUser : removed conditional - replaced equality check with false &rarr; KILLED<br/>
+2. createTokenForUser : removed conditional - replaced equality check with false &rarr; KILLED<br/>
+3. createTokenForUser : removed conditional - replaced equality check with true &rarr; KILLED<br/>
+4. createTokenForUser : removed conditional - replaced equality check with true &rarr; KILLED<br/>
+
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class='killed'>        long tokenExpiry = (user.getRoles().size() == 1 &#38;&#38; user.getRoles().getFirst() == User.Role.ROLE_ACTUATOR)</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@32333650_90'/>
+90
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@32333650_90'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>                ? expiryInMilliSecondsActuator : expiryInMilliSeconds;</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@32333650_91'/>
+91
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@32333650_91'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@32333650_92'/>
+92
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@32333650_92'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>        byte[] key = Decoders.BASE64.decode(secretKey);</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@32333650_93'/>
+93
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@32333650_93'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>        SecretKey secretKeyCrypto = Keys.hmacShaKeyFor(key);</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@32333650_94'/>
+94
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@32333650_94'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@32333650_95'/>
+95
+</td>
+<td class='killed'>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@32333650_95'>1</a>
+<span>
+1. createTokenForUser : replaced return value with &#34;&#34; for com/aidanwhiteley/books/controller/jwt/JwtUtils::createTokenForUser &rarr; KILLED<br/>
+
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class='killed'>        return Jwts.builder()</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@32333650_96'/>
+96
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@32333650_96'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>                .subject(user.getAuthenticationServiceId())</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@32333650_97'/>
+97
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@32333650_97'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>                .issuer(issuer)</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@32333650_98'/>
+98
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@32333650_98'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>                .claim(AUTH_PROVIDER, user.getAuthProvider())</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@32333650_99'/>
+99
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@32333650_99'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>                .claim(FULL_NAME, user.getFullName())</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@32333650_100'/>
+100
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@32333650_100'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>                .claim(ROLES, String.join(ROLES_DELIMETER, roles))</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@32333650_101'/>
+101
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@32333650_101'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>                .issuedAt(new Date())</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@32333650_102'/>
+102
+</td>
+<td class='killed'>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@32333650_102'>1</a>
+<span>
+1. createTokenForUser : Replaced long addition with subtraction &rarr; KILLED<br/>
+
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class='killed'>                .expiration(new Date(new Date().getTime() + tokenExpiry))</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@32333650_103'/>
+103
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@32333650_103'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>                .signWith(secretKeyCrypto)</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@32333650_104'/>
+104
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@32333650_104'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>                .compact();</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@32333650_105'/>
+105
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@32333650_105'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    }</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@32333650_106'/>
+106
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@32333650_106'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>}</span></pre></td></tr>
+
+
+
+<tr><td></td><td></td><td><h2>Mutations</h2></td></tr>
+
+<tr>
+<td><a href='#org.pitest.mutationtest.report.html.SourceFile@32333650_46'>46</a></td> 
+<td></td>
+<td>
+
+<a name='grouporg.pitest.mutationtest.report.html.SourceFile@32333650_46'/> 
+
+<p class='KILLED'><span class='pop'>1.<span><b>1</b><br/><b>Location : </b>createRandomBase64EncodedSecretKey<br/><b>Killed by : </b>com.aidanwhiteley.books.controller.jwt.JwtUtilsTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.jwt.JwtUtilsTest]/[method:testTamperedWithToken()]</span></span> replaced return value with &#34;&#34; for com/aidanwhiteley/books/controller/jwt/JwtUtils::createRandomBase64EncodedSecretKey &rarr; KILLED</span>
+</div> 
+</td>
+</tr>
+<tr>
+<td><a href='#org.pitest.mutationtest.report.html.SourceFile@32333650_64'>64</a></td> 
+<td></td>
+<td>
+
+<a name='grouporg.pitest.mutationtest.report.html.SourceFile@32333650_64'/> 
+
+<p class='KILLED'><span class='pop'>1.<span><b>1</b><br/><b>Location : </b>getUserFromToken<br/><b>Killed by : </b>com.aidanwhiteley.books.controller.jwt.JwtUtilsTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.jwt.JwtUtilsTest]/[method:testCreateAndReadGoodToken()]</span></span> removed conditional - replaced equality check with true &rarr; KILLED</span>
+</div> <p class='KILLED'><span class='pop'>2.<span><b>2</b><br/><b>Location : </b>getUserFromToken<br/><b>Killed by : </b>com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest]/[method:testCreateBookReviewInvalidData()]</span></span> removed conditional - replaced equality check with false &rarr; KILLED</span>
+</div> 
+</td>
+</tr>
+<tr>
+<td><a href='#org.pitest.mutationtest.report.html.SourceFile@32333650_78'>78</a></td> 
+<td></td>
+<td>
+
+<a name='grouporg.pitest.mutationtest.report.html.SourceFile@32333650_78'/> 
+
+<p class='KILLED'><span class='pop'>1.<span><b>1</b><br/><b>Location : </b>getUserFromToken<br/><b>Killed by : </b>com.aidanwhiteley.books.util.JwtAuthenticationUtilsTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.util.JwtAuthenticationUtilsTest]/[method:tryToGetActuatorJwtToken()]</span></span> removed call to com/aidanwhiteley/books/domain/User::addRole &rarr; KILLED</span>
+</div> 
+</td>
+</tr>
+<tr>
+<td><a href='#org.pitest.mutationtest.report.html.SourceFile@32333650_81'>81</a></td> 
+<td></td>
+<td>
+
+<a name='grouporg.pitest.mutationtest.report.html.SourceFile@32333650_81'/> 
+
+<p class='KILLED'><span class='pop'>1.<span><b>1</b><br/><b>Location : </b>getUserFromToken<br/><b>Killed by : </b>com.aidanwhiteley.books.controller.jwt.JwtUtilsTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.jwt.JwtUtilsTest]/[method:testCreateAndReadGoodToken()]</span></span> replaced return value with null for com/aidanwhiteley/books/controller/jwt/JwtUtils::getUserFromToken &rarr; KILLED</span>
+</div> 
+</td>
+</tr>
+<tr>
+<td><a href='#org.pitest.mutationtest.report.html.SourceFile@32333650_87'>87</a></td> 
+<td></td>
+<td>
+
+<a name='grouporg.pitest.mutationtest.report.html.SourceFile@32333650_87'/> 
+
+<p class='KILLED'><span class='pop'>1.<span><b>1</b><br/><b>Location : </b>createTokenForUser<br/><b>Killed by : </b>com.aidanwhiteley.books.controller.jwt.JwtUtilsTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.jwt.JwtUtilsTest]/[method:testCreateAndReadGoodToken()]</span></span> removed call to java/util/List::forEach &rarr; KILLED</span>
+</div> 
+</td>
+</tr>
+<tr>
+<td><a href='#org.pitest.mutationtest.report.html.SourceFile@32333650_89'>89</a></td> 
+<td></td>
+<td>
+
+<a name='grouporg.pitest.mutationtest.report.html.SourceFile@32333650_89'/> 
+
+<p class='KILLED'><span class='pop'>1.<span><b>1</b><br/><b>Location : </b>createTokenForUser<br/><b>Killed by : </b>com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest]/[method:testCreateBookReviewInvalidData()]</span></span> removed conditional - replaced equality check with false &rarr; KILLED</span>
+</div> <p class='KILLED'><span class='pop'>2.<span><b>2</b><br/><b>Location : </b>createTokenForUser<br/><b>Killed by : </b>com.aidanwhiteley.books.repository.GoogleBookSearchRepositoryTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.repository.GoogleBookSearchRepositoryTest]/[method:findByTitleAndAuthor()]</span></span> removed conditional - replaced equality check with false &rarr; KILLED</span>
+</div> <p class='KILLED'><span class='pop'>3.<span><b>3</b><br/><b>Location : </b>createTokenForUser<br/><b>Killed by : </b>com.aidanwhiteley.books.repository.GoogleBookSearchRepositoryTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.repository.GoogleBookSearchRepositoryTest]/[method:findByTitleAndAuthor()]</span></span> removed conditional - replaced equality check with true &rarr; KILLED</span>
+</div> <p class='KILLED'><span class='pop'>4.<span><b>4</b><br/><b>Location : </b>createTokenForUser<br/><b>Killed by : </b>com.aidanwhiteley.books.controller.jwt.JwtAuthenticationServiceTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.jwt.JwtAuthenticationServiceTest]/[method:testSetAuthenticationData()]</span></span> removed conditional - replaced equality check with true &rarr; KILLED</span>
+</div> 
+</td>
+</tr>
+<tr>
+<td><a href='#org.pitest.mutationtest.report.html.SourceFile@32333650_95'>95</a></td> 
+<td></td>
+<td>
+
+<a name='grouporg.pitest.mutationtest.report.html.SourceFile@32333650_95'/> 
+
+<p class='KILLED'><span class='pop'>1.<span><b>1</b><br/><b>Location : </b>createTokenForUser<br/><b>Killed by : </b>com.aidanwhiteley.books.controller.jwt.JwtUtilsTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.jwt.JwtUtilsTest]/[method:testTamperedWithToken()]</span></span> replaced return value with &#34;&#34; for com/aidanwhiteley/books/controller/jwt/JwtUtils::createTokenForUser &rarr; KILLED</span>
+</div> 
+</td>
+</tr>
+<tr>
+<td><a href='#org.pitest.mutationtest.report.html.SourceFile@32333650_102'>102</a></td> 
+<td></td>
+<td>
+
+<a name='grouporg.pitest.mutationtest.report.html.SourceFile@32333650_102'/> 
+
+<p class='KILLED'><span class='pop'>1.<span><b>1</b><br/><b>Location : </b>createTokenForUser<br/><b>Killed by : </b>com.aidanwhiteley.books.controller.jwt.JwtUtilsTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.jwt.JwtUtilsTest]/[method:testCreateAndReadGoodToken()]</span></span> Replaced long addition with subtraction &rarr; KILLED</span>
+</div> 
+</td>
+</tr>
+
+</table>
+
+
+<h2>Active mutators</h2>
+<ul>
+<li class='mutator'>CONDITIONALS_BOUNDARY</li>
+<li class='mutator'>EMPTY_RETURNS</li>
+<li class='mutator'>EXPERIMENTAL_SWITCH</li>
+<li class='mutator'>FALSE_RETURNS</li>
+<li class='mutator'>INCREMENTS</li>
+<li class='mutator'>INVERT_NEGS</li>
+<li class='mutator'>MATH</li>
+<li class='mutator'>NULL_RETURNS</li>
+<li class='mutator'>PRIMITIVE_RETURNS</li>
+<li class='mutator'>REMOVE_CONDITIONALS_EQUAL_ELSE</li>
+<li class='mutator'>REMOVE_CONDITIONALS_EQUAL_IF</li>
+<li class='mutator'>REMOVE_CONDITIONALS_ORDER_ELSE</li>
+<li class='mutator'>REMOVE_CONDITIONALS_ORDER_IF</li>
+<li class='mutator'>TRUE_RETURNS</li>
+<li class='mutator'>VOID_METHOD_CALLS</li>
+
+</ul>
+
+<h2>Tests examined</h2>
+<ul>
+<li>com.aidanwhiteley.books.controller.jwt.JwtUtilsTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.jwt.JwtUtilsTest]/[method:testTamperedWithToken()] (7 ms)</li><li>com.aidanwhiteley.books.controller.jwt.JwtUtilsTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.jwt.JwtUtilsTest]/[method:testExpiredToken()] (9 ms)</li><li>com.aidanwhiteley.books.controller.jwt.JwtUtilsTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.jwt.JwtUtilsTest]/[method:testCreateAndReadGoodToken()] (5 ms)</li><li>com.aidanwhiteley.books.controller.jwt.JwtAuthenticationServiceTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.jwt.JwtAuthenticationServiceTest]/[method:testSetAuthenticationData()] (10 ms)</li><li>com.aidanwhiteley.books.util.JwtAuthenticationUtilsTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.util.JwtAuthenticationUtilsTest]/[method:tryToGetActuatorJwtToken()] (9 ms)</li><li>com.aidanwhiteley.books.controller.BookSecureControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerTest]/[method:tryToCreateBookWithInsufficientPermissions()] (12 ms)</li><li>com.aidanwhiteley.books.util.ActuatorTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.util.ActuatorTest]/[method:checkActuatorEndpointsAreAvailableWithActuatorRole()] (17 ms)</li><li>com.aidanwhiteley.books.util.ActuatorTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.util.ActuatorTest]/[method:checkActuatorEndpointsNotAvailableWithAdminRole()] (23 ms)</li><li>com.aidanwhiteley.books.util.ActuatorTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.util.ActuatorTest]/[method:checkUnexpectedEndpointNotAvailable()] (22 ms)</li><li>com.aidanwhiteley.books.util.ActuatorTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.util.ActuatorTest]/[method:checkActuatorEndpointsNotAvailableWithoutActuatorRole()] (33 ms)</li><li>com.aidanwhiteley.books.controller.RestApiExceptionHandlerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.RestApiExceptionHandlerTest]/[method:testExceptionHandlerForNoPermissions()] (38 ms)</li><li>com.aidanwhiteley.books.util.ActuatorTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.util.ActuatorTest]/[method:checkSampleActuatorValue()] (34 ms)</li><li>com.aidanwhiteley.books.controller.BookSecureControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerTest]/[method:testDebugHeaders()] (26 ms)</li><li>com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest]/[method:testEditorCannotSeeUserAdmin()] (32 ms)</li><li>com.aidanwhiteley.books.controller.BookSecureControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerTest]/[method:findBookReaders()] (48 ms)</li><li>com.aidanwhiteley.books.controller.UserControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.UserControllerTest]/[method:tryToPatchOwnUserid()] (42 ms)</li><li>com.aidanwhiteley.books.controller.UserControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.UserControllerTest]/[method:getUserDetailsWithAuthentication()] (49 ms)</li><li>com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest]/[method:testAddCommentBadData()] (34 ms)</li><li>com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest]/[method:testAdminCanChangeRoleOfOtherUserid()] (56 ms)</li><li>com.aidanwhiteley.books.repository.BookRepositoryTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.repository.BookRepositoryTest]/[method:searchForBooks()] (14 ms)</li><li>com.aidanwhiteley.books.controller.BookSecureControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerTest]/[method:tryToUpdateBookWithInsufficientPermissions()] (44 ms)</li><li>com.aidanwhiteley.books.controller.BookControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerTest]/[method:findByAuthor()] (46 ms)</li><li>com.aidanwhiteley.books.controller.RestApiExceptionHandlerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.RestApiExceptionHandlerTest]/[method:testExceptionHandlerIllegalArguments()] (41 ms)</li><li>com.aidanwhiteley.books.controller.BookControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerHtmxTest]/[method:testUserDataIsReturnedToEditorUser()] (77 ms)</li><li>com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest]/[method:testCreateBookReviewInvalidData()] (65 ms)</li><li>com.aidanwhiteley.books.controller.BookControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerTest]/[method:testUserDataIsReturnedToEditorUser()] (70 ms)</li><li>com.aidanwhiteley.books.controller.BookSecureControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerTest]/[method:findBooksByReader()] (81 ms)</li><li>com.aidanwhiteley.books.repository.GoogleBookSearchRepositoryTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.repository.GoogleBookSearchRepositoryTest]/[method:findByTitleAndAuthor()] (87 ms)</li><li>com.aidanwhiteley.books.controller.UserControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.UserControllerTest]/[method:testLogout()] (174 ms)</li><li>com.aidanwhiteley.books.util.ActuatorTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.util.ActuatorTest]/[method:checkExpectedEndpointAvailable()] (193 ms)</li><li>com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest]/[method:testAdminCanSeeUserAdmin()] (196 ms)</li><li>com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest]/[method:testAdminCannotDeleteOwnUserid()] (193 ms)</li><li>com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest]/[method:testAdminCanDeleteOtherUserid()] (195 ms)</li><li>com.aidanwhiteley.books.controller.BookSecureControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerTest]/[method:tryToCreateInvalidBook()] (194 ms)</li><li>com.aidanwhiteley.books.controller.BookSecureControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerTest]/[method:tryUpdateActionWhenNoCsrfTokenInRequestHeaders()] (181 ms)</li><li>com.aidanwhiteley.books.controller.BookControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerHtmxTest]/[method:testAdminCanDeleteSomeoneElsesReview()] (173 ms)</li><li>com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest]/[method:testAdminCannotChangeOwnRoles()] (204 ms)</li><li>com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest]/[method:testEditorCannotDeleteBookReviewTheyDidntCreate()] (197 ms)</li><li>com.aidanwhiteley.books.controller.UserControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.UserControllerTest]/[method:tryToDeleteUserid()] (219 ms)</li><li>com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest]/[method:testEditorUserCanAccessCreateReviewPage()] (220 ms)</li><li>com.aidanwhiteley.books.controller.BookSecureControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerTest]/[method:createAndDeleteBook()] (201 ms)</li><li>com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest]/[method:testEditorCannotUpdateAnotherEditorsBookReview()] (194 ms)</li><li>com.aidanwhiteley.books.controller.FeedsControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.FeedsControllerTest]/[method:checkBooksExportWithLoggedOnHasNoBooks()] (205 ms)</li><li>com.aidanwhiteley.books.controller.BookControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerTest]/[method:testSensitiveDataIsReturnedToAdminUser()] (215 ms)</li><li>com.aidanwhiteley.books.controller.UserControllerNoAuthTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.UserControllerNoAuthTest]/[method:getUserDetailsNoAuthentication()] (201 ms)</li><li>com.aidanwhiteley.books.repository.GoogleBookDaoAsyncTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.repository.GoogleBookDaoAsyncTest]/[method:testBookUpdatedWithGoogleBookDetails()] (197 ms)</li><li>com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest]/[method:testAdminCanDeleteBookReview()] (230 ms)</li><li>com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest]/[method:testUpdateNonExistentBookReview()] (282 ms)</li><li>com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest]/[method:testAdminCanUpdateBookReview()] (216 ms)</li><li>com.aidanwhiteley.books.controller.BookControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerTest]/[method:testSensitiveDataNotReturnedToAnonymousUser()] (259 ms)</li><li>com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest]/[method:testAddAndDeleteComment()] (255 ms)</li><li>com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest]/[method:testEditorCanCreateBookReview()] (242 ms)</li><li>com.aidanwhiteley.books.controller.BookSecureControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerTest]/[method:updateBook()] (273 ms)</li><li>com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest]/[method:testEditorCanSeeBookReviewers()] (280 ms)</li><li>com.aidanwhiteley.books.controller.BookSecureControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerTest]/[method:addAndRemoveCommentFromBook()] (295 ms)</li><li>com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest]/[method:testEditorCanAddCommentToAnyBook()] (290 ms)</li><li>com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest]/[method:testAdminUpdateBookReviewWithBadData()] (435 ms)</li><li>com.aidanwhiteley.books.controller.BookControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerHtmxTest]/[method:testEditorCantDeleteSomeoneElsesReview()] (506 ms)</li><li>com.aidanwhiteley.books.service.UserServiceTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.service.UserServiceTest]/[method:testCreateFacebookBasedUser()] (745 ms)</li><li>com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest]/[method:testEditorUserCanAccessUpdateReviewPage()] (812 ms)</li><li>com.aidanwhiteley.books.controller.BookControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerTest]/[method:findBookById()] (1263 ms)</li><li>com.aidanwhiteley.books.controller.BookControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerHtmxTest]/[method:findBookById()] (3316 ms)</li>
+</ul>
+
+<br/>
+
+Report generated by <a href='https://pitest.org'>PIT</a> 1.22.0
+
+</body>
+</html>

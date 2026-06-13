@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JwtTokenProvider.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">SaaS Backend Starter</a> &gt; <a href="index.source.html" class="el_package">com.urke.saasbackendstarter.security</a> &gt; <span class="el_source">JwtTokenProvider.java</span></div><h1>JwtTokenProvider.java</h1><pre class="source lang-java linenums">package com.urke.saasbackendstarter.security;
+
+import io.jsonwebtoken.*;
+import javax.crypto.SecretKey;
+import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Component;
+
+import java.security.Key;
+import java.util.Date;
+
+/**
+ * Utility for generating and validating JWT tokens.
+ */
+@Component
+<span class="nc" id="L19">public class JwtTokenProvider {</span>
+
+    @Value(&quot;${jwt.secret}&quot;)
+    private String secret;
+
+    @Value(&quot;${jwt.expiration-ms}&quot;)
+    private long expirationMs;
+
+    /**
+     * Generates a JWT token for the given user.
+     */
+    public String generateToken(UserDetails userDetails) {
+<span class="nc" id="L31">        Date now = new Date();</span>
+<span class="nc" id="L32">        Date expiry = new Date(now.getTime() + expirationMs);</span>
+<span class="nc" id="L33">        return Jwts.builder()</span>
+<span class="nc" id="L34">                .subject(userDetails.getUsername())</span>
+<span class="nc" id="L35">                .issuedAt(now)</span>
+<span class="nc" id="L36">                .expiration(expiry)</span>
+<span class="nc" id="L37">                .signWith(getKey())</span>
+<span class="nc" id="L38">                .compact();</span>
+    }
+
+    /**
+     * Extracts the email (subject) from the token.
+     */
+    public String getEmailFromToken(String token) {
+        try {
+<span class="nc" id="L46">            return Jwts.parser()</span>
+<span class="nc" id="L47">                .verifyWith(getKey())</span>
+<span class="nc" id="L48">                .build()</span>
+<span class="nc" id="L49">                .parseSignedClaims(token)</span>
+<span class="nc" id="L50">                .getPayload()</span>
+<span class="nc" id="L51">                .getSubject();</span>
+<span class="nc" id="L52">        } catch (ExpiredJwtException ex) {</span>
+<span class="nc" id="L53">            throw new RuntimeException(&quot;JWT expired&quot;, ex);</span>
+<span class="nc" id="L54">        } catch (JwtException ex) {</span>
+<span class="nc" id="L55">            throw new RuntimeException(&quot;JWT invalid&quot;, ex);</span>
+        }
+    }
+
+    /**
+     * Validates the token against the user details.
+     */
+    public boolean validateToken(String token, UserDetails userDetails) {
+        try {
+<span class="nc" id="L64">            final String username = getEmailFromToken(token);</span>
+<span class="nc bnc" id="L65" title="All 4 branches missed.">            return (username.equals(userDetails.getUsername()) &amp;&amp; !isTokenExpired(token));</span>
+<span class="nc" id="L66">        } catch (JwtException ex) {</span>
+<span class="nc" id="L67">            return false;</span>
+        }
+    }
+
+    /**
+     * Checks if the token is expired.
+     */
+    public boolean isTokenExpired(String token) {
+<span class="nc" id="L75">        Date expiration = Jwts.parser()</span>
+<span class="nc" id="L76">                .verifyWith(getKey())</span>
+<span class="nc" id="L77">                .build()</span>
+<span class="nc" id="L78">                .parseSignedClaims(token)</span>
+<span class="nc" id="L79">                .getPayload()</span>
+<span class="nc" id="L80">                .getExpiration();</span>
+<span class="nc" id="L81">        return expiration.before(new Date());</span>
+    }
+
+    /**
+     * Builds an Authentication object from the token and user details.
+     */
+    public Authentication getAuthentication(String token, UserDetails userDetails) {
+<span class="nc" id="L88">        return new UsernamePasswordAuthenticationToken(</span>
+<span class="nc" id="L89">                userDetails, null, userDetails.getAuthorities());</span>
+    }
+
+    private SecretKey getKey() {
+<span class="nc" id="L93">        return Keys.hmacShaKeyFor(secret.getBytes());</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

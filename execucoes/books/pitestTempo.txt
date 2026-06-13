@@ -1,0 +1,27 @@
+3:17:30 AM PIT >> INFO : Verbose logging is disabled. If you encounter a problem, please enable it before reporting an issue.
+3:17:31 AM PIT >> INFO : Created 73 mutation test units in pre scan
+3:17:32 AM PIT >> INFO : Sending 122 test classes to minion
+3:17:32 AM PIT >> INFO : Sent tests to minion
+3:19:22 AM PIT >> INFO : Calculated coverage in 111 seconds.
+3:19:22 AM PIT >> INFO : 1 tests took longer than 2000 ms
+3:19:22 AM PIT >> INFO : Slowest test ([engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerHtmxTest]/[method:findBookById()]) took 3618 ms
+3:19:22 AM PIT >> INFO : Largest test ([engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerHtmxTest]/[method:findBookById()]) covered 1649 blocks
+3:19:24 AM PIT >> INFO : Created 49 mutation test units
+3:36:39 AM PIT >> WARNING : Minion exited abnormally due to TIMED_OUT
+4:03:01 AM PIT >> WARNING : Minion exited abnormally due to TIMED_OUT
+4:04:49 AM PIT >> WARNING : Minion exited abnormally due to TIMED_OUT
+4:30:04 AM PIT >> INFO : Completed in 4353 seconds
+4:30:06 AM PIT >> INFO : Verbose logging is disabled. If you encounter a problem, please enable it before reporting an issue.
+4:30:06 AM PIT >> INFO : Created 73 mutation test units in pre scan
+4:30:08 AM PIT >> INFO : Sending 122 test classes to minion
+4:30:08 AM PIT >> INFO : Sent tests to minion
+4:32:10 AM PIT >> INFO : Calculated coverage in 123 seconds.
+4:32:10 AM PIT >> INFO : 1 tests took longer than 2000 ms
+4:32:10 AM PIT >> INFO : Slowest test ([engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerHtmxTest]/[method:findBookById()]) took 3316 ms
+4:32:10 AM PIT >> INFO : Largest test ([engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerHtmxTest]/[method:findBookById()]) covered 1649 blocks
+4:32:11 AM PIT >> INFO : Created 49 mutation test units
+5:36:50 AM PIT >> INFO : Completed in 4003 seconds
+[0m
+real	141m3.046s
+user	254m10.580s
+sys	6m57.328s

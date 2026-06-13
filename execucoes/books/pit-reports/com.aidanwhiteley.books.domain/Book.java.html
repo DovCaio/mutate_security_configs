@@ -1,0 +1,2745 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+    <link rel="stylesheet" type="text/css" href="../style.css">
+</head>
+<body>
+
+
+<h1>Book.java</h1>
+
+<table class="src">
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_1'/>
+1
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_1'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>package com.aidanwhiteley.books.domain;</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_2'/>
+2
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_2'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_3'/>
+3
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_3'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>import com.aidanwhiteley.books.domain.googlebooks.Item;</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_4'/>
+4
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_4'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>import jakarta.validation.constraints.NotNull;</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_5'/>
+5
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_5'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>import lombok.*;</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_6'/>
+6
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_6'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>import org.hibernate.validator.constraints.Length;</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_7'/>
+7
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_7'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>import org.slf4j.Logger;</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_8'/>
+8
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_8'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>import org.slf4j.LoggerFactory;</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_9'/>
+9
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_9'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>import org.springframework.data.annotation.Id;</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_10'/>
+10
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_10'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>import org.springframework.data.annotation.Transient;</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_11'/>
+11
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_11'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>import org.springframework.data.mongodb.core.mapping.Document;</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_12'/>
+12
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_12'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_13'/>
+13
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_13'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>import java.time.LocalDateTime;</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_14'/>
+14
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_14'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>import java.util.ArrayList;</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_15'/>
+15
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_15'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>import java.util.List;</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_16'/>
+16
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_16'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_17'/>
+17
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_17'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>import static com.aidanwhiteley.books.domain.User.Role.*;</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_18'/>
+18
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_18'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_19'/>
+19
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_19'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>@Getter</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_20'/>
+20
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_20'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>@NoArgsConstructor</span></pre></td></tr>
+
+<tr>
+<td class='uncovered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_21'/>
+21
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_21'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='uncovered'><pre><span  class=''>@AllArgsConstructor</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_22'/>
+22
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_22'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>@EqualsAndHashCode(callSuper = false)</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_23'/>
+23
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_23'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>@ToString</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_24'/>
+24
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_24'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>@Document</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_25'/>
+25
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_25'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>public class Book extends Auditable {</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_26'/>
+26
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_26'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_27'/>
+27
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_27'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>    private static final Logger LOGGER = LoggerFactory.getLogger(Book.class);</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_28'/>
+28
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_28'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_29'/>
+29
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_29'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    @Id</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_30'/>
+30
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_30'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>    @Setter(AccessLevel.PROTECTED)</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_31'/>
+31
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_31'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>    private String id;</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_32'/>
+32
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_32'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_33'/>
+33
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_33'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    // Setter added for Mongo serialisation problems with Spring Boot 2.1.0</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_34'/>
+34
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_34'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>    @Setter</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_35'/>
+35
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_35'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>    private List&#60;Comment&#62; comments = new ArrayList&#60;&#62;();</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_36'/>
+36
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_36'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_37'/>
+37
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_37'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    @NotNull</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_38'/>
+38
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_38'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    @Length(min = 1, max = 100)</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_39'/>
+39
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_39'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>    @Setter</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_40'/>
+40
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_40'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>    private String title;</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_41'/>
+41
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_41'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_42'/>
+42
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_42'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    @NotNull</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_43'/>
+43
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_43'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    @Length(min = 1, max = 75)</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_44'/>
+44
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_44'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>    @Setter</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_45'/>
+45
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_45'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>    private String author;</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_46'/>
+46
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_46'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_47'/>
+47
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_47'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    @NotNull</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_48'/>
+48
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_48'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    @Length(min = 1, max = 35)</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_49'/>
+49
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_49'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>    @Setter</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_50'/>
+50
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_50'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>    private String genre;</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_51'/>
+51
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_51'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_52'/>
+52
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_52'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    @NotNull</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_53'/>
+53
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_53'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    @Length(min = 1, max = 20000)</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_54'/>
+54
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_54'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>    @Setter</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_55'/>
+55
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_55'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>    private String summary;</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_56'/>
+56
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_56'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_57'/>
+57
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_57'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    @NotNull</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_58'/>
+58
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_58'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>    @Setter</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_59'/>
+59
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_59'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>    private Rating rating;</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_60'/>
+60
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_60'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_61'/>
+61
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_61'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>    @Setter</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_62'/>
+62
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_62'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>    private String googleBookId;</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_63'/>
+63
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_63'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_64'/>
+64
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_64'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>    @Setter</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_65'/>
+65
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_65'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>    private Item googleBookDetails;</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_66'/>
+66
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_66'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_67'/>
+67
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_67'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    // The following three transient fields are intended as &#34;helpers&#34; to enable</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_68'/>
+68
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_68'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    // the client side to create links to functionality that will later pass the</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_69'/>
+69
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_69'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    // server side method level security.</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_70'/>
+70
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_70'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    // Note: These fields are set by the AOP based advice in LimitDataVisibilityAspect</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_71'/>
+71
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_71'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    //       and this advice is run when a Book (or Page&#60;Book&#62;) is returned to the client.</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_72'/>
+72
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_72'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    //       For the Htmx based client we don&#39;t have the same data security issue and</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_73'/>
+73
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_73'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    //       therefore the advice is not run and these fields are not correctly set</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_74'/>
+74
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_74'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    //       for individual users.</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_75'/>
+75
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_75'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    @Transient</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_76'/>
+76
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_76'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    @Setter(AccessLevel.NONE)</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_77'/>
+77
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_77'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>    private boolean allowUpdate;</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_78'/>
+78
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_78'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_79'/>
+79
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_79'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    @Transient</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_80'/>
+80
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_80'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    @Setter(AccessLevel.NONE)</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_81'/>
+81
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_81'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>    private boolean allowDelete;</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_82'/>
+82
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_82'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_83'/>
+83
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_83'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    @Transient</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_84'/>
+84
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_84'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    @Setter(AccessLevel.NONE)</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_85'/>
+85
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_85'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>    private boolean allowComment;</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_86'/>
+86
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_86'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_87'/>
+87
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_87'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>    @Builder</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_88'/>
+88
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_88'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    // See https://reinhard.codes/2015/09/16/lomboks-builder-annotation-and-inheritance/ for why this seems necessary</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_89'/>
+89
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_89'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    private Book(Owner createdBy, LocalDateTime createdDateTime, Owner lastModifiedBy, LocalDateTime lastModifiedDateTime,</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_90'/>
+90
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_90'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>                 String id, @NotNull String title, @NotNull String author, @NotNull String genre, @NotNull String summary, @NotNull Rating rating,</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_91'/>
+91
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_91'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>                 String googleBookId, Item googleBookDetails) {</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_92'/>
+92
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_92'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>        super(createdBy, createdDateTime, lastModifiedBy, lastModifiedDateTime);</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_93'/>
+93
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_93'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>        this.id = id;</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_94'/>
+94
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_94'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>        this.title = title;</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_95'/>
+95
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_95'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>        this.author = author;</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_96'/>
+96
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_96'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>        this.genre = genre;</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_97'/>
+97
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_97'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>        this.summary = summary;</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_98'/>
+98
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_98'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>        this.rating = rating;</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_99'/>
+99
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_99'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>        this.googleBookId = googleBookId;</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_100'/>
+100
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_100'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>        this.googleBookDetails = googleBookDetails;</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_101'/>
+101
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_101'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>    }</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_102'/>
+102
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_102'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_103'/>
+103
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_103'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    public void setPermissionsAndContentForUser(User user) {</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_104'/>
+104
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_104'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>        this.allowComment = false;</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_105'/>
+105
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_105'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>        this.allowDelete = false;</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_106'/>
+106
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_106'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>        this.allowUpdate = false;</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_107'/>
+107
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_107'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_108'/>
+108
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_108'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>        // noinspection StatementWithEmptyBody</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_109'/>
+109
+</td>
+<td class='survived'>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_109'>4</a>
+<span>
+1. setPermissionsAndContentForUser : removed conditional - replaced equality check with false &rarr; SURVIVED<br/>
+2. setPermissionsAndContentForUser : removed conditional - replaced equality check with false &rarr; SURVIVED<br/>
+3. setPermissionsAndContentForUser : removed conditional - replaced equality check with true &rarr; SURVIVED<br/>
+4. setPermissionsAndContentForUser : removed conditional - replaced equality check with true &rarr; KILLED<br/>
+
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class='survived'>        if (null == user || user.getHighestRole() == ROLE_USER) {</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_110'/>
+110
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_110'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>            // No permissions</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_111'/>
+111
+</td>
+<td class='survived'>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_111'>2</a>
+<span>
+1. setPermissionsAndContentForUser : removed conditional - replaced equality check with true &rarr; SURVIVED<br/>
+2. setPermissionsAndContentForUser : removed conditional - replaced equality check with false &rarr; KILLED<br/>
+
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class='survived'>        } else if (user.getHighestRole() == ROLE_EDITOR) {</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_112'/>
+112
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_112'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>            this.allowComment = true;</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_113'/>
+113
+</td>
+<td class='survived'>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_113'>2</a>
+<span>
+1. setPermissionsAndContentForUser : removed conditional - replaced equality check with true &rarr; SURVIVED<br/>
+2. setPermissionsAndContentForUser : removed conditional - replaced equality check with false &rarr; SURVIVED<br/>
+
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class='survived'>            if (isOwner(user)) {</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_114'/>
+114
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_114'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>                this.allowDelete = true;</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_115'/>
+115
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_115'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>                this.allowUpdate = true;</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_116'/>
+116
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_116'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>            }</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_117'/>
+117
+</td>
+<td class='survived'>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_117'>2</a>
+<span>
+1. setPermissionsAndContentForUser : removed conditional - replaced equality check with true &rarr; SURVIVED<br/>
+2. setPermissionsAndContentForUser : removed conditional - replaced equality check with false &rarr; KILLED<br/>
+
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class='survived'>        } else if (user.getHighestRole() == ROLE_ADMIN) {</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_118'/>
+118
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_118'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>            this.allowComment = true;</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_119'/>
+119
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_119'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>            this.allowDelete = true;</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_120'/>
+120
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_120'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>            this.allowUpdate = true;</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_121'/>
+121
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_121'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>        } else {</span></pre></td></tr>
+
+<tr>
+<td class='uncovered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_122'/>
+122
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_122'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='uncovered'><pre><span  class=''>            LOGGER.error(&#34;Unexpected user role found. This is a code logic error&#34;);</span></pre></td></tr>
+
+<tr>
+<td class='uncovered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_123'/>
+123
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_123'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='uncovered'><pre><span  class=''>            throw new IllegalStateException(&#34;Unable to set content in a Book appropriate for user&#34;);</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_124'/>
+124
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_124'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>        }</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_125'/>
+125
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_125'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_126'/>
+126
+</td>
+<td class='survived'>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_126'>2</a>
+<span>
+1. setPermissionsAndContentForUser : removed call to java/util/List::forEach &rarr; SURVIVED<br/>
+2. lambda$setPermissionsAndContentForUser$0 : removed call to com/aidanwhiteley/books/domain/Comment::setPermissionsAndContentForUser &rarr; SURVIVED<br/>
+
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class='survived'>        this.comments.forEach(c -&#62; c.setPermissionsAndContentForUser(user));</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_127'/>
+127
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_127'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_128'/>
+128
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_128'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>        // Remove user related data if the caller doesn&#39;t have the required level of access</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_129'/>
+129
+</td>
+<td class='killed'>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_129'>2</a>
+<span>
+1. setPermissionsAndContentForUser : removed conditional - replaced equality check with true &rarr; KILLED<br/>
+2. setPermissionsAndContentForUser : removed conditional - replaced equality check with false &rarr; KILLED<br/>
+
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class='killed'>        if (this.getCreatedBy() != null) {</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_130'/>
+130
+</td>
+<td class='killed'>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_130'>1</a>
+<span>
+1. setPermissionsAndContentForUser : removed call to com/aidanwhiteley/books/domain/Owner::setPermissionsAndContentForUser &rarr; KILLED<br/>
+
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class='killed'>            this.getCreatedBy().setPermissionsAndContentForUser(user);</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_131'/>
+131
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_131'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>        }</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_132'/>
+132
+</td>
+<td class='killed'>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_132'>2</a>
+<span>
+1. setPermissionsAndContentForUser : removed conditional - replaced equality check with false &rarr; KILLED<br/>
+2. setPermissionsAndContentForUser : removed conditional - replaced equality check with true &rarr; KILLED<br/>
+
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class='killed'>        if (this.getLastModifiedBy() != null) {</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_133'/>
+133
+</td>
+<td class='killed'>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_133'>1</a>
+<span>
+1. setPermissionsAndContentForUser : removed call to com/aidanwhiteley/books/domain/Owner::setPermissionsAndContentForUser &rarr; KILLED<br/>
+
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class='killed'>            this.getLastModifiedBy().setPermissionsAndContentForUser(user);</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_134'/>
+134
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_134'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>        }</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_135'/>
+135
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_135'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>    }</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_136'/>
+136
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_136'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_137'/>
+137
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_137'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    public boolean isOwner(User user) {</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_138'/>
+138
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_138'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>        // noinspection SimplifiableIfStatement</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_139'/>
+139
+</td>
+<td class='survived'>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_139'>4</a>
+<span>
+1. isOwner : removed conditional - replaced equality check with true &rarr; SURVIVED<br/>
+2. isOwner : removed conditional - replaced equality check with false &rarr; SURVIVED<br/>
+3. isOwner : removed conditional - replaced equality check with true &rarr; SURVIVED<br/>
+4. isOwner : removed conditional - replaced equality check with false &rarr; KILLED<br/>
+
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class='survived'>        if (user == null || this.getCreatedBy() == null) {</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_140'/>
+140
+</td>
+<td class='survived'>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_140'>1</a>
+<span>
+1. isOwner : replaced boolean return with true for com/aidanwhiteley/books/domain/Book::isOwner &rarr; SURVIVED<br/>
+
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class='survived'>            return false;</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_141'/>
+141
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_141'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>        } else {</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_142'/>
+142
+</td>
+<td class='survived'>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_142'>3</a>
+<span>
+1. isOwner : removed conditional - replaced equality check with false &rarr; SURVIVED<br/>
+2. isOwner : removed conditional - replaced equality check with true &rarr; SURVIVED<br/>
+3. isOwner : replaced boolean return with true for com/aidanwhiteley/books/domain/Book::isOwner &rarr; KILLED<br/>
+
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class='survived'>            return (user.getAuthenticationServiceId().equals(this.getCreatedBy().getAuthenticationServiceId())</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_143'/>
+143
+</td>
+<td class='survived'>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_143'>2</a>
+<span>
+1. isOwner : removed conditional - replaced equality check with true &rarr; SURVIVED<br/>
+2. isOwner : removed conditional - replaced equality check with false &rarr; SURVIVED<br/>
+
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class='survived'>                    &#38;&#38; user.getAuthProvider() == this.getCreatedBy().getAuthProvider());</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_144'/>
+144
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_144'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>        }</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_145'/>
+145
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_145'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    }</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_146'/>
+146
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_146'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_147'/>
+147
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_147'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>    @Getter</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_148'/>
+148
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_148'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    public enum Rating {</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_149'/>
+149
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_149'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>        // Note Jackson default deserialisation is 0 based - changing values</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_150'/>
+150
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_150'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>        // below would mean that that default serialisation / deserialisation</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_151'/>
+151
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_151'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>        // would need overriding.</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_152'/>
+152
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_152'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>        TERRIBLE(0), POOR(1), OK(2), GOOD(3), GREAT(4);</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_153'/>
+153
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_153'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_154'/>
+154
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_154'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>        private final int ratingLevel;</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_155'/>
+155
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_155'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_156'/>
+156
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_156'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>        Rating(int ratingLevel) {</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_157'/>
+157
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_157'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>            this.ratingLevel = ratingLevel;</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_158'/>
+158
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_158'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>        }</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_159'/>
+159
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_159'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_160'/>
+160
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_160'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>        public static Rating getRatingByString(String aRating) {</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_161'/>
+161
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_161'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>            for (Rating rating : Rating.values()) {</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_162'/>
+162
+</td>
+<td class='killed'>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_162'>2</a>
+<span>
+1. getRatingByString : removed conditional - replaced equality check with true &rarr; KILLED<br/>
+2. getRatingByString : removed conditional - replaced equality check with false &rarr; KILLED<br/>
+
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class='killed'>                if (rating.name().equalsIgnoreCase(aRating)) {</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_163'/>
+163
+</td>
+<td class='killed'>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_163'>1</a>
+<span>
+1. getRatingByString : replaced return value with null for com/aidanwhiteley/books/domain/Book$Rating::getRatingByString &rarr; KILLED<br/>
+
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class='killed'>                    return rating;</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_164'/>
+164
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_164'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>                }</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_165'/>
+165
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_165'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>            }</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_166'/>
+166
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_166'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>            return null;</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_167'/>
+167
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_167'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>        }</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_168'/>
+168
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_168'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_169'/>
+169
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_169'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    }</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@7893f240_170'/>
+170
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_170'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>}</span></pre></td></tr>
+
+
+
+<tr><td></td><td></td><td><h2>Mutations</h2></td></tr>
+
+<tr>
+<td><a href='#org.pitest.mutationtest.report.html.SourceFile@7893f240_109'>109</a></td> 
+<td></td>
+<td>
+
+<a name='grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_109'/> 
+
+<p class='SURVIVED'><span class='pop'>1.<span><b>1</b><br/><b>Location : </b>setPermissionsAndContentForUser<br/><b>Killed by : </b>none</span></span> removed conditional - replaced equality check with false &rarr; SURVIVED</span>
+<a title="Click to view covering tests" class="view-covered-by-tests" onClick="document.getElementById('MutationIdentifier-[location=Location-[clazz=com.aidanwhiteley.books.domain.Book,-method=setPermissionsAndContentForUser,-methodDesc=(Lcom/aidanwhiteley/books/domain/User;)V],-indexes=[24],-mutator=org.pitest.mutationtest.engine.gregor.mutators.RemoveConditionalMutator_EQUAL_ELSE]').style.display=(document.getElementById('MutationIdentifier-[location=Location-[clazz=com.aidanwhiteley.books.domain.Book,-method=setPermissionsAndContentForUser,-methodDesc=(Lcom/aidanwhiteley/books/domain/User;)V],-indexes=[24],-mutator=org.pitest.mutationtest.engine.gregor.mutators.RemoveConditionalMutator_EQUAL_ELSE]').style.display == 'block')?'none':'block';">Covering tests</a>
+<div class="covered-tests" id="MutationIdentifier-[location=Location-[clazz=com.aidanwhiteley.books.domain.Book,-method=setPermissionsAndContentForUser,-methodDesc=(Lcom/aidanwhiteley/books/domain/User;)V],-indexes=[24],-mutator=org.pitest.mutationtest.engine.gregor.mutators.RemoveConditionalMutator_EQUAL_ELSE]" style="display:none;">Covered by tests:
+<ul>
+<li>com.aidanwhiteley.books.controller.BookControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerTest]/[method:testUserDataIsReturnedToEditorUser()]</li> <li>com.aidanwhiteley.books.controller.BookSecureControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerTest]/[method:findBooksByReader()]</li> <li>com.aidanwhiteley.books.controller.BookControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerTest]/[method:testSensitiveDataIsReturnedToAdminUser()]</li> <li>com.aidanwhiteley.books.controller.BookSecureControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerTest]/[method:addAndRemoveCommentFromBook()]</li> 
+</ul>
+</div></div> <p class='SURVIVED'><span class='pop'>2.<span><b>2</b><br/><b>Location : </b>setPermissionsAndContentForUser<br/><b>Killed by : </b>none</span></span> removed conditional - replaced equality check with false &rarr; SURVIVED</span>
+<a title="Click to view covering tests" class="view-covered-by-tests" onClick="document.getElementById('MutationIdentifier-[location=Location-[clazz=com.aidanwhiteley.books.domain.Book,-method=setPermissionsAndContentForUser,-methodDesc=(Lcom/aidanwhiteley/books/domain/User;)V],-indexes=[20],-mutator=org.pitest.mutationtest.engine.gregor.mutators.RemoveConditionalMutator_EQUAL_ELSE]').style.display=(document.getElementById('MutationIdentifier-[location=Location-[clazz=com.aidanwhiteley.books.domain.Book,-method=setPermissionsAndContentForUser,-methodDesc=(Lcom/aidanwhiteley/books/domain/User;)V],-indexes=[20],-mutator=org.pitest.mutationtest.engine.gregor.mutators.RemoveConditionalMutator_EQUAL_ELSE]').style.display == 'block')?'none':'block';">Covering tests</a>
+<div class="covered-tests" id="MutationIdentifier-[location=Location-[clazz=com.aidanwhiteley.books.domain.Book,-method=setPermissionsAndContentForUser,-methodDesc=(Lcom/aidanwhiteley/books/domain/User;)V],-indexes=[20],-mutator=org.pitest.mutationtest.engine.gregor.mutators.RemoveConditionalMutator_EQUAL_ELSE]" style="display:none;">Covered by tests:
+<ul>
+<li>com.aidanwhiteley.books.controller.BookControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerTest]/[method:findBookByRating()]</li> <li>com.aidanwhiteley.books.controller.BookSecureControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerTest]/[method:tryToUpdateBookWithInsufficientPermissions()]</li> <li>com.aidanwhiteley.books.controller.BookControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerTest]/[method:findByAuthor()]</li> <li>com.aidanwhiteley.books.controller.BookControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerTest]/[method:testUserDataIsReturnedToEditorUser()]</li> <li>com.aidanwhiteley.books.controller.BookSecureControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerTest]/[method:findBooksByReader()]</li> <li>com.aidanwhiteley.books.controller.BookControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerTest]/[method:findAllByWhenCreatedDateTimeDesc()]</li> <li>com.aidanwhiteley.books.controller.BookControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerTest]/[method:testSensitiveDataIsReturnedToAdminUser()]</li> <li>com.aidanwhiteley.books.controller.BookControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerTest]/[method:testSensitiveDataNotReturnedToAnonymousUser()]</li> <li>com.aidanwhiteley.books.controller.BookSecureControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerTest]/[method:updateBook()]</li> <li>com.aidanwhiteley.books.controller.BookSecureControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerTest]/[method:addAndRemoveCommentFromBook()]</li> <li>com.aidanwhiteley.books.controller.BookControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerTest]/[method:findBooksByGenre()]</li> <li>com.aidanwhiteley.books.controller.BookControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerTest]/[method:findBookById()]</li> 
+</ul>
+</div></div> <p class='KILLED'><span class='pop'>3.<span><b>3</b><br/><b>Location : </b>setPermissionsAndContentForUser<br/><b>Killed by : </b>com.aidanwhiteley.books.controller.BookControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerTest]/[method:findBookByRating()]</span></span> removed conditional - replaced equality check with true &rarr; KILLED</span>
+</div> <p class='SURVIVED'><span class='pop'>4.<span><b>4</b><br/><b>Location : </b>setPermissionsAndContentForUser<br/><b>Killed by : </b>none</span></span> removed conditional - replaced equality check with true &rarr; SURVIVED</span>
+<a title="Click to view covering tests" class="view-covered-by-tests" onClick="document.getElementById('MutationIdentifier-[location=Location-[clazz=com.aidanwhiteley.books.domain.Book,-method=setPermissionsAndContentForUser,-methodDesc=(Lcom/aidanwhiteley/books/domain/User;)V],-indexes=[24],-mutator=org.pitest.mutationtest.engine.gregor.mutators.RemoveConditionalMutator_EQUAL_IF]').style.display=(document.getElementById('MutationIdentifier-[location=Location-[clazz=com.aidanwhiteley.books.domain.Book,-method=setPermissionsAndContentForUser,-methodDesc=(Lcom/aidanwhiteley/books/domain/User;)V],-indexes=[24],-mutator=org.pitest.mutationtest.engine.gregor.mutators.RemoveConditionalMutator_EQUAL_IF]').style.display == 'block')?'none':'block';">Covering tests</a>
+<div class="covered-tests" id="MutationIdentifier-[location=Location-[clazz=com.aidanwhiteley.books.domain.Book,-method=setPermissionsAndContentForUser,-methodDesc=(Lcom/aidanwhiteley/books/domain/User;)V],-indexes=[24],-mutator=org.pitest.mutationtest.engine.gregor.mutators.RemoveConditionalMutator_EQUAL_IF]" style="display:none;">Covered by tests:
+<ul>
+<li>com.aidanwhiteley.books.controller.BookControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerTest]/[method:testUserDataIsReturnedToEditorUser()]</li> <li>com.aidanwhiteley.books.controller.BookSecureControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerTest]/[method:findBooksByReader()]</li> <li>com.aidanwhiteley.books.controller.BookControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerTest]/[method:testSensitiveDataIsReturnedToAdminUser()]</li> <li>com.aidanwhiteley.books.controller.BookSecureControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerTest]/[method:addAndRemoveCommentFromBook()]</li> 
+</ul>
+</div></div> 
+</td>
+</tr>
+<tr>
+<td><a href='#org.pitest.mutationtest.report.html.SourceFile@7893f240_111'>111</a></td> 
+<td></td>
+<td>
+
+<a name='grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_111'/> 
+
+<p class='KILLED'><span class='pop'>1.<span><b>1</b><br/><b>Location : </b>setPermissionsAndContentForUser<br/><b>Killed by : </b>com.aidanwhiteley.books.controller.BookControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerTest]/[method:testUserDataIsReturnedToEditorUser()]</span></span> removed conditional - replaced equality check with false &rarr; KILLED</span>
+</div> <p class='SURVIVED'><span class='pop'>2.<span><b>2</b><br/><b>Location : </b>setPermissionsAndContentForUser<br/><b>Killed by : </b>none</span></span> removed conditional - replaced equality check with true &rarr; SURVIVED</span>
+<a title="Click to view covering tests" class="view-covered-by-tests" onClick="document.getElementById('MutationIdentifier-[location=Location-[clazz=com.aidanwhiteley.books.domain.Book,-method=setPermissionsAndContentForUser,-methodDesc=(Lcom/aidanwhiteley/books/domain/User;)V],-indexes=[32],-mutator=org.pitest.mutationtest.engine.gregor.mutators.RemoveConditionalMutator_EQUAL_IF]').style.display=(document.getElementById('MutationIdentifier-[location=Location-[clazz=com.aidanwhiteley.books.domain.Book,-method=setPermissionsAndContentForUser,-methodDesc=(Lcom/aidanwhiteley/books/domain/User;)V],-indexes=[32],-mutator=org.pitest.mutationtest.engine.gregor.mutators.RemoveConditionalMutator_EQUAL_IF]').style.display == 'block')?'none':'block';">Covering tests</a>
+<div class="covered-tests" id="MutationIdentifier-[location=Location-[clazz=com.aidanwhiteley.books.domain.Book,-method=setPermissionsAndContentForUser,-methodDesc=(Lcom/aidanwhiteley/books/domain/User;)V],-indexes=[32],-mutator=org.pitest.mutationtest.engine.gregor.mutators.RemoveConditionalMutator_EQUAL_IF]" style="display:none;">Covered by tests:
+<ul>
+<li>com.aidanwhiteley.books.controller.BookControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerTest]/[method:testUserDataIsReturnedToEditorUser()]</li> <li>com.aidanwhiteley.books.controller.BookSecureControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerTest]/[method:findBooksByReader()]</li> <li>com.aidanwhiteley.books.controller.BookControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerTest]/[method:testSensitiveDataIsReturnedToAdminUser()]</li> <li>com.aidanwhiteley.books.controller.BookSecureControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerTest]/[method:addAndRemoveCommentFromBook()]</li> 
+</ul>
+</div></div> 
+</td>
+</tr>
+<tr>
+<td><a href='#org.pitest.mutationtest.report.html.SourceFile@7893f240_113'>113</a></td> 
+<td></td>
+<td>
+
+<a name='grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_113'/> 
+
+<p class='SURVIVED'><span class='pop'>1.<span><b>1</b><br/><b>Location : </b>setPermissionsAndContentForUser<br/><b>Killed by : </b>none</span></span> removed conditional - replaced equality check with true &rarr; SURVIVED</span>
+<a title="Click to view covering tests" class="view-covered-by-tests" onClick="document.getElementById('MutationIdentifier-[location=Location-[clazz=com.aidanwhiteley.books.domain.Book,-method=setPermissionsAndContentForUser,-methodDesc=(Lcom/aidanwhiteley/books/domain/User;)V],-indexes=[43],-mutator=org.pitest.mutationtest.engine.gregor.mutators.RemoveConditionalMutator_EQUAL_IF]').style.display=(document.getElementById('MutationIdentifier-[location=Location-[clazz=com.aidanwhiteley.books.domain.Book,-method=setPermissionsAndContentForUser,-methodDesc=(Lcom/aidanwhiteley/books/domain/User;)V],-indexes=[43],-mutator=org.pitest.mutationtest.engine.gregor.mutators.RemoveConditionalMutator_EQUAL_IF]').style.display == 'block')?'none':'block';">Covering tests</a>
+<div class="covered-tests" id="MutationIdentifier-[location=Location-[clazz=com.aidanwhiteley.books.domain.Book,-method=setPermissionsAndContentForUser,-methodDesc=(Lcom/aidanwhiteley/books/domain/User;)V],-indexes=[43],-mutator=org.pitest.mutationtest.engine.gregor.mutators.RemoveConditionalMutator_EQUAL_IF]" style="display:none;">Covered by tests:
+<ul>
+<li>com.aidanwhiteley.books.controller.BookControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerTest]/[method:testUserDataIsReturnedToEditorUser()]</li> 
+</ul>
+</div></div> <p class='SURVIVED'><span class='pop'>2.<span><b>2</b><br/><b>Location : </b>setPermissionsAndContentForUser<br/><b>Killed by : </b>none</span></span> removed conditional - replaced equality check with false &rarr; SURVIVED</span>
+<a title="Click to view covering tests" class="view-covered-by-tests" onClick="document.getElementById('MutationIdentifier-[location=Location-[clazz=com.aidanwhiteley.books.domain.Book,-method=setPermissionsAndContentForUser,-methodDesc=(Lcom/aidanwhiteley/books/domain/User;)V],-indexes=[43],-mutator=org.pitest.mutationtest.engine.gregor.mutators.RemoveConditionalMutator_EQUAL_ELSE]').style.display=(document.getElementById('MutationIdentifier-[location=Location-[clazz=com.aidanwhiteley.books.domain.Book,-method=setPermissionsAndContentForUser,-methodDesc=(Lcom/aidanwhiteley/books/domain/User;)V],-indexes=[43],-mutator=org.pitest.mutationtest.engine.gregor.mutators.RemoveConditionalMutator_EQUAL_ELSE]').style.display == 'block')?'none':'block';">Covering tests</a>
+<div class="covered-tests" id="MutationIdentifier-[location=Location-[clazz=com.aidanwhiteley.books.domain.Book,-method=setPermissionsAndContentForUser,-methodDesc=(Lcom/aidanwhiteley/books/domain/User;)V],-indexes=[43],-mutator=org.pitest.mutationtest.engine.gregor.mutators.RemoveConditionalMutator_EQUAL_ELSE]" style="display:none;">Covered by tests:
+<ul>
+<li>com.aidanwhiteley.books.controller.BookControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerTest]/[method:testUserDataIsReturnedToEditorUser()]</li> 
+</ul>
+</div></div> 
+</td>
+</tr>
+<tr>
+<td><a href='#org.pitest.mutationtest.report.html.SourceFile@7893f240_117'>117</a></td> 
+<td></td>
+<td>
+
+<a name='grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_117'/> 
+
+<p class='KILLED'><span class='pop'>1.<span><b>1</b><br/><b>Location : </b>setPermissionsAndContentForUser<br/><b>Killed by : </b>com.aidanwhiteley.books.controller.BookSecureControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerTest]/[method:findBooksByReader()]</span></span> removed conditional - replaced equality check with false &rarr; KILLED</span>
+</div> <p class='SURVIVED'><span class='pop'>2.<span><b>2</b><br/><b>Location : </b>setPermissionsAndContentForUser<br/><b>Killed by : </b>none</span></span> removed conditional - replaced equality check with true &rarr; SURVIVED</span>
+<a title="Click to view covering tests" class="view-covered-by-tests" onClick="document.getElementById('MutationIdentifier-[location=Location-[clazz=com.aidanwhiteley.books.domain.Book,-method=setPermissionsAndContentForUser,-methodDesc=(Lcom/aidanwhiteley/books/domain/User;)V],-indexes=[61],-mutator=org.pitest.mutationtest.engine.gregor.mutators.RemoveConditionalMutator_EQUAL_IF]').style.display=(document.getElementById('MutationIdentifier-[location=Location-[clazz=com.aidanwhiteley.books.domain.Book,-method=setPermissionsAndContentForUser,-methodDesc=(Lcom/aidanwhiteley/books/domain/User;)V],-indexes=[61],-mutator=org.pitest.mutationtest.engine.gregor.mutators.RemoveConditionalMutator_EQUAL_IF]').style.display == 'block')?'none':'block';">Covering tests</a>
+<div class="covered-tests" id="MutationIdentifier-[location=Location-[clazz=com.aidanwhiteley.books.domain.Book,-method=setPermissionsAndContentForUser,-methodDesc=(Lcom/aidanwhiteley/books/domain/User;)V],-indexes=[61],-mutator=org.pitest.mutationtest.engine.gregor.mutators.RemoveConditionalMutator_EQUAL_IF]" style="display:none;">Covered by tests:
+<ul>
+<li>com.aidanwhiteley.books.controller.BookSecureControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerTest]/[method:findBooksByReader()]</li> <li>com.aidanwhiteley.books.controller.BookControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerTest]/[method:testSensitiveDataIsReturnedToAdminUser()]</li> <li>com.aidanwhiteley.books.controller.BookSecureControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerTest]/[method:addAndRemoveCommentFromBook()]</li> 
+</ul>
+</div></div> 
+</td>
+</tr>
+<tr>
+<td><a href='#org.pitest.mutationtest.report.html.SourceFile@7893f240_126'>126</a></td> 
+<td></td>
+<td>
+
+<a name='grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_126'/> 
+
+<p class='SURVIVED'><span class='pop'>1.<span><b>1</b><br/><b>Location : </b>setPermissionsAndContentForUser<br/><b>Killed by : </b>none</span></span> removed call to java/util/List::forEach &rarr; SURVIVED</span>
+<a title="Click to view covering tests" class="view-covered-by-tests" onClick="document.getElementById('MutationIdentifier-[location=Location-[clazz=com.aidanwhiteley.books.domain.Book,-method=setPermissionsAndContentForUser,-methodDesc=(Lcom/aidanwhiteley/books/domain/User;)V],-indexes=[98],-mutator=org.pitest.mutationtest.engine.gregor.mutators.VoidMethodCallMutator]').style.display=(document.getElementById('MutationIdentifier-[location=Location-[clazz=com.aidanwhiteley.books.domain.Book,-method=setPermissionsAndContentForUser,-methodDesc=(Lcom/aidanwhiteley/books/domain/User;)V],-indexes=[98],-mutator=org.pitest.mutationtest.engine.gregor.mutators.VoidMethodCallMutator]').style.display == 'block')?'none':'block';">Covering tests</a>
+<div class="covered-tests" id="MutationIdentifier-[location=Location-[clazz=com.aidanwhiteley.books.domain.Book,-method=setPermissionsAndContentForUser,-methodDesc=(Lcom/aidanwhiteley/books/domain/User;)V],-indexes=[98],-mutator=org.pitest.mutationtest.engine.gregor.mutators.VoidMethodCallMutator]" style="display:none;">Covered by tests:
+<ul>
+<li>com.aidanwhiteley.books.controller.BookControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerTest]/[method:findBookByRating()]</li> <li>com.aidanwhiteley.books.controller.BookSecureControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerTest]/[method:tryToUpdateBookWithInsufficientPermissions()]</li> <li>com.aidanwhiteley.books.controller.BookControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerTest]/[method:findByAuthor()]</li> <li>com.aidanwhiteley.books.controller.BookControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerTest]/[method:testUserDataIsReturnedToEditorUser()]</li> <li>com.aidanwhiteley.books.controller.BookSecureControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerTest]/[method:findBooksByReader()]</li> <li>com.aidanwhiteley.books.controller.BookControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerTest]/[method:findAllByWhenCreatedDateTimeDesc()]</li> <li>com.aidanwhiteley.books.controller.BookControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerTest]/[method:testSensitiveDataIsReturnedToAdminUser()]</li> <li>com.aidanwhiteley.books.controller.BookControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerTest]/[method:testSensitiveDataNotReturnedToAnonymousUser()]</li> <li>com.aidanwhiteley.books.controller.BookSecureControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerTest]/[method:updateBook()]</li> <li>com.aidanwhiteley.books.controller.BookSecureControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerTest]/[method:addAndRemoveCommentFromBook()]</li> <li>com.aidanwhiteley.books.controller.BookControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerTest]/[method:findBooksByGenre()]</li> <li>com.aidanwhiteley.books.controller.BookControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerTest]/[method:findBookById()]</li> 
+</ul>
+</div></div> <p class='SURVIVED'><span class='pop'>2.<span><b>2</b><br/><b>Location : </b>lambda$setPermissionsAndContentForUser$0<br/><b>Killed by : </b>none</span></span> removed call to com/aidanwhiteley/books/domain/Comment::setPermissionsAndContentForUser &rarr; SURVIVED</span>
+<a title="Click to view covering tests" class="view-covered-by-tests" onClick="document.getElementById('MutationIdentifier-[location=Location-[clazz=com.aidanwhiteley.books.domain.Book,-method=lambda$setPermissionsAndContentForUser$0,-methodDesc=(Lcom/aidanwhiteley/books/domain/User;Lcom/aidanwhiteley/books/domain/Comment;)V],-indexes=[5],-mutator=org.pitest.mutationtest.engine.gregor.mutators.VoidMethodCallMutator]').style.display=(document.getElementById('MutationIdentifier-[location=Location-[clazz=com.aidanwhiteley.books.domain.Book,-method=lambda$setPermissionsAndContentForUser$0,-methodDesc=(Lcom/aidanwhiteley/books/domain/User;Lcom/aidanwhiteley/books/domain/Comment;)V],-indexes=[5],-mutator=org.pitest.mutationtest.engine.gregor.mutators.VoidMethodCallMutator]').style.display == 'block')?'none':'block';">Covering tests</a>
+<div class="covered-tests" id="MutationIdentifier-[location=Location-[clazz=com.aidanwhiteley.books.domain.Book,-method=lambda$setPermissionsAndContentForUser$0,-methodDesc=(Lcom/aidanwhiteley/books/domain/User;Lcom/aidanwhiteley/books/domain/Comment;)V],-indexes=[5],-mutator=org.pitest.mutationtest.engine.gregor.mutators.VoidMethodCallMutator]" style="display:none;">Covered by tests:
+<ul>
+<li>com.aidanwhiteley.books.controller.BookControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerTest]/[method:findBookByRating()]</li> <li>com.aidanwhiteley.books.controller.BookSecureControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerTest]/[method:findBooksByReader()]</li> <li>com.aidanwhiteley.books.controller.BookControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerTest]/[method:findAllByWhenCreatedDateTimeDesc()]</li> <li>com.aidanwhiteley.books.controller.BookSecureControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerTest]/[method:addAndRemoveCommentFromBook()]</li> <li>com.aidanwhiteley.books.controller.BookControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerTest]/[method:findBooksByGenre()]</li> 
+</ul>
+</div></div> 
+</td>
+</tr>
+<tr>
+<td><a href='#org.pitest.mutationtest.report.html.SourceFile@7893f240_129'>129</a></td> 
+<td></td>
+<td>
+
+<a name='grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_129'/> 
+
+<p class='KILLED'><span class='pop'>1.<span><b>1</b><br/><b>Location : </b>setPermissionsAndContentForUser<br/><b>Killed by : </b>com.aidanwhiteley.books.controller.BookSecureControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerTest]/[method:addAndRemoveCommentFromBook()]</span></span> removed conditional - replaced equality check with true &rarr; KILLED</span>
+</div> <p class='KILLED'><span class='pop'>2.<span><b>2</b><br/><b>Location : </b>setPermissionsAndContentForUser<br/><b>Killed by : </b>com.aidanwhiteley.books.controller.BookControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerTest]/[method:testUserDataIsReturnedToEditorUser()]</span></span> removed conditional - replaced equality check with false &rarr; KILLED</span>
+</div> 
+</td>
+</tr>
+<tr>
+<td><a href='#org.pitest.mutationtest.report.html.SourceFile@7893f240_130'>130</a></td> 
+<td></td>
+<td>
+
+<a name='grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_130'/> 
+
+<p class='KILLED'><span class='pop'>1.<span><b>1</b><br/><b>Location : </b>setPermissionsAndContentForUser<br/><b>Killed by : </b>com.aidanwhiteley.books.controller.BookControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerTest]/[method:testUserDataIsReturnedToEditorUser()]</span></span> removed call to com/aidanwhiteley/books/domain/Owner::setPermissionsAndContentForUser &rarr; KILLED</span>
+</div> 
+</td>
+</tr>
+<tr>
+<td><a href='#org.pitest.mutationtest.report.html.SourceFile@7893f240_132'>132</a></td> 
+<td></td>
+<td>
+
+<a name='grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_132'/> 
+
+<p class='KILLED'><span class='pop'>1.<span><b>1</b><br/><b>Location : </b>setPermissionsAndContentForUser<br/><b>Killed by : </b>com.aidanwhiteley.books.controller.BookControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerTest]/[method:testSensitiveDataNotReturnedToAnonymousUser()]</span></span> removed conditional - replaced equality check with false &rarr; KILLED</span>
+</div> <p class='KILLED'><span class='pop'>2.<span><b>2</b><br/><b>Location : </b>setPermissionsAndContentForUser<br/><b>Killed by : </b>com.aidanwhiteley.books.controller.BookSecureControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerTest]/[method:addAndRemoveCommentFromBook()]</span></span> removed conditional - replaced equality check with true &rarr; KILLED</span>
+</div> 
+</td>
+</tr>
+<tr>
+<td><a href='#org.pitest.mutationtest.report.html.SourceFile@7893f240_133'>133</a></td> 
+<td></td>
+<td>
+
+<a name='grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_133'/> 
+
+<p class='KILLED'><span class='pop'>1.<span><b>1</b><br/><b>Location : </b>setPermissionsAndContentForUser<br/><b>Killed by : </b>com.aidanwhiteley.books.controller.BookControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerTest]/[method:testSensitiveDataNotReturnedToAnonymousUser()]</span></span> removed call to com/aidanwhiteley/books/domain/Owner::setPermissionsAndContentForUser &rarr; KILLED</span>
+</div> 
+</td>
+</tr>
+<tr>
+<td><a href='#org.pitest.mutationtest.report.html.SourceFile@7893f240_139'>139</a></td> 
+<td></td>
+<td>
+
+<a name='grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_139'/> 
+
+<p class='SURVIVED'><span class='pop'>1.<span><b>1</b><br/><b>Location : </b>isOwner<br/><b>Killed by : </b>none</span></span> removed conditional - replaced equality check with true &rarr; SURVIVED</span>
+<a title="Click to view covering tests" class="view-covered-by-tests" onClick="document.getElementById('MutationIdentifier-[location=Location-[clazz=com.aidanwhiteley.books.domain.Book,-method=isOwner,-methodDesc=(Lcom/aidanwhiteley/books/domain/User;)Z],-indexes=[7],-mutator=org.pitest.mutationtest.engine.gregor.mutators.RemoveConditionalMutator_EQUAL_IF]').style.display=(document.getElementById('MutationIdentifier-[location=Location-[clazz=com.aidanwhiteley.books.domain.Book,-method=isOwner,-methodDesc=(Lcom/aidanwhiteley/books/domain/User;)Z],-indexes=[7],-mutator=org.pitest.mutationtest.engine.gregor.mutators.RemoveConditionalMutator_EQUAL_IF]').style.display == 'block')?'none':'block';">Covering tests</a>
+<div class="covered-tests" id="MutationIdentifier-[location=Location-[clazz=com.aidanwhiteley.books.domain.Book,-method=isOwner,-methodDesc=(Lcom/aidanwhiteley/books/domain/User;)Z],-indexes=[7],-mutator=org.pitest.mutationtest.engine.gregor.mutators.RemoveConditionalMutator_EQUAL_IF]" style="display:none;">Covered by tests:
+<ul>
+<li>com.aidanwhiteley.books.controller.BookSecureControllerWithMocksTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerWithMocksTest]/[method:updateBookSetGoogleBookDataForFirstTime()]</li> <li>com.aidanwhiteley.books.controller.BookSecureControllerWithMocksTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerWithMocksTest]/[method:updateBookSetSameGoogleBookData()]</li> <li>com.aidanwhiteley.books.controller.BookSecureControllerWithMocksTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerWithMocksTest]/[method:updateBookWithoutSettingGoogleBookData()]</li> <li>com.aidanwhiteley.books.service.GoodReadsExportServiceTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.service.GoodReadsExportServiceTest]/[method:testGoodReadsExportHasExpectedRows()]</li> <li>com.aidanwhiteley.books.controller.BookControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerHtmxTest]/[method:testUserDataIsReturnedToEditorUser()]</li> <li>com.aidanwhiteley.books.controller.BookControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerTest]/[method:testUserDataIsReturnedToEditorUser()]</li> <li>com.aidanwhiteley.books.controller.BookSecureControllerWithMocksTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerWithMocksTest]/[method:updateBookSetDifferentGoogleBookData()]</li> <li>com.aidanwhiteley.books.controller.BookControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerHtmxTest]/[method:testAdminCanDeleteSomeoneElsesReview()]</li> <li>com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest]/[method:testEditorCannotDeleteBookReviewTheyDidntCreate()]</li> <li>com.aidanwhiteley.books.controller.BookSecureControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerTest]/[method:createAndDeleteBook()]</li> <li>com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest]/[method:testEditorCannotUpdateAnotherEditorsBookReview()]</li> <li>com.aidanwhiteley.books.controller.BookControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerTest]/[method:testSensitiveDataIsReturnedToAdminUser()]</li> <li>com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest]/[method:testAdminCanDeleteBookReview()]</li> <li>com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest]/[method:testAdminCanUpdateBookReview()]</li> <li>com.aidanwhiteley.books.controller.BookControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerTest]/[method:testSensitiveDataNotReturnedToAnonymousUser()]</li> <li>com.aidanwhiteley.books.controller.BookSecureControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerTest]/[method:updateBook()]</li> <li>com.aidanwhiteley.books.controller.BookControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerHtmxTest]/[method:testEditorCantDeleteSomeoneElsesReview()]</li> 
+</ul>
+</div></div> <p class='SURVIVED'><span class='pop'>2.<span><b>2</b><br/><b>Location : </b>isOwner<br/><b>Killed by : </b>none</span></span> removed conditional - replaced equality check with false &rarr; SURVIVED</span>
+<a title="Click to view covering tests" class="view-covered-by-tests" onClick="document.getElementById('MutationIdentifier-[location=Location-[clazz=com.aidanwhiteley.books.domain.Book,-method=isOwner,-methodDesc=(Lcom/aidanwhiteley/books/domain/User;)Z],-indexes=[4],-mutator=org.pitest.mutationtest.engine.gregor.mutators.RemoveConditionalMutator_EQUAL_ELSE]').style.display=(document.getElementById('MutationIdentifier-[location=Location-[clazz=com.aidanwhiteley.books.domain.Book,-method=isOwner,-methodDesc=(Lcom/aidanwhiteley/books/domain/User;)Z],-indexes=[4],-mutator=org.pitest.mutationtest.engine.gregor.mutators.RemoveConditionalMutator_EQUAL_ELSE]').style.display == 'block')?'none':'block';">Covering tests</a>
+<div class="covered-tests" id="MutationIdentifier-[location=Location-[clazz=com.aidanwhiteley.books.domain.Book,-method=isOwner,-methodDesc=(Lcom/aidanwhiteley/books/domain/User;)Z],-indexes=[4],-mutator=org.pitest.mutationtest.engine.gregor.mutators.RemoveConditionalMutator_EQUAL_ELSE]" style="display:none;">Covered by tests:
+<ul>
+<li>com.aidanwhiteley.books.controller.BookSecureControllerWithMocksTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerWithMocksTest]/[method:updateBookSetGoogleBookDataForFirstTime()]</li> <li>com.aidanwhiteley.books.controller.BookSecureControllerWithMocksTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerWithMocksTest]/[method:updateBookSetSameGoogleBookData()]</li> <li>com.aidanwhiteley.books.controller.BookSecureControllerWithMocksTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerWithMocksTest]/[method:updateBookWithoutSettingGoogleBookData()]</li> <li>com.aidanwhiteley.books.service.GoodReadsExportServiceTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.service.GoodReadsExportServiceTest]/[method:testGoodReadsExportHasExpectedRows()]</li> <li>com.aidanwhiteley.books.controller.BookControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerHtmxTest]/[method:testUserDataIsReturnedToEditorUser()]</li> <li>com.aidanwhiteley.books.controller.BookControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerTest]/[method:testUserDataIsReturnedToEditorUser()]</li> <li>com.aidanwhiteley.books.controller.BookSecureControllerWithMocksTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerWithMocksTest]/[method:updateBookSetDifferentGoogleBookData()]</li> <li>com.aidanwhiteley.books.controller.BookControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerHtmxTest]/[method:testAdminCanDeleteSomeoneElsesReview()]</li> <li>com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest]/[method:testEditorCannotDeleteBookReviewTheyDidntCreate()]</li> <li>com.aidanwhiteley.books.controller.BookSecureControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerTest]/[method:createAndDeleteBook()]</li> <li>com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest]/[method:testEditorCannotUpdateAnotherEditorsBookReview()]</li> <li>com.aidanwhiteley.books.controller.BookControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerTest]/[method:testSensitiveDataIsReturnedToAdminUser()]</li> <li>com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest]/[method:testAdminCanDeleteBookReview()]</li> <li>com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest]/[method:testAdminCanUpdateBookReview()]</li> <li>com.aidanwhiteley.books.controller.BookControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerTest]/[method:testSensitiveDataNotReturnedToAnonymousUser()]</li> <li>com.aidanwhiteley.books.controller.BookSecureControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerTest]/[method:updateBook()]</li> <li>com.aidanwhiteley.books.controller.BookControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerHtmxTest]/[method:testEditorCantDeleteSomeoneElsesReview()]</li> 
+</ul>
+</div></div> <p class='KILLED'><span class='pop'>3.<span><b>3</b><br/><b>Location : </b>isOwner<br/><b>Killed by : </b>com.aidanwhiteley.books.controller.BookSecureControllerWithMocksTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerWithMocksTest]/[method:updateBookSetGoogleBookDataForFirstTime()]</span></span> removed conditional - replaced equality check with false &rarr; KILLED</span>
+</div> <p class='SURVIVED'><span class='pop'>4.<span><b>4</b><br/><b>Location : </b>isOwner<br/><b>Killed by : </b>none</span></span> removed conditional - replaced equality check with true &rarr; SURVIVED</span>
+<a title="Click to view covering tests" class="view-covered-by-tests" onClick="document.getElementById('MutationIdentifier-[location=Location-[clazz=com.aidanwhiteley.books.domain.Book,-method=isOwner,-methodDesc=(Lcom/aidanwhiteley/books/domain/User;)Z],-indexes=[4],-mutator=org.pitest.mutationtest.engine.gregor.mutators.RemoveConditionalMutator_EQUAL_IF]').style.display=(document.getElementById('MutationIdentifier-[location=Location-[clazz=com.aidanwhiteley.books.domain.Book,-method=isOwner,-methodDesc=(Lcom/aidanwhiteley/books/domain/User;)Z],-indexes=[4],-mutator=org.pitest.mutationtest.engine.gregor.mutators.RemoveConditionalMutator_EQUAL_IF]').style.display == 'block')?'none':'block';">Covering tests</a>
+<div class="covered-tests" id="MutationIdentifier-[location=Location-[clazz=com.aidanwhiteley.books.domain.Book,-method=isOwner,-methodDesc=(Lcom/aidanwhiteley/books/domain/User;)Z],-indexes=[4],-mutator=org.pitest.mutationtest.engine.gregor.mutators.RemoveConditionalMutator_EQUAL_IF]" style="display:none;">Covered by tests:
+<ul>
+<li>com.aidanwhiteley.books.controller.BookSecureControllerWithMocksTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerWithMocksTest]/[method:updateBookSetGoogleBookDataForFirstTime()]</li> <li>com.aidanwhiteley.books.controller.BookSecureControllerWithMocksTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerWithMocksTest]/[method:updateBookSetSameGoogleBookData()]</li> <li>com.aidanwhiteley.books.controller.BookSecureControllerWithMocksTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerWithMocksTest]/[method:updateBookWithoutSettingGoogleBookData()]</li> <li>com.aidanwhiteley.books.service.GoodReadsExportServiceTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.service.GoodReadsExportServiceTest]/[method:testGoodReadsExportHasExpectedRows()]</li> <li>com.aidanwhiteley.books.controller.BookControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerHtmxTest]/[method:testUserDataIsReturnedToEditorUser()]</li> <li>com.aidanwhiteley.books.controller.BookControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerTest]/[method:testUserDataIsReturnedToEditorUser()]</li> <li>com.aidanwhiteley.books.controller.BookSecureControllerWithMocksTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerWithMocksTest]/[method:updateBookSetDifferentGoogleBookData()]</li> <li>com.aidanwhiteley.books.controller.BookControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerHtmxTest]/[method:testAdminCanDeleteSomeoneElsesReview()]</li> <li>com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest]/[method:testEditorCannotDeleteBookReviewTheyDidntCreate()]</li> <li>com.aidanwhiteley.books.controller.BookSecureControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerTest]/[method:createAndDeleteBook()]</li> <li>com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest]/[method:testEditorCannotUpdateAnotherEditorsBookReview()]</li> <li>com.aidanwhiteley.books.controller.BookControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerTest]/[method:testSensitiveDataIsReturnedToAdminUser()]</li> <li>com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest]/[method:testAdminCanDeleteBookReview()]</li> <li>com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest]/[method:testAdminCanUpdateBookReview()]</li> <li>com.aidanwhiteley.books.controller.BookControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerTest]/[method:testSensitiveDataNotReturnedToAnonymousUser()]</li> <li>com.aidanwhiteley.books.controller.BookSecureControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerTest]/[method:updateBook()]</li> <li>com.aidanwhiteley.books.controller.BookControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerHtmxTest]/[method:testEditorCantDeleteSomeoneElsesReview()]</li> 
+</ul>
+</div></div> 
+</td>
+</tr>
+<tr>
+<td><a href='#org.pitest.mutationtest.report.html.SourceFile@7893f240_140'>140</a></td> 
+<td></td>
+<td>
+
+<a name='grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_140'/> 
+
+<p class='SURVIVED'><span class='pop'>1.<span><b>1</b><br/><b>Location : </b>isOwner<br/><b>Killed by : </b>none</span></span> replaced boolean return with true for com/aidanwhiteley/books/domain/Book::isOwner &rarr; SURVIVED</span>
+<a title="Click to view covering tests" class="view-covered-by-tests" onClick="document.getElementById('MutationIdentifier-[location=Location-[clazz=com.aidanwhiteley.books.domain.Book,-method=isOwner,-methodDesc=(Lcom/aidanwhiteley/books/domain/User;)Z],-indexes=[12],-mutator=org.pitest.mutationtest.engine.gregor.mutators.returns.BooleanTrueReturnValsMutator]').style.display=(document.getElementById('MutationIdentifier-[location=Location-[clazz=com.aidanwhiteley.books.domain.Book,-method=isOwner,-methodDesc=(Lcom/aidanwhiteley/books/domain/User;)Z],-indexes=[12],-mutator=org.pitest.mutationtest.engine.gregor.mutators.returns.BooleanTrueReturnValsMutator]').style.display == 'block')?'none':'block';">Covering tests</a>
+<div class="covered-tests" id="MutationIdentifier-[location=Location-[clazz=com.aidanwhiteley.books.domain.Book,-method=isOwner,-methodDesc=(Lcom/aidanwhiteley/books/domain/User;)Z],-indexes=[12],-mutator=org.pitest.mutationtest.engine.gregor.mutators.returns.BooleanTrueReturnValsMutator]" style="display:none;">Covered by tests:
+<ul>
+<li>com.aidanwhiteley.books.controller.BookSecureControllerWithMocksTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerWithMocksTest]/[method:updateBookSetGoogleBookDataForFirstTime()]</li> <li>com.aidanwhiteley.books.controller.BookSecureControllerWithMocksTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerWithMocksTest]/[method:updateBookSetSameGoogleBookData()]</li> <li>com.aidanwhiteley.books.controller.BookSecureControllerWithMocksTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerWithMocksTest]/[method:updateBookWithoutSettingGoogleBookData()]</li> <li>com.aidanwhiteley.books.controller.BookSecureControllerWithMocksTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerWithMocksTest]/[method:updateBookSetDifferentGoogleBookData()]</li> 
+</ul>
+</div></div> 
+</td>
+</tr>
+<tr>
+<td><a href='#org.pitest.mutationtest.report.html.SourceFile@7893f240_142'>142</a></td> 
+<td></td>
+<td>
+
+<a name='grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_142'/> 
+
+<p class='SURVIVED'><span class='pop'>1.<span><b>1</b><br/><b>Location : </b>isOwner<br/><b>Killed by : </b>none</span></span> removed conditional - replaced equality check with false &rarr; SURVIVED</span>
+<a title="Click to view covering tests" class="view-covered-by-tests" onClick="document.getElementById('MutationIdentifier-[location=Location-[clazz=com.aidanwhiteley.books.domain.Book,-method=isOwner,-methodDesc=(Lcom/aidanwhiteley/books/domain/User;)Z],-indexes=[22],-mutator=org.pitest.mutationtest.engine.gregor.mutators.RemoveConditionalMutator_EQUAL_ELSE]').style.display=(document.getElementById('MutationIdentifier-[location=Location-[clazz=com.aidanwhiteley.books.domain.Book,-method=isOwner,-methodDesc=(Lcom/aidanwhiteley/books/domain/User;)Z],-indexes=[22],-mutator=org.pitest.mutationtest.engine.gregor.mutators.RemoveConditionalMutator_EQUAL_ELSE]').style.display == 'block')?'none':'block';">Covering tests</a>
+<div class="covered-tests" id="MutationIdentifier-[location=Location-[clazz=com.aidanwhiteley.books.domain.Book,-method=isOwner,-methodDesc=(Lcom/aidanwhiteley/books/domain/User;)Z],-indexes=[22],-mutator=org.pitest.mutationtest.engine.gregor.mutators.RemoveConditionalMutator_EQUAL_ELSE]" style="display:none;">Covered by tests:
+<ul>
+<li>com.aidanwhiteley.books.service.GoodReadsExportServiceTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.service.GoodReadsExportServiceTest]/[method:testGoodReadsExportHasExpectedRows()]</li> <li>com.aidanwhiteley.books.controller.BookControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerHtmxTest]/[method:testUserDataIsReturnedToEditorUser()]</li> <li>com.aidanwhiteley.books.controller.BookControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerTest]/[method:testUserDataIsReturnedToEditorUser()]</li> <li>com.aidanwhiteley.books.controller.BookControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerHtmxTest]/[method:testAdminCanDeleteSomeoneElsesReview()]</li> <li>com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest]/[method:testEditorCannotDeleteBookReviewTheyDidntCreate()]</li> <li>com.aidanwhiteley.books.controller.BookSecureControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerTest]/[method:createAndDeleteBook()]</li> <li>com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest]/[method:testEditorCannotUpdateAnotherEditorsBookReview()]</li> <li>com.aidanwhiteley.books.controller.BookControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerTest]/[method:testSensitiveDataIsReturnedToAdminUser()]</li> <li>com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest]/[method:testAdminCanDeleteBookReview()]</li> <li>com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest]/[method:testAdminCanUpdateBookReview()]</li> <li>com.aidanwhiteley.books.controller.BookControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerTest]/[method:testSensitiveDataNotReturnedToAnonymousUser()]</li> <li>com.aidanwhiteley.books.controller.BookSecureControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerTest]/[method:updateBook()]</li> <li>com.aidanwhiteley.books.controller.BookControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerHtmxTest]/[method:testEditorCantDeleteSomeoneElsesReview()]</li> 
+</ul>
+</div></div> <p class='KILLED'><span class='pop'>2.<span><b>2</b><br/><b>Location : </b>isOwner<br/><b>Killed by : </b>com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest]/[method:testEditorCannotDeleteBookReviewTheyDidntCreate()]</span></span> replaced boolean return with true for com/aidanwhiteley/books/domain/Book::isOwner &rarr; KILLED</span>
+</div> <p class='SURVIVED'><span class='pop'>3.<span><b>3</b><br/><b>Location : </b>isOwner<br/><b>Killed by : </b>none</span></span> removed conditional - replaced equality check with true &rarr; SURVIVED</span>
+<a title="Click to view covering tests" class="view-covered-by-tests" onClick="document.getElementById('MutationIdentifier-[location=Location-[clazz=com.aidanwhiteley.books.domain.Book,-method=isOwner,-methodDesc=(Lcom/aidanwhiteley/books/domain/User;)Z],-indexes=[22],-mutator=org.pitest.mutationtest.engine.gregor.mutators.RemoveConditionalMutator_EQUAL_IF]').style.display=(document.getElementById('MutationIdentifier-[location=Location-[clazz=com.aidanwhiteley.books.domain.Book,-method=isOwner,-methodDesc=(Lcom/aidanwhiteley/books/domain/User;)Z],-indexes=[22],-mutator=org.pitest.mutationtest.engine.gregor.mutators.RemoveConditionalMutator_EQUAL_IF]').style.display == 'block')?'none':'block';">Covering tests</a>
+<div class="covered-tests" id="MutationIdentifier-[location=Location-[clazz=com.aidanwhiteley.books.domain.Book,-method=isOwner,-methodDesc=(Lcom/aidanwhiteley/books/domain/User;)Z],-indexes=[22],-mutator=org.pitest.mutationtest.engine.gregor.mutators.RemoveConditionalMutator_EQUAL_IF]" style="display:none;">Covered by tests:
+<ul>
+<li>com.aidanwhiteley.books.service.GoodReadsExportServiceTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.service.GoodReadsExportServiceTest]/[method:testGoodReadsExportHasExpectedRows()]</li> <li>com.aidanwhiteley.books.controller.BookControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerHtmxTest]/[method:testUserDataIsReturnedToEditorUser()]</li> <li>com.aidanwhiteley.books.controller.BookControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerTest]/[method:testUserDataIsReturnedToEditorUser()]</li> <li>com.aidanwhiteley.books.controller.BookControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerHtmxTest]/[method:testAdminCanDeleteSomeoneElsesReview()]</li> <li>com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest]/[method:testEditorCannotDeleteBookReviewTheyDidntCreate()]</li> <li>com.aidanwhiteley.books.controller.BookSecureControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerTest]/[method:createAndDeleteBook()]</li> <li>com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest]/[method:testEditorCannotUpdateAnotherEditorsBookReview()]</li> <li>com.aidanwhiteley.books.controller.BookControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerTest]/[method:testSensitiveDataIsReturnedToAdminUser()]</li> <li>com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest]/[method:testAdminCanDeleteBookReview()]</li> <li>com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest]/[method:testAdminCanUpdateBookReview()]</li> <li>com.aidanwhiteley.books.controller.BookControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerTest]/[method:testSensitiveDataNotReturnedToAnonymousUser()]</li> <li>com.aidanwhiteley.books.controller.BookSecureControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerTest]/[method:updateBook()]</li> <li>com.aidanwhiteley.books.controller.BookControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerHtmxTest]/[method:testEditorCantDeleteSomeoneElsesReview()]</li> 
+</ul>
+</div></div> 
+</td>
+</tr>
+<tr>
+<td><a href='#org.pitest.mutationtest.report.html.SourceFile@7893f240_143'>143</a></td> 
+<td></td>
+<td>
+
+<a name='grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_143'/> 
+
+<p class='SURVIVED'><span class='pop'>1.<span><b>1</b><br/><b>Location : </b>isOwner<br/><b>Killed by : </b>none</span></span> removed conditional - replaced equality check with true &rarr; SURVIVED</span>
+<a title="Click to view covering tests" class="view-covered-by-tests" onClick="document.getElementById('MutationIdentifier-[location=Location-[clazz=com.aidanwhiteley.books.domain.Book,-method=isOwner,-methodDesc=(Lcom/aidanwhiteley/books/domain/User;)Z],-indexes=[30],-mutator=org.pitest.mutationtest.engine.gregor.mutators.RemoveConditionalMutator_EQUAL_IF]').style.display=(document.getElementById('MutationIdentifier-[location=Location-[clazz=com.aidanwhiteley.books.domain.Book,-method=isOwner,-methodDesc=(Lcom/aidanwhiteley/books/domain/User;)Z],-indexes=[30],-mutator=org.pitest.mutationtest.engine.gregor.mutators.RemoveConditionalMutator_EQUAL_IF]').style.display == 'block')?'none':'block';">Covering tests</a>
+<div class="covered-tests" id="MutationIdentifier-[location=Location-[clazz=com.aidanwhiteley.books.domain.Book,-method=isOwner,-methodDesc=(Lcom/aidanwhiteley/books/domain/User;)Z],-indexes=[30],-mutator=org.pitest.mutationtest.engine.gregor.mutators.RemoveConditionalMutator_EQUAL_IF]" style="display:none;">Covered by tests:
+<ul>
+<li>com.aidanwhiteley.books.service.GoodReadsExportServiceTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.service.GoodReadsExportServiceTest]/[method:testGoodReadsExportHasExpectedRows()]</li> <li>com.aidanwhiteley.books.controller.BookControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerTest]/[method:testUserDataIsReturnedToEditorUser()]</li> <li>com.aidanwhiteley.books.controller.BookSecureControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerTest]/[method:createAndDeleteBook()]</li> <li>com.aidanwhiteley.books.controller.BookControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerTest]/[method:testSensitiveDataIsReturnedToAdminUser()]</li> <li>com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest]/[method:testAdminCanDeleteBookReview()]</li> <li>com.aidanwhiteley.books.controller.BookControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerTest]/[method:testSensitiveDataNotReturnedToAnonymousUser()]</li> <li>com.aidanwhiteley.books.controller.BookSecureControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerTest]/[method:updateBook()]</li> 
+</ul>
+</div></div> <p class='SURVIVED'><span class='pop'>2.<span><b>2</b><br/><b>Location : </b>isOwner<br/><b>Killed by : </b>none</span></span> removed conditional - replaced equality check with false &rarr; SURVIVED</span>
+<a title="Click to view covering tests" class="view-covered-by-tests" onClick="document.getElementById('MutationIdentifier-[location=Location-[clazz=com.aidanwhiteley.books.domain.Book,-method=isOwner,-methodDesc=(Lcom/aidanwhiteley/books/domain/User;)Z],-indexes=[30],-mutator=org.pitest.mutationtest.engine.gregor.mutators.RemoveConditionalMutator_EQUAL_ELSE]').style.display=(document.getElementById('MutationIdentifier-[location=Location-[clazz=com.aidanwhiteley.books.domain.Book,-method=isOwner,-methodDesc=(Lcom/aidanwhiteley/books/domain/User;)Z],-indexes=[30],-mutator=org.pitest.mutationtest.engine.gregor.mutators.RemoveConditionalMutator_EQUAL_ELSE]').style.display == 'block')?'none':'block';">Covering tests</a>
+<div class="covered-tests" id="MutationIdentifier-[location=Location-[clazz=com.aidanwhiteley.books.domain.Book,-method=isOwner,-methodDesc=(Lcom/aidanwhiteley/books/domain/User;)Z],-indexes=[30],-mutator=org.pitest.mutationtest.engine.gregor.mutators.RemoveConditionalMutator_EQUAL_ELSE]" style="display:none;">Covered by tests:
+<ul>
+<li>com.aidanwhiteley.books.service.GoodReadsExportServiceTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.service.GoodReadsExportServiceTest]/[method:testGoodReadsExportHasExpectedRows()]</li> <li>com.aidanwhiteley.books.controller.BookControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerTest]/[method:testUserDataIsReturnedToEditorUser()]</li> <li>com.aidanwhiteley.books.controller.BookSecureControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerTest]/[method:createAndDeleteBook()]</li> <li>com.aidanwhiteley.books.controller.BookControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerTest]/[method:testSensitiveDataIsReturnedToAdminUser()]</li> <li>com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest]/[method:testAdminCanDeleteBookReview()]</li> <li>com.aidanwhiteley.books.controller.BookControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerTest]/[method:testSensitiveDataNotReturnedToAnonymousUser()]</li> <li>com.aidanwhiteley.books.controller.BookSecureControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerTest]/[method:updateBook()]</li> 
+</ul>
+</div></div> 
+</td>
+</tr>
+<tr>
+<td><a href='#org.pitest.mutationtest.report.html.SourceFile@7893f240_162'>162</a></td> 
+<td></td>
+<td>
+
+<a name='grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_162'/> 
+
+<p class='KILLED'><span class='pop'>1.<span><b>1</b><br/><b>Location : </b>getRatingByString<br/><b>Killed by : </b>com.aidanwhiteley.books.domain.BookTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.domain.BookTest]/[method:testGetRatingByString()]</span></span> removed conditional - replaced equality check with true &rarr; KILLED</span>
+</div> <p class='KILLED'><span class='pop'>2.<span><b>2</b><br/><b>Location : </b>getRatingByString<br/><b>Killed by : </b>com.aidanwhiteley.books.domain.BookTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.domain.BookTest]/[method:testGetRatingByString()]</span></span> removed conditional - replaced equality check with false &rarr; KILLED</span>
+</div> 
+</td>
+</tr>
+<tr>
+<td><a href='#org.pitest.mutationtest.report.html.SourceFile@7893f240_163'>163</a></td> 
+<td></td>
+<td>
+
+<a name='grouporg.pitest.mutationtest.report.html.SourceFile@7893f240_163'/> 
+
+<p class='KILLED'><span class='pop'>1.<span><b>1</b><br/><b>Location : </b>getRatingByString<br/><b>Killed by : </b>com.aidanwhiteley.books.domain.BookTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.domain.BookTest]/[method:testGetRatingByString()]</span></span> replaced return value with null for com/aidanwhiteley/books/domain/Book$Rating::getRatingByString &rarr; KILLED</span>
+</div> 
+</td>
+</tr>
+
+</table>
+
+
+<h2>Active mutators</h2>
+<ul>
+<li class='mutator'>CONDITIONALS_BOUNDARY</li>
+<li class='mutator'>EMPTY_RETURNS</li>
+<li class='mutator'>EXPERIMENTAL_SWITCH</li>
+<li class='mutator'>FALSE_RETURNS</li>
+<li class='mutator'>INCREMENTS</li>
+<li class='mutator'>INVERT_NEGS</li>
+<li class='mutator'>MATH</li>
+<li class='mutator'>NULL_RETURNS</li>
+<li class='mutator'>PRIMITIVE_RETURNS</li>
+<li class='mutator'>REMOVE_CONDITIONALS_EQUAL_ELSE</li>
+<li class='mutator'>REMOVE_CONDITIONALS_EQUAL_IF</li>
+<li class='mutator'>REMOVE_CONDITIONALS_ORDER_ELSE</li>
+<li class='mutator'>REMOVE_CONDITIONALS_ORDER_IF</li>
+<li class='mutator'>TRUE_RETURNS</li>
+<li class='mutator'>VOID_METHOD_CALLS</li>
+
+</ul>
+
+<h2>Tests examined</h2>
+<ul>
+<li>com.aidanwhiteley.books.controller.BookControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerTest]/[method:testUserDataIsReturnedToEditorUser()] (70 ms)</li><li>com.aidanwhiteley.books.controller.BookSecureControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerTest]/[method:findBooksByReader()] (81 ms)</li><li>com.aidanwhiteley.books.controller.BookControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerTest]/[method:testSensitiveDataIsReturnedToAdminUser()] (215 ms)</li><li>com.aidanwhiteley.books.controller.BookSecureControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerTest]/[method:addAndRemoveCommentFromBook()] (295 ms)</li><li>com.aidanwhiteley.books.controller.BookControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerTest]/[method:findBookByRating()] (50 ms)</li><li>com.aidanwhiteley.books.controller.BookSecureControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerTest]/[method:tryToUpdateBookWithInsufficientPermissions()] (44 ms)</li><li>com.aidanwhiteley.books.controller.BookControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerTest]/[method:findByAuthor()] (46 ms)</li><li>com.aidanwhiteley.books.controller.BookControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerTest]/[method:findAllByWhenCreatedDateTimeDesc()] (160 ms)</li><li>com.aidanwhiteley.books.controller.BookControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerTest]/[method:testSensitiveDataNotReturnedToAnonymousUser()] (259 ms)</li><li>com.aidanwhiteley.books.controller.BookSecureControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerTest]/[method:updateBook()] (273 ms)</li><li>com.aidanwhiteley.books.controller.BookControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerTest]/[method:findBooksByGenre()] (479 ms)</li><li>com.aidanwhiteley.books.controller.BookControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerTest]/[method:findBookById()] (1263 ms)</li><li>com.aidanwhiteley.books.service.GoodReadsExportServiceTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.service.GoodReadsExportServiceTest]/[method:testGoodReadsExportHasExpectedRows()] (64 ms)</li><li>com.aidanwhiteley.books.controller.BookControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerHtmxTest]/[method:testUserDataIsReturnedToEditorUser()] (77 ms)</li><li>com.aidanwhiteley.books.controller.BookControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerHtmxTest]/[method:testAdminCanDeleteSomeoneElsesReview()] (173 ms)</li><li>com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest]/[method:testEditorCannotDeleteBookReviewTheyDidntCreate()] (197 ms)</li><li>com.aidanwhiteley.books.controller.BookSecureControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerTest]/[method:createAndDeleteBook()] (201 ms)</li><li>com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest]/[method:testEditorCannotUpdateAnotherEditorsBookReview()] (194 ms)</li><li>com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest]/[method:testAdminCanDeleteBookReview()] (230 ms)</li><li>com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest]/[method:testAdminCanUpdateBookReview()] (216 ms)</li><li>com.aidanwhiteley.books.controller.BookControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerHtmxTest]/[method:testEditorCantDeleteSomeoneElsesReview()] (506 ms)</li><li>com.aidanwhiteley.books.controller.BookSecureControllerWithMocksTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerWithMocksTest]/[method:updateBookSetGoogleBookDataForFirstTime()] (3 ms)</li><li>com.aidanwhiteley.books.controller.BookSecureControllerWithMocksTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerWithMocksTest]/[method:updateBookSetSameGoogleBookData()] (8 ms)</li><li>com.aidanwhiteley.books.controller.BookSecureControllerWithMocksTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerWithMocksTest]/[method:updateBookWithoutSettingGoogleBookData()] (13 ms)</li><li>com.aidanwhiteley.books.controller.BookSecureControllerWithMocksTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerWithMocksTest]/[method:updateBookSetDifferentGoogleBookData()] (197 ms)</li><li>com.aidanwhiteley.books.domain.BookTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.domain.BookTest]/[method:testGetRatingByString()] (5 ms)</li><li>com.aidanwhiteley.books.controller.BookControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerTest]/[method:askForTooManyDataItems()] (43 ms)</li><li>com.aidanwhiteley.books.controller.BookControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerHtmxTest]/[method:findByRatingBadParams()] (60 ms)</li><li>com.aidanwhiteley.books.controller.BookControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerHtmxTest]/[method:findByRating()] (184 ms)</li><li>com.aidanwhiteley.books.controller.BookControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerHtmxTest]/[method:getBookByRating()] (214 ms)</li><li>com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest]/[method:testEditorCanCreateBookReview()] (242 ms)</li><li>com.aidanwhiteley.books.controller.BookControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerTest]/[method:findBookByRatingPreConditions()] (23 ms)</li><li>com.aidanwhiteley.books.controller.RestApiExceptionHandlerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.RestApiExceptionHandlerTest]/[method:testExceptionHandlerIllegalArguments()] (41 ms)</li><li>com.aidanwhiteley.books.controller.BookControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerHtmxTest]/[method:getBookByRatingMissingParam()] (268 ms)</li>
+</ul>
+
+<br/>
+
+Report generated by <a href='https://pitest.org'>PIT</a> 1.22.0
+
+</body>
+</html>

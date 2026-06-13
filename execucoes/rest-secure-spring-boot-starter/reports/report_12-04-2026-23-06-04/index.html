@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Relatório de Mutação</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+    <header>
+        <h1>Relatório de Mutação</h1>
+        <p>Gerado em: 12/04/2026 23:06:04</p>
+    </header>
+
+    <section class="summary">
+        <h2>Resumo Geral</h2>
+        <ul>
+            <li><strong>Total de Mutantes:</strong> 17</li>
+            <li><strong>Capturados:</strong> 10</li>
+            <li><strong>Sobreviveram:</strong> 7</li>
+            <li><strong>Taxa de Captura:</strong> 58.82%</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>Detalhes por Mutante</h2>
+        <table>
+            <tr>
+                <th>#</th>
+                <th>Package Name</th>
+                <th>Nível Annotation</th>
+                <th>Class Name</th>
+                <th>Método</th>
+                <th>Valor original</th>
+                <th>Mutação</th>
+                <th>Total</th>
+                <th>Sucesso</th>
+                <th>Falhas</th>
+                <th>Log&apos;s</th>
+                <th>Capturado</th>
+            </tr>
+    <tr class="survived">
+        <td>1</td>
+        <td>nl._42.restsecure.autoconfigure.errorhandling</td>
+        <td>Método</td>
+        <td>TestController</td>
+        <td>restrictedMethod</td>
+        <td>hasRole('ROLE_UNKNOWN')</td>
+        <td>!hasRole('ROLE_UNKNOWN')</td>
+        <td>78</td>
+        <td>78</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>2</td>
+        <td>nl._42.restsecure.autoconfigure.errorhandling</td>
+        <td>Método</td>
+        <td>TestController</td>
+        <td>restrictedMethod</td>
+        <td>hasRole('ROLE_UNKNOWN')</td>
+        <td>permitAll()</td>
+        <td>78</td>
+        <td>78</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>3</td>
+        <td>nl._42.restsecure.autoconfigure.errorhandling</td>
+        <td>Método</td>
+        <td>TestController</td>
+        <td>restrictedMethod</td>
+        <td>hasRole('ROLE_UNKNOWN')</td>
+        <td>denyAll</td>
+        <td>78</td>
+        <td>78</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>4</td>
+        <td>nl._42.restsecure.autoconfigure.errorhandling</td>
+        <td>Método</td>
+        <td>TestController</td>
+        <td>restrictedMethod</td>
+        <td>hasRole('ROLE_UNKNOWN')</td>
+        <td>hasRole('NO_ROLE_UNKNOWN')</td>
+        <td>78</td>
+        <td>78</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>5</td>
+        <td>nl._42.restsecure.autoconfigure.errorhandling</td>
+        <td>Método</td>
+        <td>TestController</td>
+        <td>restrictedMethod</td>
+        <td>hasRole('ROLE_UNKNOWN')</td>
+        <td>hasAuthority('ROLE_UNKNOWN')</td>
+        <td>78</td>
+        <td>78</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>6</td>
+        <td>nl._42.restsecure.autoconfigure.errorhandling</td>
+        <td>Método</td>
+        <td>TestController</td>
+        <td>restrictedMethod</td>
+        <td>hasRole('ROLE_UNKNOWN')</td>
+        <td>hasRole('admin')</td>
+        <td>78</td>
+        <td>78</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="survived">
+        <td>7</td>
+        <td>nl._42.restsecure.autoconfigure.errorhandling</td>
+        <td>Método</td>
+        <td>TestController</td>
+        <td>restrictedMethod</td>
+        <td>hasRole('ROLE_UNKNOWN')</td>
+        <td>hasRole('')</td>
+        <td>78</td>
+        <td>78</td>
+        <td>0</td>
+        <td></td>
+        <td>Não</td>
+    </tr>
+    <tr class="captured">
+        <td>8</td>
+        <td>nl._42.restsecure.autoconfigure.test</td>
+        <td>Método</td>
+        <td>SecuredService</td>
+        <td>authenticated</td>
+        <td>isAuthenticated()</td>
+        <td>permitAll()</td>
+        <td>78</td>
+        <td>77</td>
+        <td>1</td>
+        <td>
+Type: org.opentest4j.AssertionFailedError
+Message: Expected org.springframework.security.authentication.AuthenticationCredentialsNotFoundException to be thrown, but nothing was thrown.
+StackTrace: org.opentest4j.AssertionFailedError: Expected org.springframework.security.authentication.AuthenticationCredentialsNotFoundException to be thrown, but nothing was thrown.
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:159)
+	at org.junit.jupiter.api.AssertThrows.assertThrows(AssertThrows.java:74)
+	at org.junit.jupiter.api.AssertThrows.assertThrows(AssertThrows.java:35)
+	at org.junit.jupiter.api.Assertions.assertThrows(Assertions.java:3223)
+	at nl._42.restsecure.autoconfigure.MethodSecurityTest.authenticated_shouldFail_whenAnonymous(MethodSecurityTest.java:40)
+</td>
+        <td>Sim</td>
+    </tr>
+    <tr class="captured">
+        <td>9</td>
+        <td>nl._42.restsecure.autoconfigure.test</td>
+        <td>Método</td>
+        <td>SecuredService</td>
+        <td>authenticated</td>
+        <td>isAuthenticated()</td>
+        <td>denyAll</td>
+        <td>78</td>
+        <td>76</td>
+        <td>2</td>
+        <td>
+Type: org.opentest4j.AssertionFailedError
+Message: Unexpected exception type thrown, expected: <org.springframework.security.authentication.AuthenticationCredentialsNotFoundException> but was: <org.springframework.security.authorization.AuthorizationDeniedException>
+StackTrace: org.opentest4j.AssertionFailedError: Unexpected exception type thrown, expected: <org.springframework.security.authentication.AuthenticationCredentialsNotFoundException> but was: <org.springframework.security.authorization.AuthorizationDeniedException>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:158)
+	at org.junit.jupiter.api.AssertThrows.assertThrows(AssertThrows.java:68)
+	at org.junit.jupiter.api.AssertThrows.assertThrows(AssertThrows.java:35)
+	at org.junit.jupiter.api.Assertions.assertThrows(Assertions.java:3223)
+	at nl._42.restsecure.autoconfigure.MethodSecurityTest.authenticated_shouldFail_whenAnonymous(MethodSecurityTest.java:40)
+Caused by: org.springframework.security.authorization.AuthorizationDeniedException: Access Denied
+	at org.springframework.security.authorization.method.ThrowingMethodAuthorizationDeniedHandler.handleDeniedInvocation(ThrowingMethodAuthorizationDeniedHandler.java:38)
+	at org.springframework.security.authorization.method.PreAuthorizeAuthorizationManager.handleDeniedInvocation(PreAuthorizeAuthorizationManager.java:96)
+	at org.springframework.security.authorization.method.AuthorizationManagerBeforeMethodInterceptor.handle(AuthorizationManagerBeforeMethodInterceptor.java:290)
+	at org.springframework.security.authorization.method.AuthorizationManagerBeforeMethodInterceptor.attemptAuthorization(AuthorizationManagerBeforeMethodInterceptor.java:263)
+	at org.springframework.security.authorization.method.AuthorizationManagerBeforeMethodInterceptor.invoke(AuthorizationManagerBeforeMethodInterceptor.java:197)
+	at org.springframework.security.config.annotation.method.configuration.DeferringMethodInterceptor.invoke(DeferringMethodInterceptor.java:44)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:179)
+	at org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:719)
+	at nl._42.restsecure.autoconfigure.test.SecuredService$$SpringCGLIB$$0.authenticated(<generated>)
+	at org.junit.jupiter.api.AssertThrows.assertThrows(AssertThrows.java:54)
+	... 3 more
+</td>
+        <td>Sim</td>
+    </tr>
+    <tr class="captured">
+        <td>10</td>
+        <td>nl._42.restsecure.autoconfigure.test</td>
+        <td>Método</td>
+        <td>SecuredService</td>
+        <td>authenticated</td>
+        <td>isAuthenticated()</td>
+        <td>!isAuthenticated()</td>
+        <td>78</td>
+        <td>77</td>
+        <td>1</td>
+        <td></td>
+        <td>Sim</td>
+    </tr>
+    <tr class="captured">
+        <td>11</td>
+        <td>nl._42.restsecure.autoconfigure.test</td>
+        <td>Método</td>
+        <td>SecuredService</td>
+        <td>admin</td>
+        <td>hasRole('admin')</td>
+        <td>!hasRole('admin')</td>
+        <td>78</td>
+        <td>76</td>
+        <td>2</td>
+        <td>
+Type: org.opentest4j.AssertionFailedError
+Message: Expected org.springframework.security.access.AccessDeniedException to be thrown, but nothing was thrown.
+StackTrace: org.opentest4j.AssertionFailedError: Expected org.springframework.security.access.AccessDeniedException to be thrown, but nothing was thrown.
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:159)
+	at org.junit.jupiter.api.AssertThrows.assertThrows(AssertThrows.java:74)
+	at org.junit.jupiter.api.AssertThrows.assertThrows(AssertThrows.java:35)
+	at org.junit.jupiter.api.Assertions.assertThrows(Assertions.java:3223)
+	at nl._42.restsecure.autoconfigure.MethodSecurityTest.admin_shouldFail_whenUser(MethodSecurityTest.java:56)
+</td>
+        <td>Sim</td>
+    </tr>
+    <tr class="captured">
+        <td>12</td>
+        <td>nl._42.restsecure.autoconfigure.test</td>
+        <td>Método</td>
+        <td>SecuredService</td>
+        <td>admin</td>
+        <td>hasRole('admin')</td>
+        <td>permitAll()</td>
+        <td>78</td>
+        <td>76</td>
+        <td>2</td>
+        <td>
+Type: org.opentest4j.AssertionFailedError
+Message: Expected org.springframework.security.access.AccessDeniedException to be thrown, but nothing was thrown.
+StackTrace: org.opentest4j.AssertionFailedError: Expected org.springframework.security.access.AccessDeniedException to be thrown, but nothing was thrown.
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:159)
+	at org.junit.jupiter.api.AssertThrows.assertThrows(AssertThrows.java:74)
+	at org.junit.jupiter.api.AssertThrows.assertThrows(AssertThrows.java:35)
+	at org.junit.jupiter.api.Assertions.assertThrows(Assertions.java:3223)
+	at nl._42.restsecure.autoconfigure.MethodSecurityTest.admin_shouldFail_whenUser(MethodSecurityTest.java:56)
+
+Type: org.opentest4j.AssertionFailedError
+Message: Expected org.springframework.security.authentication.AuthenticationCredentialsNotFoundException to be thrown, but nothing was thrown.
+StackTrace: org.opentest4j.AssertionFailedError: Expected org.springframework.security.authentication.AuthenticationCredentialsNotFoundException to be thrown, but nothing was thrown.
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:159)
+	at org.junit.jupiter.api.AssertThrows.assertThrows(AssertThrows.java:74)
+	at org.junit.jupiter.api.AssertThrows.assertThrows(AssertThrows.java:35)
+	at org.junit.jupiter.api.Assertions.assertThrows(Assertions.java:3223)
+	at nl._42.restsecure.autoconfigure.MethodSecurityTest.admin_shouldFail_whenAnonymous(MethodSecurityTest.java:62)
+</td>
+        <td>Sim</td>
+    </tr>
+    <tr class="captured">
+        <td>13</td>
+        <td>nl._42.restsecure.autoconfigure.test</td>
+        <td>Método</td>
+        <td>SecuredService</td>
+        <td>admin</td>
+        <td>hasRole('admin')</td>
+        <td>denyAll</td>
+        <td>78</td>
+        <td>76</td>
+        <td>2</td>
+        <td>
+Type: org.opentest4j.AssertionFailedError
+Message: Unexpected exception type thrown, expected: <org.springframework.security.authentication.AuthenticationCredentialsNotFoundException> but was: <org.springframework.security.authorization.AuthorizationDeniedException>
+StackTrace: org.opentest4j.AssertionFailedError: Unexpected exception type thrown, expected: <org.springframework.security.authentication.AuthenticationCredentialsNotFoundException> but was: <org.springframework.security.authorization.AuthorizationDeniedException>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:158)
+	at org.junit.jupiter.api.AssertThrows.assertThrows(AssertThrows.java:68)
+	at org.junit.jupiter.api.AssertThrows.assertThrows(AssertThrows.java:35)
+	at org.junit.jupiter.api.Assertions.assertThrows(Assertions.java:3223)
+	at nl._42.restsecure.autoconfigure.MethodSecurityTest.admin_shouldFail_whenAnonymous(MethodSecurityTest.java:62)
+Caused by: org.springframework.security.authorization.AuthorizationDeniedException: Access Denied
+	at org.springframework.security.authorization.method.ThrowingMethodAuthorizationDeniedHandler.handleDeniedInvocation(ThrowingMethodAuthorizationDeniedHandler.java:38)
+	at org.springframework.security.authorization.method.PreAuthorizeAuthorizationManager.handleDeniedInvocation(PreAuthorizeAuthorizationManager.java:96)
+	at org.springframework.security.authorization.method.AuthorizationManagerBeforeMethodInterceptor.handle(AuthorizationManagerBeforeMethodInterceptor.java:290)
+	at org.springframework.security.authorization.method.AuthorizationManagerBeforeMethodInterceptor.attemptAuthorization(AuthorizationManagerBeforeMethodInterceptor.java:263)
+	at org.springframework.security.authorization.method.AuthorizationManagerBeforeMethodInterceptor.invoke(AuthorizationManagerBeforeMethodInterceptor.java:197)
+	at org.springframework.security.config.annotation.method.configuration.DeferringMethodInterceptor.invoke(DeferringMethodInterceptor.java:44)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:179)
+	at org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:719)
+	at nl._42.restsecure.autoconfigure.test.SecuredService$$SpringCGLIB$$0.admin(<generated>)
+	at org.junit.jupiter.api.AssertThrows.assertThrows(AssertThrows.java:54)
+	... 3 more
+</td>
+        <td>Sim</td>
+    </tr>
+    <tr class="captured">
+        <td>14</td>
+        <td>nl._42.restsecure.autoconfigure.test</td>
+        <td>Método</td>
+        <td>SecuredService</td>
+        <td>admin</td>
+        <td>hasRole('admin')</td>
+        <td>hasRole('NO_admin')</td>
+        <td>78</td>
+        <td>77</td>
+        <td>1</td>
+        <td></td>
+        <td>Sim</td>
+    </tr>
+    <tr class="captured">
+        <td>15</td>
+        <td>nl._42.restsecure.autoconfigure.test</td>
+        <td>Método</td>
+        <td>SecuredService</td>
+        <td>admin</td>
+        <td>hasRole('admin')</td>
+        <td>hasAuthority('admin')</td>
+        <td>78</td>
+        <td>77</td>
+        <td>1</td>
+        <td></td>
+        <td>Sim</td>
+    </tr>
+    <tr class="captured">
+        <td>16</td>
+        <td>nl._42.restsecure.autoconfigure.test</td>
+        <td>Método</td>
+        <td>SecuredService</td>
+        <td>admin</td>
+        <td>hasRole('admin')</td>
+        <td>hasRole('ROLE_UNKNOWN')</td>
+        <td>78</td>
+        <td>77</td>
+        <td>1</td>
+        <td></td>
+        <td>Sim</td>
+    </tr>
+    <tr class="captured">
+        <td>17</td>
+        <td>nl._42.restsecure.autoconfigure.test</td>
+        <td>Método</td>
+        <td>SecuredService</td>
+        <td>admin</td>
+        <td>hasRole('admin')</td>
+        <td>hasRole('')</td>
+        <td>78</td>
+        <td>77</td>
+        <td>1</td>
+        <td></td>
+        <td>Sim</td>
+    </tr>
+            </table>
+        </section>
+    </body>
+    </html>

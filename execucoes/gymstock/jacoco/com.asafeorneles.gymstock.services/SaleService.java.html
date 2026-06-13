@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SaleService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">gymstock</a> &gt; <a href="index.source.html" class="el_package">com.asafeorneles.gymstock.services</a> &gt; <span class="el_source">SaleService.java</span></div><h1>SaleService.java</h1><pre class="source lang-java linenums">package com.asafeorneles.gymstock.services;
+
+import com.asafeorneles.gymstock.dtos.SaleItem.SaleItemCreateRequest;
+import com.asafeorneles.gymstock.dtos.sale.SaleCreateRequest;
+import com.asafeorneles.gymstock.dtos.sale.SalePaymentMethodRequest;
+import com.asafeorneles.gymstock.dtos.sale.SaleResponse;
+import com.asafeorneles.gymstock.entities.*;
+import com.asafeorneles.gymstock.exceptions.ActivityStatusException;
+import com.asafeorneles.gymstock.exceptions.ResourceNotFoundException;
+import com.asafeorneles.gymstock.mapper.SaleMapper;
+import com.asafeorneles.gymstock.repositories.CouponRepository;
+import com.asafeorneles.gymstock.repositories.ProductRepository;
+import com.asafeorneles.gymstock.repositories.SaleRepository;
+import com.asafeorneles.gymstock.repositories.UserRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
+@Service
+@RequiredArgsConstructor
+public class SaleService {
+    final SaleRepository saleRepository;
+    final ProductRepository productRepository;
+    final ProductInventoryService productInventoryService;
+    final CouponRepository couponRepository;
+    final CouponService couponService;
+    final UserRepository userRepository;
+    final SaleMapper saleMapper;
+
+    @Transactional
+    public SaleResponse createSale(SaleCreateRequest saleCreateRequest, JwtAuthenticationToken token) {
+
+<span class="fc" id="L42">        User user = userRepository.findById(UUID.fromString(token.getName()))</span>
+<span class="pc" id="L43">                .orElseThrow(() -&gt; new ResourceNotFoundException(&quot;User not found to create the sale.&quot;));</span>
+
+<span class="fc" id="L45">        Sale sale = new Sale();</span>
+<span class="fc" id="L46">        List&lt;SaleItem&gt; saleItems = newSaleItemList(saleCreateRequest.saleItems(), productRepository, productInventoryService, sale);</span>
+
+<span class="fc" id="L48">        sale.setUser(user);</span>
+<span class="fc" id="L49">        sale.setSaleItems(saleItems);</span>
+<span class="fc" id="L50">        sale.setPaymentMethod(saleCreateRequest.paymentMethod());</span>
+
+<span class="fc" id="L52">        sale.calculateTotalPrice();</span>
+
+<span class="fc" id="L54">        productInventoryService.updateQuantityAfterSale(saleItems);</span>
+
+<span class="pc bpc" id="L56" title="1 of 2 branches missed.">        if (saleCreateRequest.couponId() != null){</span>
+<span class="fc" id="L57">            UUID couponId = saleCreateRequest.couponId();</span>
+<span class="fc" id="L58">            Coupon coupon = couponRepository.findById(couponId)</span>
+<span class="pc" id="L59">                    .orElseThrow(() -&gt; new ResourceNotFoundException(&quot;Coupon not found by id: &quot; + couponId));</span>
+
+<span class="fc" id="L61">            couponService.validateCouponToCreateSale(coupon);</span>
+<span class="fc" id="L62">            sale.setCoupon(coupon);</span>
+<span class="fc" id="L63">            couponService.applyCoupon(sale);</span>
+        }
+
+<span class="fc" id="L66">        saleRepository.save(sale);</span>
+<span class="fc" id="L67">        return saleMapper.toResponse(sale);</span>
+    }
+
+    public static List&lt;SaleItem&gt; newSaleItemList(List&lt;SaleItemCreateRequest&gt; saleItemCreateRequestList, ProductRepository productRepository, ProductInventoryService productInventoryService, Sale sale) {
+<span class="fc" id="L71">        List&lt;SaleItem&gt; saleItems = new ArrayList&lt;&gt;();</span>
+
+<span class="fc bfc" id="L73" title="All 2 branches covered.">        for (SaleItemCreateRequest createSaleItem : saleItemCreateRequestList) {</span>
+<span class="fc" id="L74">            UUID productId = createSaleItem.productId();</span>
+<span class="fc" id="L75">            Product product = productRepository.findById(productId)</span>
+<span class="fc" id="L76">                    .orElseThrow(() -&gt; new ResourceNotFoundException(&quot;Product not found by id: &quot; + productId));</span>
+
+<span class="fc bfc" id="L78" title="All 2 branches covered.">            if (!product.isActivity()){</span>
+<span class="fc" id="L79">                throw new ActivityStatusException(&quot;This product is inactivity!&quot;);</span>
+            }
+
+<span class="fc" id="L82">            productInventoryService.validateQuantity(product, createSaleItem.quantity());</span>
+
+<span class="fc" id="L84">            BigDecimal totalPrice = product.getPrice().multiply(BigDecimal.valueOf(createSaleItem.quantity()));</span>
+
+<span class="fc" id="L86">            SaleItem saleItem = SaleItem.builder()</span>
+<span class="fc" id="L87">                    .sale(sale)</span>
+<span class="fc" id="L88">                    .product(product)</span>
+<span class="fc" id="L89">                    .quantity(createSaleItem.quantity())</span>
+<span class="fc" id="L90">                    .costPrice(product.getCostPrice())</span>
+<span class="fc" id="L91">                    .unityPrice(product.getPrice())</span>
+<span class="fc" id="L92">                    .totalPrice(totalPrice)</span>
+<span class="fc" id="L93">                    .build();</span>
+
+<span class="fc" id="L95">            saleItems.add(saleItem);</span>
+<span class="fc" id="L96">        }</span>
+<span class="fc" id="L97">        return saleItems;</span>
+    }
+
+    public Page&lt;SaleResponse&gt; getAllSales(Specification&lt;Sale&gt; specification, Pageable pageable) {
+<span class="fc" id="L101">        return saleRepository.findAll(specification, pageable)</span>
+<span class="fc" id="L102">                .map(saleMapper::toResponse);</span>
+    }
+
+    public SaleResponse getSaleById(UUID id) {
+<span class="fc" id="L106">        return saleRepository.findById(id)</span>
+<span class="fc" id="L107">                .map(saleMapper::toResponse)</span>
+<span class="fc" id="L108">                .orElseThrow(() -&gt; new ResourceNotFoundException(&quot;No sales registered with id {&quot; + id + &quot;}&quot;));</span>
+    }
+
+    @Transactional
+    public void deleteSale(UUID id) {
+<span class="fc" id="L113">        Sale saleFound = saleRepository.findById(id)</span>
+<span class="fc" id="L114">                .orElseThrow(() -&gt; new ResourceNotFoundException(&quot;No sales registered with id {&quot; + id + &quot;}&quot;));</span>
+
+<span class="fc" id="L116">        saleRepository.delete(saleFound);</span>
+<span class="fc" id="L117">    }</span>
+
+    @Transactional
+    public SaleResponse updatePaymentMethod(UUID id, SalePaymentMethodRequest patchPaymentMethod) {
+<span class="fc" id="L121">        Sale sale = saleRepository.findById(id)</span>
+<span class="fc" id="L122">                .orElseThrow(() -&gt; new ResourceNotFoundException(&quot;No sales registered with id {&quot; + id + &quot;}&quot;));</span>
+
+<span class="fc" id="L124">        sale.setPaymentMethod(patchPaymentMethod.paymentMethod());</span>
+<span class="fc" id="L125">        saleRepository.save(sale);</span>
+
+<span class="fc" id="L127">        return saleMapper.toResponse(sale);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Sale.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">gymstock</a> &gt; <a href="index.source.html" class="el_package">com.asafeorneles.gymstock.entities</a> &gt; <span class="el_source">Sale.java</span></div><h1>Sale.java</h1><pre class="source lang-java linenums">package com.asafeorneles.gymstock.entities;
+
+import com.asafeorneles.gymstock.enums.PaymentMethod;
+import jakarta.persistence.*;
+import lombok.*;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.UUID;
+
+@Entity
+@Table(name = &quot;tb_sales&quot;)
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class Sale {
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = &quot;sale_id&quot;)
+    private UUID saleId;
+
+    @OneToMany(mappedBy = &quot;sale&quot;, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List&lt;SaleItem&gt; saleItems;
+
+    @ManyToOne
+    @JoinColumn(name = &quot;coupon_id&quot;)
+    private Coupon coupon;
+
+    @Column(name = &quot;discount_amount&quot;)
+    private BigDecimal discountAmount;
+
+    @Column(name = &quot;total_price&quot;)
+    private BigDecimal totalPrice;
+
+    @Enumerated(EnumType.STRING)
+    private PaymentMethod paymentMethod;
+
+    @ManyToOne
+    @JoinColumn(name = &quot;user_id&quot;)
+    private User user;
+
+    @Column(name = &quot;created_date&quot;)
+    private LocalDateTime createdDate;
+
+    @Column(name = &quot;updated_date&quot;)
+    private LocalDateTime updatedDate;
+
+    @PrePersist
+    public void prePersist() {
+<span class="nc" id="L53">        this.createdDate = LocalDateTime.now();</span>
+<span class="nc" id="L54">    }</span>
+
+    @PreUpdate
+    public void preUpdate() {
+<span class="nc" id="L58">        this.updatedDate = LocalDateTime.now();</span>
+<span class="nc" id="L59">    }</span>
+
+    public Boolean containsCoupon(){
+<span class="nc bnc" id="L62" title="All 2 branches missed.">        return this.getCoupon() != null;</span>
+    }
+
+    public void calculateTotalPrice() {
+<span class="fc" id="L66">        this.totalPrice = saleItems.stream()</span>
+<span class="fc" id="L67">                .map(SaleItem::getTotalPrice)</span>
+<span class="fc" id="L68">                .reduce(BigDecimal.ZERO, BigDecimal::add);</span>
+<span class="fc" id="L69">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

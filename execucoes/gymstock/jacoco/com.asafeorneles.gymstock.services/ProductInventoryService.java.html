@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ProductInventoryService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">gymstock</a> &gt; <a href="index.source.html" class="el_package">com.asafeorneles.gymstock.services</a> &gt; <span class="el_source">ProductInventoryService.java</span></div><h1>ProductInventoryService.java</h1><pre class="source lang-java linenums">package com.asafeorneles.gymstock.services;
+
+import com.asafeorneles.gymstock.dtos.ProductInventory.ProductInventoryDetailResponse;
+import com.asafeorneles.gymstock.dtos.ProductInventory.ProductInventoryLowStockThresholdRequest;
+import com.asafeorneles.gymstock.dtos.ProductInventory.ProductInventoryQuantityRequest;
+import com.asafeorneles.gymstock.entities.Product;
+import com.asafeorneles.gymstock.entities.ProductInventory;
+import com.asafeorneles.gymstock.entities.SaleItem;
+import com.asafeorneles.gymstock.enums.InventoryStatus;
+import com.asafeorneles.gymstock.exceptions.InsufficientProductQuantityException;
+import com.asafeorneles.gymstock.exceptions.ResourceNotFoundException;
+import com.asafeorneles.gymstock.mapper.ProductInventoryMapper;
+import com.asafeorneles.gymstock.repositories.ProductInventoryRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.UUID;
+
+@Service
+@RequiredArgsConstructor
+public class ProductInventoryService {
+
+    final ProductInventoryRepository productInventoryRepository;
+    final ProductInventoryMapper productInventoryMapper;
+
+    public List&lt;ProductInventoryDetailResponse&gt; findProductsInventories() {
+<span class="fc" id="L29">        return productInventoryRepository.findAll()</span>
+<span class="fc" id="L30">                .stream()</span>
+<span class="fc" id="L31">                .map(productInventoryMapper::toResponseDetail)</span>
+<span class="fc" id="L32">                .toList();</span>
+    }
+
+    public ProductInventoryDetailResponse findProductInventoryById(UUID id) {
+<span class="nc" id="L36">        return productInventoryRepository.findById(id)</span>
+<span class="nc" id="L37">                .map(productInventoryMapper::toResponseDetail)</span>
+<span class="nc" id="L38">                .orElseThrow(() -&gt; new ResourceNotFoundException(&quot;Product Inventory not found by this id: &quot; + id));</span>
+    }
+
+    @Transactional
+    public ProductInventoryDetailResponse updateQuantity(UUID id, ProductInventoryQuantityRequest patchProductInventoryQuantity) {
+<span class="fc" id="L43">        ProductInventory productInventoryFound = productInventoryRepository.findById(id)</span>
+<span class="pc" id="L44">                .orElseThrow(() -&gt; new ResourceNotFoundException(&quot;Product Inventory not found by this id: &quot; + id));</span>
+
+<span class="fc" id="L46">        Product product = productInventoryFound.getProduct();</span>
+
+<span class="fc" id="L48">        ProductService.checkProductIsActiveBeforeUpdate(product.isActivity(), &quot;This product is inactive. You can only update the inventory of products in the activity.&quot;);</span>
+
+<span class="fc" id="L50">        productInventoryFound.setQuantity(patchProductInventoryQuantity.quantity());</span>
+
+<span class="fc" id="L52">        assignInventoryStatus(productInventoryFound);</span>
+
+<span class="fc" id="L54">        productInventoryRepository.save(productInventoryFound);</span>
+
+<span class="fc" id="L56">        return productInventoryMapper.toResponseDetail(productInventoryFound);</span>
+    }
+
+    @Transactional
+    public ProductInventoryDetailResponse updateLowStockThreshold(UUID id, ProductInventoryLowStockThresholdRequest patchProductInventoryLowStockThreshold) {
+<span class="fc" id="L61">        ProductInventory productInventoryFound = productInventoryRepository.findById(id)</span>
+<span class="pc" id="L62">                .orElseThrow(() -&gt; new ResourceNotFoundException(&quot;Product Inventory not found by this id: &quot; + id));</span>
+
+<span class="fc" id="L64">        Product product = productInventoryFound.getProduct();</span>
+
+<span class="fc" id="L66">        ProductService.checkProductIsActiveBeforeUpdate(product.isActivity(), &quot;This product is inactive. You can only update the inventory of products in the activity.&quot;);</span>
+
+<span class="fc" id="L68">        productInventoryFound.setLowStockThreshold(patchProductInventoryLowStockThreshold.lowStockThreshold());</span>
+
+<span class="fc" id="L70">        assignInventoryStatus(productInventoryFound);</span>
+
+<span class="fc" id="L72">        productInventoryRepository.save(productInventoryFound);</span>
+
+<span class="fc" id="L74">        return productInventoryMapper.toResponseDetail(productInventoryFound);</span>
+    }
+
+    @Transactional
+    public void updateQuantityAfterSale(List&lt;SaleItem&gt; saleItems) {
+<span class="fc bfc" id="L79" title="All 2 branches covered.">        for (SaleItem saleItem : saleItems) {</span>
+<span class="fc" id="L80">            int quantitySold = saleItem.getQuantity();</span>
+<span class="fc" id="L81">            ProductInventory inventory = saleItem.getProduct().getInventory();</span>
+
+<span class="fc" id="L83">            inventory.setQuantity(inventory.getQuantity() - quantitySold);</span>
+
+<span class="fc" id="L85">            assignInventoryStatus(inventory);</span>
+
+<span class="fc" id="L87">            productInventoryRepository.save(inventory);</span>
+<span class="fc" id="L88">        }</span>
+<span class="fc" id="L89">    }</span>
+
+    private static void assignInventoryStatus(ProductInventory inventory) {
+        InventoryStatus inventoryStatus;
+        inventoryStatus =
+<span class="pc bpc" id="L94" title="1 of 2 branches missed.">                inventory.getQuantity() == 0 ? InventoryStatus.OUT_OF_STOCK</span>
+<span class="fc bfc" id="L95" title="All 2 branches covered.">                        : inventory.getQuantity() &lt;= inventory.getLowStockThreshold() ? InventoryStatus.LOW_STOCK</span>
+<span class="fc" id="L96">                        : InventoryStatus.OK;</span>
+<span class="fc" id="L97">        inventory.setInventoryStatus(inventoryStatus);</span>
+<span class="fc" id="L98">    }</span>
+
+    public void validateQuantity(Product product, int quantityToBuy) {
+<span class="nc" id="L101">        ProductInventory inventory = product.getInventory();</span>
+
+<span class="nc" id="L103">        int quantityAvailable = inventory.getQuantity();</span>
+<span class="nc bnc" id="L104" title="All 2 branches missed.">        if (quantityToBuy &gt; quantityAvailable) {</span>
+<span class="nc" id="L105">            throw new InsufficientProductQuantityException(&quot;insufficient quantity in stock! Quantity available: &quot; + quantityAvailable);</span>
+        }
+<span class="nc" id="L107">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

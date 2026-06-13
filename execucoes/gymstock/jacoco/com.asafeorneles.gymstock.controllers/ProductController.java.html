@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ProductController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">gymstock</a> &gt; <a href="index.source.html" class="el_package">com.asafeorneles.gymstock.controllers</a> &gt; <span class="el_source">ProductController.java</span></div><h1>ProductController.java</h1><pre class="source lang-java linenums">package com.asafeorneles.gymstock.controllers;
+
+import com.asafeorneles.gymstock.dtos.product.*;
+import com.asafeorneles.gymstock.queryFilters.ProductDetailsQueryFilters;
+import com.asafeorneles.gymstock.queryFilters.ProductQueryFilters;
+import com.asafeorneles.gymstock.services.ProductService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.UUID;
+
+@RestController
+@RequestMapping(value = &quot;/products&quot;, produces = {&quot;application/json&quot;})
+@Tag(name = &quot;Products&quot;)
+@RequiredArgsConstructor
+
+public class ProductController {
+    final ProductService productService;
+
+    @Operation(summary = &quot;Create a product&quot;)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = &quot;201&quot;, description = &quot;Product created successfully&quot;),
+            @ApiResponse(responseCode = &quot;400&quot;, description = &quot;Invalid request data&quot;),
+            @ApiResponse(responseCode = &quot;401&quot;, description = &quot;Unauthenticated user&quot;),
+            @ApiResponse(responseCode = &quot;403&quot;, description = &quot;The logged-in user does not have permission to access this route.&quot;),
+            @ApiResponse(responseCode = &quot;409&quot;, description = &quot;Product with same name and brand already exists&quot;),
+            @ApiResponse(responseCode = &quot;500&quot;, description = &quot;Unexpected server error&quot;)
+    })
+    @PreAuthorize(&quot;hasAuthority('product:create')&quot;)
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity&lt;ProductDetailResponse&gt; createProduct(@RequestBody @Valid ProductCreateRequest productCreateRequest) {
+<span class="nc" id="L43">        return ResponseEntity.status(HttpStatus.CREATED).body(productService.createProduct(productCreateRequest));</span>
+    }
+
+    @Operation(summary = &quot;Get all products&quot;)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = &quot;200&quot;, description = &quot;Products returned successfully&quot;),
+            @ApiResponse(responseCode = &quot;401&quot;, description = &quot;Unauthenticated user&quot;),
+            @ApiResponse(responseCode = &quot;403&quot;, description = &quot;The logged-in user does not have permission to access this route.&quot;),
+            @ApiResponse(responseCode = &quot;404&quot;, description = &quot;Products not found&quot;),
+            @ApiResponse(responseCode = &quot;400&quot;, description = &quot;Invalid filter parameters&quot;),
+            @ApiResponse(responseCode = &quot;500&quot;, description = &quot;Unexpected server error&quot;)
+    })
+    @PreAuthorize(&quot;hasAuthority('product:read')&quot;)
+    @GetMapping
+    public ResponseEntity&lt;List&lt;ProductResponse&gt;&gt; getAllProducts(@ParameterObject ProductQueryFilters filters) {
+<span class="nc" id="L58">        return ResponseEntity.status(HttpStatus.OK).body(productService.getAllProducts(filters.toSpecification()));</span>
+    }
+
+    @Operation(summary = &quot;Get all products with all details&quot;)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = &quot;200&quot;, description = &quot;Product returned successfully&quot;),
+            @ApiResponse(responseCode = &quot;401&quot;, description = &quot;Unauthenticated user&quot;),
+            @ApiResponse(responseCode = &quot;403&quot;, description = &quot;The logged-in user does not have permission to access this route.&quot;),
+            @ApiResponse(responseCode = &quot;404&quot;, description = &quot;Products not found&quot;),
+            @ApiResponse(responseCode = &quot;400&quot;, description = &quot;Invalid filter parameters&quot;),
+            @ApiResponse(responseCode = &quot;500&quot;, description = &quot;Unexpected server error&quot;)
+    })
+    @PreAuthorize(&quot;hasAuthority('productDetails:read')&quot;)
+    @GetMapping(&quot;/details&quot;)
+    public ResponseEntity&lt;List&lt;ProductDetailResponse&gt;&gt; getAllProductsDetails(@ParameterObject ProductDetailsQueryFilters filters) {
+<span class="nc" id="L73">        return ResponseEntity.status(HttpStatus.OK).body(productService.getAllProductsDetails(filters.toSpecification()));</span>
+    }
+
+    @Operation(summary = &quot;Get a product by id&quot;)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = &quot;200&quot;, description = &quot;Product returned successfully&quot;),
+            @ApiResponse(responseCode = &quot;400&quot;, description = &quot;Invalid ID format&quot;),
+            @ApiResponse(responseCode = &quot;401&quot;, description = &quot;Unauthenticated user&quot;),
+            @ApiResponse(responseCode = &quot;403&quot;, description = &quot;The logged-in user does not have permission to access this route.&quot;),
+            @ApiResponse(responseCode = &quot;404&quot;, description = &quot;Product not found&quot;),
+            @ApiResponse(responseCode = &quot;500&quot;, description = &quot;Unexpected server error&quot;)
+    })
+    @PreAuthorize(&quot;hasAuthority('product:read')&quot;)
+    @GetMapping(value = &quot;/{id}&quot;)
+    public ResponseEntity&lt;ProductResponse&gt; getProductById(@PathVariable(name = &quot;id&quot;) UUID id){
+<span class="nc" id="L88">        return ResponseEntity.status(HttpStatus.OK).body(productService.getProductById(id));</span>
+    }
+
+    @Operation(summary = &quot;Get all products with low stock&quot;)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = &quot;200&quot;, description = &quot;Product returned successfully&quot;),
+            @ApiResponse(responseCode = &quot;401&quot;, description = &quot;Unauthenticated user&quot;),
+            @ApiResponse(responseCode = &quot;403&quot;, description = &quot;The logged-in user does not have permission to access this route.&quot;),
+            @ApiResponse(responseCode = &quot;404&quot;, description = &quot;Products not found&quot;),
+            @ApiResponse(responseCode = &quot;500&quot;, description = &quot;Unexpected server error&quot;)
+    })
+    @PreAuthorize(&quot;hasAuthority('productLowStock:read')&quot;)
+    @GetMapping(&quot;/low-stock&quot;)
+    public ResponseEntity&lt;List&lt;ProductDetailResponse&gt;&gt; getAllProductsWithLowStock(){
+<span class="nc" id="L102">        return ResponseEntity.status(HttpStatus.OK).body(productService.getAllProductsWithLowStock());</span>
+    }
+
+    @Operation(summary = &quot;Update a product&quot;)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = &quot;201&quot;, description = &quot;Product updated successfully&quot;),
+            @ApiResponse(responseCode = &quot;400&quot;, description = &quot;Invalid ID format&quot;),
+            @ApiResponse(responseCode = &quot;401&quot;, description = &quot;Unauthenticated user&quot;),
+            @ApiResponse(responseCode = &quot;403&quot;, description = &quot;The logged-in user does not have permission to access this route.&quot;),
+            @ApiResponse(responseCode = &quot;404&quot;, description = &quot;Product not found&quot;),
+            @ApiResponse(responseCode = &quot;409&quot;, description = &quot;Conflict updating product&quot;),
+            @ApiResponse(responseCode = &quot;500&quot;, description = &quot;Unexpected server error&quot;)
+    })
+    @PreAuthorize(&quot;hasAuthority('product:update')&quot;)
+    @PutMapping(value = &quot;/{id}&quot;, consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity&lt;ProductDetailResponse&gt; updateProduct(@PathVariable(name = &quot;id&quot;) UUID id, @RequestBody @Valid ProductUpdateRequest productUpdateRequest){
+<span class="nc" id="L118">        return ResponseEntity.status(HttpStatus.OK).body(productService.updateProduct(id, productUpdateRequest));</span>
+    }
+
+    @Operation(summary = &quot;Deactivate a product&quot;)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = &quot;201&quot;, description = &quot;Product deactivated successfully&quot;),
+            @ApiResponse(responseCode = &quot;400&quot;, description = &quot;Invalid request data&quot;),
+            @ApiResponse(responseCode = &quot;401&quot;, description = &quot;Unauthenticated user&quot;),
+            @ApiResponse(responseCode = &quot;403&quot;, description = &quot;The logged-in user does not have permission to access this route.&quot;),
+            @ApiResponse(responseCode = &quot;404&quot;, description = &quot;Product not found&quot;),
+            @ApiResponse(responseCode = &quot;409&quot;, description = &quot;Product is already inactive&quot;),
+            @ApiResponse(responseCode = &quot;500&quot;, description = &quot;Unexpected server error&quot;)
+    })
+    @PreAuthorize(&quot;hasAuthority('product:deactivate')&quot;)
+    @PatchMapping(value = &quot;/deactivate/{id}&quot;, consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity&lt;ProductDetailResponse&gt; deactivateProduct(@PathVariable(name = &quot;id&quot;) UUID id, @RequestBody @Valid ProductDeactivateRequest productDeactivateRequest){
+<span class="nc" id="L134">        return ResponseEntity.status(HttpStatus.OK).body(productService.deactivateProduct(id, productDeactivateRequest));</span>
+    }
+
+    @Operation(summary = &quot;Activate a product&quot;)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = &quot;201&quot;, description = &quot;Product activated successfully&quot;),
+            @ApiResponse(responseCode = &quot;400&quot;, description = &quot;Invalid request data&quot;),
+            @ApiResponse(responseCode = &quot;401&quot;, description = &quot;Unauthenticated user&quot;),
+            @ApiResponse(responseCode = &quot;403&quot;, description = &quot;The logged-in user does not have permission to access this route.&quot;),
+            @ApiResponse(responseCode = &quot;404&quot;, description = &quot;Product not found&quot;),
+            @ApiResponse(responseCode = &quot;409&quot;, description = &quot;Product is already active&quot;),
+            @ApiResponse(responseCode = &quot;500&quot;, description = &quot;Unexpected server error&quot;)
+    })
+    @PreAuthorize(&quot;hasAuthority('product:activate')&quot;)
+    @PatchMapping(value = &quot;/activate/{id}&quot;)
+    public ResponseEntity&lt;ProductDetailResponse&gt; activateProduct(@PathVariable(name = &quot;id&quot;) UUID id){
+<span class="nc" id="L150">        return ResponseEntity.status(HttpStatus.OK).body(productService.activateProduct(id));</span>
+    }
+
+    @Operation(summary = &quot;Delete a product&quot;)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = &quot;200&quot;, description = &quot;Product deleted successfully&quot;),
+            @ApiResponse(responseCode = &quot;400&quot;, description = &quot;Invalid ID format&quot;),
+            @ApiResponse(responseCode = &quot;401&quot;, description = &quot;Unauthenticated user&quot;),
+            @ApiResponse(responseCode = &quot;403&quot;, description = &quot;The logged-in user does not have permission to access this route.&quot;),
+            @ApiResponse(responseCode = &quot;404&quot;, description = &quot;Product not found&quot;),
+            @ApiResponse(responseCode = &quot;409&quot;, description = &quot;This product has already been used in a sale&quot;),
+            @ApiResponse(responseCode = &quot;500&quot;, description = &quot;Unexpected server error&quot;)
+    })
+    @PreAuthorize(&quot;hasAuthority('product:delete')&quot;)
+    @DeleteMapping(&quot;/{id}&quot;)
+    public ResponseEntity&lt;String&gt; deleteProduct(@PathVariable(name = &quot;id&quot;) UUID id){
+<span class="nc" id="L166">        productService.deleteProduct(id);</span>
+<span class="nc" id="L167">        return ResponseEntity.status(HttpStatus.OK).body(&quot;Pet deleted successfully&quot;);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

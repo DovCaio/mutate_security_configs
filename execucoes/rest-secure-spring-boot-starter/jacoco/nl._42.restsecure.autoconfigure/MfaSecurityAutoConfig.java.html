@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MfaSecurityAutoConfig.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">42 REST Secure Spring Boot Starter</a> &gt; <a href="index.source.html" class="el_package">nl._42.restsecure.autoconfigure</a> &gt; <span class="el_source">MfaSecurityAutoConfig.java</span></div><h1>MfaSecurityAutoConfig.java</h1><pre class="source lang-java linenums">package nl._42.restsecure.autoconfigure;
+
+import nl._42.restsecure.autoconfigure.authentication.mfa.MfaSetupService;
+import nl._42.restsecure.autoconfigure.authentication.mfa.MfaSetupServiceImpl;
+import nl._42.restsecure.autoconfigure.authentication.mfa.MfaValidationService;
+import nl._42.restsecure.autoconfigure.authentication.mfa.MfaValidationServiceImpl;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.AutoConfigureAfter;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+/**
+ * Auto-configures beans for MFA validation and configuration. These beans are dependent on the beans defined in {@link dev.samstevens.totp.spring.autoconfigure.TotpAutoConfiguration}.
+ */
+@Configuration
+@ConditionalOnClass(name = &quot;dev.samstevens.totp.spring.autoconfigure.TotpAutoConfiguration&quot;)
+@AutoConfigureAfter(name = &quot;dev.samstevens.totp.spring.autoconfigure.TotpAutoConfiguration&quot;)
+<span class="fc" id="L22">public class MfaSecurityAutoConfig {</span>
+
+    @Bean
+    @ConditionalOnMissingBean(MfaValidationService.class)
+    @ConditionalOnBean(type = &quot;dev.samstevens.totp.code.CodeVerifier&quot;)
+    public MfaValidationService mfaValidationService(dev.samstevens.totp.code.CodeVerifier codeVerifier) {
+<span class="fc" id="L28">        return new MfaValidationServiceImpl(codeVerifier);</span>
+    }
+
+    @Bean
+    @ConditionalOnMissingBean(MfaSetupService.class)
+    @ConditionalOnBean(type = {&quot;dev.samstevens.totp.secret.SecretGenerator&quot;, &quot;dev.samstevens.totp.qr.QrDataFactory&quot;, &quot;dev.samstevens.totp.qr.QrGenerator&quot;})
+    public MfaSetupService mfaSetupService(dev.samstevens.totp.secret.SecretGenerator secretGenerator, dev.samstevens.totp.qr.QrDataFactory qrDataFactory, dev.samstevens.totp.qr.QrGenerator qrGenerator, @Value(&quot;${totp.issuer:needs-totp-issuer}&quot;) String issuer) {
+<span class="fc" id="L35">        return new MfaSetupServiceImpl(secretGenerator, qrDataFactory, qrGenerator, issuer);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

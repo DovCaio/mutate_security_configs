@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>BookControllerHtmxExceptionHandling.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Books Microservice</a> &gt; <a href="index.source.html" class="el_package">com.aidanwhiteley.books.controller</a> &gt; <span class="el_source">BookControllerHtmxExceptionHandling.java</span></div><h1>BookControllerHtmxExceptionHandling.java</h1><pre class="source lang-java linenums">package com.aidanwhiteley.books.controller;
+
+import com.aidanwhiteley.books.controller.exceptions.JwtAuthAuzException;
+import com.aidanwhiteley.books.controller.exceptions.NotAuthorisedException;
+import com.aidanwhiteley.books.controller.exceptions.NotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.data.mongodb.UncategorizedMongoDbException;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+
+import java.security.Principal;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
+public interface BookControllerHtmxExceptionHandling {
+
+<span class="fc" id="L24">    Logger LOGGER = LoggerFactory.getLogger(BookControllerHtmxExceptionHandling.class);</span>
+
+    // The REST API part of this application registers a global @RestControllerAdvice to centrally handle exceptions
+    // and they generally return JSON to the client.
+    // As we want to leave the REST API in place, we handle exceptions locally in this HTMX based controller
+    // so that we can return HTML views for any errors from this controller.
+
+    @ResponseStatus(HttpStatus.CONFLICT)
+    @ExceptionHandler(UncategorizedMongoDbException.class)
+    default String handleInMemoryMongoFullTextSearchException(UncategorizedMongoDbException ex, Model model,
+                                                              Principal principal, WebRequest request) {
+<span class="fc" id="L35">        LOGGER.error(&quot;An UncategorizedMongoDbException occurred. This is normally expected when running in &quot; +</span>
+                &quot;development mode when trying to use the Search as full text indexes aren't supported by &quot; +
+                &quot;the in memory fake Mongo. However, as it is just possible that it could happen for other &quot; +
+                &quot;reasons, the full stack trace is logged&quot;, ex);
+<span class="fc" id="L39">        String description = &quot;Search doesn't work when running against the in-memory Mongo &quot; +</span>
+                &quot;used in development because full text indexes are not supported in that implementation.&quot;;
+<span class="fc" id="L41">        return addAttributesToErrorPage(description, &quot;e-mongo-full-text-search&quot;, model, principal, request);</span>
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler({IllegalArgumentException.class, NumberFormatException.class, MethodArgumentTypeMismatchException.class,
+            MethodArgumentNotValidException.class})
+    default String handleIllegalArgumentException(Exception ex, Model model, Principal principal, WebRequest request) {
+<span class="fc" id="L48">        LOGGER.error(&quot;An unacceptable input was received. Either this is an application error or someone manually sending incorrect parameters&quot;, ex);</span>
+<span class="fc" id="L49">        String description = &quot;Sorry - the values sent to the application are not acceptable.&quot;;</span>
+<span class="fc" id="L50">        return addAttributesToErrorPage(description, &quot;e-400&quot;, model, principal, request);</span>
+    }
+
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(NotFoundException.class)
+    default String handleNotFoundException(NotFoundException ex, Model model, Principal principal, WebRequest request) {
+<span class="fc" id="L56">        LOGGER.error(&quot;The application couldn't find the resource requested - {}&quot;, ex.getMessage(), ex);</span>
+<span class="fc" id="L57">        String description = &quot;Sorry - the application could not find what you wanted&quot;;</span>
+<span class="fc" id="L58">        return addAttributesToErrorPage(description, &quot;e-404&quot;, model, principal, request);</span>
+    }
+
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    @ExceptionHandler(NotAuthorisedException.class)
+    default String handleNotAuthorisedException(NotAuthorisedException ex, Model model, Principal principal, WebRequest request) {
+<span class="fc" id="L64">        LOGGER.error(&quot;An attempt was made to access a protected resource without the required authorisation - {}&quot;, ex.getMessage(), ex);</span>
+<span class="fc" id="L65">        String description = &quot;Sorry - you are not authorised to access this functionality&quot;;</span>
+<span class="fc" id="L66">        return addAttributesToErrorPage(description, &quot;e-401&quot;, model, principal, request);</span>
+    }
+
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    @ExceptionHandler(JwtAuthAuzException.class)
+    default String handleJwtAuthAuzException(JwtAuthAuzException ex, Model model, Principal principal, WebRequest request) {
+<span class="nc" id="L72">        LOGGER.error(&quot;There was a problem with the JWT token process - {}&quot;, ex.getMessage(), ex);</span>
+<span class="nc" id="L73">        String description = &quot;Sorry - there was problem with processing your logon token&quot;;</span>
+<span class="nc" id="L74">        return addAttributesToErrorPage(description, &quot;e-401&quot;, model, principal, request);</span>
+    }
+
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    @ExceptionHandler(AccessDeniedException.class)
+    default String handleAccessDeniedException(AccessDeniedException ex, Model model, Principal principal, WebRequest request) {
+        // We don't want to log a stack trace for this but we do want to be able to see details of who was trying to access what.
+<span class="fc" id="L81">        StringBuilder errMsg = new StringBuilder();</span>
+<span class="fc" id="L82">        errMsg.append(&quot;An attempt was made to access a protected resource without the required permission. &quot;);</span>
+<span class="fc" id="L83">        errMsg.append(&quot; Exception message: &quot;).append(ex.getMessage());</span>
+<span class="fc" id="L84">        errMsg.append(&quot; Principal: &quot;);</span>
+<span class="fc bfc" id="L85" title="All 2 branches covered.">        if (principal != null) {</span>
+<span class="fc" id="L86">            errMsg.append(principal);</span>
+        }
+<span class="pc bpc" id="L88" title="1 of 2 branches missed.">        if (request != null) {</span>
+<span class="fc" id="L89">            errMsg.append(&quot; Request details: &quot;).append(request);</span>
+        }
+<span class="pc bpc" id="L91" title="1 of 2 branches missed.">        if (LOGGER.isWarnEnabled()) {</span>
+<span class="fc" id="L92">            LOGGER.warn(errMsg.toString());</span>
+        }
+<span class="fc" id="L94">        String description = &quot;Sorry - you are not permitted to access this functionality&quot;;</span>
+<span class="fc" id="L95">        return addAttributesToErrorPage(description, &quot;e-403&quot;, model, principal, request);</span>
+    }
+
+    // Exception handler of last resort!
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ExceptionHandler(Exception.class)
+    default String handleException(Exception ex, Model model, Principal principal, WebRequest request) {
+<span class="nc" id="L102">        LOGGER.error(&quot;An unhandled exception was caught by the exception handler of last resort - {}&quot;, ex.getMessage(), ex);</span>
+<span class="nc" id="L103">        String description = &quot;Sorry - an unexpected problem occurred in the application.&quot;;</span>
+<span class="nc" id="L104">        return addAttributesToErrorPage(description, &quot;e-500&quot;, model, principal, request);</span>
+    }
+
+    private String addAttributesToErrorPage(String description, String code, Model model, Principal principal, WebRequest request) {
+<span class="fc" id="L108">        model.addAttribute(&quot;description&quot;, description);</span>
+<span class="fc" id="L109">        model.addAttribute(&quot;code&quot;, code);</span>
+<span class="fc" id="L110">        model.addAttribute(&quot;dateTime&quot;, LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));</span>
+<span class="fc" id="L111">        addUserToModel(principal, model);</span>
+
+<span class="pc bpc" id="L113" title="2 of 4 branches missed.">        if (request != null &amp;&amp; request.getHeader(&quot;hx-request&quot;) != null &amp;&amp;</span>
+<span class="nc bnc" id="L114" title="All 2 branches missed.">                request.getHeader(&quot;hx-request&quot;).equals(&quot;true&quot;)) {</span>
+<span class="nc" id="L115">            return &quot;error :: cloudy-error-detail&quot;;</span>
+        } else {
+<span class="fc" id="L117">            return &quot;error&quot;;</span>
+        }
+    }
+
+    void addUserToModel(Principal principal, Model model);
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

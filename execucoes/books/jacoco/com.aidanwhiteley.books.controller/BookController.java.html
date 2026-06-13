@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>BookController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Books Microservice</a> &gt; <a href="index.source.html" class="el_package">com.aidanwhiteley.books.controller</a> &gt; <span class="el_source">BookController.java</span></div><h1>BookController.java</h1><pre class="source lang-java linenums">package com.aidanwhiteley.books.controller;
+
+import com.aidanwhiteley.books.controller.aspect.LimitDataVisibility;
+import com.aidanwhiteley.books.controller.exceptions.NotFoundException;
+import com.aidanwhiteley.books.domain.Book;
+import com.aidanwhiteley.books.repository.BookRepository;
+import com.aidanwhiteley.books.repository.dtos.BooksByAuthor;
+import com.aidanwhiteley.books.repository.dtos.BooksByGenre;
+import com.aidanwhiteley.books.service.StatsService;
+import com.aidanwhiteley.books.service.dtos.SummaryStats;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.web.bind.annotation.*;
+
+import java.security.Principal;
+import java.util.List;
+
+@LimitDataVisibility
+@RestController
+@RequestMapping(&quot;/api&quot;)
+public class BookController {
+
+    public static final String PAGE_REQUEST_TOO_BIG_MESSAGE = &quot;Cannot request a page of data containing more than %s elements&quot;;
+
+    private final BookRepository bookRepository;
+
+    private final StatsService statsService;
+
+    @Value(&quot;${books.users.default.page.size}&quot;)
+    private int defaultPageSize;
+
+    @Value(&quot;${books.users.max.page.size}&quot;)
+    private int maxPageSize;
+
+<span class="fc" id="L36">    public BookController(BookRepository bookRepository, StatsService statsService) {</span>
+<span class="fc" id="L37">        this.bookRepository = bookRepository;</span>
+<span class="fc" id="L38">        this.statsService = statsService;</span>
+<span class="fc" id="L39">    }</span>
+
+    @GetMapping(value = &quot;/books&quot;)
+    public Page&lt;Book&gt; findAllByCreatedDateTimeDesc(Principal principal) {
+<span class="fc" id="L43">        return findAllByCreatedDateTimeDesc(0, defaultPageSize, principal);</span>
+    }
+
+    @GetMapping(value = {&quot;/books&quot;, &quot;/books/&quot;}, params = {&quot;page&quot;, &quot;size&quot;})
+    public Page&lt;Book&gt; findAllByCreatedDateTimeDesc(@RequestParam int page,
+                                                   @RequestParam int size, Principal principal) {
+
+<span class="fc" id="L50">        PageRequest pageObj = PageRequest.of(page, size);</span>
+<span class="fc" id="L51">        return bookRepository.findAllByOrderByCreatedDateTimeDesc(pageObj);</span>
+    }
+
+    @GetMapping(value = &quot;/books/{id}&quot;)
+    public Book findBookById(@PathVariable String id, Principal principal) {
+<span class="fc" id="L56">        return bookRepository.findById(id).orElseThrow(() -&gt; new NotFoundException(&quot;Book id &quot; + id + &quot; not found&quot;));</span>
+    }
+
+    @GetMapping(value = {&quot;/books&quot;, &quot;/books/&quot;}, params = {&quot;author&quot;})
+    public Page&lt;Book&gt; findByAuthor(@RequestParam String author, Principal principal) {
+<span class="nc" id="L61">        return findByAuthor(author, 0, defaultPageSize, principal);</span>
+    }
+
+    @GetMapping(value = {&quot;/books&quot;, &quot;books/&quot;}, params = {&quot;author&quot;, &quot;page&quot;, &quot;size&quot;})
+    public Page&lt;Book&gt; findByAuthor(@RequestParam String author, @RequestParam int page,
+                                   @RequestParam int size, Principal principal) {
+
+<span class="pc bpc" id="L68" title="1 of 4 branches missed.">        if (null == author || author.trim().isEmpty()) {</span>
+<span class="fc" id="L69">            throw new IllegalArgumentException(&quot;Author parameter cannot be empty&quot;);</span>
+        }
+
+<span class="fc bfc" id="L72" title="All 2 branches covered.">        if (size &gt; maxPageSize) {</span>
+<span class="fc" id="L73">            throw new IllegalArgumentException(PAGE_REQUEST_TOO_BIG_MESSAGE.formatted(maxPageSize));</span>
+        }
+
+<span class="fc" id="L76">        PageRequest pageObj = PageRequest.of(page, size);</span>
+<span class="fc" id="L77">        return bookRepository.findAllByAuthorOrderByCreatedDateTimeDesc(pageObj, author);</span>
+    }
+
+    @GetMapping(value = {&quot;/books&quot;, &quot;/books/&quot;}, params = {&quot;search&quot;})
+    public Page&lt;Book&gt; findBySearch(@RequestParam String search, Principal principal) {
+<span class="nc" id="L82">        return findBySearch(search, 0, defaultPageSize, principal);</span>
+    }
+
+    @GetMapping(value = {&quot;/books&quot;, &quot;/books/&quot;}, params = {&quot;search&quot;, &quot;page&quot;, &quot;size&quot;})
+    public Page&lt;Book&gt; findBySearch(@RequestParam String search, @RequestParam int page,
+                                   @RequestParam int size, Principal principal) {
+
+<span class="pc bpc" id="L89" title="1 of 4 branches missed.">        if (null == search || search.trim().isEmpty()) {</span>
+<span class="fc" id="L90">            throw new IllegalArgumentException(&quot;Search query string cannot be empty&quot;);</span>
+        }
+
+<span class="pc bpc" id="L93" title="1 of 2 branches missed.">        if (size &gt; maxPageSize) {</span>
+<span class="fc" id="L94">            throw new IllegalArgumentException(PAGE_REQUEST_TOO_BIG_MESSAGE.formatted(maxPageSize));</span>
+        }
+
+<span class="nc" id="L97">        PageRequest pageObj = PageRequest.of(page, size);</span>
+<span class="nc" id="L98">        return bookRepository.searchForBooks(search, pageObj);</span>
+    }
+
+    @GetMapping(value = {&quot;/books&quot;, &quot;/books/&quot;}, params = {&quot;genre&quot;})
+    public Page&lt;Book&gt; findByGenre(@RequestParam String genre, Principal principal) {
+<span class="fc" id="L103">        return findByGenre(genre, 0, defaultPageSize, principal);</span>
+    }
+
+    @GetMapping(value = {&quot;/books&quot;, &quot;/books/&quot;}, params = {&quot;genre&quot;, &quot;page&quot;, &quot;size&quot;})
+    public Page&lt;Book&gt; findByGenre(@RequestParam String genre, @RequestParam int page,
+                                  @RequestParam int size, Principal principal) {
+
+<span class="pc bpc" id="L110" title="1 of 4 branches missed.">        if (null == genre || genre.trim().isEmpty()) {</span>
+<span class="fc" id="L111">            throw new IllegalArgumentException(&quot;Genre parameter cannot be empty&quot;);</span>
+        }
+
+<span class="fc bfc" id="L114" title="All 2 branches covered.">        if (size &gt; maxPageSize) {</span>
+<span class="fc" id="L115">            throw new IllegalArgumentException(PAGE_REQUEST_TOO_BIG_MESSAGE.formatted(maxPageSize));</span>
+        }
+
+<span class="fc" id="L118">        PageRequest pageObj = PageRequest.of(page, size);</span>
+<span class="fc" id="L119">        return bookRepository.findAllByGenreOrderByCreatedDateTimeDesc(pageObj, genre);</span>
+    }
+
+    @GetMapping(value = &quot;/books/stats&quot;)
+    public SummaryStats getSummaryStats() {
+<span class="fc" id="L124">        return statsService.getSummaryStats();</span>
+    }
+
+    @GetMapping(value = &quot;/books/genres&quot;)
+    public List&lt;BooksByGenre&gt; findBookGenres() {
+<span class="nc" id="L129">        return bookRepository.countBooksByGenre();</span>
+    }
+
+    @GetMapping(value = &quot;/books/authors&quot;)
+    public List&lt;BooksByAuthor&gt; findBookAuthors() {
+<span class="nc" id="L134">        return bookRepository.countBooksByAuthor();</span>
+    }
+
+    @GetMapping(value = {&quot;/books&quot;, &quot;/books/&quot;}, params = {&quot;rating&quot;})
+    public Page&lt;Book&gt; findByRating(@RequestParam String rating, Principal principal) {
+<span class="fc" id="L139">        return findByRating(rating, 0, defaultPageSize, principal);</span>
+    }
+
+    @GetMapping(value = {&quot;/books&quot;, &quot;/books/&quot;}, params = {&quot;rating&quot;, &quot;page&quot;, &quot;size&quot;})
+    public Page&lt;Book&gt; findByRating(@RequestParam String rating, @RequestParam int page,
+                                   @RequestParam int size, Principal principal) {
+
+<span class="pc bpc" id="L146" title="1 of 4 branches missed.">        if (null == rating || rating.trim().isEmpty()) {</span>
+<span class="fc" id="L147">            throw new IllegalArgumentException(&quot;Rating parameter cannot be empty&quot;);</span>
+        }
+
+<span class="fc" id="L150">        Book.Rating aRating = Book.Rating.getRatingByString(rating);</span>
+<span class="fc bfc" id="L151" title="All 2 branches covered.">        if (null == aRating) {</span>
+<span class="fc" id="L152">            throw new IllegalArgumentException(&quot;Supplied rating parameter not recognised&quot;);</span>
+        }
+
+<span class="fc bfc" id="L155" title="All 2 branches covered.">        if (size &gt; maxPageSize) {</span>
+<span class="fc" id="L156">            throw new IllegalArgumentException(PAGE_REQUEST_TOO_BIG_MESSAGE.formatted(maxPageSize));</span>
+        }
+
+<span class="fc" id="L159">        PageRequest pageObj = PageRequest.of(page, size);</span>
+<span class="fc" id="L160">        return bookRepository.findByRatingOrderByCreatedDateTimeDesc(pageObj, aRating);</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

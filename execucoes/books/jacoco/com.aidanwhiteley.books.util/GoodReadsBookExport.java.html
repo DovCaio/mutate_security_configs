@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GoodReadsBookExport.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Books Microservice</a> &gt; <a href="index.source.html" class="el_package">com.aidanwhiteley.books.util</a> &gt; <span class="el_source">GoodReadsBookExport.java</span></div><h1>GoodReadsBookExport.java</h1><pre class="source lang-java linenums">package com.aidanwhiteley.books.util;
+
+import com.aidanwhiteley.books.domain.Book;
+import com.aidanwhiteley.books.domain.googlebooks.IndustryIdentifiers;
+
+import java.time.LocalDateTime;
+
+/**
+ * I couldn't find any documentation of the GoodReads export format so this code mimics a couple of
+ * Gists found online and also the export / import functionality on StoryGraph.
+ */
+public class GoodReadsBookExport {
+
+    private static final String DELIMTER = &quot;,&quot;;
+    private static final String COMMA = &quot;,&quot;;
+    private static final String DOUBLE_QUOTE = &quot;\&quot;&quot;;
+    private static final String SPACE = &quot; &quot;;
+    private static final String EMPTY_FIELD = &quot;&quot;;
+
+    // Multiline string not used because of additional whitespace it can introduce
+    private static final String HEADER_ROW_PART1 = &quot;Book Id,Title,Author,Author l-f,Additional Authors,ISBN,ISBN13,My Rating,&quot;;
+    private static final String HEADER_ROW_PART2 = &quot;Average Rating,Publisher,Binding,Number of Pages,Year Published,&quot;;
+    private static final String HEADER_ROW_PART3 = &quot;Original Publication Year,Date Read,Date Added,Bookshelves,&quot;;
+    private static final String HEADER_ROW_PART4 = &quot;Bookshelves with positions,Exclusive Shelf,My Review,Spoiler,Private Notes,&quot;;
+    private static final String HEADER_ROW_PART5 = &quot;Read Count,Owned Copies&quot;;
+    private static final String HEADER_ROW = HEADER_ROW_PART1 + HEADER_ROW_PART2 + HEADER_ROW_PART3 + HEADER_ROW_PART4 + HEADER_ROW_PART5;
+
+    private GoodReadsBookExport() {
+        // Private - only static utility methods supported
+    }
+
+    public static String goodReadsExportHeaderRow() {
+<span class="fc" id="L33">        return removeNewLines(HEADER_ROW).trim();</span>
+    }
+
+    public static String goodReadsExportAsCsv(Book book) {
+
+<span class="fc" id="L38">        var bookExport = new StringBuilder();</span>
+<span class="fc" id="L39">        bookExport.append(book.getId()).append(DELIMTER);</span>
+<span class="fc" id="L40">        bookExport.append(encloseInDoubleQuotes(escapeDoubleQuote(book.getTitle()))).append(DELIMTER);</span>
+<span class="fc" id="L41">        bookExport.append(encloseInDoubleQuotes(escapeDoubleQuote(book.getAuthor()))).append(DELIMTER);</span>
+<span class="fc" id="L42">        bookExport.append(lastFirst(book.getAuthor())).append(DELIMTER);</span>
+        // Additional Authors not supported
+<span class="fc" id="L44">        bookExport.append(EMPTY_FIELD).append(DELIMTER);</span>
+        // The getIsbnNumbers method appends both ISBN and ISBN13 fields
+<span class="fc" id="L46">        bookExport = getIsbnNumbers(book, bookExport);</span>
+<span class="fc" id="L47">        bookExport.append(getRating(book)).append(DELIMTER);</span>
+        // Average rating not supported
+<span class="fc" id="L49">        bookExport.append(EMPTY_FIELD).append(DELIMTER);</span>
+        // Publisher not supported
+<span class="fc" id="L51">        bookExport.append(EMPTY_FIELD).append(DELIMTER);</span>
+        // Binding not supported
+<span class="fc" id="L53">        bookExport.append(EMPTY_FIELD).append(DELIMTER);</span>
+        // Number of pages not supported
+<span class="fc" id="L55">        bookExport.append(EMPTY_FIELD).append(DELIMTER);</span>
+        // Year published not supported
+<span class="fc" id="L57">        bookExport.append(EMPTY_FIELD).append(DELIMTER);</span>
+        // Original publication year not supported
+<span class="fc" id="L59">        bookExport.append(EMPTY_FIELD).append(DELIMTER);</span>
+        // We set both Date Read and Date Added to when the review was created on Cloudy
+<span class="fc" id="L61">        bookExport.append(getReviewCreatedData(book)).append(DELIMTER);</span>
+<span class="fc" id="L62">        bookExport.append(getReviewCreatedData(book)).append(DELIMTER);</span>
+        // Bookshelves not supported
+<span class="fc" id="L64">        bookExport.append(EMPTY_FIELD).append(DELIMTER);</span>
+        // Bookshelves with positions not supported
+<span class="fc" id="L66">        bookExport.append(EMPTY_FIELD).append(DELIMTER);</span>
+        // Exclusive shelf is hard coded to read
+<span class="fc" id="L68">        bookExport.append(&quot;read&quot;).append(DELIMTER);</span>
+        // Sigh - Good Reads don't appear to output the &quot;My Review&quot; field!
+<span class="fc" id="L70">        bookExport.append(EMPTY_FIELD).append(DELIMTER);</span>
+        // Spoiler shelf not supported
+<span class="fc" id="L72">        bookExport.append(EMPTY_FIELD).append(DELIMTER);</span>
+        // Private notes not supported
+<span class="fc" id="L74">        bookExport.append(EMPTY_FIELD).append(DELIMTER);</span>
+        // Read count and Owned copies always both defaulted to 1
+<span class="fc" id="L76">        bookExport.append(&quot;1&quot;).append(DELIMTER);</span>
+<span class="fc" id="L77">        bookExport.append(&quot;1&quot;);</span>
+
+<span class="fc" id="L79">        return bookExport.toString();</span>
+    }
+
+    private static String getReviewCreatedData(Book book) {
+<span class="pc bpc" id="L83" title="1 of 2 branches missed.">        if (book.getCreatedDateTime() != null) {</span>
+<span class="fc bfc" id="L84" title="All 2 branches covered.">            var day = book.getCreatedDateTime().getDayOfMonth() &lt; 10 ?</span>
+<span class="fc" id="L85">                    &quot;0&quot; + book.getCreatedDateTime().getDayOfMonth() : book.getCreatedDateTime().getDayOfMonth();</span>
+<span class="pc bpc" id="L86" title="1 of 2 branches missed.">            var month = book.getCreatedDateTime().getMonthValue() &lt; 10 ?</span>
+<span class="pc" id="L87">                    &quot;0&quot; + book.getCreatedDateTime().getMonthValue() : book.getCreatedDateTime().getMonthValue();</span>
+
+            // Good Reads follows US date pattern
+<span class="fc" id="L90">            return book.getCreatedDateTime().getYear() + &quot;/&quot; +</span>
+                    month + &quot;/&quot; +
+                    day;
+        } else {
+            // A very basic fallback implementation
+<span class="nc" id="L95">            return LocalDateTime.now().getYear() + &quot;/&quot; + LocalDateTime.now().getMonthValue() +</span>
+<span class="nc" id="L96">                    &quot;/&quot; + LocalDateTime.now().getDayOfMonth();</span>
+        }
+    }
+
+    private static String getRating(Book book) {
+<span class="fc" id="L101">        var rating = book.getRating();</span>
+        // Cloudy use a range of 0 to 4 where as Goodreads uses 1 to 5;
+<span class="fc" id="L103">        return (rating.getRatingLevel() + 1) + &quot;&quot;;</span>
+    }
+
+    // So here's an example of what these two wierd fields look like in an actual export
+    // from Good Reads
+    // ,&quot;=&quot;&quot;0752889516&quot;&quot;&quot;,&quot;=&quot;&quot;9780752889511&quot;&quot;&quot;,
+    private static StringBuilder getIsbnNumbers(Book book, StringBuilder bookExport) {
+<span class="pc bpc" id="L110" title="1 of 4 branches missed.">        if (book.getGoogleBookDetails() != null &amp;&amp; book.getGoogleBookDetails().getVolumeInfo() != null</span>
+<span class="pc bpc" id="L111" title="1 of 2 branches missed.">            &amp;&amp; book.getGoogleBookDetails().getVolumeInfo().getIndustryIdentifiers() != null) {</span>
+<span class="fc" id="L112">            var isbn10 = book.getGoogleBookDetails().getVolumeInfo().getIndustryIdentifiers().</span>
+<span class="fc" id="L113">                    stream().filter(s -&gt; s.getType().equals(IndustryIdentifiers.TYPE_ISBN_10)).</span>
+<span class="fc" id="L114">                    map(s -&gt; s.getIdentifier()).</span>
+<span class="fc" id="L115">                    findFirst().orElse(&quot;&quot;);</span>
+<span class="fc" id="L116">            bookExport.append(&quot;\&quot;=\&quot;\&quot;&quot;).append(isbn10).append(&quot;\&quot;\&quot;\&quot;&quot;).append(DELIMTER);</span>
+
+<span class="fc" id="L118">            var isbn13 = book.getGoogleBookDetails().getVolumeInfo().getIndustryIdentifiers().</span>
+<span class="fc" id="L119">                    stream().filter(s -&gt; s.getType().equals(IndustryIdentifiers.TYPE_ISBN_13)).</span>
+<span class="fc" id="L120">                    map(s -&gt; s.getIdentifier()).</span>
+<span class="fc" id="L121">                    findFirst().orElse(&quot;&quot;);</span>
+<span class="fc" id="L122">            bookExport.append(&quot;\&quot;=\&quot;\&quot;&quot;).append(isbn13).append(&quot;\&quot;\&quot;\&quot;&quot;).append(DELIMTER);</span>
+        }
+<span class="fc" id="L124">        return bookExport;</span>
+    }
+
+    private static String encloseInDoubleQuotes(String field) {
+<span class="pc bpc" id="L128" title="1 of 2 branches missed.">        if (field == null) {</span>
+<span class="nc" id="L129">            return SPACE;</span>
+        }
+
+<span class="fc bfc" id="L132" title="All 2 branches covered.">        if (field.contains(DELIMTER)) {</span>
+<span class="fc" id="L133">            return DOUBLE_QUOTE + field.replace(DOUBLE_QUOTE, &quot;&quot;) + DOUBLE_QUOTE;</span>
+        } else {
+<span class="fc" id="L135">            return field;</span>
+        }
+    }
+
+    private static String escapeDoubleQuote(String field) {
+<span class="pc bpc" id="L140" title="1 of 2 branches missed.">        if (field == null) {</span>
+<span class="nc" id="L141">            return SPACE;</span>
+        }
+
+<span class="fc" id="L144">        return field.replace(&quot;\&quot;&quot;, &quot;\&quot;\&quot;&quot;);</span>
+    }
+
+    private static String removeNewLines(String field) {
+<span class="fc" id="L148">        var output = field.replace(&quot;\r\n&quot;, SPACE);</span>
+<span class="fc" id="L149">        return output.replace(&quot;\n&quot;, SPACE);</span>
+    }
+
+    private static String lastFirst(String field) {
+<span class="pc bpc" id="L153" title="2 of 4 branches missed.">        if (field == null || !field.contains(SPACE)) {</span>
+<span class="nc" id="L154">            return SPACE;</span>
+        }
+<span class="fc" id="L156">        int lastSpace = field.lastIndexOf(SPACE);</span>
+<span class="fc" id="L157">        return encloseInDoubleQuotes(field.substring(lastSpace).trim() + COMMA +</span>
+<span class="fc" id="L158">                SPACE + field.substring(0, lastSpace));</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

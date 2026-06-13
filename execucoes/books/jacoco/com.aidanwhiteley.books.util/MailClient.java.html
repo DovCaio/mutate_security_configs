@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MailClient.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Books Microservice</a> &gt; <a href="index.source.html" class="el_package">com.aidanwhiteley.books.util</a> &gt; <span class="el_source">MailClient.java</span></div><h1>MailClient.java</h1><pre class="source lang-java linenums">package com.aidanwhiteley.books.util;
+
+import com.aidanwhiteley.books.domain.User;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mail.MailException;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.mail.javamail.MimeMessagePreparator;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+@Service
+public class MailClient {
+
+<span class="fc" id="L18">    private static final Logger LOGGER = LoggerFactory.getLogger(MailClient.class);</span>
+
+    private static final String SPACES = &quot;    &quot;;
+    private static final String LINE_SEPARATOR = &quot;\r\n&quot;;
+
+    private final JavaMailSender mailSender;
+
+    @Value(&quot;${books.users.registrationAdminEmail.emailTitle}&quot;)
+    private String registrationAdminEmailTitle;
+
+    @Value(&quot;${books.users.registrationAdminEmail.emailContent}&quot;)
+    private String registrationAdminEmailContent;
+
+    @Value(&quot;${books.users.registrationAdminEmail.emailFrom}&quot;)
+    private String registrationAdminEmailFrom;
+
+    @Value(&quot;${books.users.registrationAdminEmail.emailTo}&quot;)
+    private String registrationAdminEmailTo;
+
+<span class="fc" id="L37">    public MailClient(JavaMailSender mailSender) {</span>
+<span class="fc" id="L38">        this.mailSender = mailSender;</span>
+<span class="fc" id="L39">    }</span>
+
+    public boolean sendEmailsToAdminsForNewUsers(List&lt;User&gt; newUsers) {
+<span class="fc" id="L42">        boolean emailSent = true;</span>
+
+<span class="fc" id="L44">        MimeMessagePreparator messagePreparator = mimeMessage -&gt; {</span>
+<span class="fc" id="L45">            MimeMessageHelper messageHelper = new MimeMessageHelper(mimeMessage);</span>
+
+<span class="fc" id="L47">            messageHelper.setFrom(registrationAdminEmailFrom);</span>
+<span class="fc" id="L48">            messageHelper.setTo(registrationAdminEmailTo);</span>
+<span class="fc" id="L49">            messageHelper.setSubject(registrationAdminEmailTitle);</span>
+<span class="fc" id="L50">            messageHelper.setText(prepareAdminNewUsersNotificationEmailContent(newUsers));</span>
+<span class="fc" id="L51">        };</span>
+
+        try {
+<span class="fc" id="L54">            mailSender.send(messagePreparator);</span>
+<span class="nc" id="L55">        } catch (MailException me) {</span>
+<span class="nc" id="L56">            emailSent = false;</span>
+<span class="nc" id="L57">            LOGGER.error(&quot;Failed to send user registration emails for {}&quot;, newUsers, me);</span>
+<span class="fc" id="L58">        }</span>
+
+<span class="fc" id="L60">        return emailSent;</span>
+    }
+
+    private String prepareAdminNewUsersNotificationEmailContent(List&lt;User&gt; newUsers) {
+<span class="fc" id="L64">        StringBuilder message = new StringBuilder();</span>
+<span class="fc" id="L65">        message.append(registrationAdminEmailContent).append(LINE_SEPARATOR).append(LINE_SEPARATOR);</span>
+<span class="fc" id="L66">        newUsers.forEach(s -&gt; message.append(s.getFullName()).append(SPACES).append(s.getEmail()).</span>
+<span class="fc" id="L67">                append(SPACES).append(s.getLink()).append(LINE_SEPARATOR));</span>
+<span class="fc" id="L68">        return message.toString();</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

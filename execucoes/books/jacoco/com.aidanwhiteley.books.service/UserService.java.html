@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>UserService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Books Microservice</a> &gt; <a href="index.source.html" class="el_package">com.aidanwhiteley.books.service</a> &gt; <span class="el_source">UserService.java</span></div><h1>UserService.java</h1><pre class="source lang-java linenums">package com.aidanwhiteley.books.service;
+
+import com.aidanwhiteley.books.domain.User;
+import com.aidanwhiteley.books.repository.UserRepository;
+import com.aidanwhiteley.books.util.Oauth2AuthenticationUtils;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.util.*;
+
+import static com.aidanwhiteley.books.domain.User.AuthenticationProvider.*;
+
+@Service
+public class UserService {
+
+    private static final String EMAIL = &quot;email&quot;;
+    private static final String PICTURE = &quot;picture&quot;;
+
+<span class="fc" id="L27">    private static final Logger LOGGER = LoggerFactory.getLogger(UserService.class);</span>
+
+    private static final String LOCAL_ACTUATOR_USER = &quot;LOCAL_ACTUATOR_USER&quot;;
+    private static final String FIRST_NAME_PROPERTY = &quot;first_name&quot;;
+    private static final String LAST_NAME_PROPERTY = &quot;last_name&quot;;
+    private static final String NAME_PROPERTY = &quot;name&quot;;
+
+    private final UserRepository userRepository;
+    private final Oauth2AuthenticationUtils authUtils;
+
+    @Value(&quot;${books.users.default.admin.email}&quot;)
+    private String defaultAdminEmail;
+
+    @Setter
+    @Value(&quot;${books.users.allow.actuator.user.creation}&quot;)
+    private boolean allowActuatorUserCreation;
+
+    @Autowired
+<span class="fc" id="L45">    public UserService(UserRepository userRepository, Oauth2AuthenticationUtils oauth2AuthenticationUtils) {</span>
+<span class="fc" id="L46">        this.userRepository = userRepository;</span>
+<span class="fc" id="L47">        this.authUtils = oauth2AuthenticationUtils;</span>
+<span class="fc" id="L48">    }</span>
+
+    public User createOrUpdateUser(OAuth2AuthenticationToken authentication) {
+
+<span class="fc" id="L52">        Map&lt;String, Object&gt; userDetails = authUtils.getUserDetails(authentication);</span>
+<span class="fc" id="L53">        User.AuthenticationProvider provider = authUtils.getAuthenticationProvider(authentication);</span>
+<span class="fc" id="L54">        Optional&lt;User&gt; user = authUtils.getUserIfExists(authentication);</span>
+
+<span class="fc" id="L56">        return user.map(user1 -&gt; updateUser(</span>
+<span class="fc" id="L57">                UpdateUserDetails.builder().</span>
+<span class="fc" id="L58">                        userDetails(userDetails).</span>
+<span class="fc" id="L59">                        user(user1).</span>
+<span class="fc" id="L60">                        provider(provider).</span>
+<span class="fc" id="L61">                        build())</span>
+<span class="fc" id="L62">        ).orElseGet(() -&gt; createUser(userDetails, provider));</span>
+    }
+
+    public Optional&lt;User&gt; createOrUpdateActuatorUser() {
+
+<span class="fc bfc" id="L67" title="All 2 branches covered.">        if (allowActuatorUserCreation) {</span>
+<span class="fc" id="L68">            Map&lt;String, Object&gt; userDetails = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L69">            User.AuthenticationProvider provider = LOCAL;</span>
+<span class="fc" id="L70">            userDetails.put(FIRST_NAME_PROPERTY, &quot;Actuator&quot;);</span>
+<span class="fc" id="L71">            userDetails.put(LAST_NAME_PROPERTY, &quot;User&quot;);</span>
+<span class="fc" id="L72">            userDetails.put(NAME_PROPERTY, &quot;Actuator User&quot;);</span>
+
+<span class="fc" id="L74">            List&lt;User&gt; users = userRepository.</span>
+<span class="fc" id="L75">                    findAllByAuthenticationServiceIdAndAuthProvider(LOCAL_ACTUATOR_USER, LOCAL.toString());</span>
+<span class="fc bfc" id="L76" title="All 2 branches covered.">            if (users.isEmpty()) {</span>
+<span class="fc" id="L77">                return Optional.of(createUser(userDetails, provider));</span>
+            } else {
+<span class="fc" id="L79">                return Optional.of(updateUser(</span>
+<span class="fc" id="L80">                        UpdateUserDetails.builder().userDetails(userDetails).</span>
+<span class="fc" id="L81">                                user(users.getFirst()).provider(provider).build()));</span>
+            }
+        } else {
+<span class="fc" id="L84">            return Optional.empty();</span>
+        }
+    }
+
+    private User createUser(Map&lt;String, Object&gt; userDetails, User.AuthenticationProvider provider) {
+
+        User user;
+<span class="fc" id="L91">        LocalDateTime now = LocalDateTime.now();</span>
+
+<span class="pc bpc" id="L93" title="1 of 4 branches missed.">        switch (provider) {</span>
+            case GOOGLE: {
+<span class="fc" id="L95">                user = createGoogleUser(userDetails, now);</span>
+<span class="fc" id="L96">                break;</span>
+            }
+            case FACEBOOK: {
+<span class="fc" id="L99">                user = createFacebookUser(userDetails);</span>
+<span class="fc" id="L100">                break;</span>
+            }
+            case LOCAL: {
+<span class="fc" id="L103">                user = createLocalActuatorUser(userDetails, now);</span>
+<span class="fc" id="L104">                break;</span>
+            }
+            default: {
+<span class="nc" id="L107">                LOGGER.error(&quot;Unexpected oauth user type {} in createUser&quot;, provider);</span>
+<span class="nc" id="L108">                throw new IllegalArgumentException(&quot;Unexpected oauth type: &quot; + provider);</span>
+            }
+        }
+
+<span class="fc" id="L112">        userRepository.insert(user);</span>
+<span class="fc" id="L113">        LOGGER.info(&quot;User created in repository: {}&quot;, user);</span>
+<span class="fc" id="L114">        return user;</span>
+    }
+
+    private User createFacebookUser(Map&lt;String, Object&gt; userDetails) {
+        User user;
+<span class="fc" id="L119">        user = User.builder().authenticationServiceId((String) userDetails.get(&quot;id&quot;)).</span>
+<span class="fc" id="L120">                firstName((String) userDetails.get(FIRST_NAME_PROPERTY)).</span>
+<span class="fc" id="L121">                lastName((String) userDetails.get(LAST_NAME_PROPERTY)).</span>
+<span class="fc" id="L122">                fullName((String) userDetails.get(NAME_PROPERTY)).</span>
+<span class="fc" id="L123">                link((String) userDetails.get(&quot;link&quot;)).</span>
+<span class="fc" id="L124">                email((String) userDetails.get(EMAIL)).</span>
+<span class="fc" id="L125">                lastLogon(LocalDateTime.now()).</span>
+<span class="fc" id="L126">                firstLogon(LocalDateTime.now()).</span>
+<span class="fc" id="L127">                authProvider(FACEBOOK).</span>
+<span class="fc" id="L128">                build();</span>
+<span class="fc" id="L129">        setDefaultAdminUser(user);</span>
+<span class="fc" id="L130">        user.addRole(User.Role.ROLE_USER);</span>
+
+<span class="fc" id="L132">        String url = extractFaceBookPictureUrl(userDetails);</span>
+<span class="pc bpc" id="L133" title="1 of 2 branches missed.">        if (url != null) {</span>
+<span class="nc" id="L134">            user.setPicture(url);</span>
+        }
+<span class="fc" id="L136">        return user;</span>
+    }
+
+    private User createGoogleUser(Map&lt;String, Object&gt; userDetails, LocalDateTime now) {
+        User user;
+<span class="fc" id="L141">        user = User.builder().authenticationServiceId((String) userDetails.get(&quot;sub&quot;)).</span>
+<span class="fc" id="L142">                firstName((String) userDetails.get(&quot;given_name&quot;)).</span>
+<span class="fc" id="L143">                lastName((String) userDetails.get(&quot;family_name&quot;)).</span>
+<span class="fc" id="L144">                fullName((String) userDetails.get(NAME_PROPERTY)).</span>
+<span class="fc" id="L145">                link((String) userDetails.get(&quot;link&quot;)).</span>
+<span class="fc" id="L146">                picture((String) userDetails.get(PICTURE)).</span>
+<span class="fc" id="L147">                email((String) userDetails.get(EMAIL)).</span>
+<span class="fc" id="L148">                lastLogon(now).</span>
+<span class="fc" id="L149">                firstLogon(now).</span>
+<span class="fc" id="L150">                authProvider(GOOGLE).</span>
+<span class="fc" id="L151">                build();</span>
+
+<span class="fc" id="L153">        setDefaultAdminUser(user);</span>
+<span class="fc" id="L154">        user.addRole(User.Role.ROLE_USER);</span>
+<span class="fc" id="L155">        return user;</span>
+    }
+
+    private User createLocalActuatorUser(Map&lt;String, Object&gt; userDetails, LocalDateTime now) {
+        User user;
+<span class="fc" id="L160">        user = User.builder().authenticationServiceId(LOCAL_ACTUATOR_USER).</span>
+<span class="fc" id="L161">                firstName((String) userDetails.get(FIRST_NAME_PROPERTY)).</span>
+<span class="fc" id="L162">                lastName((String) userDetails.get(LAST_NAME_PROPERTY)).</span>
+<span class="fc" id="L163">                fullName((String) userDetails.get(NAME_PROPERTY)).</span>
+<span class="fc" id="L164">                lastLogon(now).</span>
+<span class="fc" id="L165">                firstLogon(now).</span>
+<span class="fc" id="L166">                authProvider(LOCAL).</span>
+<span class="fc" id="L167">                build();</span>
+
+<span class="fc" id="L169">        user.addRole(User.Role.ROLE_ACTUATOR);</span>
+<span class="fc" id="L170">        return user;</span>
+    }
+
+    private User updateUser(UpdateUserDetails updateUserDetails) {
+
+<span class="pc bpc" id="L175" title="1 of 4 branches missed.">        switch (updateUserDetails.getProvider()) {</span>
+            case GOOGLE: {
+<span class="fc" id="L177">                updateGoogleUser(updateUserDetails.getUserDetails(), updateUserDetails.getUser());</span>
+<span class="fc" id="L178">                break;</span>
+            }
+            case FACEBOOK: {
+<span class="fc" id="L181">                updateFacebookUser(updateUserDetails.getUserDetails(), updateUserDetails.getUser());</span>
+<span class="fc" id="L182">                break;</span>
+            }
+            case LOCAL: {
+<span class="fc" id="L185">                updateLocalActuatorUser(updateUserDetails.getUser());</span>
+<span class="fc" id="L186">                break;</span>
+            }
+            default: {
+<span class="nc" id="L189">                LOGGER.error(&quot;Unexpected oauth user type {}&quot;, updateUserDetails.getProvider());</span>
+<span class="nc" id="L190">                throw new IllegalArgumentException(&quot;Unexpected oauth type: %s&quot;.formatted(updateUserDetails.getProvider()));</span>
+            }
+        }
+
+<span class="fc" id="L194">        userRepository.save(updateUserDetails.getUser());</span>
+<span class="fc" id="L195">        LOGGER.info(&quot;User updated in repository: {}&quot;, updateUserDetails.getUser());</span>
+<span class="fc" id="L196">        return updateUserDetails.getUser();</span>
+    }
+
+    private void updateFacebookUser(Map&lt;String, Object&gt; userDetails, User user) {
+<span class="fc" id="L200">        user.setFirstName((String) userDetails.get(FIRST_NAME_PROPERTY));</span>
+<span class="fc" id="L201">        user.setLastName((String) userDetails.get(LAST_NAME_PROPERTY));</span>
+<span class="fc" id="L202">        user.setFullName((String) userDetails.get(NAME_PROPERTY));</span>
+<span class="fc" id="L203">        user.setLink((String) userDetails.get(&quot;link&quot;));</span>
+<span class="fc" id="L204">        String url = extractFaceBookPictureUrl(userDetails);</span>
+<span class="pc bpc" id="L205" title="1 of 2 branches missed.">        if (url != null) {</span>
+<span class="nc" id="L206">            user.setPicture(url);</span>
+        }
+<span class="fc" id="L208">        user.setEmail((String) userDetails.get(EMAIL));</span>
+<span class="fc" id="L209">        user.setLastLogon(LocalDateTime.now());</span>
+<span class="fc" id="L210">    }</span>
+
+    private void updateGoogleUser(Map&lt;String, Object&gt; userDetails, User user) {
+<span class="fc" id="L213">        user.setFirstName((String) userDetails.get(&quot;given_name&quot;));</span>
+<span class="fc" id="L214">        user.setLastName((String) userDetails.get(&quot;family_name&quot;));</span>
+<span class="fc" id="L215">        user.setFullName((String) userDetails.get(NAME_PROPERTY));</span>
+<span class="fc" id="L216">        user.setLink((String) userDetails.get(&quot;link&quot;));</span>
+<span class="fc" id="L217">        user.setPicture((String) userDetails.get(PICTURE));</span>
+<span class="fc" id="L218">        user.setEmail((String) userDetails.get(EMAIL));</span>
+<span class="fc" id="L219">        user.setLastLogon(LocalDateTime.now());</span>
+<span class="fc" id="L220">    }</span>
+
+    private void updateLocalActuatorUser(User user) {
+<span class="fc" id="L223">        user.setLastLogon(LocalDateTime.now());</span>
+<span class="fc" id="L224">    }</span>
+
+    private void setDefaultAdminUser(User user) {
+<span class="pc bpc" id="L227" title="3 of 4 branches missed.">        if (defaultAdminEmail != null &amp;&amp; defaultAdminEmail.equals(user.getEmail())) {</span>
+<span class="nc" id="L228">            user.addRole(User.Role.ROLE_EDITOR);</span>
+<span class="nc" id="L229">            user.addRole(User.Role.ROLE_ACTUATOR);</span>
+<span class="nc" id="L230">            user.addRole(User.Role.ROLE_ADMIN);</span>
+        }
+<span class="fc" id="L232">    }</span>
+
+    private String extractFaceBookPictureUrl(Map&lt;String, Object&gt; userDetails) {
+<span class="pc bpc" id="L235" title="1 of 2 branches missed.">        if (userDetails.get(PICTURE) instanceof LinkedHashMap) {</span>
+            @SuppressWarnings(&quot;unchecked&quot;)
+<span class="nc" id="L237">            LinkedHashMap&lt;String, Object&gt; picture = (LinkedHashMap&lt;String, Object&gt;) userDetails.get(PICTURE);</span>
+<span class="nc bnc" id="L238" title="All 2 branches missed.">            if (picture.get(&quot;data&quot;) instanceof LinkedHashMap) {</span>
+                @SuppressWarnings(&quot;unchecked&quot;)
+<span class="nc" id="L240">                LinkedHashMap&lt;String, Object&gt; data = (LinkedHashMap&lt;String, Object&gt;) picture.get(&quot;data&quot;);</span>
+<span class="nc" id="L241">                return (String) data.get(&quot;url&quot;);</span>
+            }
+        }
+<span class="fc" id="L244">        return null;</span>
+    }
+
+    @Builder
+    @Getter
+    private static class UpdateUserDetails {
+        private final Map&lt;String, Object&gt; userDetails;
+        private final User user;
+        private final User.AuthenticationProvider provider;
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

@@ -1,0 +1,263 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>WebSecurityAutoConfig.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">42 REST Secure Spring Boot Starter</a> &gt; <a href="index.source.html" class="el_package">nl._42.restsecure.autoconfigure</a> &gt; <span class="el_source">WebSecurityAutoConfig.java</span></div><h1>WebSecurityAutoConfig.java</h1><pre class="source lang-java linenums">package nl._42.restsecure.autoconfigure;
+
+import static org.springframework.http.HttpMethod.DELETE;
+import static org.springframework.security.config.Customizer.withDefaults;
+import static org.springframework.security.config.http.SessionCreationPolicy.ALWAYS;
+import static org.springframework.security.web.csrf.CookieCsrfTokenRepository.withHttpOnlyFalse;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import lombok.extern.slf4j.Slf4j;
+import nl._42.restsecure.autoconfigure.authentication.AbstractRestAuthenticationSuccessHandler;
+import nl._42.restsecure.autoconfigure.authentication.AbstractUserDetailsService;
+import nl._42.restsecure.autoconfigure.authentication.AuthenticationController;
+import nl._42.restsecure.autoconfigure.authentication.AuthenticationResultProvider;
+import nl._42.restsecure.autoconfigure.authentication.DefaultAuthenticationResultProvider;
+import nl._42.restsecure.autoconfigure.authentication.DefaultUserProvider;
+import nl._42.restsecure.autoconfigure.authentication.RegisteredUser;
+import nl._42.restsecure.autoconfigure.authentication.UserProvider;
+import nl._42.restsecure.autoconfigure.authentication.mfa.MfaAuthenticationProvider;
+import nl._42.restsecure.autoconfigure.errorhandling.DefaultLoginAuthenticationExceptionHandler;
+import nl._42.restsecure.autoconfigure.errorhandling.GenericErrorHandler;
+import nl._42.restsecure.autoconfigure.errorhandling.LoginAuthenticationExceptionHandler;
+import nl._42.restsecure.autoconfigure.errorhandling.RestAccessDeniedHandler;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.AutoConfigureAfter;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.webmvc.autoconfigure.WebMvcAutoConfiguration;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
+import org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.RememberMeServices;
+import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
+import org.springframework.security.web.authentication.logout.LogoutFilter;
+import org.springframework.security.web.context.DelegatingSecurityContextRepository;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
+import org.springframework.security.web.context.RequestAttributeSecurityContextRepository;
+import org.springframework.security.web.context.SecurityContextRepository;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.csrf.CsrfTokenRepository;
+import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
+import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
+
+/**
+ * Auto-configures Spring Web Security with a customized UserDetailsService for internal users storage or with crowd-integration-springsecurity for external crowd authentication.
+ * Spring Method Security is enabled: You can make use of `@PreAuthorize` and `@PostAuthorize`.
+ * Customizable authentication endpoints provided:
+ * POST `/authentication` - to be able to login clients should provide a json request body like `{ username: 'user@email.com', password: 'secret'}`.
+ * GET `/authentication/current` - to obtain the current logged in user
+ */
+<span class="fc" id="L65">@Slf4j</span>
+@Configuration
+@AutoConfigureAfter(WebMvcAutoConfiguration.class)
+@ComponentScan(basePackageClasses = { AuthenticationController.class, GenericErrorHandler.class })
+@EnableWebSecurity
+@EnableMethodSecurity
+public class WebSecurityAutoConfig {
+    private final RestAccessDeniedHandler accessDeniedHandler;
+
+    private AbstractRestAuthenticationSuccessHandler&lt;? extends RegisteredUser&gt; authenticationSuccessHandler;
+    private AbstractUserDetailsService&lt;? extends RegisteredUser&gt; userDetailsService;
+<span class="fc" id="L76">    private List&lt;AuthenticationProvider&gt; authProviders = new ArrayList&lt;&gt;();</span>
+    private RequestAuthorizationCustomizer authCustomizer;
+    private HttpSecurityCustomizer httpCustomizer;
+    private RememberMeServices rememberMeServices;
+
+    @Autowired(required = false)
+    public void setAuthenticationSuccessHandler(
+            AbstractRestAuthenticationSuccessHandler&lt;? extends RegisteredUser&gt; authenticationSuccessHandler) {
+<span class="fc" id="L84">        this.authenticationSuccessHandler = authenticationSuccessHandler;</span>
+<span class="fc" id="L85">    }</span>
+
+    @Autowired(required = false)
+    public void setUserDetailsService(
+            AbstractUserDetailsService&lt;? extends RegisteredUser&gt; userDetailsService) {
+<span class="fc" id="L90">        this.userDetailsService = userDetailsService;</span>
+<span class="fc" id="L91">    }</span>
+
+    @Autowired(required = false)
+    public void setAuthProviders(List&lt;AuthenticationProvider&gt; authProviders) {
+<span class="fc" id="L95">        this.authProviders = authProviders;</span>
+<span class="fc" id="L96">    }</span>
+
+    @Autowired(required = false)
+    public void setAuthCustomizer(RequestAuthorizationCustomizer authCustomizer) {
+<span class="fc" id="L100">        this.authCustomizer = authCustomizer;</span>
+<span class="fc" id="L101">    }</span>
+
+    @Autowired(required = false)
+    public void setHttpCustomizer(HttpSecurityCustomizer httpCustomizer) {
+<span class="fc" id="L105">        this.httpCustomizer = httpCustomizer;</span>
+<span class="fc" id="L106">    }</span>
+
+    @Autowired(required = false)
+    public void setRememberMeServices(RememberMeServices rememberMeServices) {
+<span class="fc" id="L110">        this.rememberMeServices = rememberMeServices;</span>
+<span class="fc" id="L111">    }</span>
+
+<span class="fc" id="L113">    public WebSecurityAutoConfig(RestAccessDeniedHandler accessDeniedHandler) {</span>
+<span class="fc" id="L114">        this.accessDeniedHandler = accessDeniedHandler;</span>
+<span class="fc" id="L115">    }</span>
+
+    /**
+     * Adds a {@link BCryptPasswordEncoder} to the {@link ApplicationContext} if no {@link PasswordEncoder} bean is found already.
+     *
+     * @return PasswordEncoder
+     */
+    @Bean
+    @ConditionalOnBean(AbstractUserDetailsService.class)
+    @ConditionalOnMissingBean(PasswordEncoder.class)
+    public PasswordEncoder passwordEncoder() {
+<span class="fc" id="L126">        log.info(&quot;Adding default BCryptPasswordEncoder to ApplicationContext.&quot;);</span>
+<span class="fc" id="L127">        return new BCryptPasswordEncoder();</span>
+    }
+
+    /**
+     * Adds an {@link UserProvider} to the {@link ApplicationContext} if no {@link UserProvider} bean is found already.
+     *
+     * @return UserMapper
+     */
+    @Bean
+    @ConditionalOnMissingBean(UserProvider.class)
+    public UserProvider userProvider() {
+<span class="fc" id="L138">        return new DefaultUserProvider();</span>
+    }
+
+    @Bean
+    @ConditionalOnMissingBean(LoginAuthenticationExceptionHandler.class)
+    public LoginAuthenticationExceptionHandler loginExceptionHandler(GenericErrorHandler errorHandler) {
+<span class="fc" id="L144">        return new DefaultLoginAuthenticationExceptionHandler(errorHandler);</span>
+    }
+
+    @Bean
+    @ConditionalOnMissingBean(WebSecurityCustomizer.class)
+    public WebSecurityCustomizer webSecurityCustomizer() {
+<span class="fc" id="L150">        return web -&gt; log.info(&quot;No WebSecurityCustomizer bean found in ApplicationContext, no custom configuring of WebSecurity object.&quot;);</span>
+    }
+
+    /**
+     * Adds an {@link AuthenticationResultProvider} to the {@link ApplicationContext} if no {@link AuthenticationResultProvider} bean is found already.
+     *
+     * @return AuthenticationResultProvider
+     */
+    @Bean
+    @ConditionalOnMissingBean(AuthenticationResultProvider.class)
+    public AuthenticationResultProvider&lt;RegisteredUser&gt; authenticationResultProvider() {
+<span class="fc" id="L161">        return new DefaultAuthenticationResultProvider();</span>
+    }
+
+    @Bean
+    @ConditionalOnMissingBean(AuthenticationManager.class)
+    public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
+<span class="fc" id="L167">        AuthenticationManagerBuilder auth = http.getSharedObject(AuthenticationManagerBuilder.class);</span>
+
+        // If the MfaAuthenticationProvider is configured, do *not* register the userDetailsService. This because the DaoAuthenticationProvider it creates would bypass the MFA.
+<span class="fc bfc" id="L170" title="All 4 branches covered.">        if (userDetailsService != null &amp;&amp; !isMfaAuthenticationProviderConfigured()) {</span>
+<span class="fc" id="L171">            log.info(&quot;Found UserDetailService in ApplicationContext. Setting up a DaoAuthenticationProvider with this UserDetailService&quot;);</span>
+<span class="fc" id="L172">            auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());</span>
+        }
+
+<span class="fc bfc" id="L175" title="All 2 branches covered.">        if (!authProviders.isEmpty()) {</span>
+<span class="fc" id="L176">            log.info(&quot;Found AuthenticationProvider(s) in ApplicationContext.&quot;);</span>
+<span class="fc" id="L177">            authProviders.forEach(authProvider -&gt; {</span>
+<span class="fc" id="L178">                log.info(&quot;\t Registering '{}' as authentication provider.&quot;, authProvider.getClass().getSimpleName());</span>
+<span class="fc" id="L179">                auth.authenticationProvider(authProvider);</span>
+<span class="fc" id="L180">            });</span>
+        }
+<span class="pc bpc" id="L182" title="1 of 4 branches missed.">        if (userDetailsService == null &amp;&amp; authProviders.isEmpty()) {</span>
+<span class="nc" id="L183">            throw new IllegalStateException(</span>
+                &quot;Cannot configure security; either a UserDetailsService or AuthenticationProvider bean must be present.&quot;
+            );
+        }
+<span class="fc" id="L187">        return auth.build();</span>
+    }
+
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http, LoginAuthenticationExceptionHandler exceptionHandler, AuthenticationManager authenticationManager) throws Exception {
+<span class="fc" id="L192">        RestAuthenticationFilter restAuthenticationFilter = new RestAuthenticationFilter(exceptionHandler, authenticationManager);</span>
+<span class="fc" id="L193">        http.with(new RestAuthenticationFilterConfigurer&lt;&gt;(restAuthenticationFilter, rememberMeServices, authenticationSuccessHandler), withDefaults())</span>
+<span class="fc" id="L194">            .securityContext(scc -&gt; scc.securityContextRepository(securityContextRepository()))</span>
+<span class="fc" id="L195">            .addFilterAfter(restAuthenticationFilter, LogoutFilter.class)</span>
+<span class="fc" id="L196">            .sessionManagement(smc -&gt; smc.sessionCreationPolicy(ALWAYS))</span>
+<span class="fc" id="L197">            .authenticationManager(authenticationManager)</span>
+<span class="fc" id="L198">            .authorizeHttpRequests(urlRegistry -&gt; {</span>
+<span class="fc" id="L199">                urlRegistry.requestMatchers(&quot;/authentication&quot;).permitAll();</span>
+<span class="fc" id="L200">                customize(urlRegistry)</span>
+<span class="fc" id="L201">                        .anyRequest().fullyAuthenticated();</span>
+<span class="fc" id="L202">            })</span>
+<span class="fc" id="L203">            .exceptionHandling(exceptionHandling -&gt; exceptionHandling.accessDeniedHandler(accessDeniedHandler)</span>
+<span class="fc" id="L204">                    .authenticationEntryPoint(accessDeniedHandler))</span>
+<span class="fc" id="L205">            .logout(logoutConfigurer -&gt; logoutConfigurer.logoutRequestMatcher(</span>
+<span class="fc" id="L206">                    PathPatternRequestMatcher.withDefaults().matcher(DELETE, &quot;/authentication&quot;))</span>
+<span class="fc" id="L207">                    .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler()))</span>
+<span class="fc" id="L208">            .csrf(csrfConfigurer -&gt; csrfConfigurer.csrfTokenRequestHandler(csrfRequestHandler())</span>
+<span class="fc" id="L209">                    .csrfTokenRepository(csrfTokenRepository()));</span>
+<span class="fc" id="L210">        return customize(http)</span>
+<span class="fc" id="L211">                .build();</span>
+    }
+
+    @Bean
+    @ConditionalOnMissingBean(SecurityContextRepository.class)
+    public SecurityContextRepository securityContextRepository() {
+<span class="fc" id="L217">        return new DelegatingSecurityContextRepository(</span>
+                new RequestAttributeSecurityContextRepository(),
+                new HttpSessionSecurityContextRepository()
+        );
+    }
+
+    private AuthorizeHttpRequestsConfigurer&lt;HttpSecurity&gt;.AuthorizationManagerRequestMatcherRegistry customize(
+            AuthorizeHttpRequestsConfigurer&lt;HttpSecurity&gt;.AuthorizationManagerRequestMatcherRegistry urlRegistry) {
+<span class="fc bfc" id="L225" title="All 2 branches covered.">        if (authCustomizer != null) {</span>
+<span class="fc" id="L226">            log.info(&quot;Found RequestAuthorization bean in ApplicationContext, custom configuring of urlRegistry object started.&quot;);</span>
+<span class="fc" id="L227">            return authCustomizer.customize(urlRegistry);</span>
+        } else {
+<span class="fc" id="L229">            log.info(&quot;No RequestAuthorization bean found in ApplicationContext, no custom configuring of urlRegistry object.&quot;);</span>
+        }
+<span class="fc" id="L231">        return urlRegistry;</span>
+    }
+
+    private HttpSecurity customize(HttpSecurity http) throws Exception {
+<span class="fc bfc" id="L235" title="All 2 branches covered.">        if (httpCustomizer != null) {</span>
+<span class="fc" id="L236">            log.info(&quot;Found HttpSecurityCustomizer bean in ApplicationContext, custom configuring of HttpSecurity object started.&quot;);</span>
+<span class="fc" id="L237">            return httpCustomizer.customize(http);</span>
+        } else {
+<span class="fc" id="L239">            log.info(&quot;No HttpSecurityCustomizer bean found in ApplicationContext, no custom configuring of HttpSecurity object.&quot;);</span>
+<span class="fc" id="L240">            return http;</span>
+        }
+    }
+
+    private CsrfTokenRepository csrfTokenRepository() {
+<span class="fc" id="L245">        CookieCsrfTokenRepository repository = withHttpOnlyFalse();</span>
+<span class="fc" id="L246">        repository.setCookiePath(&quot;/&quot;);</span>
+<span class="fc" id="L247">        return repository;</span>
+    }
+
+    private CsrfTokenRequestAttributeHandler csrfRequestHandler() {
+<span class="fc" id="L251">        CsrfTokenRequestAttributeHandler csrfTokenHandler = new CsrfTokenRequestAttributeHandler();</span>
+        // By setting the csrfRequestAttributeName to null, the CsrfToken must first be loaded to determine what attribute name to use.
+        // This causes the CsrfToken to be loaded on every request.
+        // This disables deferred loading CsrfToken.
+<span class="fc" id="L255">        csrfTokenHandler.setCsrfRequestAttributeName(null);</span>
+<span class="fc" id="L256">        return csrfTokenHandler;</span>
+    }
+
+    private boolean isMfaAuthenticationProviderConfigured() {
+<span class="fc" id="L260">        return authProviders.stream().anyMatch(MfaAuthenticationProvider.class::isInstance);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

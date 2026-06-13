@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>OrganizationMapper.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">SaaS Backend Starter</a> &gt; <a href="index.source.html" class="el_package">com.urke.saasbackendstarter.mapper</a> &gt; <span class="el_source">OrganizationMapper.java</span></div><h1>OrganizationMapper.java</h1><pre class="source lang-java linenums">package com.urke.saasbackendstarter.mapper;
+
+import com.urke.saasbackendstarter.domain.Organization;
+import com.urke.saasbackendstarter.dto.organization.OrganizationCreateRequest;
+import com.urke.saasbackendstarter.dto.organization.OrganizationSummary;
+import org.springframework.stereotype.Component;
+
+/**
+ * Mapper for converting between Organization entity and DTOs.
+ * Provides utility methods for mapping between entity and summary/request DTOs.
+ */
+@Component
+<span class="nc" id="L13">public class OrganizationMapper {</span>
+
+    /**
+     * Maps Organization entity to OrganizationSummary DTO.
+     *
+     * @param entity Organization entity
+     * @return OrganizationSummary DTO or null if input is null
+     */
+    public OrganizationSummary toSummary(Organization entity) {
+<span class="nc bnc" id="L22" title="All 2 branches missed.">        if (entity == null) return null;</span>
+<span class="nc" id="L23">        return OrganizationSummary.builder()</span>
+<span class="nc" id="L24">                .id(entity.getId())</span>
+<span class="nc" id="L25">                .name(entity.getName())</span>
+<span class="nc" id="L26">                .slug(entity.getSlug())</span>
+<span class="nc" id="L27">                .build();</span>
+    }
+
+    /**
+     * Maps OrganizationCreateRequest DTO to Organization entity.
+     *
+     * @param dto OrganizationCreateRequest DTO
+     * @return Organization entity or null if input is null
+     */
+    public Organization toEntity(OrganizationCreateRequest dto) {
+<span class="nc bnc" id="L37" title="All 2 branches missed.">        if (dto == null) return null;</span>
+<span class="nc" id="L38">        return Organization.builder()</span>
+<span class="nc" id="L39">                .name(dto.getName())</span>
+                // slug and deleted fields are handled in the service
+<span class="nc" id="L41">                .build();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

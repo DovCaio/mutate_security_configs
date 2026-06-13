@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>BookForm.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Books Microservice</a> &gt; <a href="index.source.html" class="el_package">com.aidanwhiteley.books.controller.dtos</a> &gt; <span class="el_source">BookForm.java</span></div><h1>BookForm.java</h1><pre class="source lang-java linenums">package com.aidanwhiteley.books.controller.dtos;
+
+import com.aidanwhiteley.books.domain.Book;
+import com.aidanwhiteley.books.domain.Comment;
+import com.aidanwhiteley.books.service.dtos.GoogleBookSearchResult;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.List;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class BookForm {
+
+    private String bookId;
+    private List&lt;Comment&gt; comments = new ArrayList&lt;&gt;();
+    @Size(min = 1, max = 100, message
+            = &quot;A book title between 1 and 100 characters is required&quot;)
+    private String title;
+    @Size(min = 1, max = 100, message = &quot;The name of the author must be specified&quot;)
+    private String author;
+    @Size(min = 1, max = 30, message = &quot;The book's genre must be specified and be less than 30 characters&quot;)
+    private String genre;
+    @Size(min = 10, max = 5000, message
+            = &quot;A review of the book is required. Anything less than 10 character is too brief and more than 5k is too loquacious&quot;)
+    private String summary;
+    @NotBlank(message = &quot;The book must be given a rating&quot;)
+    private String rating;
+    private int index = -1;
+    private String googleBookId;
+    private GoogleBookSearchResult googleBookSearchResult;
+
+    public static BookForm getBookFormFromBook(Book book) {
+<span class="fc" id="L39">        var bookForm = new BookForm();</span>
+<span class="fc" id="L40">        bookForm.setBookId(book.getId());</span>
+<span class="fc" id="L41">        bookForm.setComments(book.getComments());</span>
+<span class="fc" id="L42">        bookForm.setTitle(book.getTitle());</span>
+<span class="fc" id="L43">        bookForm.setAuthor(book.getAuthor());</span>
+<span class="fc" id="L44">        bookForm.setGenre(book.getGenre());</span>
+<span class="fc" id="L45">        bookForm.setSummary(book.getSummary());</span>
+<span class="fc" id="L46">        bookForm.setRating(book.getRating().toString());</span>
+<span class="fc" id="L47">        bookForm.setGoogleBookId(book.getGoogleBookId());</span>
+
+<span class="fc" id="L49">        var googleBookSearchResult = new GoogleBookSearchResult();</span>
+<span class="fc" id="L50">        googleBookSearchResult.setItem(book.getGoogleBookDetails());</span>
+<span class="fc" id="L51">        bookForm.setGoogleBookSearchResult(googleBookSearchResult);</span>
+
+<span class="fc" id="L53">        return bookForm;</span>
+    }
+
+    public Book getBookFromBookForm() {
+<span class="fc" id="L57">        var buildingBook = Book.builder().title(title).author(author).genre(genre).summary(summary).</span>
+<span class="fc" id="L58">                rating(Book.Rating.getRatingByString(rating)).googleBookId(googleBookId);</span>
+
+        // Its important that we don't set an empty string for the id of the Book as that
+        // could result inserting a Book with an id of &quot;&quot; rather than creating a new entry.
+<span class="pc bpc" id="L62" title="1 of 4 branches missed.">        if (bookId == null || bookId.isBlank()) {</span>
+<span class="fc" id="L63">            return buildingBook.build();</span>
+        } else {
+<span class="fc" id="L65">            return buildingBook.id(bookId).build();</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+    <link rel="stylesheet" type="text/css" href="../style.css">
+</head>
+<body>
+
+
+<h1>GenericErrorHandler.java</h1>
+
+<table class="src">
+
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@3b3e2f54_1'/>
+1
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@3b3e2f54_1'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>package nl._42.restsecure.autoconfigure.errorhandling;</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@3b3e2f54_2'/>
+2
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@3b3e2f54_2'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@3b3e2f54_3'/>
+3
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@3b3e2f54_3'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@3b3e2f54_4'/>
+4
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@3b3e2f54_4'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@3b3e2f54_5'/>
+5
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@3b3e2f54_5'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>import java.io.IOException;</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@3b3e2f54_6'/>
+6
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@3b3e2f54_6'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@3b3e2f54_7'/>
+7
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@3b3e2f54_7'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>import jakarta.servlet.http.HttpServletResponse;</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@3b3e2f54_8'/>
+8
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@3b3e2f54_8'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>import tools.jackson.databind.ObjectMapper;</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@3b3e2f54_9'/>
+9
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@3b3e2f54_9'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@3b3e2f54_10'/>
+10
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@3b3e2f54_10'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>import org.springframework.http.HttpStatus;</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@3b3e2f54_11'/>
+11
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@3b3e2f54_11'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>import org.springframework.http.ProblemDetail;</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@3b3e2f54_12'/>
+12
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@3b3e2f54_12'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>import org.springframework.stereotype.Component;</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@3b3e2f54_13'/>
+13
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@3b3e2f54_13'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@3b3e2f54_14'/>
+14
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@3b3e2f54_14'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>/**</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@3b3e2f54_15'/>
+15
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@3b3e2f54_15'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''> * REST errorhandler that sets given http status and writes given errorCode as custom property in the RFC-7078 json object to the http response.</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@3b3e2f54_16'/>
+16
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@3b3e2f54_16'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''> * Json example: { errorCode: &#39;server.error&#39;}</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@3b3e2f54_17'/>
+17
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@3b3e2f54_17'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''> */</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@3b3e2f54_18'/>
+18
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@3b3e2f54_18'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>@Component</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@3b3e2f54_19'/>
+19
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@3b3e2f54_19'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>public class GenericErrorHandler {</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@3b3e2f54_20'/>
+20
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@3b3e2f54_20'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@3b3e2f54_21'/>
+21
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@3b3e2f54_21'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    private final ObjectMapper objectMapper;</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@3b3e2f54_22'/>
+22
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@3b3e2f54_22'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@3b3e2f54_23'/>
+23
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@3b3e2f54_23'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>    public GenericErrorHandler(ObjectMapper objectMapper) {</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@3b3e2f54_24'/>
+24
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@3b3e2f54_24'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>        this.objectMapper = objectMapper;</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@3b3e2f54_25'/>
+25
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@3b3e2f54_25'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>    }</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@3b3e2f54_26'/>
+26
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@3b3e2f54_26'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@3b3e2f54_27'/>
+27
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@3b3e2f54_27'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    public void respond(HttpServletResponse response, HttpStatus status, String errorCode) throws IOException {</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@3b3e2f54_28'/>
+28
+</td>
+<td class='killed'>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@3b3e2f54_28'>1</a>
+<span>
+1. respond : removed call to jakarta/servlet/http/HttpServletResponse::setStatus &rarr; KILLED<br/>
+
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class='killed'>        response.setStatus(status.value());</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@3b3e2f54_29'/>
+29
+</td>
+<td class='survived'>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@3b3e2f54_29'>1</a>
+<span>
+1. respond : removed call to jakarta/servlet/http/HttpServletResponse::setContentType &rarr; SURVIVED<br/>
+
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class='survived'>        response.setContentType(APPLICATION_JSON_VALUE);</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@3b3e2f54_30'/>
+30
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@3b3e2f54_30'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>        ProblemDetail pd = ProblemDetail.forStatus(status);</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@3b3e2f54_31'/>
+31
+</td>
+<td class='killed'>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@3b3e2f54_31'>1</a>
+<span>
+1. respond : removed call to org/springframework/http/ProblemDetail::setProperty &rarr; KILLED<br/>
+
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class='killed'>        pd.setProperty(&#34;errorCode&#34;, errorCode);</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@3b3e2f54_32'/>
+32
+</td>
+<td class='killed'>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@3b3e2f54_32'>1</a>
+<span>
+1. respond : removed call to tools/jackson/databind/ObjectMapper::writeValue &rarr; KILLED<br/>
+
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class='killed'>        objectMapper.writeValue(response.getWriter(), pd);</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@3b3e2f54_33'/>
+33
+</td>
+<td class='survived'>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@3b3e2f54_33'>1</a>
+<span>
+1. respond : removed call to java/io/PrintWriter::flush &rarr; SURVIVED<br/>
+
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class='survived'>        response.getWriter().flush();</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@3b3e2f54_34'/>
+34
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@3b3e2f54_34'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>    }</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@3b3e2f54_35'/>
+35
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@3b3e2f54_35'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>}</span></pre></td></tr>
+
+
+
+<tr><td></td><td></td><td><h2>Mutations</h2></td></tr>
+
+<tr>
+<td><a href='#org.pitest.mutationtest.report.html.SourceFile@3b3e2f54_28'>28</a></td> 
+<td></td>
+<td>
+
+<a name='grouporg.pitest.mutationtest.report.html.SourceFile@3b3e2f54_28'/> 
+
+<p class='KILLED'><span class='pop'>1.<span><b>1</b><br/><b>Location : </b>respond<br/><b>Killed by : </b>nl._42.restsecure.autoconfigure.errorhandling.DefaultLoginAuthenticationExceptionHandlerTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.errorhandling.DefaultLoginAuthenticationExceptionHandlerTest]/[nested-class:handle]/[method:shouldReturnLoginFailedErrorForAnyOtherException()]</span></span> removed call to jakarta/servlet/http/HttpServletResponse::setStatus &rarr; KILLED</p> 
+</td>
+</tr>
+<tr>
+<td><a href='#org.pitest.mutationtest.report.html.SourceFile@3b3e2f54_29'>29</a></td> 
+<td></td>
+<td>
+
+<a name='grouporg.pitest.mutationtest.report.html.SourceFile@3b3e2f54_29'/> 
+
+<p class='SURVIVED'><span class='pop'>1.<span><b>1</b><br/><b>Location : </b>respond<br/><b>Killed by : </b>none</span></span> removed call to jakarta/servlet/http/HttpServletResponse::setContentType &rarr; SURVIVED</p> 
+</td>
+</tr>
+<tr>
+<td><a href='#org.pitest.mutationtest.report.html.SourceFile@3b3e2f54_31'>31</a></td> 
+<td></td>
+<td>
+
+<a name='grouporg.pitest.mutationtest.report.html.SourceFile@3b3e2f54_31'/> 
+
+<p class='KILLED'><span class='pop'>1.<span><b>1</b><br/><b>Location : </b>respond<br/><b>Killed by : </b>nl._42.restsecure.autoconfigure.errorhandling.DefaultLoginAuthenticationExceptionHandlerTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.errorhandling.DefaultLoginAuthenticationExceptionHandlerTest]/[nested-class:handle]/[method:shouldReturnLoginFailedErrorForAnyOtherException()]</span></span> removed call to org/springframework/http/ProblemDetail::setProperty &rarr; KILLED</p> 
+</td>
+</tr>
+<tr>
+<td><a href='#org.pitest.mutationtest.report.html.SourceFile@3b3e2f54_32'>32</a></td> 
+<td></td>
+<td>
+
+<a name='grouporg.pitest.mutationtest.report.html.SourceFile@3b3e2f54_32'/> 
+
+<p class='KILLED'><span class='pop'>1.<span><b>1</b><br/><b>Location : </b>respond<br/><b>Killed by : </b>nl._42.restsecure.autoconfigure.errorhandling.DefaultLoginAuthenticationExceptionHandlerTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.errorhandling.DefaultLoginAuthenticationExceptionHandlerTest]/[nested-class:handle]/[method:shouldReturnLoginFailedErrorForAnyOtherException()]</span></span> removed call to tools/jackson/databind/ObjectMapper::writeValue &rarr; KILLED</p> 
+</td>
+</tr>
+<tr>
+<td><a href='#org.pitest.mutationtest.report.html.SourceFile@3b3e2f54_33'>33</a></td> 
+<td></td>
+<td>
+
+<a name='grouporg.pitest.mutationtest.report.html.SourceFile@3b3e2f54_33'/> 
+
+<p class='SURVIVED'><span class='pop'>1.<span><b>1</b><br/><b>Location : </b>respond<br/><b>Killed by : </b>none</span></span> removed call to java/io/PrintWriter::flush &rarr; SURVIVED</p> 
+</td>
+</tr>
+
+</table>
+
+
+<h2>Active mutators</h2>
+<ul>
+<li class='mutator'>CONDITIONALS_BOUNDARY</li>
+<li class='mutator'>EMPTY_RETURNS</li>
+<li class='mutator'>FALSE_RETURNS</li>
+<li class='mutator'>INCREMENTS</li>
+<li class='mutator'>INVERT_NEGS</li>
+<li class='mutator'>MATH</li>
+<li class='mutator'>NEGATE_CONDITIONALS</li>
+<li class='mutator'>NULL_RETURNS</li>
+<li class='mutator'>PRIMITIVE_RETURNS</li>
+<li class='mutator'>TRUE_RETURNS</li>
+<li class='mutator'>VOID_METHOD_CALLS</li>
+
+</ul>
+
+<h2>Tests examined</h2>
+<ul>
+<li>nl._42.restsecure.autoconfigure.errorhandling.DefaultLoginAuthenticationExceptionHandlerTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.errorhandling.DefaultLoginAuthenticationExceptionHandlerTest]/[nested-class:handle]/[method:shouldReturnLoginFailedErrorForAnyOtherException()] (3 ms)</li><li>nl._42.restsecure.autoconfigure.errorhandling.DefaultLoginAuthenticationExceptionHandlerTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.errorhandling.DefaultLoginAuthenticationExceptionHandlerTest]/[nested-class:handle]/[method:shouldReturnMfaCodeRequiredError()] (5 ms)</li><li>nl._42.restsecure.autoconfigure.errorhandling.AccessDeniedHandlerTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.errorhandling.AccessDeniedHandlerTest]/[method:forbiddenEndpoint_shouldFail_whenAdmin()] (142 ms)</li><li>nl._42.restsecure.autoconfigure.errorhandling.AccessDeniedHandlerTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.errorhandling.AccessDeniedHandlerTest]/[method:currentUser_shouldFail_withInvalidSession_whenNotLoggedIn()] (153 ms)</li><li>nl._42.restsecure.autoconfigure.errorhandling.AccessDeniedHandlerTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.errorhandling.AccessDeniedHandlerTest]/[method:forbiddenEndpoint_shouldFail_andNotThrowExceptions_whenIllegalRequestContentSent()] (153 ms)</li><li>nl._42.restsecure.autoconfigure.errorhandling.AccessDeniedHandlerTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.errorhandling.AccessDeniedHandlerTest]/[method:currentUser_shouldFail_withValidSession_whenNotLoggedIn()] (159 ms)</li><li>nl._42.restsecure.autoconfigure.authentication.AuthenticationControllerTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.authentication.AuthenticationControllerTest]/[method:currentUser_shouldFail_whenNotLoggedIn()] (166 ms)</li><li>nl._42.restsecure.autoconfigure.authentication.AuthenticationControllerTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.authentication.AuthenticationControllerTest]/[method:authenticate_shouldFail_withAccountLocked()] (186 ms)</li><li>nl._42.restsecure.autoconfigure.authentication.AuthenticationControllerTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.authentication.AuthenticationControllerTest]/[method:successHandler_shouldNotBeCalled_afterFailedAuthentication()] (199 ms)</li><li>nl._42.restsecure.autoconfigure.authentication.AuthenticationControllerTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.authentication.AuthenticationControllerTest]/[method:rememberMe_shouldFail_afterFailedAuthentication()] (218 ms)</li><li>nl._42.restsecure.autoconfigure.authentication.AuthenticationControllerTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.authentication.AuthenticationControllerTest]/[method:authenticate_shouldFail_withAccountExpired()] (235 ms)</li><li>nl._42.restsecure.autoconfigure.authentication.AuthenticationControllerTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.authentication.AuthenticationControllerTest]/[method:authenticate_shouldFail_withAuthenticationExceptionInSubsequentFilter()] (235 ms)</li><li>nl._42.restsecure.autoconfigure.authentication.AuthenticationControllerTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.authentication.AuthenticationControllerTest]/[method:authenticate_shouldFail_withCorrectCredentials_butBcryptPasswordEncoder()] (407 ms)</li><li>nl._42.restsecure.autoconfigure.authentication.AuthenticationControllerTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.authentication.AuthenticationControllerTest]/[method:authenticate_shouldFail_withCredentialsExpired()] (496 ms)</li>
+</ul>
+
+<br/>
+
+Report generated by <a href='https://pitest.org'>PIT</a> 1.15.0
+
+</body>
+</html>

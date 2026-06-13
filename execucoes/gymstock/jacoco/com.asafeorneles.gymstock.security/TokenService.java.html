@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>TokenService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">gymstock</a> &gt; <a href="index.source.html" class="el_package">com.asafeorneles.gymstock.security</a> &gt; <span class="el_source">TokenService.java</span></div><h1>TokenService.java</h1><pre class="source lang-java linenums">package com.asafeorneles.gymstock.security;
+
+import com.asafeorneles.gymstock.entities.User;
+import com.asafeorneles.gymstock.exceptions.ResourceNotFoundException;
+import com.asafeorneles.gymstock.repositories.UserRepository;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.oauth2.jwt.JwtClaimsSet;
+import org.springframework.security.oauth2.jwt.JwtEncoder;
+import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
+import org.springframework.stereotype.Service;
+
+import java.time.Instant;
+import java.util.stream.Collectors;
+
+@Service
+@RequiredArgsConstructor
+public class TokenService {
+
+    final JwtEncoder jwtEncoder;
+    final UserRepository userRepository;
+
+    @Getter
+    @Value(&quot;${jwt.expiration}&quot;)
+    private Long accessTokenExpiration;
+
+    @Getter
+    @Value(&quot;${jwt.refresh-token.expiration}&quot;)
+    private Long refreshTokenExpiration;
+
+    private final String refreshType = &quot;refresh&quot;;
+    private final String accessType = &quot;access&quot;;
+
+    private String generateToken(Authentication authentication, Long expiration, String tokenType, String jti) {
+
+<span class="fc" id="L39">        String scopes = authentication.getAuthorities().stream()</span>
+<span class="fc" id="L40">                .map(GrantedAuthority::getAuthority)</span>
+<span class="fc" id="L41">                .collect(Collectors.joining(&quot; &quot;));</span>
+
+<span class="fc" id="L43">        Instant now = Instant.now();</span>
+
+<span class="fc" id="L45">        String username = authentication.getName();</span>
+
+<span class="fc" id="L47">        User user = userRepository.findByUsername(username)</span>
+<span class="pc" id="L48">                .orElseThrow(() -&gt; new ResourceNotFoundException(&quot;User not found creating JWT accessToken&quot;));</span>
+
+<span class="fc" id="L50">        JwtClaimsSet.Builder claimsBuilder = JwtClaimsSet.builder()</span>
+<span class="fc" id="L51">                .issuer(&quot;gym-stock-api&quot;)</span>
+<span class="fc" id="L52">                .subject(user.getUserId().toString())</span>
+<span class="fc" id="L53">                .issuedAt(now)</span>
+<span class="fc" id="L54">                .expiresAt(now.plusSeconds(expiration))</span>
+<span class="fc" id="L55">                .claim(&quot;scopes&quot;, scopes)</span>
+<span class="fc" id="L56">                .claim(&quot;username&quot;, username)</span>
+<span class="fc" id="L57">                .claim(&quot;type&quot;, tokenType);</span>
+
+
+<span class="fc bfc" id="L60" title="All 2 branches covered.">        if (jti != null){</span>
+<span class="fc" id="L61">            claimsBuilder.id(jti);</span>
+        }
+
+<span class="fc" id="L64">        return jwtEncoder.encode(JwtEncoderParameters.from(claimsBuilder.build())).getTokenValue();</span>
+    }
+
+    public String getAccessToken(Authentication authentication){
+<span class="fc" id="L68">        return generateToken(authentication, accessTokenExpiration, accessType, null);</span>
+    }
+
+    public String getRefreshToken(Authentication authentication, String jti){
+<span class="fc" id="L72">        return generateToken(authentication, refreshTokenExpiration, refreshType, jti);</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

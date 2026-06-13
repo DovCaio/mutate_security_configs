@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JwtAuthenticationFilter.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Books Microservice</a> &gt; <a href="index.source.html" class="el_package">com.aidanwhiteley.books.controller.jwt</a> &gt; <span class="el_source">JwtAuthenticationFilter.java</span></div><h1>JwtAuthenticationFilter.java</h1><pre class="source lang-java linenums">package com.aidanwhiteley.books.controller.jwt;
+
+import com.aidanwhiteley.books.domain.User;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import org.jspecify.annotations.NonNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
+import org.springframework.web.filter.OncePerRequestFilter;
+
+import java.io.IOException;
+import java.time.LocalDateTime;
+
+@Component
+public class JwtAuthenticationFilter extends OncePerRequestFilter {
+
+<span class="fc" id="L22">    private static final Logger LOGGER = LoggerFactory.getLogger(JwtAuthenticationFilter.class);</span>
+
+    private final JwtAuthenticationService jwtService;
+
+    @Value(&quot;${books.autoAuthUser}&quot;)
+    private boolean autoAuthUser;
+
+    @Value(&quot;${books.reload.development.data}&quot;)
+    private boolean reloadDevelopmentData;
+
+<span class="fc" id="L32">    public JwtAuthenticationFilter(JwtAuthenticationService jwtAuthenticationService) {</span>
+<span class="fc" id="L33">        this.jwtService = jwtAuthenticationService;</span>
+<span class="fc" id="L34">    }</span>
+
+    @Override
+    protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain)
+            throws ServletException, IOException {
+
+<span class="fc" id="L40">        JwtAuthentication auth = jwtService.readAndValidateAuthenticationData(request, response);</span>
+<span class="pc bpc" id="L41" title="1 of 4 branches missed.">        if (auth != null &amp;&amp; auth.isAuthenticated()) {</span>
+<span class="fc" id="L42">            LOGGER.debug(&quot;Setting authentication into SecurityContext&quot;);</span>
+<span class="fc" id="L43">            SecurityContextHolder.getContext().setAuthentication(auth);</span>
+<span class="pc bpc" id="L44" title="2 of 6 branches missed.">        } else if (auth == null &amp;&amp; autoAuthUser &amp;&amp; reloadDevelopmentData) {</span>
+            // Support for auto authorising a dummy user - but only if the correct
+            // config has been set and we are running a profile that drops and
+            // recreates all data in the database each time the application starts
+            // i.e. we are running a non production system!
+<span class="fc" id="L49">            auth = new JwtAuthentication(createDummyUser());</span>
+<span class="fc" id="L50">            auth.setAuthenticated(true);</span>
+<span class="fc" id="L51">            SecurityContextHolder.getContext().setAuthentication(auth);</span>
+<span class="fc" id="L52">            LOGGER.debug(&quot;Setting dummy auth: {}&quot;, auth);</span>
+        } else {
+<span class="fc" id="L54">            LOGGER.debug(&quot;Auth status was: {}&quot;, auth);</span>
+        }
+<span class="fc" id="L56">        filterChain.doFilter(request, response);</span>
+<span class="fc" id="L57">    }</span>
+
+    private User createDummyUser() {
+<span class="fc" id="L60">        User dummyUser = new User();</span>
+
+        // The data below must match the corresponding entry in users.data
+<span class="fc" id="L63">        dummyUser.setFirstName(&quot;Auto&quot;);</span>
+<span class="fc" id="L64">        dummyUser.setLastName(&quot;Logon&quot;);</span>
+<span class="fc" id="L65">        dummyUser.setFullName(&quot;Auto Logon&quot;);</span>
+<span class="fc" id="L66">        dummyUser.addRole(User.Role.ROLE_ADMIN);</span>
+<span class="fc" id="L67">        dummyUser.setLastLogon(LocalDateTime.MIN);</span>
+<span class="fc" id="L68">        dummyUser.setEmail(&quot;example@example.com&quot;);</span>
+<span class="fc" id="L69">        dummyUser.setAuthProvider(User.AuthenticationProvider.LOCAL);</span>
+<span class="fc" id="L70">        dummyUser.setAuthenticationServiceId(&quot;Dummy12345678&quot;);</span>
+
+<span class="fc" id="L72">        return dummyUser;</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

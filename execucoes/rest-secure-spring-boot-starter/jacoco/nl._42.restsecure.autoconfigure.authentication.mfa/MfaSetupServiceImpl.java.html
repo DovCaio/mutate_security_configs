@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MfaSetupServiceImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">42 REST Secure Spring Boot Starter</a> &gt; <a href="index.source.html" class="el_package">nl._42.restsecure.autoconfigure.authentication.mfa</a> &gt; <span class="el_source">MfaSetupServiceImpl.java</span></div><h1>MfaSetupServiceImpl.java</h1><pre class="source lang-java linenums">package nl._42.restsecure.autoconfigure.authentication.mfa;
+
+import static dev.samstevens.totp.util.Utils.getDataUriForImage;
+
+import dev.samstevens.totp.exceptions.QrGenerationException;
+import dev.samstevens.totp.qr.QrData;
+import dev.samstevens.totp.qr.QrDataFactory;
+import dev.samstevens.totp.qr.QrGenerator;
+import dev.samstevens.totp.secret.SecretGenerator;
+
+/**
+ * Service which contains logic to set up MFA authentication
+ */
+public class MfaSetupServiceImpl implements MfaSetupService {
+
+    private final SecretGenerator secretGenerator;
+    private final QrDataFactory qrDataFactory;
+    private final QrGenerator qrGenerator;
+    private final String issuer;
+
+<span class="fc" id="L21">    public MfaSetupServiceImpl(SecretGenerator secretGenerator, QrDataFactory qrDataFactory, QrGenerator qrGenerator, String issuer) {</span>
+<span class="fc" id="L22">        this.secretGenerator = secretGenerator;</span>
+<span class="fc" id="L23">        this.qrDataFactory = qrDataFactory;</span>
+<span class="fc" id="L24">        this.qrGenerator = qrGenerator;</span>
+<span class="fc" id="L25">        this.issuer = issuer;</span>
+<span class="fc" id="L26">    }</span>
+
+    /**
+     * Generates a new MFA secret
+     * The secret is to be stored in a secure way for the given user.
+     * @return Secret key to generate a QR code and to validate MFA authentication codes.
+     */
+    public String generateSecret() {
+        // Generates a new MFA secret
+<span class="fc" id="L35">        return secretGenerator.generate();</span>
+    }
+
+    /**
+     * Generates a new MFA QR code
+     * @param secret Secret key of the user
+     * @param label Label to show in the MFA app. This must be something related to the user (e.g. username, email address).
+     * @return A base64-encoded DATA URI of the QR code. This can for example be used in a HTML img element.
+     * @throws MfaException If the QR code cannot be generated.
+     */
+    public String generateQrCode(String secret, String label) throws MfaException {
+<span class="fc bfc" id="L46" title="All 4 branches covered.">        if (label == null || label.equals(&quot;&quot;)) {</span>
+<span class="fc" id="L47">            throw new MfaException(&quot;Label cannot be blank!&quot;, null);</span>
+        }
+
+        String labelWithIssuer;
+
+<span class="fc bfc" id="L52" title="All 2 branches covered.">        if (label.contains(issuer + &quot;:&quot;)) {</span>
+<span class="fc" id="L53">            labelWithIssuer = label;</span>
+        } else {
+<span class="fc" id="L55">            labelWithIssuer = String.format(&quot;%s:%s&quot;, issuer, label);</span>
+        }
+
+<span class="fc" id="L58">        QrData data = qrDataFactory.newBuilder()</span>
+<span class="fc" id="L59">            .label(labelWithIssuer)</span>
+<span class="fc" id="L60">            .secret(secret)</span>
+<span class="fc" id="L61">            .issuer(issuer)</span>
+<span class="fc" id="L62">            .build();</span>
+
+        // Generate the QR code image data as a base64 string which
+        // can be used in an &lt;img&gt; tag:
+        try {
+<span class="fc" id="L67">            return getDataUriForImage(</span>
+<span class="fc" id="L68">                    qrGenerator.generate(data),</span>
+<span class="fc" id="L69">                    qrGenerator.getImageMimeType()</span>
+            );
+<span class="fc" id="L71">        } catch (QrGenerationException e) {</span>
+<span class="fc" id="L72">            throw new MfaException(&quot;Unable to generate QR code&quot;, e);</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

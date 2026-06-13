@@ -1,0 +1,2546 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+    <link rel="stylesheet" type="text/css" href="../style.css">
+</head>
+<body>
+
+
+<h1>JwtAuthenticationService.java</h1>
+
+<table class="src">
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_1'/>
+1
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_1'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>package com.aidanwhiteley.books.controller.jwt;</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_2'/>
+2
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_2'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_3'/>
+3
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_3'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>import com.aidanwhiteley.books.domain.User;</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_4'/>
+4
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_4'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>import io.jsonwebtoken.ExpiredJwtException;</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_5'/>
+5
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_5'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>import jakarta.servlet.http.Cookie;</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_6'/>
+6
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_6'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>import jakarta.servlet.http.HttpServletRequest;</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_7'/>
+7
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_7'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>import jakarta.servlet.http.HttpServletResponse;</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_8'/>
+8
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_8'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>import lombok.Setter;</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_9'/>
+9
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_9'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>import org.slf4j.Logger;</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_10'/>
+10
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_10'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>import org.slf4j.LoggerFactory;</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_11'/>
+11
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_11'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>import org.springframework.beans.factory.annotation.Value;</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_12'/>
+12
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_12'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>import org.springframework.stereotype.Service;</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_13'/>
+13
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_13'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_14'/>
+14
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_14'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>@Service</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_15'/>
+15
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_15'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>public class JwtAuthenticationService {</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_16'/>
+16
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_16'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_17'/>
+17
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_17'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    // Changes made here would need to be replicated into</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_18'/>
+18
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_18'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    // any API gateway - to ensure that the API gateway fowards</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_19'/>
+19
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_19'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    // on any headers or cookies required on the application tier.</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_20'/>
+20
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_20'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    public static final String JWT_COOKIE_NAME = &#34;CLOUDY-JWT&#34;;</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_21'/>
+21
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_21'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    public static final String XSRF_HEADER_NAME = &#34;X-XSRF-TOKEN&#34;;</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_22'/>
+22
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_22'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    public static final String XSRF_COOKIE_NAME = &#34;XSRF-TOKEN&#34;;</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_23'/>
+23
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_23'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    private static final String JSESSIONID_COOKIE_NAME = &#34;JSESSIONID&#34;;</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_24'/>
+24
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_24'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>    private static final Logger LOGGER = LoggerFactory.getLogger(JwtAuthenticationService.class);</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_25'/>
+25
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_25'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_26'/>
+26
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_26'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    private final JwtUtils jwtUtils;</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_27'/>
+27
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_27'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_28'/>
+28
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_28'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    // Setters for testing support outside of a Spring context</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_29'/>
+29
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_29'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>    @Setter</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_30'/>
+30
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_30'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    @Value(&#34;${books.jwt.cookieOverHttpsOnly}&#34;)</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_31'/>
+31
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_31'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    private boolean cookieOverHttpsOnly;</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_32'/>
+32
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_32'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_33'/>
+33
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_33'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>    @Setter</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_34'/>
+34
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_34'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    @Value(&#34;${books.jwt.cookieAccessedByHttpOnly}&#34;)</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_35'/>
+35
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_35'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    private boolean cookieAccessedByHttpOnly;</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_36'/>
+36
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_36'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_37'/>
+37
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_37'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>    @Setter</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_38'/>
+38
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_38'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    @Value(&#34;${books.jwt.cookiePath}&#34;)</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_39'/>
+39
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_39'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    private String jwtCookiePath;</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_40'/>
+40
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_40'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_41'/>
+41
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_41'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>    @Setter</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_42'/>
+42
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_42'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    @Value(&#34;${books.jwt.cookieExpirySeconds}&#34;)</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_43'/>
+43
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_43'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    private int cookieExpirySeconds;</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_44'/>
+44
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_44'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_45'/>
+45
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_45'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>    public JwtAuthenticationService(JwtUtils jwtUtils) {</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_46'/>
+46
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_46'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>        this.jwtUtils = jwtUtils;</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_47'/>
+47
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_47'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>    }</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_48'/>
+48
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_48'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_49'/>
+49
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_49'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    public void setAuthenticationData(HttpServletResponse response, User user) {</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_50'/>
+50
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_50'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_51'/>
+51
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_51'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>        String token = jwtUtils.createTokenForUser(user);</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_52'/>
+52
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_52'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_53'/>
+53
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_53'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>        // There is currently no functionality on the jakarta.servlet.http.Cookie class to set SameSite directly.</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_54'/>
+54
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_54'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>        var cookie = new StringBuilder();</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_55'/>
+55
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_55'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>        cookie.append(JWT_COOKIE_NAME + &#34;=&#34;).append(token);</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_56'/>
+56
+</td>
+<td class='survived'>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_56'>2</a>
+<span>
+1. setAuthenticationData : removed conditional - replaced equality check with true &rarr; SURVIVED<br/>
+2. setAuthenticationData : removed conditional - replaced equality check with false &rarr; KILLED<br/>
+
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class='survived'>        if (cookieAccessedByHttpOnly) {</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_57'/>
+57
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_57'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>            cookie.append(&#34;; HttpOnly&#34;);</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_58'/>
+58
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_58'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>        }</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_59'/>
+59
+</td>
+<td class='survived'>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_59'>2</a>
+<span>
+1. setAuthenticationData : removed conditional - replaced equality check with true &rarr; SURVIVED<br/>
+2. setAuthenticationData : removed conditional - replaced equality check with false &rarr; SURVIVED<br/>
+
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class='survived'>        if (cookieOverHttpsOnly) {</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_60'/>
+60
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_60'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>            cookie.append(&#34;; Secure&#34;);</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_61'/>
+61
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_61'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>        }</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_62'/>
+62
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_62'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>        cookie.append(&#34;; Path=&#34;).append(jwtCookiePath);</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_63'/>
+63
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_63'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>        cookie.append(&#34;; Max-Age=&#34;).append(cookieExpirySeconds);</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_64'/>
+64
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_64'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>        cookie.append(&#34;; SameSite=Lax&#34;);</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_65'/>
+65
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_65'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_66'/>
+66
+</td>
+<td class='killed'>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_66'>1</a>
+<span>
+1. setAuthenticationData : removed call to jakarta/servlet/http/HttpServletResponse::addHeader &rarr; KILLED<br/>
+
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class='killed'>        response.addHeader(&#34;Set-Cookie&#34;, cookie.toString());</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_67'/>
+67
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_67'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>        LOGGER.debug(&#34;JWT cookie written for {}&#34;, user.getFullName());</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_68'/>
+68
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_68'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>    }</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_69'/>
+69
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_69'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_70'/>
+70
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_70'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    public JwtAuthentication readAndValidateAuthenticationData(HttpServletRequest request,</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_71'/>
+71
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_71'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>                                                               HttpServletResponse response) {</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_72'/>
+72
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_72'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_73'/>
+73
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_73'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>        JwtAuthentication auth = null;</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_74'/>
+74
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_74'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_75'/>
+75
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_75'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>        Cookie[] cookies = request.getCookies();</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_76'/>
+76
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_76'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_77'/>
+77
+</td>
+<td class='killed'>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_77'>2</a>
+<span>
+1. readAndValidateAuthenticationData : removed conditional - replaced equality check with true &rarr; KILLED<br/>
+2. readAndValidateAuthenticationData : removed conditional - replaced equality check with false &rarr; KILLED<br/>
+
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class='killed'>        if (cookies != null) {</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_78'/>
+78
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_78'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>            for (Cookie cookie : cookies) {</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_79'/>
+79
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_79'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>                LOGGER.debug(&#34;Found cookie named: {}&#34;, cookie.getName());</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_80'/>
+80
+</td>
+<td class='killed'>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_80'>1</a>
+<span>
+1. readAndValidateAuthenticationData : Changed switch default to be first case &rarr; KILLED<br/>
+
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class='killed'>                switch (cookie.getName()) {</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_81'/>
+81
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_81'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>                    case JWT_COOKIE_NAME:</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_82'/>
+82
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_82'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>                        String token = cookie.getValue();</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_83'/>
+83
+</td>
+<td class='killed'>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_83'>4</a>
+<span>
+1. readAndValidateAuthenticationData : removed conditional - replaced equality check with true &rarr; KILLED<br/>
+2. readAndValidateAuthenticationData : removed conditional - replaced equality check with false &rarr; KILLED<br/>
+3. readAndValidateAuthenticationData : removed conditional - replaced equality check with false &rarr; KILLED<br/>
+4. readAndValidateAuthenticationData : removed conditional - replaced equality check with true &rarr; KILLED<br/>
+
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class='killed'>                        if (token == null || token.trim().isEmpty()) {</span></pre></td></tr>
+
+<tr>
+<td class='uncovered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_84'/>
+84
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_84'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='uncovered'><pre><span  class=''>                            LOGGER.warn(&#34;JWT cookie found but was empty - we will look to remove this later&#34;);</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_85'/>
+85
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_85'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>                        } else {</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_86'/>
+86
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_86'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>                            try {</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_87'/>
+87
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_87'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>                                User user = jwtUtils.getUserFromToken(token);</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_88'/>
+88
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_88'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_89'/>
+89
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_89'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>                                // TODO - add support for interval based checking of whether the user is still in the database.</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_90'/>
+90
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_90'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>                                //        Will require adding a &#34;lastChecked&#34; field to the JWT and calling the database appropriately.</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_91'/>
+91
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_91'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_92'/>
+92
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_92'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>                                auth = new JwtAuthentication(user);</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_93'/>
+93
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_93'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_94'/>
+94
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_94'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>                                // If we got to here with no exceptions thrown</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_95'/>
+95
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_95'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>                                // then we can assume we have a valid token</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_96'/>
+96
+</td>
+<td class='killed'>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_96'>1</a>
+<span>
+1. readAndValidateAuthenticationData : removed call to com/aidanwhiteley/books/controller/jwt/JwtAuthentication::setAuthenticated &rarr; KILLED<br/>
+
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class='killed'>                                auth.setAuthenticated(true);</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_97'/>
+97
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_97'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>                                LOGGER.debug(&#34;JWT found and validated - setting authentication true&#34;);</span></pre></td></tr>
+
+<tr>
+<td class='uncovered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_98'/>
+98
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_98'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='uncovered'><pre><span  class=''>                            } catch (ExpiredJwtException eje) {</span></pre></td></tr>
+
+<tr>
+<td class='uncovered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_99'/>
+99
+</td>
+<td class='survived'>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_99'>1</a>
+<span>
+1. readAndValidateAuthenticationData : removed call to com/aidanwhiteley/books/controller/jwt/JwtAuthenticationService::expireJwtCookie &rarr; NO_COVERAGE<br/>
+
+</span>
+</span>
+</td>
+<td class='uncovered'><pre><span  class='survived'>                                expireJwtCookie(response);</span></pre></td></tr>
+
+<tr>
+<td class='uncovered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_100'/>
+100
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_100'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='uncovered'><pre><span  class=''>                                LOGGER.info(&#34;JWT expired so cookie deleted&#34;);</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_101'/>
+101
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_101'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>                            } catch (RuntimeException re) {</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_102'/>
+102
+</td>
+<td class='survived'>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_102'>1</a>
+<span>
+1. readAndValidateAuthenticationData : removed call to com/aidanwhiteley/books/controller/jwt/JwtAuthenticationService::expireJwtCookie &rarr; SURVIVED<br/>
+
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class='survived'>                                expireJwtCookie(response);</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_103'/>
+103
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_103'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>                                LOGGER.error(&#34;Error validating jwt token: {}. So cookie deleted&#34;, re.getMessage());</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_104'/>
+104
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_104'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>                            }</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_105'/>
+105
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_105'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>                        }</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_106'/>
+106
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_106'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>                        break;</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_107'/>
+107
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_107'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>                    case JSESSIONID_COOKIE_NAME:</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_108'/>
+108
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_108'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>                        // With the use of Spring Security Oauth2 and the custom</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_109'/>
+109
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_109'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>                        // HttpCookieOAuth2AuthorizationRequestRepository there</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_110'/>
+110
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_110'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>                        // should be no JSESSIONIDs being writtem</span></pre></td></tr>
+
+<tr>
+<td class='uncovered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_111'/>
+111
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_111'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='uncovered'><pre><span  class=''>                        LOGGER.warn(&#34;Unexpectedly found a JSESSIONID based cookie - killing it!&#34;);</span></pre></td></tr>
+
+<tr>
+<td class='uncovered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_112'/>
+112
+</td>
+<td class='survived'>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_112'>1</a>
+<span>
+1. readAndValidateAuthenticationData : removed call to com/aidanwhiteley/books/controller/jwt/JwtAuthenticationService::expireJsessionIdCookie &rarr; NO_COVERAGE<br/>
+
+</span>
+</span>
+</td>
+<td class='uncovered'><pre><span  class='survived'>                        expireJsessionIdCookie(response);</span></pre></td></tr>
+
+<tr>
+<td class='uncovered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_113'/>
+113
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_113'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='uncovered'><pre><span  class=''>                        break;</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_114'/>
+114
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_114'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>                    default:</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_115'/>
+115
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_115'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>                        LOGGER.debug(&#34;Found cookie named {}&#34;, cookie.getName());</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_116'/>
+116
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_116'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>                        break;</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_117'/>
+117
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_117'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>                }</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_118'/>
+118
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_118'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>            }</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_119'/>
+119
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_119'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>        }</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_120'/>
+120
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_120'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_121'/>
+121
+</td>
+<td class='killed'>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_121'>1</a>
+<span>
+1. readAndValidateAuthenticationData : replaced return value with null for com/aidanwhiteley/books/controller/jwt/JwtAuthenticationService::readAndValidateAuthenticationData &rarr; KILLED<br/>
+
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class='killed'>        return auth;</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_122'/>
+122
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_122'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    }</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_123'/>
+123
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_123'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_124'/>
+124
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_124'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    public void expireJwtCookie(HttpServletResponse response) {</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_125'/>
+125
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_125'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>        Cookie emptyCookie = new Cookie(JWT_COOKIE_NAME, &#34;&#34;);</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_126'/>
+126
+</td>
+<td class='killed'>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_126'>1</a>
+<span>
+1. expireJwtCookie : removed call to com/aidanwhiteley/books/controller/jwt/JwtAuthenticationService::expireCookie &rarr; KILLED<br/>
+
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class='killed'>        expireCookie(response, emptyCookie, cookieAccessedByHttpOnly);</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_127'/>
+127
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_127'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_128'/>
+128
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_128'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>        if (LOGGER.isDebugEnabled()) {</span></pre></td></tr>
+
+<tr>
+<td class='uncovered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_129'/>
+129
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_129'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='uncovered'><pre><span  class=''>            LOGGER.debug(&#34;Expired JWT cookie&#34;);</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_130'/>
+130
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_130'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>        }</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_131'/>
+131
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_131'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>    }</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_132'/>
+132
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_132'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_133'/>
+133
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_133'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    public void expireXsrfCookie(HttpServletResponse response) {</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_134'/>
+134
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_134'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>        Cookie emptyCookie = new Cookie(XSRF_COOKIE_NAME, &#34;&#34;);</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_135'/>
+135
+</td>
+<td class='survived'>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_135'>1</a>
+<span>
+1. expireXsrfCookie : removed call to com/aidanwhiteley/books/controller/jwt/JwtAuthenticationService::expireCookie &rarr; SURVIVED<br/>
+
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class='survived'>        expireCookie(response, emptyCookie, false);</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_136'/>
+136
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_136'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_137'/>
+137
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_137'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>        if (LOGGER.isDebugEnabled()) {</span></pre></td></tr>
+
+<tr>
+<td class='uncovered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_138'/>
+138
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_138'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='uncovered'><pre><span  class=''>            LOGGER.debug(&#34;Expired Xsrf cookie&#34;);</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_139'/>
+139
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_139'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>        }</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_140'/>
+140
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_140'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>    }</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_141'/>
+141
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_141'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_142'/>
+142
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_142'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    public void expireJsessionIdCookie(HttpServletResponse response) {</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_143'/>
+143
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_143'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>        Cookie emptyCookie = new Cookie(JSESSIONID_COOKIE_NAME, &#34;&#34;);</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_144'/>
+144
+</td>
+<td class='survived'>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_144'>1</a>
+<span>
+1. expireJsessionIdCookie : removed call to com/aidanwhiteley/books/controller/jwt/JwtAuthenticationService::expireCookie &rarr; SURVIVED<br/>
+
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class='survived'>        expireCookie(response, emptyCookie, true);</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_145'/>
+145
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_145'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>    }</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_146'/>
+146
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_146'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_147'/>
+147
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_147'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    private void expireCookie(HttpServletResponse response, Cookie emptyCookie, boolean httpOnly) {</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_148'/>
+148
+</td>
+<td class='survived'>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_148'>1</a>
+<span>
+1. expireCookie : removed call to jakarta/servlet/http/Cookie::setMaxAge &rarr; SURVIVED<br/>
+
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class='survived'>        emptyCookie.setMaxAge(0);</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_149'/>
+149
+</td>
+<td class='survived'>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_149'>1</a>
+<span>
+1. expireCookie : removed call to jakarta/servlet/http/Cookie::setHttpOnly &rarr; SURVIVED<br/>
+
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class='survived'>        emptyCookie.setHttpOnly(httpOnly);</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_150'/>
+150
+</td>
+<td class='survived'>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_150'>1</a>
+<span>
+1. expireCookie : removed call to jakarta/servlet/http/Cookie::setSecure &rarr; SURVIVED<br/>
+
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class='survived'>        emptyCookie.setSecure(cookieOverHttpsOnly);</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_151'/>
+151
+</td>
+<td class='survived'>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_151'>1</a>
+<span>
+1. expireCookie : removed call to jakarta/servlet/http/Cookie::setPath &rarr; SURVIVED<br/>
+
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class='survived'>        emptyCookie.setPath(jwtCookiePath);</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_152'/>
+152
+</td>
+<td class='killed'>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_152'>1</a>
+<span>
+1. expireCookie : removed call to jakarta/servlet/http/HttpServletResponse::addCookie &rarr; KILLED<br/>
+
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class='killed'>        response.addCookie(emptyCookie);            // lgtm[java/insecure-cookie]</span></pre></td></tr>
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_153'/>
+153
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_153'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>    }</span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_154'/>
+154
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_154'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_155'/>
+155
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_155'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@223a4213_156'/>
+156
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_156'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>}</span></pre></td></tr>
+
+
+
+<tr><td></td><td></td><td><h2>Mutations</h2></td></tr>
+
+<tr>
+<td><a href='#org.pitest.mutationtest.report.html.SourceFile@223a4213_56'>56</a></td> 
+<td></td>
+<td>
+
+<a name='grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_56'/> 
+
+<p class='KILLED'><span class='pop'>1.<span><b>1</b><br/><b>Location : </b>setAuthenticationData<br/><b>Killed by : </b>com.aidanwhiteley.books.controller.jwt.JwtAuthenticationServiceTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.jwt.JwtAuthenticationServiceTest]/[method:testSetAuthenticationData()]</span></span> removed conditional - replaced equality check with false &rarr; KILLED</span>
+</div> <p class='SURVIVED'><span class='pop'>2.<span><b>2</b><br/><b>Location : </b>setAuthenticationData<br/><b>Killed by : </b>none</span></span> removed conditional - replaced equality check with true &rarr; SURVIVED</span>
+<a title="Click to view covering tests" class="view-covered-by-tests" onClick="document.getElementById('MutationIdentifier-[location=Location-[clazz=com.aidanwhiteley.books.controller.jwt.JwtAuthenticationService,-method=setAuthenticationData,-methodDesc=(Ljakarta/servlet/http/HttpServletResponse;Lcom/aidanwhiteley/books/domain/User;)V],-indexes=[26],-mutator=org.pitest.mutationtest.engine.gregor.mutators.RemoveConditionalMutator_EQUAL_IF]').style.display=(document.getElementById('MutationIdentifier-[location=Location-[clazz=com.aidanwhiteley.books.controller.jwt.JwtAuthenticationService,-method=setAuthenticationData,-methodDesc=(Ljakarta/servlet/http/HttpServletResponse;Lcom/aidanwhiteley/books/domain/User;)V],-indexes=[26],-mutator=org.pitest.mutationtest.engine.gregor.mutators.RemoveConditionalMutator_EQUAL_IF]').style.display == 'block')?'none':'block';">Covering tests</a>
+<div class="covered-tests" id="MutationIdentifier-[location=Location-[clazz=com.aidanwhiteley.books.controller.jwt.JwtAuthenticationService,-method=setAuthenticationData,-methodDesc=(Ljakarta/servlet/http/HttpServletResponse;Lcom/aidanwhiteley/books/domain/User;)V],-indexes=[26],-mutator=org.pitest.mutationtest.engine.gregor.mutators.RemoveConditionalMutator_EQUAL_IF]" style="display:none;">Covered by tests:
+<ul>
+<li>com.aidanwhiteley.books.controller.jwt.JwtAuthenticationServiceTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.jwt.JwtAuthenticationServiceTest]/[method:testSetAuthenticationData()]</li> 
+</ul>
+</div></div> 
+</td>
+</tr>
+<tr>
+<td><a href='#org.pitest.mutationtest.report.html.SourceFile@223a4213_59'>59</a></td> 
+<td></td>
+<td>
+
+<a name='grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_59'/> 
+
+<p class='SURVIVED'><span class='pop'>1.<span><b>1</b><br/><b>Location : </b>setAuthenticationData<br/><b>Killed by : </b>none</span></span> removed conditional - replaced equality check with true &rarr; SURVIVED</span>
+<a title="Click to view covering tests" class="view-covered-by-tests" onClick="document.getElementById('MutationIdentifier-[location=Location-[clazz=com.aidanwhiteley.books.controller.jwt.JwtAuthenticationService,-method=setAuthenticationData,-methodDesc=(Ljakarta/servlet/http/HttpServletResponse;Lcom/aidanwhiteley/books/domain/User;)V],-indexes=[38],-mutator=org.pitest.mutationtest.engine.gregor.mutators.RemoveConditionalMutator_EQUAL_IF]').style.display=(document.getElementById('MutationIdentifier-[location=Location-[clazz=com.aidanwhiteley.books.controller.jwt.JwtAuthenticationService,-method=setAuthenticationData,-methodDesc=(Ljakarta/servlet/http/HttpServletResponse;Lcom/aidanwhiteley/books/domain/User;)V],-indexes=[38],-mutator=org.pitest.mutationtest.engine.gregor.mutators.RemoveConditionalMutator_EQUAL_IF]').style.display == 'block')?'none':'block';">Covering tests</a>
+<div class="covered-tests" id="MutationIdentifier-[location=Location-[clazz=com.aidanwhiteley.books.controller.jwt.JwtAuthenticationService,-method=setAuthenticationData,-methodDesc=(Ljakarta/servlet/http/HttpServletResponse;Lcom/aidanwhiteley/books/domain/User;)V],-indexes=[38],-mutator=org.pitest.mutationtest.engine.gregor.mutators.RemoveConditionalMutator_EQUAL_IF]" style="display:none;">Covered by tests:
+<ul>
+<li>com.aidanwhiteley.books.controller.jwt.JwtAuthenticationServiceTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.jwt.JwtAuthenticationServiceTest]/[method:testSetAuthenticationData()]</li> 
+</ul>
+</div></div> <p class='SURVIVED'><span class='pop'>2.<span><b>2</b><br/><b>Location : </b>setAuthenticationData<br/><b>Killed by : </b>none</span></span> removed conditional - replaced equality check with false &rarr; SURVIVED</span>
+<a title="Click to view covering tests" class="view-covered-by-tests" onClick="document.getElementById('MutationIdentifier-[location=Location-[clazz=com.aidanwhiteley.books.controller.jwt.JwtAuthenticationService,-method=setAuthenticationData,-methodDesc=(Ljakarta/servlet/http/HttpServletResponse;Lcom/aidanwhiteley/books/domain/User;)V],-indexes=[38],-mutator=org.pitest.mutationtest.engine.gregor.mutators.RemoveConditionalMutator_EQUAL_ELSE]').style.display=(document.getElementById('MutationIdentifier-[location=Location-[clazz=com.aidanwhiteley.books.controller.jwt.JwtAuthenticationService,-method=setAuthenticationData,-methodDesc=(Ljakarta/servlet/http/HttpServletResponse;Lcom/aidanwhiteley/books/domain/User;)V],-indexes=[38],-mutator=org.pitest.mutationtest.engine.gregor.mutators.RemoveConditionalMutator_EQUAL_ELSE]').style.display == 'block')?'none':'block';">Covering tests</a>
+<div class="covered-tests" id="MutationIdentifier-[location=Location-[clazz=com.aidanwhiteley.books.controller.jwt.JwtAuthenticationService,-method=setAuthenticationData,-methodDesc=(Ljakarta/servlet/http/HttpServletResponse;Lcom/aidanwhiteley/books/domain/User;)V],-indexes=[38],-mutator=org.pitest.mutationtest.engine.gregor.mutators.RemoveConditionalMutator_EQUAL_ELSE]" style="display:none;">Covered by tests:
+<ul>
+<li>com.aidanwhiteley.books.controller.jwt.JwtAuthenticationServiceTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.jwt.JwtAuthenticationServiceTest]/[method:testSetAuthenticationData()]</li> 
+</ul>
+</div></div> 
+</td>
+</tr>
+<tr>
+<td><a href='#org.pitest.mutationtest.report.html.SourceFile@223a4213_66'>66</a></td> 
+<td></td>
+<td>
+
+<a name='grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_66'/> 
+
+<p class='KILLED'><span class='pop'>1.<span><b>1</b><br/><b>Location : </b>setAuthenticationData<br/><b>Killed by : </b>com.aidanwhiteley.books.controller.jwt.JwtAuthenticationServiceTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.jwt.JwtAuthenticationServiceTest]/[method:testSetAuthenticationData()]</span></span> removed call to jakarta/servlet/http/HttpServletResponse::addHeader &rarr; KILLED</span>
+</div> 
+</td>
+</tr>
+<tr>
+<td><a href='#org.pitest.mutationtest.report.html.SourceFile@223a4213_77'>77</a></td> 
+<td></td>
+<td>
+
+<a name='grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_77'/> 
+
+<p class='KILLED'><span class='pop'>1.<span><b>1</b><br/><b>Location : </b>readAndValidateAuthenticationData<br/><b>Killed by : </b>com.aidanwhiteley.books.controller.RestApiExceptionHandlerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.RestApiExceptionHandlerTest]/[method:testExceptionHandlerForResourceNotFound()]</span></span> removed conditional - replaced equality check with true &rarr; KILLED</span>
+</div> <p class='KILLED'><span class='pop'>2.<span><b>2</b><br/><b>Location : </b>readAndValidateAuthenticationData<br/><b>Killed by : </b>com.aidanwhiteley.books.util.ActuatorTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.util.ActuatorTest]/[method:checkActuatorEndpointsNotAvailableWithAdminRole()]</span></span> removed conditional - replaced equality check with false &rarr; KILLED</span>
+</div> 
+</td>
+</tr>
+<tr>
+<td><a href='#org.pitest.mutationtest.report.html.SourceFile@223a4213_80'>80</a></td> 
+<td></td>
+<td>
+
+<a name='grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_80'/> 
+
+<p class='KILLED'><span class='pop'>1.<span><b>1</b><br/><b>Location : </b>readAndValidateAuthenticationData<br/><b>Killed by : </b>com.aidanwhiteley.books.util.ActuatorTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.util.ActuatorTest]/[method:checkActuatorEndpointsNotAvailableWithAdminRole()]</span></span> Changed switch default to be first case &rarr; KILLED</span>
+</div> 
+</td>
+</tr>
+<tr>
+<td><a href='#org.pitest.mutationtest.report.html.SourceFile@223a4213_83'>83</a></td> 
+<td></td>
+<td>
+
+<a name='grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_83'/> 
+
+<p class='KILLED'><span class='pop'>1.<span><b>1</b><br/><b>Location : </b>readAndValidateAuthenticationData<br/><b>Killed by : </b>com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest]/[method:testCreateBookReviewInvalidData()]</span></span> removed conditional - replaced equality check with true &rarr; KILLED</span>
+</div> <p class='KILLED'><span class='pop'>2.<span><b>2</b><br/><b>Location : </b>readAndValidateAuthenticationData<br/><b>Killed by : </b>com.aidanwhiteley.books.util.ActuatorTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.util.ActuatorTest]/[method:checkActuatorEndpointsNotAvailableWithAdminRole()]</span></span> removed conditional - replaced equality check with false &rarr; KILLED</span>
+</div> <p class='KILLED'><span class='pop'>3.<span><b>3</b><br/><b>Location : </b>readAndValidateAuthenticationData<br/><b>Killed by : </b>com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest]/[method:testCreateBookReviewInvalidData()]</span></span> removed conditional - replaced equality check with false &rarr; KILLED</span>
+</div> <p class='KILLED'><span class='pop'>4.<span><b>4</b><br/><b>Location : </b>readAndValidateAuthenticationData<br/><b>Killed by : </b>com.aidanwhiteley.books.util.ActuatorTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.util.ActuatorTest]/[method:checkActuatorEndpointsNotAvailableWithAdminRole()]</span></span> removed conditional - replaced equality check with true &rarr; KILLED</span>
+</div> 
+</td>
+</tr>
+<tr>
+<td><a href='#org.pitest.mutationtest.report.html.SourceFile@223a4213_96'>96</a></td> 
+<td></td>
+<td>
+
+<a name='grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_96'/> 
+
+<p class='KILLED'><span class='pop'>1.<span><b>1</b><br/><b>Location : </b>readAndValidateAuthenticationData<br/><b>Killed by : </b>com.aidanwhiteley.books.util.ActuatorTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.util.ActuatorTest]/[method:checkActuatorEndpointsNotAvailableWithAdminRole()]</span></span> removed call to com/aidanwhiteley/books/controller/jwt/JwtAuthentication::setAuthenticated &rarr; KILLED</span>
+</div> 
+</td>
+</tr>
+<tr>
+<td><a href='#org.pitest.mutationtest.report.html.SourceFile@223a4213_99'>99</a></td> 
+<td></td>
+<td>
+
+<a name='grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_99'/> 
+
+<p class='NO_COVERAGE'><span class='pop'>1.<span><b>1</b><br/><b>Location : </b>readAndValidateAuthenticationData<br/><b>Killed by : </b>none</span></span> removed call to com/aidanwhiteley/books/controller/jwt/JwtAuthenticationService::expireJwtCookie &rarr; NO_COVERAGE</span>
+</div> 
+</td>
+</tr>
+<tr>
+<td><a href='#org.pitest.mutationtest.report.html.SourceFile@223a4213_102'>102</a></td> 
+<td></td>
+<td>
+
+<a name='grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_102'/> 
+
+<p class='SURVIVED'><span class='pop'>1.<span><b>1</b><br/><b>Location : </b>readAndValidateAuthenticationData<br/><b>Killed by : </b>none</span></span> removed call to com/aidanwhiteley/books/controller/jwt/JwtAuthenticationService::expireJwtCookie &rarr; SURVIVED</span>
+<a title="Click to view covering tests" class="view-covered-by-tests" onClick="document.getElementById('MutationIdentifier-[location=Location-[clazz=com.aidanwhiteley.books.controller.jwt.JwtAuthenticationService,-method=readAndValidateAuthenticationData,-methodDesc=(Ljakarta/servlet/http/HttpServletRequest;Ljakarta/servlet/http/HttpServletResponse;)Lcom/aidanwhiteley/books/controller/jwt/JwtAuthentication;],-indexes=[144],-mutator=org.pitest.mutationtest.engine.gregor.mutators.VoidMethodCallMutator]').style.display=(document.getElementById('MutationIdentifier-[location=Location-[clazz=com.aidanwhiteley.books.controller.jwt.JwtAuthenticationService,-method=readAndValidateAuthenticationData,-methodDesc=(Ljakarta/servlet/http/HttpServletRequest;Ljakarta/servlet/http/HttpServletResponse;)Lcom/aidanwhiteley/books/controller/jwt/JwtAuthentication;],-indexes=[144],-mutator=org.pitest.mutationtest.engine.gregor.mutators.VoidMethodCallMutator]').style.display == 'block')?'none':'block';">Covering tests</a>
+<div class="covered-tests" id="MutationIdentifier-[location=Location-[clazz=com.aidanwhiteley.books.controller.jwt.JwtAuthenticationService,-method=readAndValidateAuthenticationData,-methodDesc=(Ljakarta/servlet/http/HttpServletRequest;Ljakarta/servlet/http/HttpServletResponse;)Lcom/aidanwhiteley/books/controller/jwt/JwtAuthentication;],-indexes=[144],-mutator=org.pitest.mutationtest.engine.gregor.mutators.VoidMethodCallMutator]" style="display:none;">Covered by tests:
+<ul>
+<li>com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest]/[method:testInvalidJwtToken()]</li> 
+</ul>
+</div></div> 
+</td>
+</tr>
+<tr>
+<td><a href='#org.pitest.mutationtest.report.html.SourceFile@223a4213_112'>112</a></td> 
+<td></td>
+<td>
+
+<a name='grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_112'/> 
+
+<p class='NO_COVERAGE'><span class='pop'>1.<span><b>1</b><br/><b>Location : </b>readAndValidateAuthenticationData<br/><b>Killed by : </b>none</span></span> removed call to com/aidanwhiteley/books/controller/jwt/JwtAuthenticationService::expireJsessionIdCookie &rarr; NO_COVERAGE</span>
+</div> 
+</td>
+</tr>
+<tr>
+<td><a href='#org.pitest.mutationtest.report.html.SourceFile@223a4213_121'>121</a></td> 
+<td></td>
+<td>
+
+<a name='grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_121'/> 
+
+<p class='KILLED'><span class='pop'>1.<span><b>1</b><br/><b>Location : </b>readAndValidateAuthenticationData<br/><b>Killed by : </b>com.aidanwhiteley.books.util.ActuatorTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.util.ActuatorTest]/[method:checkActuatorEndpointsNotAvailableWithAdminRole()]</span></span> replaced return value with null for com/aidanwhiteley/books/controller/jwt/JwtAuthenticationService::readAndValidateAuthenticationData &rarr; KILLED</span>
+</div> 
+</td>
+</tr>
+<tr>
+<td><a href='#org.pitest.mutationtest.report.html.SourceFile@223a4213_126'>126</a></td> 
+<td></td>
+<td>
+
+<a name='grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_126'/> 
+
+<p class='KILLED'><span class='pop'>1.<span><b>1</b><br/><b>Location : </b>expireJwtCookie<br/><b>Killed by : </b>com.aidanwhiteley.books.controller.UserControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.UserControllerTest]/[method:testLogout()]</span></span> removed call to com/aidanwhiteley/books/controller/jwt/JwtAuthenticationService::expireCookie &rarr; KILLED</span>
+</div> 
+</td>
+</tr>
+<tr>
+<td><a href='#org.pitest.mutationtest.report.html.SourceFile@223a4213_135'>135</a></td> 
+<td></td>
+<td>
+
+<a name='grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_135'/> 
+
+<p class='SURVIVED'><span class='pop'>1.<span><b>1</b><br/><b>Location : </b>expireXsrfCookie<br/><b>Killed by : </b>none</span></span> removed call to com/aidanwhiteley/books/controller/jwt/JwtAuthenticationService::expireCookie &rarr; SURVIVED</span>
+<a title="Click to view covering tests" class="view-covered-by-tests" onClick="document.getElementById('MutationIdentifier-[location=Location-[clazz=com.aidanwhiteley.books.controller.jwt.JwtAuthenticationService,-method=expireXsrfCookie,-methodDesc=(Ljakarta/servlet/http/HttpServletResponse;)V],-indexes=[15],-mutator=org.pitest.mutationtest.engine.gregor.mutators.VoidMethodCallMutator]').style.display=(document.getElementById('MutationIdentifier-[location=Location-[clazz=com.aidanwhiteley.books.controller.jwt.JwtAuthenticationService,-method=expireXsrfCookie,-methodDesc=(Ljakarta/servlet/http/HttpServletResponse;)V],-indexes=[15],-mutator=org.pitest.mutationtest.engine.gregor.mutators.VoidMethodCallMutator]').style.display == 'block')?'none':'block';">Covering tests</a>
+<div class="covered-tests" id="MutationIdentifier-[location=Location-[clazz=com.aidanwhiteley.books.controller.jwt.JwtAuthenticationService,-method=expireXsrfCookie,-methodDesc=(Ljakarta/servlet/http/HttpServletResponse;)V],-indexes=[15],-mutator=org.pitest.mutationtest.engine.gregor.mutators.VoidMethodCallMutator]" style="display:none;">Covered by tests:
+<ul>
+<li>com.aidanwhiteley.books.controller.UserControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.UserControllerTest]/[method:testLogout()]</li> 
+</ul>
+</div></div> 
+</td>
+</tr>
+<tr>
+<td><a href='#org.pitest.mutationtest.report.html.SourceFile@223a4213_144'>144</a></td> 
+<td></td>
+<td>
+
+<a name='grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_144'/> 
+
+<p class='SURVIVED'><span class='pop'>1.<span><b>1</b><br/><b>Location : </b>expireJsessionIdCookie<br/><b>Killed by : </b>none</span></span> removed call to com/aidanwhiteley/books/controller/jwt/JwtAuthenticationService::expireCookie &rarr; SURVIVED</span>
+<a title="Click to view covering tests" class="view-covered-by-tests" onClick="document.getElementById('MutationIdentifier-[location=Location-[clazz=com.aidanwhiteley.books.controller.jwt.JwtAuthenticationService,-method=expireJsessionIdCookie,-methodDesc=(Ljakarta/servlet/http/HttpServletResponse;)V],-indexes=[15],-mutator=org.pitest.mutationtest.engine.gregor.mutators.VoidMethodCallMutator]').style.display=(document.getElementById('MutationIdentifier-[location=Location-[clazz=com.aidanwhiteley.books.controller.jwt.JwtAuthenticationService,-method=expireJsessionIdCookie,-methodDesc=(Ljakarta/servlet/http/HttpServletResponse;)V],-indexes=[15],-mutator=org.pitest.mutationtest.engine.gregor.mutators.VoidMethodCallMutator]').style.display == 'block')?'none':'block';">Covering tests</a>
+<div class="covered-tests" id="MutationIdentifier-[location=Location-[clazz=com.aidanwhiteley.books.controller.jwt.JwtAuthenticationService,-method=expireJsessionIdCookie,-methodDesc=(Ljakarta/servlet/http/HttpServletResponse;)V],-indexes=[15],-mutator=org.pitest.mutationtest.engine.gregor.mutators.VoidMethodCallMutator]" style="display:none;">Covered by tests:
+<ul>
+<li>com.aidanwhiteley.books.controller.UserControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.UserControllerTest]/[method:testLogout()]</li> 
+</ul>
+</div></div> 
+</td>
+</tr>
+<tr>
+<td><a href='#org.pitest.mutationtest.report.html.SourceFile@223a4213_148'>148</a></td> 
+<td></td>
+<td>
+
+<a name='grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_148'/> 
+
+<p class='SURVIVED'><span class='pop'>1.<span><b>1</b><br/><b>Location : </b>expireCookie<br/><b>Killed by : </b>none</span></span> removed call to jakarta/servlet/http/Cookie::setMaxAge &rarr; SURVIVED</span>
+<a title="Click to view covering tests" class="view-covered-by-tests" onClick="document.getElementById('MutationIdentifier-[location=Location-[clazz=com.aidanwhiteley.books.controller.jwt.JwtAuthenticationService,-method=expireCookie,-methodDesc=(Ljakarta/servlet/http/HttpServletResponse;Ljakarta/servlet/http/Cookie;Z)V],-indexes=[5],-mutator=org.pitest.mutationtest.engine.gregor.mutators.VoidMethodCallMutator]').style.display=(document.getElementById('MutationIdentifier-[location=Location-[clazz=com.aidanwhiteley.books.controller.jwt.JwtAuthenticationService,-method=expireCookie,-methodDesc=(Ljakarta/servlet/http/HttpServletResponse;Ljakarta/servlet/http/Cookie;Z)V],-indexes=[5],-mutator=org.pitest.mutationtest.engine.gregor.mutators.VoidMethodCallMutator]').style.display == 'block')?'none':'block';">Covering tests</a>
+<div class="covered-tests" id="MutationIdentifier-[location=Location-[clazz=com.aidanwhiteley.books.controller.jwt.JwtAuthenticationService,-method=expireCookie,-methodDesc=(Ljakarta/servlet/http/HttpServletResponse;Ljakarta/servlet/http/Cookie;Z)V],-indexes=[5],-mutator=org.pitest.mutationtest.engine.gregor.mutators.VoidMethodCallMutator]" style="display:none;">Covered by tests:
+<ul>
+<li>com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest]/[method:testInvalidJwtToken()]</li> <li>com.aidanwhiteley.books.controller.UserControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.UserControllerTest]/[method:testLogout()]</li> 
+</ul>
+</div></div> 
+</td>
+</tr>
+<tr>
+<td><a href='#org.pitest.mutationtest.report.html.SourceFile@223a4213_149'>149</a></td> 
+<td></td>
+<td>
+
+<a name='grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_149'/> 
+
+<p class='SURVIVED'><span class='pop'>1.<span><b>1</b><br/><b>Location : </b>expireCookie<br/><b>Killed by : </b>none</span></span> removed call to jakarta/servlet/http/Cookie::setHttpOnly &rarr; SURVIVED</span>
+<a title="Click to view covering tests" class="view-covered-by-tests" onClick="document.getElementById('MutationIdentifier-[location=Location-[clazz=com.aidanwhiteley.books.controller.jwt.JwtAuthenticationService,-method=expireCookie,-methodDesc=(Ljakarta/servlet/http/HttpServletResponse;Ljakarta/servlet/http/Cookie;Z)V],-indexes=[10],-mutator=org.pitest.mutationtest.engine.gregor.mutators.VoidMethodCallMutator]').style.display=(document.getElementById('MutationIdentifier-[location=Location-[clazz=com.aidanwhiteley.books.controller.jwt.JwtAuthenticationService,-method=expireCookie,-methodDesc=(Ljakarta/servlet/http/HttpServletResponse;Ljakarta/servlet/http/Cookie;Z)V],-indexes=[10],-mutator=org.pitest.mutationtest.engine.gregor.mutators.VoidMethodCallMutator]').style.display == 'block')?'none':'block';">Covering tests</a>
+<div class="covered-tests" id="MutationIdentifier-[location=Location-[clazz=com.aidanwhiteley.books.controller.jwt.JwtAuthenticationService,-method=expireCookie,-methodDesc=(Ljakarta/servlet/http/HttpServletResponse;Ljakarta/servlet/http/Cookie;Z)V],-indexes=[10],-mutator=org.pitest.mutationtest.engine.gregor.mutators.VoidMethodCallMutator]" style="display:none;">Covered by tests:
+<ul>
+<li>com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest]/[method:testInvalidJwtToken()]</li> <li>com.aidanwhiteley.books.controller.UserControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.UserControllerTest]/[method:testLogout()]</li> 
+</ul>
+</div></div> 
+</td>
+</tr>
+<tr>
+<td><a href='#org.pitest.mutationtest.report.html.SourceFile@223a4213_150'>150</a></td> 
+<td></td>
+<td>
+
+<a name='grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_150'/> 
+
+<p class='SURVIVED'><span class='pop'>1.<span><b>1</b><br/><b>Location : </b>expireCookie<br/><b>Killed by : </b>none</span></span> removed call to jakarta/servlet/http/Cookie::setSecure &rarr; SURVIVED</span>
+<a title="Click to view covering tests" class="view-covered-by-tests" onClick="document.getElementById('MutationIdentifier-[location=Location-[clazz=com.aidanwhiteley.books.controller.jwt.JwtAuthenticationService,-method=expireCookie,-methodDesc=(Ljakarta/servlet/http/HttpServletResponse;Ljakarta/servlet/http/Cookie;Z)V],-indexes=[16],-mutator=org.pitest.mutationtest.engine.gregor.mutators.VoidMethodCallMutator]').style.display=(document.getElementById('MutationIdentifier-[location=Location-[clazz=com.aidanwhiteley.books.controller.jwt.JwtAuthenticationService,-method=expireCookie,-methodDesc=(Ljakarta/servlet/http/HttpServletResponse;Ljakarta/servlet/http/Cookie;Z)V],-indexes=[16],-mutator=org.pitest.mutationtest.engine.gregor.mutators.VoidMethodCallMutator]').style.display == 'block')?'none':'block';">Covering tests</a>
+<div class="covered-tests" id="MutationIdentifier-[location=Location-[clazz=com.aidanwhiteley.books.controller.jwt.JwtAuthenticationService,-method=expireCookie,-methodDesc=(Ljakarta/servlet/http/HttpServletResponse;Ljakarta/servlet/http/Cookie;Z)V],-indexes=[16],-mutator=org.pitest.mutationtest.engine.gregor.mutators.VoidMethodCallMutator]" style="display:none;">Covered by tests:
+<ul>
+<li>com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest]/[method:testInvalidJwtToken()]</li> <li>com.aidanwhiteley.books.controller.UserControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.UserControllerTest]/[method:testLogout()]</li> 
+</ul>
+</div></div> 
+</td>
+</tr>
+<tr>
+<td><a href='#org.pitest.mutationtest.report.html.SourceFile@223a4213_151'>151</a></td> 
+<td></td>
+<td>
+
+<a name='grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_151'/> 
+
+<p class='SURVIVED'><span class='pop'>1.<span><b>1</b><br/><b>Location : </b>expireCookie<br/><b>Killed by : </b>none</span></span> removed call to jakarta/servlet/http/Cookie::setPath &rarr; SURVIVED</span>
+<a title="Click to view covering tests" class="view-covered-by-tests" onClick="document.getElementById('MutationIdentifier-[location=Location-[clazz=com.aidanwhiteley.books.controller.jwt.JwtAuthenticationService,-method=expireCookie,-methodDesc=(Ljakarta/servlet/http/HttpServletResponse;Ljakarta/servlet/http/Cookie;Z)V],-indexes=[22],-mutator=org.pitest.mutationtest.engine.gregor.mutators.VoidMethodCallMutator]').style.display=(document.getElementById('MutationIdentifier-[location=Location-[clazz=com.aidanwhiteley.books.controller.jwt.JwtAuthenticationService,-method=expireCookie,-methodDesc=(Ljakarta/servlet/http/HttpServletResponse;Ljakarta/servlet/http/Cookie;Z)V],-indexes=[22],-mutator=org.pitest.mutationtest.engine.gregor.mutators.VoidMethodCallMutator]').style.display == 'block')?'none':'block';">Covering tests</a>
+<div class="covered-tests" id="MutationIdentifier-[location=Location-[clazz=com.aidanwhiteley.books.controller.jwt.JwtAuthenticationService,-method=expireCookie,-methodDesc=(Ljakarta/servlet/http/HttpServletResponse;Ljakarta/servlet/http/Cookie;Z)V],-indexes=[22],-mutator=org.pitest.mutationtest.engine.gregor.mutators.VoidMethodCallMutator]" style="display:none;">Covered by tests:
+<ul>
+<li>com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest]/[method:testInvalidJwtToken()]</li> <li>com.aidanwhiteley.books.controller.UserControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.UserControllerTest]/[method:testLogout()]</li> 
+</ul>
+</div></div> 
+</td>
+</tr>
+<tr>
+<td><a href='#org.pitest.mutationtest.report.html.SourceFile@223a4213_152'>152</a></td> 
+<td></td>
+<td>
+
+<a name='grouporg.pitest.mutationtest.report.html.SourceFile@223a4213_152'/> 
+
+<p class='KILLED'><span class='pop'>1.<span><b>1</b><br/><b>Location : </b>expireCookie<br/><b>Killed by : </b>com.aidanwhiteley.books.controller.UserControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.UserControllerTest]/[method:testLogout()]</span></span> removed call to jakarta/servlet/http/HttpServletResponse::addCookie &rarr; KILLED</span>
+</div> 
+</td>
+</tr>
+
+</table>
+
+
+<h2>Active mutators</h2>
+<ul>
+<li class='mutator'>CONDITIONALS_BOUNDARY</li>
+<li class='mutator'>EMPTY_RETURNS</li>
+<li class='mutator'>EXPERIMENTAL_SWITCH</li>
+<li class='mutator'>FALSE_RETURNS</li>
+<li class='mutator'>INCREMENTS</li>
+<li class='mutator'>INVERT_NEGS</li>
+<li class='mutator'>MATH</li>
+<li class='mutator'>NULL_RETURNS</li>
+<li class='mutator'>PRIMITIVE_RETURNS</li>
+<li class='mutator'>REMOVE_CONDITIONALS_EQUAL_ELSE</li>
+<li class='mutator'>REMOVE_CONDITIONALS_EQUAL_IF</li>
+<li class='mutator'>REMOVE_CONDITIONALS_ORDER_ELSE</li>
+<li class='mutator'>REMOVE_CONDITIONALS_ORDER_IF</li>
+<li class='mutator'>TRUE_RETURNS</li>
+<li class='mutator'>VOID_METHOD_CALLS</li>
+
+</ul>
+
+<h2>Tests examined</h2>
+<ul>
+<li>com.aidanwhiteley.books.controller.jwt.JwtAuthenticationServiceTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.jwt.JwtAuthenticationServiceTest]/[method:testSetAuthenticationData()] (10 ms)</li><li>com.aidanwhiteley.books.util.ActuatorTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.util.ActuatorTest]/[method:checkActuatorEndpointsAreAvailableWithActuatorRole()] (17 ms)</li><li>com.aidanwhiteley.books.util.ActuatorTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.util.ActuatorTest]/[method:checkActuatorEndpointsNotAvailableWithAdminRole()] (23 ms)</li><li>com.aidanwhiteley.books.util.ActuatorTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.util.ActuatorTest]/[method:checkUnexpectedEndpointNotAvailable()] (22 ms)</li><li>com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest]/[method:testInvalidJwtToken()] (32 ms)</li><li>com.aidanwhiteley.books.util.ActuatorTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.util.ActuatorTest]/[method:checkActuatorEndpointsNotAvailableWithoutActuatorRole()] (33 ms)</li><li>com.aidanwhiteley.books.util.ActuatorTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.util.ActuatorTest]/[method:checkSampleActuatorValue()] (34 ms)</li><li>com.aidanwhiteley.books.controller.BookSecureControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerTest]/[method:testDebugHeaders()] (26 ms)</li><li>com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest]/[method:testEditorCannotSeeUserAdmin()] (32 ms)</li><li>com.aidanwhiteley.books.controller.BookSecureControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerTest]/[method:findBookReaders()] (48 ms)</li><li>com.aidanwhiteley.books.controller.UserControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.UserControllerTest]/[method:tryToPatchOwnUserid()] (42 ms)</li><li>com.aidanwhiteley.books.controller.UserControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.UserControllerTest]/[method:getUserDetailsWithAuthentication()] (49 ms)</li><li>com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest]/[method:testAddCommentBadData()] (34 ms)</li><li>com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest]/[method:testAdminCanChangeRoleOfOtherUserid()] (56 ms)</li><li>com.aidanwhiteley.books.controller.BookSecureControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerTest]/[method:tryToUpdateBookWithInsufficientPermissions()] (44 ms)</li><li>com.aidanwhiteley.books.controller.BookControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerTest]/[method:findByAuthor()] (46 ms)</li><li>com.aidanwhiteley.books.controller.BookControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerHtmxTest]/[method:testUserDataIsReturnedToEditorUser()] (77 ms)</li><li>com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest]/[method:testCreateBookReviewInvalidData()] (65 ms)</li><li>com.aidanwhiteley.books.controller.BookControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerTest]/[method:testUserDataIsReturnedToEditorUser()] (70 ms)</li><li>com.aidanwhiteley.books.controller.BookSecureControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerTest]/[method:findBooksByReader()] (81 ms)</li><li>com.aidanwhiteley.books.controller.UserControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.UserControllerTest]/[method:testLogout()] (174 ms)</li><li>com.aidanwhiteley.books.util.ActuatorTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.util.ActuatorTest]/[method:checkExpectedEndpointAvailable()] (193 ms)</li><li>com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest]/[method:testAdminCanSeeUserAdmin()] (196 ms)</li><li>com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest]/[method:testAdminCannotDeleteOwnUserid()] (193 ms)</li><li>com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest]/[method:testAdminCanDeleteOtherUserid()] (195 ms)</li><li>com.aidanwhiteley.books.controller.BookSecureControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerTest]/[method:tryToCreateInvalidBook()] (194 ms)</li><li>com.aidanwhiteley.books.controller.BookSecureControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerTest]/[method:tryUpdateActionWhenNoCsrfTokenInRequestHeaders()] (181 ms)</li><li>com.aidanwhiteley.books.controller.BookControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerHtmxTest]/[method:testAdminCanDeleteSomeoneElsesReview()] (173 ms)</li><li>com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest]/[method:testAdminCannotChangeOwnRoles()] (204 ms)</li><li>com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest]/[method:testEditorCannotDeleteBookReviewTheyDidntCreate()] (197 ms)</li><li>com.aidanwhiteley.books.controller.UserControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.UserControllerTest]/[method:tryToDeleteUserid()] (219 ms)</li><li>com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest]/[method:testEditorUserCanAccessCreateReviewPage()] (220 ms)</li><li>com.aidanwhiteley.books.controller.BookSecureControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerTest]/[method:createAndDeleteBook()] (201 ms)</li><li>com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest]/[method:testEditorCannotUpdateAnotherEditorsBookReview()] (194 ms)</li><li>com.aidanwhiteley.books.controller.FeedsControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.FeedsControllerTest]/[method:checkBooksExportWithLoggedOnHasNoBooks()] (205 ms)</li><li>com.aidanwhiteley.books.controller.BookControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerTest]/[method:testSensitiveDataIsReturnedToAdminUser()] (215 ms)</li><li>com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest]/[method:testAdminCanDeleteBookReview()] (230 ms)</li><li>com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest]/[method:testUpdateNonExistentBookReview()] (282 ms)</li><li>com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest]/[method:testAdminCanUpdateBookReview()] (216 ms)</li><li>com.aidanwhiteley.books.controller.BookControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerTest]/[method:testSensitiveDataNotReturnedToAnonymousUser()] (259 ms)</li><li>com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest]/[method:testAddAndDeleteComment()] (255 ms)</li><li>com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest]/[method:testEditorCanCreateBookReview()] (242 ms)</li><li>com.aidanwhiteley.books.controller.BookSecureControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerTest]/[method:updateBook()] (273 ms)</li><li>com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest]/[method:testEditorCanSeeBookReviewers()] (280 ms)</li><li>com.aidanwhiteley.books.controller.BookSecureControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerTest]/[method:addAndRemoveCommentFromBook()] (295 ms)</li><li>com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest]/[method:testEditorCanAddCommentToAnyBook()] (290 ms)</li><li>com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest]/[method:testAdminUpdateBookReviewWithBadData()] (435 ms)</li><li>com.aidanwhiteley.books.controller.BookControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerHtmxTest]/[method:testEditorCantDeleteSomeoneElsesReview()] (506 ms)</li><li>com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest]/[method:testEditorUserCanAccessUpdateReviewPage()] (812 ms)</li><li>com.aidanwhiteley.books.controller.BookControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerTest]/[method:findBookById()] (1263 ms)</li><li>com.aidanwhiteley.books.controller.RestApiExceptionHandlerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.RestApiExceptionHandlerTest]/[method:testExceptionHandlerForResourceNotFound()] (14 ms)</li><li>com.aidanwhiteley.books.controller.UserControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.UserControllerTest]/[method:getUserDetailsNoAuthentication()] (15 ms)</li><li>com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookSecureControllerHtmxTest]/[method:testNonEditorUserCantAccessCreateReviewPage()] (17 ms)</li><li>com.aidanwhiteley.books.controller.BookControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerTest]/[method:findBookByRatingPreConditions()] (23 ms)</li><li>com.aidanwhiteley.books.controller.FeedsControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.FeedsControllerTest]/[method:checkBooksExportNotLoggedOnHasNoBooks()] (26 ms)</li><li>com.aidanwhiteley.books.controller.config.OpenApiConfigTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.config.OpenApiConfigTest]/[method:testOpenApiSwaggerUiHtml()] (30 ms)</li><li>com.aidanwhiteley.books.controller.BookControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerTest]/[method:testBookDataSummaryApis()] (30 ms)</li><li>com.aidanwhiteley.books.controller.RestApiExceptionHandlerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.RestApiExceptionHandlerTest]/[method:testExceptionHandlerForNoPermissions()] (38 ms)</li><li>com.aidanwhiteley.books.controller.BookControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerHtmxTest]/[method:testUserDataIsNotReturnedToBasicUser()] (24 ms)</li><li>com.aidanwhiteley.books.controller.BookControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerTest]/[method:askForTooManyDataItems()] (43 ms)</li><li>com.aidanwhiteley.books.controller.BookControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerHtmxTest]/[method:findBySearch()] (59 ms)</li><li>com.aidanwhiteley.books.controller.BookControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerHtmxTest]/[method:findByRatingBadParams()] (60 ms)</li><li>com.aidanwhiteley.books.controller.BookControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerHtmxTest]/[method:findByGenre()] (48 ms)</li><li>com.aidanwhiteley.books.controller.BookControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerTest]/[method:findBookByRating()] (50 ms)</li><li>com.aidanwhiteley.books.controller.RestApiExceptionHandlerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.RestApiExceptionHandlerTest]/[method:testExceptionHandlerIllegalArguments()] (41 ms)</li><li>com.aidanwhiteley.books.controller.BookControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerTest]/[method:findAllByWhenCreatedDateTimeDesc()] (160 ms)</li><li>com.aidanwhiteley.books.controller.BookControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerHtmxTest]/[method:findByAuthorBadParams()] (182 ms)</li><li>com.aidanwhiteley.books.controller.BookControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerTest]/[method:askForEmptySearchCriteria()] (197 ms)</li><li>com.aidanwhiteley.books.controller.BookControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerHtmxTest]/[method:findByAuthor()] (185 ms)</li><li>com.aidanwhiteley.books.controller.BookControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerHtmxTest]/[method:findByGenreBadParams()] (212 ms)</li><li>com.aidanwhiteley.books.controller.BookControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerHtmxTest]/[method:findByRating()] (184 ms)</li><li>com.aidanwhiteley.books.controller.BookControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerHtmxTest]/[method:getBookByRating()] (214 ms)</li><li>com.aidanwhiteley.books.controller.BookControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerHtmxTest]/[method:getBookByRatingMissingParam()] (268 ms)</li><li>com.aidanwhiteley.books.controller.BookControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerHtmxTest]/[method:statistics()] (261 ms)</li><li>com.aidanwhiteley.books.controller.UserControllerNoAuthTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.UserControllerNoAuthTest]/[method:getUserDetailsNoAuthentication()] (201 ms)</li><li>com.aidanwhiteley.books.controller.BookControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerHtmxTest]/[method:searchBadParams()] (463 ms)</li><li>com.aidanwhiteley.books.controller.BookControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerHtmxTest]/[method:findRecent()] (464 ms)</li><li>com.aidanwhiteley.books.controller.BookControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerTest]/[method:findBooksByGenre()] (479 ms)</li><li>com.aidanwhiteley.books.controller.BookControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerHtmxTest]/[method:findBooksOnHomePage()] (527 ms)</li><li>com.aidanwhiteley.books.controller.BookControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerHtmxTest]/[method:findOptions()] (730 ms)</li><li>com.aidanwhiteley.books.controller.FeedsControllerTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.FeedsControllerTest]/[method:checkRssFeedsHasEntries()] (1020 ms)</li><li>com.aidanwhiteley.books.controller.BookControllerHtmxTest.[engine:junit-jupiter]/[class:com.aidanwhiteley.books.controller.BookControllerHtmxTest]/[method:findBookById()] (3316 ms)</li>
+</ul>
+
+<br/>
+
+Report generated by <a href='https://pitest.org'>PIT</a> 1.22.0
+
+</body>
+</html>

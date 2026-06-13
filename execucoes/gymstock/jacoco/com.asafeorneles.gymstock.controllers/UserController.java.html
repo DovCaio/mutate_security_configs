@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>UserController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">gymstock</a> &gt; <a href="index.source.html" class="el_package">com.asafeorneles.gymstock.controllers</a> &gt; <span class="el_source">UserController.java</span></div><h1>UserController.java</h1><pre class="source lang-java linenums">package com.asafeorneles.gymstock.controllers;
+
+import com.asafeorneles.gymstock.dtos.user.UserResponse;
+import com.asafeorneles.gymstock.services.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.UUID;
+
+@RestController
+@RequestMapping(&quot;/users&quot;)
+@Tag(name = &quot;Users&quot;)
+@RequiredArgsConstructor
+public class UserController {
+
+    final UserService userService;
+
+    @Operation(summary = &quot;Get all users&quot;)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = &quot;200&quot;, description = &quot;Users returned successfully&quot;),
+            @ApiResponse(responseCode = &quot;403&quot;, description = &quot;The logged-in user does not have permission to access this route.&quot;),
+            @ApiResponse(responseCode = &quot;500&quot;, description = &quot;Unexpected server error&quot;)
+    })
+    @PreAuthorize(&quot;hasAuthority('user:read')&quot;)
+    @GetMapping
+    public ResponseEntity&lt;List&lt;UserResponse&gt;&gt; getAllUsers(){
+<span class="nc" id="L36">        List&lt;UserResponse&gt; users = userService.getAllUsers();</span>
+<span class="nc" id="L37">        return ResponseEntity.status(HttpStatus.OK).body(users);</span>
+    }
+
+    @Operation(summary = &quot;Get a user by ID&quot;)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = &quot;200&quot;, description = &quot;Users returned successfully&quot;),
+            @ApiResponse(responseCode = &quot;403&quot;, description = &quot;The logged-in user does not have permission to access this route.&quot;),
+            @ApiResponse(responseCode = &quot;500&quot;, description = &quot;Unexpected server error&quot;)
+    })
+    @PreAuthorize(&quot;hasAuthority('user:read')&quot;)
+    @GetMapping(&quot;/{id}&quot;)
+    public ResponseEntity&lt;UserResponse&gt; getUserById(@PathVariable(name = &quot;id&quot;) UUID id){
+<span class="nc" id="L49">        UserResponse user = userService.getUserById(id);</span>
+<span class="nc" id="L50">        return ResponseEntity.status(HttpStatus.OK).body(user);</span>
+    }
+
+    @Operation(summary = &quot;Deactivate a user&quot;)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = &quot;200&quot;, description = &quot;User deactivated successfully&quot;),
+            @ApiResponse(responseCode = &quot;403&quot;, description = &quot;The logged-in user does not have permission to access this route.&quot;),
+            @ApiResponse(responseCode = &quot;404&quot;, description = &quot;User not found&quot;),
+            @ApiResponse(responseCode = &quot;409&quot;, description = &quot;User is already inactive&quot;),
+            @ApiResponse(responseCode = &quot;500&quot;, description = &quot;Unexpected server error&quot;)
+    })
+    @PreAuthorize(&quot;hasAuthority('user:deactivate')&quot;)
+    @PatchMapping(&quot;/deactivate/{id}&quot;)
+    public ResponseEntity&lt;String&gt; deactivateUser(@PathVariable(name = &quot;id&quot;) UUID id, JwtAuthenticationToken token){
+<span class="nc" id="L64">        userService.deactivateUser(id, token);</span>
+<span class="nc" id="L65">        return ResponseEntity.status(HttpStatus.OK).body(&quot;User deactivated successfully&quot;);</span>
+    }
+
+    @Operation(summary = &quot;Activate a user&quot;)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = &quot;200&quot;, description = &quot;User activated successfully&quot;),
+            @ApiResponse(responseCode = &quot;403&quot;, description = &quot;The logged-in user does not have permission to access this route.&quot;),
+            @ApiResponse(responseCode = &quot;404&quot;, description = &quot;User not found&quot;),
+            @ApiResponse(responseCode = &quot;409&quot;, description = &quot;User is already active&quot;),
+            @ApiResponse(responseCode = &quot;500&quot;, description = &quot;Unexpected server error&quot;)
+    })
+    @PreAuthorize(&quot;hasAuthority('user:activate')&quot;)
+    @PatchMapping(&quot;/activate/{id}&quot;)
+    public ResponseEntity&lt;String&gt; activateUser(@PathVariable(name = &quot;id&quot;) UUID id){
+<span class="nc" id="L79">        userService.activityUser(id);</span>
+<span class="nc" id="L80">        return ResponseEntity.status(HttpStatus.OK).body(&quot;User activate successfully&quot;);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

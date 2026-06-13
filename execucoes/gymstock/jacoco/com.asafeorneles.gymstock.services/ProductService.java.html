@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ProductService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">gymstock</a> &gt; <a href="index.source.html" class="el_package">com.asafeorneles.gymstock.services</a> &gt; <span class="el_source">ProductService.java</span></div><h1>ProductService.java</h1><pre class="source lang-java linenums">package com.asafeorneles.gymstock.services;
+
+import com.asafeorneles.gymstock.dtos.product.*;
+import com.asafeorneles.gymstock.entities.Category;
+import com.asafeorneles.gymstock.entities.Product;
+import com.asafeorneles.gymstock.entities.ProductInventory;
+import com.asafeorneles.gymstock.exceptions.ActivityStatusException;
+import com.asafeorneles.gymstock.exceptions.BusinessConflictException;
+import com.asafeorneles.gymstock.exceptions.ResourceNotFoundException;
+import com.asafeorneles.gymstock.mapper.ProductMapper;
+import com.asafeorneles.gymstock.repositories.CategoryRepository;
+import com.asafeorneles.gymstock.repositories.ProductRepository;
+import com.asafeorneles.gymstock.repositories.SaleItemRepository;
+import com.asafeorneles.gymstock.services.factory.ProductInventoryFactory;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.UUID;
+
+
+@Service
+@RequiredArgsConstructor
+public class ProductService {
+    final ProductRepository productRepository;
+    final CategoryRepository categoryRepository;
+    final SaleItemRepository saleItemRepository;
+    final ProductMapper productMapper;
+
+    @Transactional
+    public ProductDetailResponse createProduct(ProductCreateRequest productCreateRequest) {
+<span class="fc" id="L34">        UUID categoryId = productCreateRequest.categoryId();</span>
+<span class="fc" id="L35">        Category category = categoryRepository.findById(categoryId)</span>
+<span class="pc" id="L36">                .orElseThrow(() -&gt; new ResourceNotFoundException(&quot;The category {&quot; + categoryId + &quot;} does not exist. Please insert a valid category.&quot;));</span>
+
+<span class="fc bfc" id="L38" title="All 2 branches covered.">        if (!category.isActivity()) {</span>
+<span class="fc" id="L39">            throw new ActivityStatusException(&quot;This category is inactivity!&quot;);</span>
+        }
+
+<span class="fc bfc" id="L42" title="All 2 branches covered.">        if (productRepository.existsByNameAndBrand(productCreateRequest.name(), productCreateRequest.brand())) {</span>
+<span class="fc" id="L43">            throw new BusinessConflictException(&quot;Product already exists&quot;);</span>
+        }
+
+<span class="fc" id="L46">        Product product = productMapper.toEntity(productCreateRequest);</span>
+
+<span class="fc" id="L48">        ProductInventory productInventory = ProductInventoryFactory</span>
+<span class="fc" id="L49">                .newProductInventory(product, productCreateRequest.quantity(), productCreateRequest.lowStockThreshold());</span>
+
+<span class="fc" id="L51">        product.setInventory(productInventory);</span>
+<span class="fc" id="L52">        product.setCategory(category);</span>
+<span class="fc" id="L53">        product.activity();</span>
+
+<span class="fc" id="L55">        productRepository.save(product);</span>
+
+<span class="fc" id="L57">        return productMapper.toResponseDetails(product);</span>
+    }
+
+    public List&lt;ProductResponse&gt; getAllProducts(Specification&lt;Product&gt; specification) {
+<span class="fc" id="L61">        return productRepository.findAll(specification)</span>
+<span class="fc" id="L62">                .stream()</span>
+<span class="fc" id="L63">                .map(productMapper::toResponse)</span>
+<span class="fc" id="L64">                .toList();</span>
+    }
+
+    public List&lt;ProductDetailResponse&gt; getAllProductsDetails(Specification&lt;Product&gt; specification) {
+<span class="nc" id="L68">        return productRepository.findAll(specification)</span>
+<span class="nc" id="L69">                .stream()</span>
+<span class="nc" id="L70">                .map(productMapper::toResponseDetails)</span>
+<span class="nc" id="L71">                .toList();</span>
+    }
+
+    public ProductResponse getProductById(UUID id) {
+<span class="fc" id="L75">        return productRepository.findById(id)</span>
+<span class="fc" id="L76">                .filter(Product::isActivity)</span>
+<span class="fc" id="L77">                .map(productMapper::toResponse)</span>
+<span class="fc" id="L78">                .orElseThrow(() -&gt; new ResourceNotFoundException(&quot;Product not found by id: &quot; + id));</span>
+    }
+
+    public List&lt;ProductDetailResponse&gt; getAllProductsWithLowStock() {
+<span class="fc" id="L82">        return productRepository.findProductWithLowStock()</span>
+<span class="fc" id="L83">                .stream()</span>
+<span class="fc" id="L84">                .map(productMapper::toResponseDetails)</span>
+<span class="fc" id="L85">                .toList();</span>
+    }
+
+    @Transactional
+    public ProductDetailResponse updateProduct(UUID id, ProductUpdateRequest productUpdateRequest) {
+<span class="fc" id="L90">        Product product = productRepository.findById(id)</span>
+<span class="fc" id="L91">                .orElseThrow(() -&gt; new ResourceNotFoundException(&quot;Product not found by id: &quot; + id));</span>
+
+<span class="fc" id="L93">        checkProductIsActiveBeforeUpdate(product.isActivity(), &quot;This product is inactive.. You can only update activity products.&quot;);</span>
+
+<span class="fc" id="L95">        UUID updateCategoryId = productUpdateRequest.categoryId();</span>
+<span class="fc" id="L96">        Category category = categoryRepository.findById(updateCategoryId)</span>
+<span class="fc" id="L97">                .orElseThrow(() -&gt; new ResourceNotFoundException(&quot;The category {&quot; + updateCategoryId + &quot;} does not exist. Please insert a valid category to update the product.&quot;));</span>
+
+<span class="fc" id="L99">        productMapper.updateEntity(productUpdateRequest, product);</span>
+<span class="fc" id="L100">        product.setCategory(category);</span>
+
+<span class="fc" id="L102">        productRepository.save(product);</span>
+
+<span class="fc" id="L104">        return productMapper.toResponseDetails(product);</span>
+    }
+
+    @Transactional
+    public void deleteProduct(UUID id) {
+<span class="fc bfc" id="L109" title="All 2 branches covered.">        if (saleItemRepository.existsByProduct_ProductId(id)) {</span>
+<span class="fc" id="L110">            throw new BusinessConflictException(&quot;This product has already been used in a sale. Please use the deactivate option.&quot;);</span>
+        }
+
+<span class="fc" id="L113">        Product product = productRepository.findById(id)</span>
+<span class="fc" id="L114">                .orElseThrow(() -&gt; new ResourceNotFoundException(&quot;Product not found by id: &quot; + id));</span>
+
+<span class="fc" id="L116">        productRepository.delete(product);</span>
+<span class="fc" id="L117">    }</span>
+
+
+    @Transactional
+    public ProductDetailResponse deactivateProduct(UUID id, ProductDeactivateRequest productDeactivateRequest) {
+<span class="fc" id="L122">        Product product = productRepository.findById(id)</span>
+<span class="pc" id="L123">                .orElseThrow(() -&gt; new ResourceNotFoundException(&quot;Product not found by id: &quot; + id));</span>
+
+<span class="fc" id="L125">        product.inactivity(productDeactivateRequest.reason());</span>
+
+<span class="fc" id="L127">        productRepository.save(product);</span>
+
+<span class="fc" id="L129">        return productMapper.toResponseDetails(product);</span>
+    }
+
+    @Transactional
+    public ProductDetailResponse activateProduct(UUID id) {
+<span class="fc" id="L134">        Product product = productRepository.findById(id)</span>
+<span class="pc" id="L135">                .orElseThrow(() -&gt; new ResourceNotFoundException(&quot;Product not found by id: &quot; + id));</span>
+
+<span class="fc" id="L137">        product.activity();</span>
+
+<span class="fc" id="L139">        productRepository.save(product);</span>
+
+<span class="fc" id="L141">        return productMapper.toResponseDetails(product);</span>
+    }
+
+    public static void checkProductIsActiveBeforeUpdate(boolean isActivity, String error) {
+<span class="fc bfc" id="L145" title="All 2 branches covered.">        if (!isActivity) {</span>
+<span class="fc" id="L146">            throw new BusinessConflictException(error);</span>
+        }
+<span class="fc" id="L148">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

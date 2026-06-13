@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>InventoryController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">gymstock</a> &gt; <a href="index.source.html" class="el_package">com.asafeorneles.gymstock.controllers</a> &gt; <span class="el_source">InventoryController.java</span></div><h1>InventoryController.java</h1><pre class="source lang-java linenums">package com.asafeorneles.gymstock.controllers;
+
+import com.asafeorneles.gymstock.dtos.ProductInventory.ProductInventoryDetailResponse;
+import com.asafeorneles.gymstock.dtos.ProductInventory.ProductInventoryLowStockThresholdRequest;
+import com.asafeorneles.gymstock.dtos.ProductInventory.ProductInventoryQuantityRequest;
+import com.asafeorneles.gymstock.services.ProductInventoryService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.UUID;
+
+@RestController
+@RequestMapping(value = &quot;/inventories&quot;, produces = {&quot;application/json&quot;})
+@Tag(name = &quot;Products Inventories&quot;)
+@RequiredArgsConstructor
+public class InventoryController {
+
+    final ProductInventoryService productInventoryService;
+
+    @Operation(summary = &quot;Get all products inventories&quot;)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = &quot;200&quot;, description = &quot;Product inventories returned successfully&quot;),
+            @ApiResponse(responseCode = &quot;401&quot;, description = &quot;Unauthenticated user&quot;),
+            @ApiResponse(responseCode = &quot;403&quot;, description = &quot;The logged-in user does not have permission to access this route.&quot;),
+            @ApiResponse(responseCode = &quot;404&quot;, description = &quot;Product inventories not found&quot;),
+            @ApiResponse(responseCode = &quot;500&quot;, description = &quot;Unexpected server error&quot;)
+    })
+    @PreAuthorize(&quot;hasAuthority('inventory:read')&quot;)
+    @GetMapping
+    public ResponseEntity&lt;List&lt;ProductInventoryDetailResponse&gt;&gt; findProductsInventories(){
+<span class="nc" id="L40">        return ResponseEntity.status(HttpStatus.OK).body(productInventoryService.findProductsInventories());</span>
+    }
+
+    @Operation(summary = &quot;Get a products by ID&quot;)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = &quot;200&quot;, description = &quot;Product inventories returned successfully&quot;),
+            @ApiResponse(responseCode = &quot;400&quot;, description = &quot;Invalid ID format&quot;),
+            @ApiResponse(responseCode = &quot;401&quot;, description = &quot;Unauthenticated user&quot;),
+            @ApiResponse(responseCode = &quot;403&quot;, description = &quot;The logged-in user does not have permission to access this route.&quot;),
+            @ApiResponse(responseCode = &quot;404&quot;, description = &quot;Product inventory not found&quot;),
+            @ApiResponse(responseCode = &quot;500&quot;, description = &quot;Unexpected server error&quot;)
+    })
+    @PreAuthorize(&quot;hasAuthority('inventory:read')&quot;)
+    @GetMapping(&quot;/{id}&quot;)
+    public ResponseEntity&lt;ProductInventoryDetailResponse&gt; findProductsInventories(@PathVariable(name = &quot;id&quot;) UUID id){
+<span class="nc" id="L55">        return ResponseEntity.status(HttpStatus.OK).body(productInventoryService.findProductInventoryById(id));</span>
+    }
+
+    @Operation(summary = &quot;Update the quantity of a product inventory&quot;)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = &quot;201&quot;, description = &quot;Product inventory quantity updated successfully&quot;),
+            @ApiResponse(responseCode = &quot;400&quot;, description = &quot;Invalid request data&quot;),
+            @ApiResponse(responseCode = &quot;401&quot;, description = &quot;Unauthenticated user&quot;),
+            @ApiResponse(responseCode = &quot;403&quot;, description = &quot;The logged-in user does not have permission to access this route.&quot;),
+            @ApiResponse(responseCode = &quot;404&quot;, description = &quot;Product inventory not found&quot;),
+            @ApiResponse(responseCode = &quot;409&quot;, description = &quot;Conflict updating inventory&quot;),
+            @ApiResponse(responseCode = &quot;500&quot;, description = &quot;Unexpected server error&quot;)
+    })
+    @PreAuthorize(&quot;hasAuthority('inventory:updateQuantity')&quot;)
+    @PatchMapping(value = &quot;/quantity/{id}&quot;, consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity&lt;ProductInventoryDetailResponse&gt; updateQuantity(@PathVariable(name = &quot;id&quot;) UUID id, @RequestBody ProductInventoryQuantityRequest patchProductInventoryQuantity){
+<span class="nc" id="L71">        return ResponseEntity.status(HttpStatus.OK).body(productInventoryService.updateQuantity(id, patchProductInventoryQuantity));</span>
+    }
+
+    @Operation(summary = &quot;Update the low stock threshold of a product inventory&quot;)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = &quot;201&quot;, description = &quot;Low stock threshold updated successfully&quot;),
+            @ApiResponse(responseCode = &quot;400&quot;, description = &quot;Invalid request data&quot;),
+            @ApiResponse(responseCode = &quot;401&quot;, description = &quot;Unauthenticated user&quot;),
+            @ApiResponse(responseCode = &quot;403&quot;, description = &quot;The logged-in user does not have permission to access this route.&quot;),
+            @ApiResponse(responseCode = &quot;404&quot;, description = &quot;Product inventory not found&quot;),
+            @ApiResponse(responseCode = &quot;409&quot;, description = &quot;Conflict updating inventory&quot;),
+            @ApiResponse(responseCode = &quot;500&quot;, description = &quot;Unexpected server error&quot;)
+    })
+    @PreAuthorize(&quot;hasAuthority('inventory:updateLowStock')&quot;)
+    @PatchMapping(value = &quot;/low-stock/{id}&quot;, consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity&lt;ProductInventoryDetailResponse&gt; updateQuantity(@PathVariable(name = &quot;id&quot;) UUID id, @RequestBody ProductInventoryLowStockThresholdRequest patchProductInventoryLowStockThreshold){
+<span class="nc" id="L87">        return ResponseEntity.status(HttpStatus.OK).body(productInventoryService.updateLowStockThreshold(id, patchProductInventoryLowStockThreshold));</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

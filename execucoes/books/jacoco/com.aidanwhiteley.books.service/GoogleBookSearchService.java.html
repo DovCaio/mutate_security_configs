@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GoogleBookSearchService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Books Microservice</a> &gt; <a href="index.source.html" class="el_package">com.aidanwhiteley.books.service</a> &gt; <span class="el_source">GoogleBookSearchService.java</span></div><h1>GoogleBookSearchService.java</h1><pre class="source lang-java linenums">package com.aidanwhiteley.books.service;
+
+import com.aidanwhiteley.books.domain.Book;
+import com.aidanwhiteley.books.domain.googlebooks.BookSearchResult;
+import com.aidanwhiteley.books.domain.googlebooks.Item;
+import com.aidanwhiteley.books.domain.googlebooks.VolumeInfo;
+import com.aidanwhiteley.books.repository.BookRepository;
+import com.aidanwhiteley.books.repository.GoogleBookSearchRepository;
+import com.aidanwhiteley.books.repository.GoogleBooksDaoSync;
+import com.aidanwhiteley.books.repository.dtos.GoogleBookSearch;
+import com.aidanwhiteley.books.service.dtos.GoogleBookSearchResult;
+import com.aidanwhiteley.books.util.HtmlSanitiserUtils;
+import com.aidanwhiteley.books.util.LogDetaint;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+@Service
+public class GoogleBookSearchService {
+
+<span class="fc" id="L25">    private static final Logger LOGGER = LoggerFactory.getLogger(GoogleBookSearchService.class);</span>
+
+    private final GoogleBookSearchRepository googleBookSearchRepository;
+    private final GoogleBooksDaoSync googleBooksDaoSync;
+    private final BookRepository bookRepository;
+
+    @Value(&quot;${books.google.books.cacheTimeoutMinutes}&quot;)
+    private int cacheTimeoutMinutes;
+
+    public GoogleBookSearchService(GoogleBookSearchRepository googleBookSearchRepository,
+                                   GoogleBooksDaoSync googleBooksDaoSync,
+<span class="fc" id="L36">                                   BookRepository bookRepository) {</span>
+<span class="fc" id="L37">        this.googleBookSearchRepository = googleBookSearchRepository;</span>
+<span class="fc" id="L38">        this.googleBooksDaoSync = googleBooksDaoSync;</span>
+<span class="fc" id="L39">        this.bookRepository =bookRepository;</span>
+<span class="fc" id="L40">    }</span>
+
+    public GoogleBookSearchResult getGoogleBooks(String title, String author, int index) {
+
+<span class="fc" id="L44">        List&lt;GoogleBookSearch&gt; googleBookSearchList = googleBookSearchRepository.findAllByTitleAndAuthor(title, author);</span>
+
+<span class="fc bfc" id="L46" title="All 2 branches covered.">        if (!googleBookSearchList.isEmpty()) {</span>
+<span class="fc" id="L47">            return getGoogleBookSearchResultFromCache(title, author, index, googleBookSearchList);</span>
+        } else {
+<span class="fc" id="L49">            return getGoogleBookSearchResultFromAPI(title, author, index);</span>
+        }
+    }
+
+    public Book updateBookWithGoogleBookDetails(Book aBook, String title, String author, int index) {
+
+<span class="fc" id="L55">        GoogleBookSearchResult googleBookSearchResult = getGoogleBooks(title, author, index);</span>
+<span class="fc" id="L56">        Item item = googleBookSearchResult.getItem();</span>
+
+        // Google Books API data _should_ be safe from CSRF attacks but lets make sure before storing the
+        // description text in the database!
+<span class="fc" id="L60">        VolumeInfo vlInfo = item.getVolumeInfo();</span>
+<span class="pc bpc" id="L61" title="2 of 4 branches missed.">        if (vlInfo != null &amp;&amp; vlInfo.getDescription() != null) {</span>
+<span class="fc" id="L62">            vlInfo.setDescription(HtmlSanitiserUtils.allowBasicTextFormattingOnly(vlInfo.getDescription()));</span>
+<span class="fc" id="L63">            item.setVolumeInfo(vlInfo);</span>
+        }
+
+<span class="fc" id="L66">        bookRepository.addGoogleBookItemToBook(aBook.getId(), item);</span>
+<span class="fc" id="L67">        LOGGER.debug(&quot;Google Books details added to Mongo for {}&quot;, aBook.getId());</span>
+
+<span class="fc" id="L69">        aBook.setGoogleBookDetails(item);</span>
+<span class="fc" id="L70">        return aBook;</span>
+    }
+
+
+    private GoogleBookSearchResult getGoogleBookSearchResultFromCache(String title, String author, int index,
+                                                                      List&lt;GoogleBookSearch&gt; googleBookSearchList) {
+<span class="fc bfc" id="L76" title="All 2 branches covered.">        if (LOGGER.isDebugEnabled()) {</span>
+<span class="fc" id="L77">            LOGGER.debug(&quot;Using Google books search cache for title {}, author {} and index {} &quot;,</span>
+<span class="fc" id="L78">                    LogDetaint.logMessageDetaint(title),</span>
+<span class="fc" id="L79">                    LogDetaint.logMessageDetaint(author),</span>
+<span class="fc" id="L80">                    LogDetaint.logMessageDetaint(index));</span>
+        }
+        // A unique index means that there should only be one entry
+<span class="fc" id="L83">        GoogleBookSearch googleBookSearch = googleBookSearchList.getFirst();</span>
+<span class="fc" id="L84">        Item anItem = googleBookSearch.getBookSearchResult().getItems().get(index);</span>
+<span class="pc bpc" id="L85" title="1 of 2 branches missed.">        boolean hasMore = index &lt; googleBookSearch.getBookSearchResult().getItems().size() - 1;</span>
+<span class="fc bfc" id="L86" title="All 2 branches covered.">        boolean hasPrevious = index &gt; 0;</span>
+<span class="fc" id="L87">        return new GoogleBookSearchResult(anItem, index, hasMore, hasPrevious, true);</span>
+    }
+
+    private GoogleBookSearchResult getGoogleBookSearchResultFromAPI(String title, String author, int index) {
+<span class="fc bfc" id="L91" title="All 2 branches covered.">        if (LOGGER.isDebugEnabled()) {</span>
+<span class="fc" id="L92">            LOGGER.debug(&quot;Calling Google books API for title {}, author {} and index {} &quot;,</span>
+<span class="fc" id="L93">                    LogDetaint.logMessageDetaint(title),</span>
+<span class="fc" id="L94">                    LogDetaint.logMessageDetaint(author),</span>
+<span class="fc" id="L95">                    LogDetaint.logMessageDetaint(index));</span>
+        }
+<span class="pc bpc" id="L97" title="1 of 2 branches missed.">        if (index != 0) {</span>
+<span class="nc" id="L98">            LOGGER.warn(&quot;Calling the Google books API when the required index is {}. This is unusual &quot; +</span>
+                    &quot;and probably either indicates a logic error in the client or that the timeout on the &quot; +
+<span class="nc" id="L100">                    &quot;Google books search cache is too low at {} minutes&quot;, index, cacheTimeoutMinutes);</span>
+        }
+
+<span class="fc" id="L103">        BookSearchResult result = googleBooksDaoSync.searchGoogleBooksByTitleAndAuthor(title, author);</span>
+<span class="pc bpc" id="L104" title="3 of 6 branches missed.">        if (result != null &amp;&amp; result.getItems() != null &amp;&amp; !result.getItems().isEmpty()) {</span>
+<span class="fc bfc" id="L105" title="All 2 branches covered.">            if (LOGGER.isDebugEnabled()) {</span>
+<span class="fc" id="L106">                LOGGER.debug(&quot;Inserting an entry into the Google books search cache for title {}, author {} and index {} &quot;,</span>
+<span class="fc" id="L107">                        LogDetaint.logMessageDetaint(title),</span>
+<span class="fc" id="L108">                        LogDetaint.logMessageDetaint(author),</span>
+<span class="fc" id="L109">                        LogDetaint.logMessageDetaint(index));</span>
+            }
+<span class="fc" id="L111">            googleBookSearchRepository.insert(</span>
+<span class="fc" id="L112">                    new GoogleBookSearch(title, author, result, LocalDateTime.now().plusMinutes(cacheTimeoutMinutes)));</span>
+
+<span class="pc bpc" id="L114" title="1 of 2 branches missed.">            Item anItem = index &lt; result.getItems().size() ? result.getItems().get(index) :</span>
+<span class="pc" id="L115">                    result.getItems().getLast();</span>
+<span class="pc bpc" id="L116" title="1 of 2 branches missed.">            boolean hasMore = index &lt; result.getItems().size() - 1;</span>
+<span class="pc bpc" id="L117" title="1 of 2 branches missed.">            boolean hasPrevious = index &gt; 0;</span>
+<span class="fc" id="L118">            return new GoogleBookSearchResult(anItem, index, hasMore, hasPrevious, false);</span>
+        } else {
+<span class="nc bnc" id="L120" title="All 2 branches missed.">            if (LOGGER.isDebugEnabled()) {</span>
+<span class="nc" id="L121">                LOGGER.debug(&quot;No matching results found using the Google Books API for title {}, author {} and index {} &quot;,</span>
+<span class="nc" id="L122">                        LogDetaint.logMessageDetaint(title),</span>
+<span class="nc" id="L123">                        LogDetaint.logMessageDetaint(author),</span>
+<span class="nc" id="L124">                        LogDetaint.logMessageDetaint(index));</span>
+            }
+<span class="nc" id="L126">            return new GoogleBookSearchResult(null, index, false, false, false);</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

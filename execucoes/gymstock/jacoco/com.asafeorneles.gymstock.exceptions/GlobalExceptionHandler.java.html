@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GlobalExceptionHandler.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">gymstock</a> &gt; <a href="index.source.html" class="el_package">com.asafeorneles.gymstock.exceptions</a> &gt; <span class="el_source">GlobalExceptionHandler.java</span></div><h1>GlobalExceptionHandler.java</h1><pre class="source lang-java linenums">package com.asafeorneles.gymstock.exceptions;
+
+import com.asafeorneles.gymstock.dtos.exception.ExceptionResponse;
+import com.asafeorneles.gymstock.dtos.exception.ExceptionValidationResponse;
+import jakarta.validation.ConstraintViolationException;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
+
+@RestControllerAdvice
+<span class="fc" id="L21">public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {</span>
+
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity&lt;ExceptionResponse&gt; resourceNotFoundExceptionHandler(ResourceNotFoundException e) {
+<span class="nc" id="L25">        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(</span>
+                new ExceptionResponse(
+<span class="nc" id="L27">                        HttpStatus.NOT_FOUND.value(),</span>
+                        &quot;NOT_FOUND&quot;,
+<span class="nc" id="L29">                        e.getMessage(),</span>
+<span class="nc" id="L30">                        LocalDateTime.now()</span>
+                )
+        );
+    }
+
+    @ExceptionHandler(ActivityStatusException.class)
+    public ResponseEntity&lt;ExceptionResponse&gt; statusActivityExceptionHandler(ActivityStatusException e) {
+<span class="nc" id="L37">        return ResponseEntity.status(HttpStatus.CONFLICT).body(</span>
+                new ExceptionResponse(
+<span class="nc" id="L39">                        HttpStatus.CONFLICT.value(),</span>
+                        &quot;CONFLICT&quot;,
+<span class="nc" id="L41">                        e.getMessage(),</span>
+<span class="nc" id="L42">                        LocalDateTime.now()</span>
+                )
+        );
+    }
+
+    @ExceptionHandler(BusinessConflictException.class)
+    public ResponseEntity&lt;ExceptionResponse&gt; businessConflictExceptionHandler(BusinessConflictException e) {
+<span class="nc" id="L49">        return ResponseEntity.status(HttpStatus.CONFLICT).body(</span>
+                new ExceptionResponse(
+<span class="nc" id="L51">                        HttpStatus.CONFLICT.value(),</span>
+                        &quot;CONFLICT&quot;,
+<span class="nc" id="L53">                        e.getMessage(),</span>
+<span class="nc" id="L54">                        LocalDateTime.now()</span>
+                )
+        );
+    }
+
+    @ExceptionHandler(InsufficientProductQuantityException.class)
+    public ResponseEntity&lt;ExceptionResponse&gt; insufficientProductQuantityExceptionHandler(InsufficientProductQuantityException e) {
+<span class="nc" id="L61">        return ResponseEntity.status(HttpStatus.CONFLICT).body(</span>
+                new ExceptionResponse(
+<span class="nc" id="L63">                        HttpStatus.CONFLICT.value(),</span>
+                        &quot;CONFLICT&quot;,
+<span class="nc" id="L65">                        e.getMessage(),</span>
+<span class="nc" id="L66">                        LocalDateTime.now()</span>
+                )
+        );
+    }
+
+    @ExceptionHandler(InvalidCouponException.class)
+    public ResponseEntity&lt;ExceptionResponse&gt; invalidCouponExceptionHandler(InvalidCouponException e) {
+<span class="nc" id="L73">        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(</span>
+                new ExceptionResponse(
+<span class="nc" id="L75">                        HttpStatus.BAD_REQUEST.value(),</span>
+                        &quot;BAD_REQUEST&quot;,
+<span class="nc" id="L77">                        e.getMessage(),</span>
+<span class="nc" id="L78">                        LocalDateTime.now()</span>
+                )
+        );
+    }
+
+    @Override
+    protected ResponseEntity&lt;Object&gt; handleMethodArgumentNotValid(MethodArgumentNotValidException e, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
+
+<span class="nc" id="L86">        Map&lt;String, String&gt; fieldErrors = new HashMap&lt;&gt;();</span>
+
+<span class="nc" id="L88">        e.getBindingResult().getFieldErrors().forEach(error -&gt;</span>
+<span class="nc" id="L89">                fieldErrors.put(error.getField(), error.getDefaultMessage())</span>
+        );
+
+<span class="nc" id="L92">        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(</span>
+                new ExceptionValidationResponse(
+<span class="nc" id="L94">                        HttpStatus.BAD_REQUEST.value(),</span>
+                        &quot;BAD_REQUEST&quot;,
+                        &quot;Validation error in the submitted fields.&quot;,
+<span class="nc" id="L97">                        LocalDateTime.now(),</span>
+                        fieldErrors
+                ));
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity&lt;ExceptionValidationResponse&gt; handleConstraintViolation(ConstraintViolationException e) {
+
+<span class="nc" id="L105">        Map&lt;String, String&gt; fieldErrors = new HashMap&lt;&gt;();</span>
+
+<span class="nc" id="L107">        e.getConstraintViolations().forEach(violation -&gt;</span>
+<span class="nc" id="L108">                fieldErrors.put(violation.getPropertyPath().toString(), violation.getMessage())</span>
+        );
+
+<span class="nc" id="L111">        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(</span>
+                new ExceptionValidationResponse(
+<span class="nc" id="L113">                        HttpStatus.BAD_REQUEST.value(),</span>
+                        &quot;BAD_REQUEST&quot;,
+                        &quot;Validation error in the submitted fields.&quot;,
+<span class="nc" id="L116">                        LocalDateTime.now(),</span>
+                        fieldErrors
+                )
+        );
+    }
+
+    @ExceptionHandler(UnauthorizedException.class)
+    public ResponseEntity&lt;ExceptionResponse&gt; handleUnauthorizedException(UnauthorizedException e) {
+<span class="nc" id="L124">        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(</span>
+                new ExceptionResponse(
+<span class="nc" id="L126">                        HttpStatus.UNAUTHORIZED.value(),</span>
+                        &quot;UNAUTHORIZED&quot;,
+<span class="nc" id="L128">                        e.getMessage(),</span>
+<span class="nc" id="L129">                        LocalDateTime.now()</span>
+                ));
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

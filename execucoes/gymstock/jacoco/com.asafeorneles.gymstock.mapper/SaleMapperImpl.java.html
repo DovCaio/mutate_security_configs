@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SaleMapperImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">gymstock</a> &gt; <a href="index.source.html" class="el_package">com.asafeorneles.gymstock.mapper</a> &gt; <span class="el_source">SaleMapperImpl.java</span></div><h1>SaleMapperImpl.java</h1><pre class="source lang-java linenums">package com.asafeorneles.gymstock.mapper;
+
+import com.asafeorneles.gymstock.dtos.SaleItem.SaleItemResponse;
+import com.asafeorneles.gymstock.dtos.coupon.CouponAppliedResponse;
+import com.asafeorneles.gymstock.dtos.sale.SaleCreateRequest;
+import com.asafeorneles.gymstock.dtos.sale.SaleResponse;
+import com.asafeorneles.gymstock.dtos.user.UserSoldByResponse;
+import com.asafeorneles.gymstock.entities.Sale;
+import com.asafeorneles.gymstock.entities.SaleItem;
+import com.asafeorneles.gymstock.enums.PaymentMethod;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+import javax.annotation.processing.Generated;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+@Generated(
+    value = &quot;org.mapstruct.ap.MappingProcessor&quot;,
+    date = &quot;2026-04-09T00:10:37+0000&quot;,
+    comments = &quot;version: 1.6.3, compiler: javac, environment: Java 21.0.10 (Eclipse Adoptium)&quot;
+)
+@Component
+public class SaleMapperImpl implements SaleMapper {
+
+    private final UserMapper userMapper;
+    private final SaleItemMapper saleItemMapper;
+
+    @Autowired
+<span class="fc" id="L32">    public SaleMapperImpl(UserMapper userMapper, SaleItemMapper saleItemMapper) {</span>
+
+<span class="fc" id="L34">        this.userMapper = userMapper;</span>
+<span class="fc" id="L35">        this.saleItemMapper = saleItemMapper;</span>
+<span class="fc" id="L36">    }</span>
+
+    @Override
+    public Sale toEntity(SaleCreateRequest saleCreateRequest) {
+<span class="nc bnc" id="L40" title="All 2 branches missed.">        if ( saleCreateRequest == null ) {</span>
+<span class="nc" id="L41">            return null;</span>
+        }
+
+<span class="nc" id="L44">        Sale.SaleBuilder sale = Sale.builder();</span>
+
+<span class="nc" id="L46">        sale.paymentMethod( saleCreateRequest.paymentMethod() );</span>
+
+<span class="nc" id="L48">        return sale.build();</span>
+    }
+
+    @Override
+    public SaleResponse toResponse(Sale sale) {
+<span class="pc bpc" id="L53" title="1 of 2 branches missed.">        if ( sale == null ) {</span>
+<span class="nc" id="L54">            return null;</span>
+        }
+
+<span class="fc" id="L57">        UserSoldByResponse soldBy = null;</span>
+<span class="fc" id="L58">        UUID saleId = null;</span>
+<span class="fc" id="L59">        List&lt;SaleItemResponse&gt; saleItems = null;</span>
+<span class="fc" id="L60">        BigDecimal totalPrice = null;</span>
+<span class="fc" id="L61">        PaymentMethod paymentMethod = null;</span>
+<span class="fc" id="L62">        LocalDateTime createdDate = null;</span>
+
+<span class="fc" id="L64">        soldBy = userMapper.soldByUser( sale.getUser() );</span>
+<span class="fc" id="L65">        saleId = sale.getSaleId();</span>
+<span class="fc" id="L66">        saleItems = saleItemListToSaleItemResponseList( sale.getSaleItems() );</span>
+<span class="fc" id="L67">        totalPrice = sale.getTotalPrice();</span>
+<span class="fc" id="L68">        paymentMethod = sale.getPaymentMethod();</span>
+<span class="fc" id="L69">        createdDate = sale.getCreatedDate();</span>
+
+<span class="fc" id="L71">        CouponAppliedResponse couponApplied = mapCoupon(sale);</span>
+
+<span class="fc" id="L73">        SaleResponse saleResponse = new SaleResponse( saleId, saleItems, couponApplied, totalPrice, paymentMethod, soldBy, createdDate );</span>
+
+<span class="fc" id="L75">        return saleResponse;</span>
+    }
+
+    protected List&lt;SaleItemResponse&gt; saleItemListToSaleItemResponseList(List&lt;SaleItem&gt; list) {
+<span class="pc bpc" id="L79" title="1 of 2 branches missed.">        if ( list == null ) {</span>
+<span class="nc" id="L80">            return null;</span>
+        }
+
+<span class="fc" id="L83">        List&lt;SaleItemResponse&gt; list1 = new ArrayList&lt;SaleItemResponse&gt;( list.size() );</span>
+<span class="fc bfc" id="L84" title="All 2 branches covered.">        for ( SaleItem saleItem : list ) {</span>
+<span class="fc" id="L85">            list1.add( saleItemMapper.toResponse( saleItem ) );</span>
+<span class="fc" id="L86">        }</span>
+
+<span class="fc" id="L88">        return list1;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

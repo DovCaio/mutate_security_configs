@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SignUpNotificationService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Books Microservice</a> &gt; <a href="index.source.html" class="el_package">com.aidanwhiteley.books.service</a> &gt; <span class="el_source">SignUpNotificationService.java</span></div><h1>SignUpNotificationService.java</h1><pre class="source lang-java linenums">package com.aidanwhiteley.books.service;
+
+import com.aidanwhiteley.books.domain.User;
+import com.aidanwhiteley.books.repository.UserRepository;
+import com.aidanwhiteley.books.util.MailClient;
+import lombok.Setter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+@Service
+public class SignUpNotificationService {
+
+<span class="fc" id="L19">    private static final Logger LOGGER = LoggerFactory.getLogger(SignUpNotificationService.class);</span>
+    private final UserRepository userRepository;
+    private final MailClient mailClient;
+    @Setter
+    @Value(&quot;${books.users.registrationAdminEmail.enabled}&quot;)
+    private boolean registrationAdminEmailEnabled;
+
+<span class="fc" id="L26">    public SignUpNotificationService(UserRepository userRepository, MailClient mailClient) {</span>
+<span class="fc" id="L27">        this.userRepository = userRepository;</span>
+<span class="fc" id="L28">        this.mailClient = mailClient;</span>
+<span class="fc" id="L29">    }</span>
+
+    public List&lt;User&gt; findNewUsers() {
+<span class="fc" id="L32">        return userRepository.findAllByAdminEmailedAboutSignupIsFalse();</span>
+    }
+
+
+    @Scheduled(cron = &quot;${books.users.registrationAdminEmail.cron}&quot;)
+    public void checkForNewUsersAndEmailAdmin() {
+
+<span class="pc bpc" id="L39" title="1 of 2 branches missed.">        if (registrationAdminEmailEnabled) {</span>
+
+<span class="fc" id="L41">            List&lt;User&gt; newUsers = findNewUsers();</span>
+
+<span class="pc bpc" id="L43" title="1 of 2 branches missed.">            if (newUsers.isEmpty()) {</span>
+<span class="nc" id="L44">                LOGGER.debug(&quot;No new user registration found so no emails to the admin at {}&quot;, LocalDateTime.now());</span>
+            } else {
+<span class="fc" id="L46">                boolean emailsSent = mailClient.sendEmailsToAdminsForNewUsers(newUsers);</span>
+
+<span class="pc bpc" id="L48" title="1 of 2 branches missed.">                if (emailsSent) {</span>
+<span class="fc" id="L49">                    newUsers.forEach(userRepository::updateUserAdminNotified);</span>
+                }
+<span class="fc" id="L51">                LOGGER.debug(&quot;Command issued to send new user registration emails to the admin for users: {} at {}&quot;,</span>
+<span class="fc" id="L52">                        newUsers, LocalDateTime.now());</span>
+            }
+<span class="fc" id="L54">        } else {</span>
+<span class="nc" id="L55">            LOGGER.debug(&quot;Did not send any new user registration emails to the admin at {}&quot;, LocalDateTime.now());</span>
+        }
+<span class="fc" id="L57">    }</span>
+
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

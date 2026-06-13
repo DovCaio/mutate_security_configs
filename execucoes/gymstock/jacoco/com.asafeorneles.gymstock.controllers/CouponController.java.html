@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CouponController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">gymstock</a> &gt; <a href="index.source.html" class="el_package">com.asafeorneles.gymstock.controllers</a> &gt; <span class="el_source">CouponController.java</span></div><h1>CouponController.java</h1><pre class="source lang-java linenums">package com.asafeorneles.gymstock.controllers;
+
+import com.asafeorneles.gymstock.dtos.coupon.CouponResponse;
+import com.asafeorneles.gymstock.dtos.coupon.CreateCouponRequest;
+import com.asafeorneles.gymstock.queryFilters.CouponQueryFilters;
+import com.asafeorneles.gymstock.services.CouponService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.UUID;
+
+@RestController
+@RequestMapping(value = &quot;/coupons&quot;, produces = {&quot;application/json&quot;})
+@Tag(name = &quot;Coupons&quot;)
+@RequiredArgsConstructor
+public class CouponController {
+
+    final CouponService couponService;
+
+    @Operation(summary = &quot;Create a coupon&quot;)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = &quot;201&quot;, description = &quot;Coupon created successfully&quot;),
+            @ApiResponse(responseCode = &quot;400&quot;, description = &quot;Invalid request data&quot;),
+            @ApiResponse(responseCode = &quot;401&quot;, description = &quot;Unauthenticated user&quot;),
+            @ApiResponse(responseCode = &quot;403&quot;, description = &quot;The logged-in user does not have permission to access this route.&quot;),
+            @ApiResponse(responseCode = &quot;409&quot;, description = &quot;Coupon with same code and brand already exists&quot;),
+            @ApiResponse(responseCode = &quot;500&quot;, description = &quot;Unexpected server error&quot;)
+    })
+    @PreAuthorize(&quot;hasAuthority('coupon:create')&quot;)
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity&lt;CouponResponse&gt; createCoupon(@RequestBody @Valid CreateCouponRequest createCouponRequest){
+<span class="nc" id="L43">        return ResponseEntity.status(HttpStatus.CREATED).body(couponService.createCoupon(createCouponRequest));</span>
+    }
+
+    @Operation(summary = &quot;Get all coupons&quot;)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = &quot;200&quot;, description = &quot;Coupons returned successfully&quot;),
+            @ApiResponse(responseCode = &quot;401&quot;, description = &quot;Unauthenticated user&quot;),
+            @ApiResponse(responseCode = &quot;403&quot;, description = &quot;The logged-in user does not have permission to access this route.&quot;),
+            @ApiResponse(responseCode = &quot;404&quot;, description = &quot;Coupons not found&quot;),
+            @ApiResponse(responseCode = &quot;500&quot;, description = &quot;Unexpected server error&quot;)
+    })
+    @PreAuthorize(&quot;hasAuthority('coupon:read')&quot;)
+    @GetMapping
+    public ResponseEntity&lt;List&lt;CouponResponse&gt;&gt; getAllCoupons(@ParameterObject CouponQueryFilters filters){
+<span class="nc" id="L57">        return ResponseEntity.status(HttpStatus.OK).body(couponService.getAllCoupons(filters.toSpecification()));</span>
+    }
+
+    @Operation(summary = &quot;Get a coupon by id&quot;)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = &quot;200&quot;, description = &quot;Coupon returned successfully&quot;),
+            @ApiResponse(responseCode = &quot;400&quot;, description = &quot;Invalid ID format&quot;),
+            @ApiResponse(responseCode = &quot;401&quot;, description = &quot;Unauthenticated user&quot;),
+            @ApiResponse(responseCode = &quot;403&quot;, description = &quot;The logged-in user does not have permission to access this route.&quot;),
+            @ApiResponse(responseCode = &quot;404&quot;, description = &quot;Coupon not found&quot;),
+            @ApiResponse(responseCode = &quot;500&quot;, description = &quot;Unexpected server error&quot;)
+    })
+    @PreAuthorize(&quot;hasAuthority('coupon:read')&quot;)
+    @GetMapping(&quot;/{id}&quot;)
+    public ResponseEntity&lt;CouponResponse&gt; getCouponById(@PathVariable(value = &quot;id&quot;) UUID id){
+<span class="nc" id="L72">        return ResponseEntity.status(HttpStatus.OK).body(couponService.getCouponById(id));</span>
+    }
+
+    @Operation(summary = &quot;Deactivate a product&quot;)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = &quot;201&quot;, description = &quot;Coupon deactivated successfully&quot;),
+            @ApiResponse(responseCode = &quot;400&quot;, description = &quot;Invalid request data&quot;),
+            @ApiResponse(responseCode = &quot;401&quot;, description = &quot;Unauthenticated user&quot;),
+            @ApiResponse(responseCode = &quot;403&quot;, description = &quot;The logged-in user does not have permission to access this route.&quot;),
+            @ApiResponse(responseCode = &quot;404&quot;, description = &quot;Coupon not found&quot;),
+            @ApiResponse(responseCode = &quot;409&quot;, description = &quot;Coupon is already inactive&quot;),
+            @ApiResponse(responseCode = &quot;500&quot;, description = &quot;Unexpected server error&quot;)
+    })
+    @PreAuthorize(&quot;hasAuthority('coupon:deactivate')&quot;)
+    @PatchMapping(&quot;/deactivate/{id}&quot;)
+    public ResponseEntity&lt;CouponResponse&gt; deactivateCoupon(@PathVariable(value = &quot;id&quot;) UUID id){
+<span class="nc" id="L88">        return ResponseEntity.status(HttpStatus.OK).body(couponService.deactivateCoupon(id));</span>
+    }
+
+    @Operation(summary = &quot;Activate a coupon&quot;)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = &quot;201&quot;, description = &quot;Coupon activated successfully&quot;),
+            @ApiResponse(responseCode = &quot;400&quot;, description = &quot;Invalid request data&quot;),
+            @ApiResponse(responseCode = &quot;401&quot;, description = &quot;Unauthenticated user&quot;),
+            @ApiResponse(responseCode = &quot;403&quot;, description = &quot;The logged-in user does not have permission to access this route.&quot;),
+            @ApiResponse(responseCode = &quot;404&quot;, description = &quot;Coupon not found&quot;),
+            @ApiResponse(responseCode = &quot;409&quot;, description = &quot;Coupon is already active&quot;),
+            @ApiResponse(responseCode = &quot;500&quot;, description = &quot;Unexpected server error&quot;)
+    })
+    @PreAuthorize(&quot;hasAuthority('coupon:activate')&quot;)
+    @PatchMapping(&quot;/activate/{id}&quot;)
+    public ResponseEntity&lt;CouponResponse&gt; activateCoupon(@PathVariable(value = &quot;id&quot;) UUID id){
+<span class="nc" id="L104">        return ResponseEntity.status(HttpStatus.OK).body(couponService.activateCoupon(id));</span>
+    }
+
+    @Operation(summary = &quot;Delete a coupon&quot;)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = &quot;200&quot;, description = &quot;Coupon deleted successfully&quot;),
+            @ApiResponse(responseCode = &quot;400&quot;, description = &quot;Invalid ID format&quot;),
+            @ApiResponse(responseCode = &quot;401&quot;, description = &quot;Unauthenticated user&quot;),
+            @ApiResponse(responseCode = &quot;403&quot;, description = &quot;The logged-in user does not have permission to access this route.&quot;),
+            @ApiResponse(responseCode = &quot;404&quot;, description = &quot;Coupon not found&quot;),
+            @ApiResponse(responseCode = &quot;409&quot;, description = &quot;This coupon has already been used in a sale&quot;),
+            @ApiResponse(responseCode = &quot;500&quot;, description = &quot;Unexpected server error&quot;)
+    })
+    @PreAuthorize(&quot;hasAuthority('coupon:delete')&quot;)
+    @DeleteMapping (&quot;/{id}&quot;)
+    public ResponseEntity&lt;String&gt; deleteCoupon(@PathVariable(value = &quot;id&quot;) UUID id){
+<span class="nc" id="L120">        couponService.deleteCoupon(id);</span>
+<span class="nc" id="L121">        return ResponseEntity.status(HttpStatus.CREATED).body(&quot;Coupon deleted successfully&quot;);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

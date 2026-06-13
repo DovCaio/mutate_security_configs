@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SaleMapper.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">gymstock</a> &gt; <a href="index.source.html" class="el_package">com.asafeorneles.gymstock.mapper</a> &gt; <span class="el_source">SaleMapper.java</span></div><h1>SaleMapper.java</h1><pre class="source lang-java linenums">package com.asafeorneles.gymstock.mapper;
+
+import com.asafeorneles.gymstock.dtos.coupon.CouponAppliedResponse;
+import com.asafeorneles.gymstock.dtos.sale.SaleCreateRequest;
+import com.asafeorneles.gymstock.dtos.sale.SaleResponse;
+import com.asafeorneles.gymstock.entities.Sale;
+import org.mapstruct.InjectionStrategy;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+
+@Mapper(componentModel = &quot;spring&quot;,
+        uses = {UserMapper.class, SaleItemMapper.class},
+        injectionStrategy = InjectionStrategy.CONSTRUCTOR
+
+)
+public interface SaleMapper {
+
+    @Mapping(target = &quot;saleId&quot;, ignore = true)
+    @Mapping(target = &quot;discountAmount&quot;, ignore = true)
+    @Mapping(target = &quot;totalPrice&quot;, ignore = true)
+    @Mapping(target = &quot;user&quot;, ignore = true)
+    @Mapping(target = &quot;createdDate&quot;, ignore = true)
+    @Mapping(target = &quot;updatedDate&quot;, ignore = true)
+    @Mapping(target = &quot;coupon&quot;, ignore = true)
+    @Mapping(target = &quot;saleItems&quot;, ignore = true)
+    Sale toEntity(SaleCreateRequest saleCreateRequest);
+
+    @Mapping(target = &quot;soldBy&quot;, source = &quot;user&quot;)
+    @Mapping(target = &quot;couponApplied&quot;, expression = &quot;java(mapCoupon(sale))&quot;)
+    SaleResponse toResponse(Sale sale);
+
+    default CouponAppliedResponse mapCoupon(Sale sale) {
+<span class="pc bpc" id="L33" title="1 of 2 branches missed.">        if (sale.getCoupon() == null) {</span>
+<span class="nc" id="L34">            return null;</span>
+        }
+
+<span class="fc" id="L37">        return new CouponAppliedResponse(</span>
+<span class="fc" id="L38">                sale.getCoupon().getCode(),</span>
+<span class="fc" id="L39">                sale.getDiscountAmount()</span>
+        );
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

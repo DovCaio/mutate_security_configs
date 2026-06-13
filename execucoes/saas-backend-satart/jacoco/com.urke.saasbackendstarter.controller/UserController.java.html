@@ -1,0 +1,293 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>UserController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">SaaS Backend Starter</a> &gt; <a href="index.source.html" class="el_package">com.urke.saasbackendstarter.controller</a> &gt; <span class="el_source">UserController.java</span></div><h1>UserController.java</h1><pre class="source lang-java linenums">package com.urke.saasbackendstarter.controller;
+
+import com.urke.saasbackendstarter.domain.Organization;
+import com.urke.saasbackendstarter.domain.User;
+import com.urke.saasbackendstarter.dto.user.UserSummary;
+import com.urke.saasbackendstarter.dto.user.UserDetails;
+import com.urke.saasbackendstarter.dto.user.UserCreateRequest;
+import com.urke.saasbackendstarter.dto.user.UserUpdateRequest;
+import com.urke.saasbackendstarter.mapper.UserMapper;
+import com.urke.saasbackendstarter.exception.UserNotFoundException;
+import com.urke.saasbackendstarter.security.CurrentUserProvider;
+import com.urke.saasbackendstarter.service.UserExportService;
+import com.urke.saasbackendstarter.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.Parameter;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.bind.annotation.RequestBody;
+
+import java.security.Principal;
+import java.util.List;
+
+@Tag(
+    name = &quot;Users&quot;,
+    description = &quot;Endpoints for user registration, management, and profile operations.&quot;
+)
+@RestController
+@RequestMapping(&quot;/api/v1/users&quot;)
+@RequiredArgsConstructor
+public class UserController {
+
+    private final UserService userService;
+    private final UserExportService userExportService;
+    private final CurrentUserProvider currentUserProvider;
+    private final MessageSource messageSource;
+    private final UserMapper userMapper;
+
+    private String msg(String code) {
+<span class="nc" id="L55">        return messageSource.getMessage(code, null, LocaleContextHolder.getLocale());</span>
+    }
+
+    private String msg(String code, Object... args) {
+<span class="nc" id="L59">        return messageSource.getMessage(code, args, LocaleContextHolder.getLocale());</span>
+    }
+
+    @Operation(
+        summary = &quot;Register new user&quot;,
+        description = &quot;Register a new user account. Open for everyone (no authentication required).&quot;,
+        requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+        	description = &quot;User registration data&quot;,
+        	required = true
+        ),
+        responses = {
+            @ApiResponse(responseCode = &quot;200&quot;, description = &quot;User registered successfully&quot;),
+            @ApiResponse(responseCode = &quot;400&quot;, description = &quot;Invalid input data&quot;)
+        }
+    )
+    @PostMapping(&quot;/register&quot;)
+    public ResponseEntity&lt;UserSummary&gt; register(
+            @Valid @RequestBody UserCreateRequest request) {
+<span class="nc" id="L77">        User user = userService.register(request);</span>
+<span class="nc" id="L78">        return ResponseEntity.ok(userMapper.toSummary(user));</span>
+    }
+
+    @Operation(
+        summary = &quot;Get all users (paged)&quot;,
+        description = &quot;Admins can view all users. Non-admins can view only users from their own organization.&quot;,
+        security = @SecurityRequirement(name = &quot;bearerAuth&quot;),
+        parameters = {
+            @Parameter(name = &quot;page&quot;, description = &quot;Page number (zero-based, default: 0)&quot;, example = &quot;0&quot;),
+            @Parameter(name = &quot;size&quot;, description = &quot;Page size (default: 10)&quot;, example = &quot;10&quot;),
+            @Parameter(name = &quot;email&quot;, description = &quot;Optional email filter&quot;)
+        },
+        responses = {
+            @ApiResponse(responseCode = &quot;200&quot;, description = &quot;Paged list of users returned&quot;),
+            @ApiResponse(responseCode = &quot;401&quot;, description = &quot;Unauthorized&quot;),
+            @ApiResponse(responseCode = &quot;403&quot;, description = &quot;Forbidden&quot;)
+        }
+    )
+    @GetMapping
+    @PreAuthorize(&quot;hasAuthority('USER_VIEW_ALL') or hasRole('ADMIN')&quot;)
+    public ResponseEntity&lt;Page&lt;UserSummary&gt;&gt; getAllPaged(
+            @RequestParam(defaultValue = &quot;0&quot;) int page,
+            @RequestParam(defaultValue = &quot;10&quot;) int size,
+            @RequestParam(required = false) String email,
+            Principal principal) {
+
+<span class="nc" id="L104">        Pageable pageable = PageRequest.of(page, size);</span>
+<span class="nc" id="L105">        User currentUser = userService.findByEmail(principal.getName())</span>
+<span class="nc" id="L106">                .orElseThrow(() -&gt; new UserNotFoundException(msg(&quot;user.notfound&quot;)));</span>
+
+<span class="nc" id="L108">        boolean isAdmin = currentUser.getRoles().stream()</span>
+<span class="nc" id="L109">                .map(r -&gt; r.getName())</span>
+<span class="nc" id="L110">                .anyMatch(role -&gt; role.equals(&quot;ADMIN&quot;));</span>
+
+        Page&lt;User&gt; usersPage;
+<span class="nc bnc" id="L113" title="All 2 branches missed.">        if (isAdmin) {</span>
+<span class="nc bnc" id="L114" title="All 4 branches missed.">            if (email != null &amp;&amp; !email.isBlank()) {</span>
+<span class="nc" id="L115">                usersPage = userService.findAllByEmailFilter(email, pageable);</span>
+            } else {
+<span class="nc" id="L117">                usersPage = userService.findAll(pageable);</span>
+            }
+        } else {
+<span class="nc" id="L120">            List&lt;User&gt; users = userService.findAllByOrganization(currentUser.getOrganization());</span>
+<span class="nc" id="L121">            usersPage = new PageImpl&lt;&gt;(users, pageable, users.size());</span>
+        }
+<span class="nc" id="L123">        Page&lt;UserSummary&gt; result = usersPage.map(userMapper::toSummary);</span>
+<span class="nc" id="L124">        return ResponseEntity.ok(result);</span>
+    }
+
+    @Operation(
+        summary = &quot;Update user&quot;,
+        description = &quot;Update user profile. Admins can update any user; regular users can update only their own profile in their own organization.&quot;,
+        security = @SecurityRequirement(name = &quot;bearerAuth&quot;),
+        parameters = {
+            @Parameter(name = &quot;id&quot;, description = &quot;ID of the user to update&quot;, required = true)
+        },
+        requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+            description = &quot;User registration data&quot;,
+        	required = true
+        ),			
+        responses = {
+            @ApiResponse(responseCode = &quot;200&quot;, description = &quot;User updated successfully&quot;),
+            @ApiResponse(responseCode = &quot;400&quot;, description = &quot;Invalid input&quot;),
+            @ApiResponse(responseCode = &quot;401&quot;, description = &quot;Unauthorized&quot;),
+            @ApiResponse(responseCode = &quot;403&quot;, description = &quot;Forbidden&quot;),
+            @ApiResponse(responseCode = &quot;404&quot;, description = &quot;User not found&quot;)
+        }
+    )
+    @PutMapping(&quot;/{id}&quot;)
+    @PreAuthorize(&quot;hasAuthority('USER_UPDATE_SELF') or hasRole('ADMIN')&quot;)
+    public ResponseEntity&lt;UserSummary&gt; updateUser(
+    		@PathVariable Long id,
+    	    @Valid @RequestBody UserUpdateRequest request,
+    	    Principal principal) {
+
+<span class="nc" id="L153">        User currentUser = userService.findByEmail(principal.getName())</span>
+<span class="nc" id="L154">                .orElseThrow(() -&gt; new UserNotFoundException(msg(&quot;user.notfound&quot;)));</span>
+<span class="nc" id="L155">        User targetUser = userService.findById(id)</span>
+<span class="nc" id="L156">                .orElseThrow(() -&gt; new UserNotFoundException(msg(&quot;user.notfound&quot;)));</span>
+
+<span class="nc" id="L158">        boolean isAdmin = currentUser.getRoles().stream()</span>
+<span class="nc" id="L159">                .map(r -&gt; r.getName())</span>
+<span class="nc" id="L160">                .anyMatch(role -&gt; role.equals(&quot;ADMIN&quot;));</span>
+
+<span class="nc bnc" id="L162" title="All 2 branches missed.">        if (!isAdmin) {</span>
+<span class="nc bnc" id="L163" title="All 2 branches missed.">            if (!currentUser.getOrganization().getId().equals(targetUser.getOrganization().getId())) {</span>
+<span class="nc" id="L164">                throw new ResponseStatusException(HttpStatus.FORBIDDEN, msg(&quot;org.notfound&quot;));</span>
+            }
+<span class="nc bnc" id="L166" title="All 2 branches missed.">            if (!currentUser.getId().equals(id)) {</span>
+<span class="nc" id="L167">                throw new ResponseStatusException(HttpStatus.FORBIDDEN, msg(&quot;user.notfound&quot;));</span>
+            }
+        }
+
+<span class="nc" id="L171">        User updated = userService.updateUser(id, request);</span>
+<span class="nc" id="L172">        return ResponseEntity.ok(userMapper.toSummary(updated));</span>
+    }
+
+    @Operation(
+        summary = &quot;Get user by ID&quot;,
+        description = &quot;Get details of a user by ID. Admins can access any user; regular users only within their own organization.&quot;,
+        security = @SecurityRequirement(name = &quot;bearerAuth&quot;),
+        parameters = {
+            @Parameter(name = &quot;id&quot;, description = &quot;User ID&quot;, required = true)
+        },
+        responses = {
+            @ApiResponse(responseCode = &quot;200&quot;, description = &quot;User details returned&quot;),
+            @ApiResponse(responseCode = &quot;401&quot;, description = &quot;Unauthorized&quot;),
+            @ApiResponse(responseCode = &quot;403&quot;, description = &quot;Forbidden&quot;),
+            @ApiResponse(responseCode = &quot;404&quot;, description = &quot;User not found&quot;)
+        }
+    )
+    @GetMapping(&quot;/{id}&quot;)
+    @PreAuthorize(&quot;hasAuthority('USER_VIEW_ALL') or hasRole('ADMIN') or hasAuthority('USER_UPDATE_SELF')&quot;)
+    public ResponseEntity&lt;UserDetails&gt; getById(
+            @PathVariable Long id,
+            Principal principal) {
+<span class="nc" id="L194">        User currentUser = userService.findByEmail(principal.getName())</span>
+<span class="nc" id="L195">                .orElseThrow(() -&gt; new UserNotFoundException(msg(&quot;user.notfound&quot;)));</span>
+<span class="nc" id="L196">        User user = userService.findById(id)</span>
+<span class="nc" id="L197">                .orElseThrow(() -&gt; new UserNotFoundException(msg(&quot;user.notfound&quot;)));</span>
+
+<span class="nc" id="L199">        boolean isAdmin = currentUser.getRoles().stream()</span>
+<span class="nc" id="L200">                .map(r -&gt; r.getName())</span>
+<span class="nc" id="L201">                .anyMatch(role -&gt; role.equals(&quot;ADMIN&quot;));</span>
+
+<span class="nc bnc" id="L203" title="All 4 branches missed.">        if (!currentUser.getId().equals(id)</span>
+                &amp;&amp; !isAdmin
+<span class="nc bnc" id="L205" title="All 4 branches missed.">                &amp;&amp; (user.getOrganization() != null &amp;&amp; !user.getOrganization().equals(currentUser.getOrganization()))) {</span>
+<span class="nc" id="L206">            throw new ResponseStatusException(HttpStatus.FORBIDDEN, msg(&quot;org.notfound&quot;));</span>
+        }
+<span class="nc" id="L208">        return ResponseEntity.ok(userMapper.toDetails(user));</span>
+    }
+
+    @Operation(
+        summary = &quot;Delete user&quot;,
+        description = &quot;Delete a user by ID. Admins can delete any user; regular users can delete only themselves within their own organization.&quot;,
+        security = @SecurityRequirement(name = &quot;bearerAuth&quot;),
+        parameters = {
+            @Parameter(name = &quot;id&quot;, description = &quot;User ID to delete&quot;, required = true)
+        },
+        responses = {
+            @ApiResponse(responseCode = &quot;204&quot;, description = &quot;User deleted successfully&quot;),
+            @ApiResponse(responseCode = &quot;401&quot;, description = &quot;Unauthorized&quot;),
+            @ApiResponse(responseCode = &quot;403&quot;, description = &quot;Forbidden&quot;),
+            @ApiResponse(responseCode = &quot;404&quot;, description = &quot;User not found&quot;)
+        }
+    )
+    @DeleteMapping(&quot;/{id}&quot;)
+    @PreAuthorize(&quot;hasAuthority('USER_DELETE') or hasRole('ADMIN')&quot;)
+    public ResponseEntity&lt;Void&gt; deleteUser(
+            @PathVariable Long id,
+            Principal principal) {
+
+<span class="nc" id="L231">        User currentUser = userService.findByEmail(principal.getName())</span>
+<span class="nc" id="L232">                .orElseThrow(() -&gt; new UserNotFoundException(msg(&quot;user.notfound&quot;)));</span>
+<span class="nc" id="L233">        User targetUser = userService.findById(id)</span>
+<span class="nc" id="L234">                .orElseThrow(() -&gt; new UserNotFoundException(msg(&quot;user.notfound&quot;)));</span>
+
+<span class="nc" id="L236">        boolean isAdmin = currentUser.getRoles().stream()</span>
+<span class="nc" id="L237">                .map(r -&gt; r.getName())</span>
+<span class="nc" id="L238">                .anyMatch(role -&gt; role.equals(&quot;ADMIN&quot;));</span>
+
+<span class="nc bnc" id="L240" title="All 2 branches missed.">        if (!isAdmin) {</span>
+<span class="nc bnc" id="L241" title="All 2 branches missed.">            if (!currentUser.getOrganization().getId().equals(targetUser.getOrganization().getId())) {</span>
+<span class="nc" id="L242">                throw new ResponseStatusException(HttpStatus.FORBIDDEN, msg(&quot;org.notfound&quot;));</span>
+            }
+<span class="nc bnc" id="L244" title="All 2 branches missed.">            if (!currentUser.getId().equals(id)) {</span>
+<span class="nc" id="L245">                throw new ResponseStatusException(HttpStatus.FORBIDDEN, msg(&quot;user.notfound&quot;));</span>
+            }
+        }
+
+<span class="nc" id="L249">        userService.deleteUser(id);</span>
+<span class="nc" id="L250">        return ResponseEntity.noContent().build();</span>
+    }
+
+    @Operation(
+        summary = &quot;Export users as PDF or Excel&quot;,
+        description = &quot;Exports users of current organization as PDF (.pdf) or Excel (.xlsx). Only admins can export all, regular users export their organization.&quot;,
+        security = @SecurityRequirement(name = &quot;bearerAuth&quot;),
+        parameters = {
+            @Parameter(name = &quot;format&quot;, description = &quot;Export format: 'pdf' or 'xlsx'&quot;, required = true, example = &quot;pdf&quot;),
+            @Parameter(name = &quot;email&quot;, description = &quot;Optional filter by email&quot;)
+        },
+        responses = {
+            @ApiResponse(responseCode = &quot;200&quot;, description = &quot;File exported successfully&quot;),
+            @ApiResponse(responseCode = &quot;400&quot;, description = &quot;Invalid format or filter&quot;)
+        }
+    )
+    @GetMapping(&quot;/export&quot;)
+    @PreAuthorize(&quot;hasAuthority('USER_VIEW_ALL') or hasRole('ADMIN')&quot;)
+    public ResponseEntity&lt;byte[]&gt; exportUsers(
+            @RequestParam String format,
+            @RequestParam(required = false) String email,
+            Principal principal) {
+
+<span class="nc" id="L273">        Organization org = currentUserProvider.getCurrentOrganization();</span>
+<span class="nc" id="L274">        List&lt;User&gt; users = userExportService.findExportUsers(org, email);</span>
+
+<span class="nc bnc" id="L276" title="All 2 branches missed.">        if (&quot;xlsx&quot;.equalsIgnoreCase(format)) {</span>
+<span class="nc" id="L277">            byte[] file = userExportService.exportToExcel(users);</span>
+<span class="nc" id="L278">            return ResponseEntity.ok()</span>
+<span class="nc" id="L279">                    .contentType(MediaType.parseMediaType(&quot;application/vnd.openxmlformats-officedocument.spreadsheetml.sheet&quot;))</span>
+<span class="nc" id="L280">                    .header(HttpHeaders.CONTENT_DISPOSITION, &quot;attachment; filename=users.xlsx&quot;)</span>
+<span class="nc" id="L281">                    .body(file);</span>
+<span class="nc bnc" id="L282" title="All 2 branches missed.">        } else if (&quot;pdf&quot;.equalsIgnoreCase(format)) {</span>
+<span class="nc" id="L283">            byte[] file = userExportService.exportToPdf(users);</span>
+<span class="nc" id="L284">            return ResponseEntity.ok()</span>
+<span class="nc" id="L285">                    .contentType(MediaType.APPLICATION_PDF)</span>
+<span class="nc" id="L286">                    .header(HttpHeaders.CONTENT_DISPOSITION, &quot;attachment; filename=users.pdf&quot;)</span>
+<span class="nc" id="L287">                    .body(file);</span>
+        } else {
+<span class="nc" id="L289">            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, msg(&quot;validation.error&quot;));</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

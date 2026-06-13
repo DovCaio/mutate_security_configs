@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CouponSpec.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">gymstock</a> &gt; <a href="index.source.html" class="el_package">com.asafeorneles.gymstock.specifications</a> &gt; <span class="el_source">CouponSpec.java</span></div><h1>CouponSpec.java</h1><pre class="source lang-java linenums">package com.asafeorneles.gymstock.specifications;
+
+import com.asafeorneles.gymstock.entities.Coupon;
+import com.asafeorneles.gymstock.enums.ActivityStatus;
+import com.asafeorneles.gymstock.enums.DiscountType;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.util.ObjectUtils;
+
+<span class="nc" id="L9">public class CouponSpec {</span>
+
+    public static Specification&lt;Coupon&gt; codeContains(String code){
+<span class="nc" id="L12">        return (root, query, builder) -&gt; {</span>
+<span class="nc bnc" id="L13" title="All 2 branches missed.">            if (ObjectUtils.isEmpty(code)){</span>
+<span class="nc" id="L14">                return null;</span>
+            }
+<span class="nc" id="L16">            return builder.like(root.get(&quot;code&quot;), &quot;%&quot; + code + &quot;%&quot;);</span>
+        };
+    }
+
+    public static Specification&lt;Coupon&gt; activityStatusEquals(ActivityStatus activityStatus){
+<span class="nc" id="L21">        return (root, query, builder) -&gt; {</span>
+<span class="nc bnc" id="L22" title="All 2 branches missed.">            if (ObjectUtils.isEmpty(activityStatus)){</span>
+<span class="nc" id="L23">                return null;</span>
+            }
+<span class="nc" id="L25">            return builder.equal(root.get(&quot;activityStatus&quot;), activityStatus);</span>
+        };
+    }
+
+    public static Specification&lt;Coupon&gt; discountTypeEquals(DiscountType discountType){
+<span class="nc" id="L30">        return (root, query, builder) -&gt; {</span>
+<span class="nc bnc" id="L31" title="All 2 branches missed.">            if (ObjectUtils.isEmpty(discountType)){</span>
+<span class="nc" id="L32">                return null;</span>
+            }
+<span class="nc" id="L34">            return builder.equal(root.get(&quot;discountType&quot;), discountType);</span>
+        };
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>OrganizationController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">SaaS Backend Starter</a> &gt; <a href="index.source.html" class="el_package">com.urke.saasbackendstarter.controller</a> &gt; <span class="el_source">OrganizationController.java</span></div><h1>OrganizationController.java</h1><pre class="source lang-java linenums">package com.urke.saasbackendstarter.controller;
+
+import com.urke.saasbackendstarter.domain.Organization;
+import com.urke.saasbackendstarter.dto.organization.OrganizationCreateRequest;
+import com.urke.saasbackendstarter.dto.organization.OrganizationSummary;
+import com.urke.saasbackendstarter.mapper.OrganizationMapper;
+import com.urke.saasbackendstarter.service.OrganizationService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.Parameter;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.context.MessageSource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Locale;
+
+/**
+ * REST controller for organization management: create, list, and soft-delete organizations.
+ */
+@Tag(
+    name = &quot;Organizations&quot;,
+    description = &quot;Endpoints for organization management: create, list, and soft delete organizations.&quot;
+)
+@RestController
+@RequestMapping(&quot;/api/v1/organizations&quot;)
+@RequiredArgsConstructor
+public class OrganizationController {
+
+    private final OrganizationService organizationService;
+    private final OrganizationMapper organizationMapper;
+    private final MessageSource messageSource;
+
+    /**
+     * Create and register a new organization entity.
+     */
+    @Operation(
+        summary = &quot;Create a new organization&quot;,
+        description = &quot;Create and register a new organization entity. Only accessible by authenticated users.&quot;,
+        security = @SecurityRequirement(name = &quot;bearerAuth&quot;),
+        responses = {
+            @ApiResponse(responseCode = &quot;200&quot;, description = &quot;Organization created successfully&quot;),
+            @ApiResponse(responseCode = &quot;400&quot;, description = &quot;Invalid input&quot;),
+            @ApiResponse(responseCode = &quot;401&quot;, description = &quot;Unauthorized&quot;)
+        }
+    )
+    @PostMapping
+    public ResponseEntity&lt;OrganizationSummary&gt; createOrg(
+            @Valid @RequestBody OrganizationCreateRequest request,
+            Locale locale) {
+<span class="fc" id="L58">        Organization org = organizationService.create(request);</span>
+<span class="fc" id="L59">        OrganizationSummary summary = organizationMapper.toSummary(org);</span>
+<span class="fc" id="L60">        return ResponseEntity.ok().body(summary);</span>
+    }
+
+    /**
+     * Retrieve a paged list of all organizations, optionally filtered by name.
+     */
+    @Operation(
+        summary = &quot;Get paged organizations&quot;,
+        description = &quot;Retrieve a paged list of all organizations, optionally filtered by name.&quot;,
+        security = @SecurityRequirement(name = &quot;bearerAuth&quot;),
+        parameters = {
+            @Parameter(name = &quot;page&quot;, description = &quot;Page number (zero-based)&quot;, example = &quot;0&quot;),
+            @Parameter(name = &quot;size&quot;, description = &quot;Page size&quot;, example = &quot;10&quot;),
+            @Parameter(name = &quot;name&quot;, description = &quot;Optional name filter (case-insensitive)&quot;)
+        },
+        responses = {
+            @ApiResponse(responseCode = &quot;200&quot;, description = &quot;List of organizations returned&quot;),
+            @ApiResponse(responseCode = &quot;401&quot;, description = &quot;Unauthorized&quot;)
+        }
+    )
+    @GetMapping
+    public ResponseEntity&lt;Page&lt;OrganizationSummary&gt;&gt; getAllPaged(
+            @RequestParam(defaultValue = &quot;0&quot;) int page,
+            @RequestParam(defaultValue = &quot;10&quot;) int size,
+            @RequestParam(required = false) String name) {
+
+<span class="fc" id="L86">        Pageable pageable = PageRequest.of(page, size);</span>
+        Page&lt;Organization&gt; orgPage;
+<span class="pc bpc" id="L88" title="1 of 4 branches missed.">        if (name != null &amp;&amp; !name.isBlank()) {</span>
+<span class="fc" id="L89">            orgPage = organizationService.findAllByNameFilter(name, pageable);</span>
+        } else {
+<span class="fc" id="L91">            orgPage = organizationService.findAll(pageable);</span>
+        }
+<span class="fc" id="L93">        Page&lt;OrganizationSummary&gt; summaries = orgPage.map(organizationMapper::toSummary);</span>
+<span class="fc" id="L94">        return ResponseEntity.ok(summaries);</span>
+    }
+
+    /**
+     * Soft delete an organization by its ID. Only accessible by admins.
+     */
+    @Operation(
+        summary = &quot;Delete organization (soft delete)&quot;,
+        description = &quot;Soft delete an organization by its ID. Only accessible by admins.&quot;,
+        security = @SecurityRequirement(name = &quot;bearerAuth&quot;),
+        parameters = {
+            @Parameter(name = &quot;id&quot;, description = &quot;ID of the organization to delete&quot;, required = true)
+        },
+        responses = {
+            @ApiResponse(responseCode = &quot;204&quot;, description = &quot;Organization deleted successfully (no content)&quot;),
+            @ApiResponse(responseCode = &quot;401&quot;, description = &quot;Unauthorized&quot;),
+            @ApiResponse(responseCode = &quot;403&quot;, description = &quot;Forbidden – insufficient privileges&quot;),
+            @ApiResponse(responseCode = &quot;404&quot;, description = &quot;Organization not found&quot;)
+        }
+    )
+    @DeleteMapping(&quot;/{id}&quot;)
+    @PreAuthorize(&quot;hasRole('ADMIN')&quot;)
+    public ResponseEntity&lt;Void&gt; deleteOrganization(@PathVariable Long id, Locale locale) {
+<span class="fc" id="L117">        organizationService.deleteOrganization(id);</span>
+<span class="fc" id="L118">        return ResponseEntity.noContent().build();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

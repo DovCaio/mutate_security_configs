@@ -1,0 +1,1568 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+    <link rel="stylesheet" type="text/css" href="../style.css">
+</head>
+<body>
+
+
+<h1>MfaAuthenticationProvider.java</h1>
+
+<table class="src">
+
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@611aca39_1'/>
+1
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@611aca39_1'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>package nl._42.restsecure.autoconfigure.authentication.mfa;</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@611aca39_2'/>
+2
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@611aca39_2'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@611aca39_3'/>
+3
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@611aca39_3'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>import java.util.ArrayList;</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@611aca39_4'/>
+4
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@611aca39_4'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>import java.util.List;</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@611aca39_5'/>
+5
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@611aca39_5'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@611aca39_6'/>
+6
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@611aca39_6'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>import nl._42.restsecure.autoconfigure.authentication.RegisteredUser;</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@611aca39_7'/>
+7
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@611aca39_7'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>import nl._42.restsecure.autoconfigure.authentication.UserDetailsAdapter;</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@611aca39_8'/>
+8
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@611aca39_8'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@611aca39_9'/>
+9
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@611aca39_9'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@611aca39_10'/>
+10
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@611aca39_10'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>import org.springframework.security.authentication.dao.DaoAuthenticationProvider;</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@611aca39_11'/>
+11
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@611aca39_11'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>import org.springframework.security.core.AuthenticationException;</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@611aca39_12'/>
+12
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@611aca39_12'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>import org.springframework.security.core.userdetails.UserDetails;</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@611aca39_13'/>
+13
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@611aca39_13'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>import org.springframework.security.core.userdetails.UserDetailsService;</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@611aca39_14'/>
+14
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@611aca39_14'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>import org.springframework.util.Assert;</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@611aca39_15'/>
+15
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@611aca39_15'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@611aca39_16'/>
+16
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@611aca39_16'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>/**</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@611aca39_17'/>
+17
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@611aca39_17'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''> * An {@link DaoAuthenticationProvider} that supports Multi-Factor authentication (MFA, 2FA) using Time-based One-Time-Password (TOTP).</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@611aca39_18'/>
+18
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@611aca39_18'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''> */</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@611aca39_19'/>
+19
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@611aca39_19'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>public class MfaAuthenticationProvider extends DaoAuthenticationProvider {</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@611aca39_20'/>
+20
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@611aca39_20'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@611aca39_21'/>
+21
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@611aca39_21'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    public static final String SERVER_MFA_CODE_REQUIRED_ERROR = &#34;SERVER.MFA_CODE_REQUIRED_ERROR&#34;;</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@611aca39_22'/>
+22
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@611aca39_22'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    public static final String DETAILS_MFA_SETUP_REQUIRED = &#34;DETAILS.MFA_SETUP_REQUIRED&#34;;</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@611aca39_23'/>
+23
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@611aca39_23'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@611aca39_24'/>
+24
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@611aca39_24'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>    private boolean customVerificationStepsRegistered = false;</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@611aca39_25'/>
+25
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@611aca39_25'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    private List&#60;MfaVerificationCheck&#62; verificationChecks;</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@611aca39_26'/>
+26
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@611aca39_26'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@611aca39_27'/>
+27
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@611aca39_27'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    private final MfaValidationService mfaValidationService;</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@611aca39_28'/>
+28
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@611aca39_28'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@611aca39_29'/>
+29
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@611aca39_29'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    public MfaAuthenticationProvider(UserDetailsService userDetailsService, MfaValidationService mfaValidationService) {</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@611aca39_30'/>
+30
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@611aca39_30'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>        super(userDetailsService);</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@611aca39_31'/>
+31
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@611aca39_31'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>        this.mfaValidationService = mfaValidationService;</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@611aca39_32'/>
+32
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@611aca39_32'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>    }</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@611aca39_33'/>
+33
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@611aca39_33'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@611aca39_34'/>
+34
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@611aca39_34'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    public void setVerificationChecks(List&#60;MfaVerificationCheck&#62; verificationChecks) {</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@611aca39_35'/>
+35
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@611aca39_35'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>        this.customVerificationStepsRegistered = true;</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@611aca39_36'/>
+36
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@611aca39_36'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>        this.verificationChecks = verificationChecks;</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@611aca39_37'/>
+37
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@611aca39_37'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>    }</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@611aca39_38'/>
+38
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@611aca39_38'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@611aca39_39'/>
+39
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@611aca39_39'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    @Override</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@611aca39_40'/>
+40
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@611aca39_40'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    protected void doAfterPropertiesSet() {</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@611aca39_41'/>
+41
+</td>
+<td class='survived'>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@611aca39_41'>1</a>
+<span>
+1. doAfterPropertiesSet : removed call to org/springframework/security/authentication/dao/DaoAuthenticationProvider::doAfterPropertiesSet &rarr; SURVIVED<br/>
+
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class='survived'>        super.doAfterPropertiesSet();</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@611aca39_42'/>
+42
+</td>
+<td class='killed'>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@611aca39_42'>1</a>
+<span>
+1. doAfterPropertiesSet : removed call to org/springframework/util/Assert::notNull &rarr; KILLED<br/>
+
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class='killed'>        Assert.notNull(this.mfaValidationService, &#34;A MfaValidationService must be set&#34;);</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@611aca39_43'/>
+43
+</td>
+<td class='killed'>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@611aca39_43'>1</a>
+<span>
+1. doAfterPropertiesSet : negated conditional &rarr; KILLED<br/>
+
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class='killed'>        if (!this.customVerificationStepsRegistered) {</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@611aca39_44'/>
+44
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@611aca39_44'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>            this.verificationChecks = List.of(new MfaTotpVerificationCheck(mfaValidationService));</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@611aca39_45'/>
+45
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@611aca39_45'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>        } else {</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@611aca39_46'/>
+46
+</td>
+<td class='killed'>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@611aca39_46'>3</a>
+<span>
+1. doAfterPropertiesSet : removed call to org/springframework/util/Assert::isTrue &rarr; KILLED<br/>
+2. doAfterPropertiesSet : negated conditional &rarr; KILLED<br/>
+3. doAfterPropertiesSet : negated conditional &rarr; KILLED<br/>
+
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class='killed'>            Assert.isTrue(this.verificationChecks != null &#38;&#38; !this.verificationChecks.isEmpty(), &#34;At least one verification check must be provided&#34;);</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@611aca39_47'/>
+47
+</td>
+<td class='killed'>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@611aca39_47'>1</a>
+<span>
+1. doAfterPropertiesSet : negated conditional &rarr; KILLED<br/>
+
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class='killed'>            if (verificationChecks.stream().noneMatch(MfaTotpVerificationCheck.class::isInstance)) {</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@611aca39_48'/>
+48
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@611aca39_48'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>                verificationChecks = new ArrayList&#60;&#62;(verificationChecks); // Ensure we are a mutable list.</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@611aca39_49'/>
+49
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@611aca39_49'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>                verificationChecks.add(new MfaTotpVerificationCheck(mfaValidationService));</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@611aca39_50'/>
+50
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@611aca39_50'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>            }</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@611aca39_51'/>
+51
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@611aca39_51'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>        }</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@611aca39_52'/>
+52
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@611aca39_52'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>    }</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@611aca39_53'/>
+53
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@611aca39_53'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@611aca39_54'/>
+54
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@611aca39_54'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    @Override</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@611aca39_55'/>
+55
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@611aca39_55'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    protected void additionalAuthenticationChecks(UserDetails userDetails, UsernamePasswordAuthenticationToken authentication) throws AuthenticationException {</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@611aca39_56'/>
+56
+</td>
+<td class='killed'>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@611aca39_56'>1</a>
+<span>
+1. additionalAuthenticationChecks : removed call to org/springframework/security/authentication/dao/DaoAuthenticationProvider::additionalAuthenticationChecks &rarr; KILLED<br/>
+
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class='killed'>        super.additionalAuthenticationChecks(userDetails, authentication);</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@611aca39_57'/>
+57
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@611aca39_57'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@611aca39_58'/>
+58
+</td>
+<td class='killed'>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@611aca39_58'>1</a>
+<span>
+1. additionalAuthenticationChecks : negated conditional &rarr; KILLED<br/>
+
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class='killed'>        if (userDetails instanceof UserDetailsAdapter&#60;? extends RegisteredUser&#62; userDetailsAdapter) {</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@611aca39_59'/>
+59
+</td>
+<td class='killed'>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@611aca39_59'>1</a>
+<span>
+1. additionalAuthenticationChecks : negated conditional &rarr; KILLED<br/>
+
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class='killed'>            if (userDetailsAdapter.isMfaConfigured()) {</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@611aca39_60'/>
+60
+</td>
+<td class='killed'>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@611aca39_60'>1</a>
+<span>
+1. additionalAuthenticationChecks : removed call to nl/_42/restsecure/autoconfigure/authentication/mfa/MfaAuthenticationProvider::executeMfaVerificationSteps &rarr; KILLED<br/>
+
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class='killed'>                executeMfaVerificationSteps((MfaAuthenticationToken) authentication, userDetailsAdapter);</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@611aca39_61'/>
+61
+</td>
+<td class='killed'>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@611aca39_61'>1</a>
+<span>
+1. additionalAuthenticationChecks : negated conditional &rarr; KILLED<br/>
+
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class='killed'>            } else if (userDetailsAdapter.isMfaMandatory()) {</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@611aca39_62'/>
+62
+</td>
+<td class='killed'>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@611aca39_62'>1</a>
+<span>
+1. additionalAuthenticationChecks : removed call to org/springframework/security/authentication/UsernamePasswordAuthenticationToken::setDetails &rarr; KILLED<br/>
+
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class='killed'>                authentication.setDetails(DETAILS_MFA_SETUP_REQUIRED);</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@611aca39_63'/>
+63
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@611aca39_63'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>            }</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@611aca39_64'/>
+64
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@611aca39_64'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>        }</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@611aca39_65'/>
+65
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@611aca39_65'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>    }</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@611aca39_66'/>
+66
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@611aca39_66'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@611aca39_67'/>
+67
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@611aca39_67'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    private void executeMfaVerificationSteps(MfaAuthenticationToken mfaAuthenticationToken, UserDetailsAdapter&#60;? extends RegisteredUser&#62; userDetailsAdapter) {</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@611aca39_68'/>
+68
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@611aca39_68'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>        // If no code supplied, indicate a code is needed.</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@611aca39_69'/>
+69
+</td>
+<td class='killed'>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@611aca39_69'>2</a>
+<span>
+1. executeMfaVerificationSteps : negated conditional &rarr; KILLED<br/>
+2. executeMfaVerificationSteps : negated conditional &rarr; KILLED<br/>
+
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class='killed'>        if (mfaAuthenticationToken.getVerificationCode() == null || mfaAuthenticationToken.getVerificationCode().isEmpty()) {</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@611aca39_70'/>
+70
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@611aca39_70'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>            throw new MfaRequiredException(SERVER_MFA_CODE_REQUIRED_ERROR);</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@611aca39_71'/>
+71
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@611aca39_71'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>        }</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@611aca39_72'/>
+72
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@611aca39_72'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>        boolean verificationSucceeded = false;</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@611aca39_73'/>
+73
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@611aca39_73'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>        for (MfaVerificationCheck verificationCheck : verificationChecks) {</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@611aca39_74'/>
+74
+</td>
+<td class='killed'>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@611aca39_74'>1</a>
+<span>
+1. executeMfaVerificationSteps : negated conditional &rarr; KILLED<br/>
+
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class='killed'>            if (verificationCheck.validate(userDetailsAdapter.user(), mfaAuthenticationToken)) {</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@611aca39_75'/>
+75
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@611aca39_75'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>                verificationSucceeded = true;</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@611aca39_76'/>
+76
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@611aca39_76'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>                break;</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@611aca39_77'/>
+77
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@611aca39_77'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>            }</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@611aca39_78'/>
+78
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@611aca39_78'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>        }</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@611aca39_79'/>
+79
+</td>
+<td class='killed'>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@611aca39_79'>1</a>
+<span>
+1. executeMfaVerificationSteps : negated conditional &rarr; KILLED<br/>
+
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class='killed'>        if (!verificationSucceeded) {</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@611aca39_80'/>
+80
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@611aca39_80'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>            throw new IllegalStateException(</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@611aca39_81'/>
+81
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@611aca39_81'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>                    &#34;At least one verification check must either have succeeded or thrown an AuthenticationException. Check the verifications passed to .setVerificationChecks() for any unmatched scenarios.&#34;);</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@611aca39_82'/>
+82
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@611aca39_82'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>        }</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@611aca39_83'/>
+83
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@611aca39_83'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>    }</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@611aca39_84'/>
+84
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@611aca39_84'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@611aca39_85'/>
+85
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@611aca39_85'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    @Override</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@611aca39_86'/>
+86
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@611aca39_86'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    public boolean supports(Class&#60;?&#62; authentication) {</span></pre></td></tr>
+
+
+<tr>
+<td class='uncovered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@611aca39_87'/>
+87
+</td>
+<td class='survived'>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@611aca39_87'>2</a>
+<span>
+1. supports : replaced boolean return with true for nl/_42/restsecure/autoconfigure/authentication/mfa/MfaAuthenticationProvider::supports &rarr; NO_COVERAGE<br/>
+2. supports : replaced boolean return with false for nl/_42/restsecure/autoconfigure/authentication/mfa/MfaAuthenticationProvider::supports &rarr; NO_COVERAGE<br/>
+
+</span>
+</span>
+</td>
+<td class='uncovered'><pre><span  class='survived'>        return MfaAuthenticationToken.class.isAssignableFrom(authentication);</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@611aca39_88'/>
+88
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@611aca39_88'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    }</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@611aca39_89'/>
+89
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@611aca39_89'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>}</span></pre></td></tr>
+
+
+
+<tr><td></td><td></td><td><h2>Mutations</h2></td></tr>
+
+<tr>
+<td><a href='#org.pitest.mutationtest.report.html.SourceFile@611aca39_41'>41</a></td> 
+<td></td>
+<td>
+
+<a name='grouporg.pitest.mutationtest.report.html.SourceFile@611aca39_41'/> 
+
+<p class='SURVIVED'><span class='pop'>1.<span><b>1</b><br/><b>Location : </b>doAfterPropertiesSet<br/><b>Killed by : </b>none</span></span> removed call to org/springframework/security/authentication/dao/DaoAuthenticationProvider::doAfterPropertiesSet &rarr; SURVIVED</p> 
+</td>
+</tr>
+<tr>
+<td><a href='#org.pitest.mutationtest.report.html.SourceFile@611aca39_42'>42</a></td> 
+<td></td>
+<td>
+
+<a name='grouporg.pitest.mutationtest.report.html.SourceFile@611aca39_42'/> 
+
+<p class='KILLED'><span class='pop'>1.<span><b>1</b><br/><b>Location : </b>doAfterPropertiesSet<br/><b>Killed by : </b>nl._42.restsecure.autoconfigure.authentication.mfa.MfaAuthenticationProviderTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.authentication.mfa.MfaAuthenticationProviderTest]/[nested-class:additionalAuthenticationChecks]/[nested-class:afterPropertiesSet]/[method:shouldThrowForMissingDependencies()]</span></span> removed call to org/springframework/util/Assert::notNull &rarr; KILLED</p> 
+</td>
+</tr>
+<tr>
+<td><a href='#org.pitest.mutationtest.report.html.SourceFile@611aca39_43'>43</a></td> 
+<td></td>
+<td>
+
+<a name='grouporg.pitest.mutationtest.report.html.SourceFile@611aca39_43'/> 
+
+<p class='KILLED'><span class='pop'>1.<span><b>1</b><br/><b>Location : </b>doAfterPropertiesSet<br/><b>Killed by : </b>nl._42.restsecure.autoconfigure.authentication.mfa.MfaAuthenticationProviderTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.authentication.mfa.MfaAuthenticationProviderTest]/[nested-class:additionalAuthenticationChecks]/[nested-class:otherVerificationChecks]/[method:shouldThrow_ForNullChecks()]</span></span> negated conditional &rarr; KILLED</p> 
+</td>
+</tr>
+<tr>
+<td><a href='#org.pitest.mutationtest.report.html.SourceFile@611aca39_46'>46</a></td> 
+<td></td>
+<td>
+
+<a name='grouporg.pitest.mutationtest.report.html.SourceFile@611aca39_46'/> 
+
+<p class='KILLED'><span class='pop'>1.<span><b>1</b><br/><b>Location : </b>doAfterPropertiesSet<br/><b>Killed by : </b>nl._42.restsecure.autoconfigure.authentication.mfa.MfaAuthenticationProviderTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.authentication.mfa.MfaAuthenticationProviderTest]/[nested-class:additionalAuthenticationChecks]/[nested-class:otherVerificationChecks]/[method:shouldThrow_ForNullChecks()]</span></span> removed call to org/springframework/util/Assert::isTrue &rarr; KILLED</p> <p class='KILLED'><span class='pop'>2.<span><b>2</b><br/><b>Location : </b>doAfterPropertiesSet<br/><b>Killed by : </b>nl._42.restsecure.autoconfigure.authentication.mfa.MfaAuthenticationProviderTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.authentication.mfa.MfaAuthenticationProviderTest]/[nested-class:additionalAuthenticationChecks]/[nested-class:otherVerificationChecks]/[method:shouldThrow_ForNullChecks()]</span></span> negated conditional &rarr; KILLED</p> <p class='KILLED'><span class='pop'>3.<span><b>3</b><br/><b>Location : </b>doAfterPropertiesSet<br/><b>Killed by : </b>nl._42.restsecure.autoconfigure.authentication.mfa.MfaAuthenticationProviderTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.authentication.mfa.MfaAuthenticationProviderTest]/[nested-class:additionalAuthenticationChecks]/[nested-class:otherVerificationChecks]/[method:shouldThrow_ForNullChecks()]</span></span> negated conditional &rarr; KILLED</p> 
+</td>
+</tr>
+<tr>
+<td><a href='#org.pitest.mutationtest.report.html.SourceFile@611aca39_47'>47</a></td> 
+<td></td>
+<td>
+
+<a name='grouporg.pitest.mutationtest.report.html.SourceFile@611aca39_47'/> 
+
+<p class='KILLED'><span class='pop'>1.<span><b>1</b><br/><b>Location : </b>doAfterPropertiesSet<br/><b>Killed by : </b>nl._42.restsecure.autoconfigure.authentication.mfa.MfaAuthenticationProviderTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.authentication.mfa.MfaAuthenticationProviderTest]/[nested-class:additionalAuthenticationChecks]/[nested-class:otherVerificationChecks]/[method:shouldInsertTotpCheckAtGivenPosition()]</span></span> negated conditional &rarr; KILLED</p> 
+</td>
+</tr>
+<tr>
+<td><a href='#org.pitest.mutationtest.report.html.SourceFile@611aca39_56'>56</a></td> 
+<td></td>
+<td>
+
+<a name='grouporg.pitest.mutationtest.report.html.SourceFile@611aca39_56'/> 
+
+<p class='KILLED'><span class='pop'>1.<span><b>1</b><br/><b>Location : </b>additionalAuthenticationChecks<br/><b>Killed by : </b>nl._42.restsecure.autoconfigure.authentication.mfa.MfaAuthenticationProviderTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.authentication.mfa.MfaAuthenticationProviderTest]/[nested-class:additionalAuthenticationChecks]/[nested-class:mfaDisabledNonMandatory]/[method:shouldThrowForBadCredentials()]</span></span> removed call to org/springframework/security/authentication/dao/DaoAuthenticationProvider::additionalAuthenticationChecks &rarr; KILLED</p> 
+</td>
+</tr>
+<tr>
+<td><a href='#org.pitest.mutationtest.report.html.SourceFile@611aca39_58'>58</a></td> 
+<td></td>
+<td>
+
+<a name='grouporg.pitest.mutationtest.report.html.SourceFile@611aca39_58'/> 
+
+<p class='KILLED'><span class='pop'>1.<span><b>1</b><br/><b>Location : </b>additionalAuthenticationChecks<br/><b>Killed by : </b>nl._42.restsecure.autoconfigure.authentication.mfa.MfaAuthenticationProviderTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.authentication.mfa.MfaAuthenticationProviderTest]/[nested-class:additionalAuthenticationChecks]/[nested-class:otherUserTypes]/[method:shouldDoNothingForOtherUsers()]</span></span> negated conditional &rarr; KILLED</p> 
+</td>
+</tr>
+<tr>
+<td><a href='#org.pitest.mutationtest.report.html.SourceFile@611aca39_59'>59</a></td> 
+<td></td>
+<td>
+
+<a name='grouporg.pitest.mutationtest.report.html.SourceFile@611aca39_59'/> 
+
+<p class='KILLED'><span class='pop'>1.<span><b>1</b><br/><b>Location : </b>additionalAuthenticationChecks<br/><b>Killed by : </b>nl._42.restsecure.autoconfigure.authentication.mfa.MfaAuthenticationProviderTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.authentication.mfa.MfaAuthenticationProviderTest]/[nested-class:additionalAuthenticationChecks]/[nested-class:mfaDisabledNonMandatory]/[method:shouldLoginWithUsernameAndPassword()]</span></span> negated conditional &rarr; KILLED</p> 
+</td>
+</tr>
+<tr>
+<td><a href='#org.pitest.mutationtest.report.html.SourceFile@611aca39_60'>60</a></td> 
+<td></td>
+<td>
+
+<a name='grouporg.pitest.mutationtest.report.html.SourceFile@611aca39_60'/> 
+
+<p class='KILLED'><span class='pop'>1.<span><b>1</b><br/><b>Location : </b>additionalAuthenticationChecks<br/><b>Killed by : </b>nl._42.restsecure.autoconfigure.authentication.mfa.MfaAuthenticationProviderTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.authentication.mfa.MfaAuthenticationProviderTest]/[nested-class:additionalAuthenticationChecks]/[nested-class:mfaEnabled]/[method:shouldThrowIfCodeMissing()]</span></span> removed call to nl/_42/restsecure/autoconfigure/authentication/mfa/MfaAuthenticationProvider::executeMfaVerificationSteps &rarr; KILLED</p> 
+</td>
+</tr>
+<tr>
+<td><a href='#org.pitest.mutationtest.report.html.SourceFile@611aca39_61'>61</a></td> 
+<td></td>
+<td>
+
+<a name='grouporg.pitest.mutationtest.report.html.SourceFile@611aca39_61'/> 
+
+<p class='KILLED'><span class='pop'>1.<span><b>1</b><br/><b>Location : </b>additionalAuthenticationChecks<br/><b>Killed by : </b>nl._42.restsecure.autoconfigure.authentication.mfa.MfaAuthenticationProviderTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.authentication.mfa.MfaAuthenticationProviderTest]/[nested-class:additionalAuthenticationChecks]/[nested-class:mfaDisabledNonMandatory]/[method:shouldLoginWithUsernameAndPassword()]</span></span> negated conditional &rarr; KILLED</p> 
+</td>
+</tr>
+<tr>
+<td><a href='#org.pitest.mutationtest.report.html.SourceFile@611aca39_62'>62</a></td> 
+<td></td>
+<td>
+
+<a name='grouporg.pitest.mutationtest.report.html.SourceFile@611aca39_62'/> 
+
+<p class='KILLED'><span class='pop'>1.<span><b>1</b><br/><b>Location : </b>additionalAuthenticationChecks<br/><b>Killed by : </b>nl._42.restsecure.autoconfigure.authentication.mfa.MfaAuthenticationProviderTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.authentication.mfa.MfaAuthenticationProviderTest]/[nested-class:additionalAuthenticationChecks]/[nested-class:mfaDisabledMandatory]/[method:shouldIndicateSetupRequiredWithMfaCode()]</span></span> removed call to org/springframework/security/authentication/UsernamePasswordAuthenticationToken::setDetails &rarr; KILLED</p> 
+</td>
+</tr>
+<tr>
+<td><a href='#org.pitest.mutationtest.report.html.SourceFile@611aca39_69'>69</a></td> 
+<td></td>
+<td>
+
+<a name='grouporg.pitest.mutationtest.report.html.SourceFile@611aca39_69'/> 
+
+<p class='KILLED'><span class='pop'>1.<span><b>1</b><br/><b>Location : </b>executeMfaVerificationSteps<br/><b>Killed by : </b>nl._42.restsecure.autoconfigure.authentication.mfa.MfaAuthenticationProviderTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.authentication.mfa.MfaAuthenticationProviderTest]/[nested-class:additionalAuthenticationChecks]/[nested-class:mfaEnabled]/[method:shouldThrowIfCodeMissing()]</span></span> negated conditional &rarr; KILLED</p> <p class='KILLED'><span class='pop'>2.<span><b>2</b><br/><b>Location : </b>executeMfaVerificationSteps<br/><b>Killed by : </b>nl._42.restsecure.autoconfigure.authentication.mfa.MfaAuthenticationProviderTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.authentication.mfa.MfaAuthenticationProviderTest]/[nested-class:additionalAuthenticationChecks]/[nested-class:mfaEnabled]/[method:shouldThrowIfCodeMissing()]</span></span> negated conditional &rarr; KILLED</p> 
+</td>
+</tr>
+<tr>
+<td><a href='#org.pitest.mutationtest.report.html.SourceFile@611aca39_74'>74</a></td> 
+<td></td>
+<td>
+
+<a name='grouporg.pitest.mutationtest.report.html.SourceFile@611aca39_74'/> 
+
+<p class='KILLED'><span class='pop'>1.<span><b>1</b><br/><b>Location : </b>executeMfaVerificationSteps<br/><b>Killed by : </b>nl._42.restsecure.autoconfigure.authentication.mfa.MfaAuthenticationProviderTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.authentication.mfa.MfaAuthenticationProviderTest]/[nested-class:additionalAuthenticationChecks]/[nested-class:mfaEnabled]/[method:shouldAuthenticateValidCode_mfaNotMandatory()]</span></span> negated conditional &rarr; KILLED</p> 
+</td>
+</tr>
+<tr>
+<td><a href='#org.pitest.mutationtest.report.html.SourceFile@611aca39_79'>79</a></td> 
+<td></td>
+<td>
+
+<a name='grouporg.pitest.mutationtest.report.html.SourceFile@611aca39_79'/> 
+
+<p class='KILLED'><span class='pop'>1.<span><b>1</b><br/><b>Location : </b>executeMfaVerificationSteps<br/><b>Killed by : </b>nl._42.restsecure.autoconfigure.authentication.mfa.MfaAuthenticationProviderTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.authentication.mfa.MfaAuthenticationProviderTest]/[nested-class:additionalAuthenticationChecks]/[nested-class:mfaEnabled]/[method:shouldAuthenticateValidCode_mfaNotMandatory()]</span></span> negated conditional &rarr; KILLED</p> 
+</td>
+</tr>
+<tr>
+<td><a href='#org.pitest.mutationtest.report.html.SourceFile@611aca39_87'>87</a></td> 
+<td></td>
+<td>
+
+<a name='grouporg.pitest.mutationtest.report.html.SourceFile@611aca39_87'/> 
+
+<p class='NO_COVERAGE'><span class='pop'>1.<span><b>1</b><br/><b>Location : </b>supports<br/><b>Killed by : </b>none</span></span> replaced boolean return with true for nl/_42/restsecure/autoconfigure/authentication/mfa/MfaAuthenticationProvider::supports &rarr; NO_COVERAGE</p> <p class='NO_COVERAGE'><span class='pop'>2.<span><b>2</b><br/><b>Location : </b>supports<br/><b>Killed by : </b>none</span></span> replaced boolean return with false for nl/_42/restsecure/autoconfigure/authentication/mfa/MfaAuthenticationProvider::supports &rarr; NO_COVERAGE</p> 
+</td>
+</tr>
+
+</table>
+
+
+<h2>Active mutators</h2>
+<ul>
+<li class='mutator'>CONDITIONALS_BOUNDARY</li>
+<li class='mutator'>EMPTY_RETURNS</li>
+<li class='mutator'>FALSE_RETURNS</li>
+<li class='mutator'>INCREMENTS</li>
+<li class='mutator'>INVERT_NEGS</li>
+<li class='mutator'>MATH</li>
+<li class='mutator'>NEGATE_CONDITIONALS</li>
+<li class='mutator'>NULL_RETURNS</li>
+<li class='mutator'>PRIMITIVE_RETURNS</li>
+<li class='mutator'>TRUE_RETURNS</li>
+<li class='mutator'>VOID_METHOD_CALLS</li>
+
+</ul>
+
+<h2>Tests examined</h2>
+<ul>
+<li>nl._42.restsecure.autoconfigure.authentication.mfa.MfaAuthenticationProviderTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.authentication.mfa.MfaAuthenticationProviderTest]/[nested-class:additionalAuthenticationChecks]/[nested-class:mfaEnabled]/[method:shouldThrowIfCodeMissing()] (1 ms)</li><li>nl._42.restsecure.autoconfigure.authentication.mfa.MfaAuthenticationProviderTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.authentication.mfa.MfaAuthenticationProviderTest]/[nested-class:additionalAuthenticationChecks]/[nested-class:otherVerificationChecks]/[method:shouldStop_ifCheckThrows()] (1 ms)</li><li>nl._42.restsecure.autoconfigure.authentication.mfa.MfaAuthenticationProviderTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.authentication.mfa.MfaAuthenticationProviderTest]/[nested-class:additionalAuthenticationChecks]/[nested-class:mfaEnabled]/[method:shouldThrowIfCodeInvalid()] (4 ms)</li><li>nl._42.restsecure.autoconfigure.authentication.mfa.MfaAuthenticationProviderTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.authentication.mfa.MfaAuthenticationProviderTest]/[nested-class:additionalAuthenticationChecks]/[nested-class:mfaEnabled]/[method:shouldAuthenticateValidCode_mfaNotMandatory()] (2 ms)</li><li>nl._42.restsecure.autoconfigure.authentication.mfa.MfaAuthenticationProviderTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.authentication.mfa.MfaAuthenticationProviderTest]/[nested-class:additionalAuthenticationChecks]/[nested-class:mfaEnabled]/[method:shouldAuthenticateValidCode_mfaMandatory()] (3 ms)</li><li>nl._42.restsecure.autoconfigure.authentication.mfa.MfaAuthenticationProviderTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.authentication.mfa.MfaAuthenticationProviderTest]/[nested-class:additionalAuthenticationChecks]/[nested-class:otherVerificationChecks]/[method:shouldStop_ifCheckReturnsTrue()] (3 ms)</li><li>nl._42.restsecure.autoconfigure.authentication.mfa.MfaAuthenticationProviderTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.authentication.mfa.MfaAuthenticationProviderTest]/[nested-class:additionalAuthenticationChecks]/[nested-class:otherVerificationChecks]/[method:shouldInsertTotpCheckAtGivenPosition()] (2 ms)</li><li>nl._42.restsecure.autoconfigure.authentication.mfa.MfaAuthenticationProviderTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.authentication.mfa.MfaAuthenticationProviderTest]/[nested-class:additionalAuthenticationChecks]/[nested-class:otherVerificationChecks]/[method:shouldContinue_ifCheckReturnsFalse()] (3 ms)</li><li>nl._42.restsecure.autoconfigure.authentication.mfa.MfaAuthenticationProviderTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.authentication.mfa.MfaAuthenticationProviderTest]/[nested-class:additionalAuthenticationChecks]/[nested-class:otherVerificationChecks]/[method:shouldThrow_ForNullChecks()] (2 ms)</li><li>nl._42.restsecure.autoconfigure.authentication.mfa.MfaAuthenticationProviderTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.authentication.mfa.MfaAuthenticationProviderTest]/[nested-class:additionalAuthenticationChecks]/[nested-class:mfaDisabledNonMandatory]/[method:shouldThrowForBadCredentials()] (2 ms)</li><li>nl._42.restsecure.autoconfigure.authentication.mfa.MfaAuthenticationProviderTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.authentication.mfa.MfaAuthenticationProviderTest]/[nested-class:additionalAuthenticationChecks]/[nested-class:otherUserTypes]/[method:shouldDoNothingForOtherUsers()] (4 ms)</li><li>nl._42.restsecure.autoconfigure.authentication.mfa.MfaAuthenticationProviderTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.authentication.mfa.MfaAuthenticationProviderTest]/[nested-class:additionalAuthenticationChecks]/[nested-class:mfaDisabledNonMandatory]/[method:shouldLoginWithUsernameAndPassword()] (0 ms)</li><li>nl._42.restsecure.autoconfigure.authentication.mfa.MfaAuthenticationProviderTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.authentication.mfa.MfaAuthenticationProviderTest]/[nested-class:additionalAuthenticationChecks]/[nested-class:mfaDisabledMandatory]/[method:shouldIndicateSetupRequiredWithMfaCode()] (0 ms)</li><li>nl._42.restsecure.autoconfigure.authentication.mfa.MfaAuthenticationProviderTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.authentication.mfa.MfaAuthenticationProviderTest]/[nested-class:additionalAuthenticationChecks]/[nested-class:mfaDisabledMandatory]/[method:shouldIndicateSetupRequiredWithoutMfaCode()] (1 ms)</li><li>nl._42.restsecure.autoconfigure.authentication.mfa.MfaAuthenticationProviderTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.authentication.mfa.MfaAuthenticationProviderTest]/[nested-class:additionalAuthenticationChecks]/[nested-class:afterPropertiesSet]/[method:shouldThrowForMissingDependencies()] (6 ms)</li><li>nl._42.restsecure.autoconfigure.authentication.mfa.MfaSetupRequiredFilterTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.authentication.mfa.MfaSetupRequiredFilterTest]/[nested-class:afterPropertiesSet]/[method:shouldThrowForMissingObjectMapper()] (146 ms)</li><li>nl._42.restsecure.autoconfigure.authentication.mfa.MfaSetupRequiredFilterTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.authentication.mfa.MfaSetupRequiredFilterTest]/[nested-class:filter]/[method:shouldDenyRequest_whenNotExcludedAndMfaConfigurationIsInvalid()] (156 ms)</li><li>nl._42.restsecure.autoconfigure.authentication.mfa.MfaSetupRequiredFilterTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.authentication.mfa.MfaSetupRequiredFilterTest]/[nested-class:filter]/[method:shouldAllowRequest_whenExcludedByLogicCheck()] (156 ms)</li><li>nl._42.restsecure.autoconfigure.authentication.mfa.MfaSetupRequiredFilterTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.authentication.mfa.MfaSetupRequiredFilterTest]/[nested-class:filter]/[method:shouldAllowRequest_withValidMfaConfiguration()] (159 ms)</li><li>nl._42.restsecure.autoconfigure.authentication.mfa.MfaSetupRequiredFilterTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.authentication.mfa.MfaSetupRequiredFilterTest]/[nested-class:filter]/[method:shouldAllowRequest_whenExcludedByUrl()] (193 ms)</li><li>nl._42.restsecure.autoconfigure.WebSecurityAutoConfigTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.WebSecurityAutoConfigTest]/[method:autoConfig_shouldConfigureSecurity_withServiceAndMfaProvider_shouldNotGenerateDaoAuthenticationProvider()] (451 ms)</li><li>nl._42.restsecure.autoconfigure.MfaSecurityAutoConfigTest.[engine:junit-jupiter]/[class:nl._42.restsecure.autoconfigure.MfaSecurityAutoConfigTest]/[method:autoConfig_shouldConfigureMfaServices()] (536 ms)</li>
+</ul>
+
+<br/>
+
+Report generated by <a href='https://pitest.org'>PIT</a> 1.15.0
+
+</body>
+</html>

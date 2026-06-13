@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Permission.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">gymstock</a> &gt; <a href="index.source.html" class="el_package">com.asafeorneles.gymstock.enums</a> &gt; <span class="el_source">Permission.java</span></div><h1>Permission.java</h1><pre class="source lang-java linenums">package com.asafeorneles.gymstock.enums;
+
+import lombok.Getter;
+
+<span class="nc" id="L5">@Getter</span>
+public enum Permission {
+<span class="nc" id="L7">    USER_REGISTER(&quot;user:register&quot;),</span>
+<span class="nc" id="L8">    USER_READ(&quot;user:read&quot;),</span>
+<span class="nc" id="L9">    USER_UPDATE(&quot;user:update&quot;),</span>
+<span class="nc" id="L10">    USER_DELETE(&quot;user:delete&quot;),</span>
+<span class="nc" id="L11">    USER_DEACTIVATE(&quot;user:deactivate&quot;),</span>
+<span class="nc" id="L12">    USER_ACTIVATE(&quot;user:activate&quot;),</span>
+
+<span class="nc" id="L14">    PRODUCT_CREATE(&quot;product:create&quot;),</span>
+<span class="nc" id="L15">    PRODUCT_READ(&quot;product:read&quot;),</span>
+<span class="nc" id="L16">    PRODUCT_DETAILS_READ(&quot;productDetails:read&quot;),</span>
+<span class="nc" id="L17">    PRODUCT_LOW_STOCK_READ(&quot;productLowStock:read&quot;),</span>
+<span class="nc" id="L18">    PRODUCT_UPDATE(&quot;product:update&quot;),</span>
+<span class="nc" id="L19">    PRODUCT_DEACTIVATE(&quot;product:deactivate&quot;),</span>
+<span class="nc" id="L20">    PRODUCT_ACTIVATE(&quot;product:activate&quot;),</span>
+<span class="nc" id="L21">    PRODUCT_DELETE(&quot;product:delete&quot;),</span>
+
+<span class="nc" id="L23">    CATEGORY_CREATE(&quot;category:create&quot;),</span>
+<span class="nc" id="L24">    CATEGORY_READ(&quot;category:read&quot;),</span>
+<span class="nc" id="L25">    CATEGORY_UPDATE(&quot;category:update&quot;),</span>
+<span class="nc" id="L26">    CATEGORY_DEACTIVATE(&quot;category:deactivate&quot;),</span>
+<span class="nc" id="L27">    CATEGORY_ACTIVATE(&quot;category:activate&quot;),</span>
+<span class="nc" id="L28">    CATEGORY_DELETE(&quot;category:delete&quot;),</span>
+
+<span class="nc" id="L30">    PRODUCT_INVENTORY_READ(&quot;inventory:read&quot;),</span>
+<span class="nc" id="L31">    PRODUCT_INVENTORY_UPDATE_QUANTITY(&quot;inventory:updateQuantity&quot;),</span>
+<span class="nc" id="L32">    PRODUCT_INVENTORY_UPDATE_LOW_STOCK(&quot;inventory:updateLowStock&quot;),</span>
+
+<span class="nc" id="L34">    SALE_CREATE(&quot;sale:create&quot;),</span>
+<span class="nc" id="L35">    SALE_READ(&quot;sale:read&quot;),</span>
+<span class="nc" id="L36">    SALE_UPDATE(&quot;sale:update&quot;),</span>
+<span class="nc" id="L37">    SALE_DELETE(&quot;sale:delete&quot;),</span>
+
+<span class="nc" id="L39">    COUPON_CREATE(&quot;coupon:create&quot;),</span>
+<span class="nc" id="L40">    COUPON_READ(&quot;coupon:read&quot;),</span>
+<span class="nc" id="L41">    COUPON_DEACTIVATE(&quot;coupon:deactivate&quot;),</span>
+<span class="nc" id="L42">    COUPON_ACTIVATE(&quot;coupon:activate&quot;),</span>
+<span class="nc" id="L43">    COUPON_DELETE(&quot;coupon:delete&quot;),</span>
+
+<span class="nc" id="L45">    ANALYTICS_READ(&quot;analytics:read&quot;);</span>
+
+    private final String permission;
+
+<span class="nc" id="L49">    Permission(String permission) {</span>
+<span class="nc" id="L50">        this.permission = permission;</span>
+<span class="nc" id="L51">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GoogleBooksDaoSync.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Books Microservice</a> &gt; <a href="index.source.html" class="el_package">com.aidanwhiteley.books.repository</a> &gt; <span class="el_source">GoogleBooksDaoSync.java</span></div><h1>GoogleBooksDaoSync.java</h1><pre class="source lang-java linenums">package com.aidanwhiteley.books.repository;
+
+import com.aidanwhiteley.books.domain.googlebooks.BookSearchResult;
+import com.aidanwhiteley.books.domain.googlebooks.Item;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.converter.StringHttpMessageConverter;
+import org.springframework.stereotype.Repository;
+import org.springframework.web.client.HttpStatusCodeException;
+import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestTemplate;
+
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+
+import static com.aidanwhiteley.books.util.ClientInputSanitiserUtils.isValidTitleOrAuthor;
+import static com.aidanwhiteley.books.util.ClientInputSanitiserUtils.sanitiseGoogleBookId;
+import static com.aidanwhiteley.books.util.LogDetaint.logMessageDetaint;
+
+@Repository
+public class GoogleBooksDaoSync {
+
+<span class="fc" id="L23">    private static final Logger LOGGER = LoggerFactory.getLogger(GoogleBooksDaoSync.class);</span>
+    private final GoogleBooksApiConfig googleBooksApiConfig;
+    private final RestTemplate googleBooksRestTemplate;
+
+<span class="fc" id="L27">    public GoogleBooksDaoSync(GoogleBooksApiConfig googleBooksApiConfig) {</span>
+<span class="fc" id="L28">        this.googleBooksApiConfig = googleBooksApiConfig;</span>
+<span class="fc" id="L29">        this.googleBooksRestTemplate = new RestTemplate();</span>
+<span class="fc" id="L30">    }</span>
+
+    // Commenting out the previous init() method to ease the migration to spring Boot 4 after which we'll convert
+    // to using RestClient anyway
+
+    public BookSearchResult searchGoogleBooksByTitleAndAuthor(String title, String author) {
+
+<span class="pc bpc" id="L37" title="1 of 4 branches missed.">        if (!isValidTitleOrAuthor(title) || !isValidTitleOrAuthor(author)) {</span>
+<span class="pc bpc" id="L38" title="1 of 2 branches missed.">            if (LOGGER.isWarnEnabled()) {</span>
+<span class="fc" id="L39">                LOGGER.warn(&quot;Invalid input for title or author {} {}&quot;,</span>
+<span class="fc" id="L40">                        logMessageDetaint(title), logMessageDetaint(author));</span>
+            }
+
+<span class="fc" id="L43">            throw new IllegalArgumentException(&quot;Invalid input for title or author&quot;);</span>
+        }
+
+<span class="fc" id="L46">        String encodedTitle = URLEncoder.encode(title, StandardCharsets.UTF_8);</span>
+<span class="fc" id="L47">        String encodedAuthor = URLEncoder.encode(author, StandardCharsets.UTF_8);</span>
+
+<span class="fc" id="L49">        googleBooksRestTemplate.getMessageConverters().addFirst(</span>
+                new StringHttpMessageConverter(StandardCharsets.UTF_8));
+
+<span class="fc" id="L52">        final String searchString = googleBooksApiConfig.getSearchUrl() + &quot;+intitle:&quot; + encodedTitle +</span>
+<span class="fc" id="L53">                &quot;+inauthor:&quot; + encodedAuthor + &quot;&amp;&quot; + googleBooksApiConfig.getCountryCode() +</span>
+<span class="fc" id="L54">                &quot;&amp;&quot; + googleBooksApiConfig.getMaxResults();</span>
+
+<span class="pc bpc" id="L56" title="1 of 2 branches missed.">        if (LOGGER.isInfoEnabled()) {</span>
+<span class="nc" id="L57">            LOGGER.info(&quot;Google Books API called with API called: {}&quot;, searchString);</span>
+        }
+
+<span class="fc" id="L60">        BookSearchResult result = googleBooksRestTemplate.getForObject(searchString, BookSearchResult.class);</span>
+
+<span class="pc bpc" id="L62" title="1 of 2 branches missed.">        if (LOGGER.isDebugEnabled()) {</span>
+<span class="nc" id="L63">            LOGGER.debug(&quot;Result of Google Books API call: {}&quot;, result);</span>
+        }
+
+<span class="fc" id="L66">        return result;</span>
+    }
+
+    public Item searchGoogleBooksByGoogleBookId(String id) {
+
+<span class="fc" id="L71">        googleBooksRestTemplate.getMessageConverters().addFirst(new StringHttpMessageConverter(StandardCharsets.UTF_8));</span>
+        try {
+<span class="fc" id="L73">            return googleBooksRestTemplate.getForObject(googleBooksApiConfig.getGetByIdUrl() +</span>
+<span class="fc" id="L74">                    sanitiseGoogleBookId(id) + &quot;/?&quot; +</span>
+<span class="fc" id="L75">                    googleBooksApiConfig.getCountryCode(), Item.class);</span>
+<span class="fc" id="L76">        } catch (HttpStatusCodeException e) {</span>
+<span class="fc" id="L77">            String errorpayload = e.getResponseBodyAsString();</span>
+<span class="fc" id="L78">            LOGGER.error(&quot;Error calling Google Books API: {}&quot;, errorpayload, e);</span>
+<span class="fc" id="L79">            throw e;</span>
+<span class="nc" id="L80">        } catch (RestClientException e) {</span>
+<span class="nc" id="L81">            LOGGER.error(&quot;Rest client error calling Google Books API: &quot;, e);</span>
+<span class="nc" id="L82">            throw e;</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

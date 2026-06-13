@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Category.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">gymstock</a> &gt; <a href="index.source.html" class="el_package">com.asafeorneles.gymstock.entities</a> &gt; <span class="el_source">Category.java</span></div><h1>Category.java</h1><pre class="source lang-java linenums">package com.asafeorneles.gymstock.entities;
+
+import com.asafeorneles.gymstock.enums.ActivityStatus;
+import com.asafeorneles.gymstock.exceptions.ActivityStatusException;
+import jakarta.persistence.*;
+import lombok.*;
+
+import java.time.LocalDateTime;
+import java.util.UUID;
+
+@Entity
+@Table(name = &quot;tb_categories&quot;)
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class Category {
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = &quot;category_id&quot;)
+    private UUID categoryId;
+
+    @Column(name = &quot;name&quot;)
+    private String name;
+
+    @Column(name = &quot;description&quot;)
+    private String description;
+
+    @Column(name = &quot;activity_status&quot;)
+    @Enumerated(EnumType.STRING)
+    private ActivityStatus activityStatus;
+
+    @Column(name = &quot;created_date&quot;)
+    private LocalDateTime createdDate;
+
+    @Column(name = &quot;updated_date&quot;)
+    private LocalDateTime updatedDate;
+
+    public void inactivity(){
+<span class="pc bpc" id="L41" title="1 of 2 branches missed.">        if (this.activityStatus == ActivityStatus.INACTIVITY){</span>
+<span class="nc" id="L42">            throw new ActivityStatusException(&quot;Category is already inactive!&quot;);</span>
+        }
+<span class="fc" id="L44">        this.activityStatus = ActivityStatus.INACTIVITY;</span>
+<span class="fc" id="L45">    }</span>
+
+    public void activity(){
+<span class="fc bfc" id="L48" title="All 2 branches covered.">        if (this.activityStatus == ActivityStatus.ACTIVE){</span>
+<span class="fc" id="L49">            throw new ActivityStatusException(&quot;Category is already active!&quot;);</span>
+        }
+<span class="fc" id="L51">        this.activityStatus = ActivityStatus.ACTIVE;</span>
+<span class="fc" id="L52">    }</span>
+
+    public boolean isActivity(){
+<span class="fc bfc" id="L55" title="All 2 branches covered.">        return this.activityStatus == ActivityStatus.ACTIVE;</span>
+    }
+
+    @PrePersist
+    public void prePersist(){
+<span class="nc" id="L60">        this.createdDate = LocalDateTime.now();</span>
+<span class="nc" id="L61">    }</span>
+
+    @PreUpdate
+    public void preUpdate() {
+<span class="nc" id="L65">        this.updatedDate = LocalDateTime.now();</span>
+<span class="nc" id="L66">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>RestExceptionHandler.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">SaaS Backend Starter</a> &gt; <a href="index.source.html" class="el_package">com.urke.saasbackendstarter.exception</a> &gt; <span class="el_source">RestExceptionHandler.java</span></div><h1>RestExceptionHandler.java</h1><pre class="source lang-java linenums">package com.urke.saasbackendstarter.exception;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import org.springframework.context.MessageSource;
+import org.springframework.http.*;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.security.access.AccessDeniedException;
+
+import java.util.Locale;
+import java.util.stream.Collectors;
+
+@RestControllerAdvice
+public class RestExceptionHandler {
+
+    private final MessageSource messageSource;
+
+<span class="fc" id="L22">    public RestExceptionHandler(MessageSource messageSource) {</span>
+<span class="fc" id="L23">        this.messageSource = messageSource;</span>
+<span class="fc" id="L24">    }</span>
+
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity&lt;ErrorDTO&gt; handleUserNotFound(UserNotFoundException ex, WebRequest request) {
+<span class="fc" id="L28">        Locale locale = request.getLocale();</span>
+<span class="fc" id="L29">        String message = messageSource.getMessage(&quot;user.notfound&quot;, null, locale);</span>
+<span class="fc" id="L30">        return ResponseEntity.status(HttpStatus.NOT_FOUND)</span>
+<span class="fc" id="L31">                .body(new ErrorDTO(&quot;not_found&quot;, message));</span>
+    }
+
+    @ExceptionHandler(UserAlreadyExistsException.class)
+    public ResponseEntity&lt;ErrorDTO&gt; handleUserAlreadyExists(UserAlreadyExistsException ex, WebRequest request) {
+<span class="fc" id="L36">        Locale locale = request.getLocale();</span>
+<span class="fc" id="L37">        String message = messageSource.getMessage(&quot;user.exists&quot;, null, locale);</span>
+<span class="fc" id="L38">        return ResponseEntity.status(HttpStatus.CONFLICT)</span>
+<span class="fc" id="L39">                .body(new ErrorDTO(&quot;user_exists&quot;, message));</span>
+    }
+
+    @ExceptionHandler(AuthException.class)
+    public ResponseEntity&lt;ErrorDTO&gt; handleAuthException(AuthException ex, WebRequest request) {
+<span class="fc" id="L44">        Locale locale = request.getLocale();</span>
+<span class="pc bpc" id="L45" title="1 of 2 branches missed.">        String message = ex.getMessage() != null ? ex.getMessage() :</span>
+<span class="pc" id="L46">                messageSource.getMessage(&quot;auth.invalid.credentials&quot;, null, locale);</span>
+<span class="fc" id="L47">        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)</span>
+<span class="fc" id="L48">                .body(new ErrorDTO(&quot;auth_error&quot;, message));</span>
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity&lt;ErrorDTO&gt; handleAccessDenied(AccessDeniedException ex, WebRequest request) {
+<span class="fc" id="L53">        Locale locale = request.getLocale();</span>
+<span class="fc" id="L54">        String message = messageSource.getMessage(&quot;access.denied&quot;, null, locale);</span>
+<span class="fc" id="L55">        return ResponseEntity.status(HttpStatus.FORBIDDEN)</span>
+<span class="fc" id="L56">                .body(new ErrorDTO(&quot;forbidden&quot;, message));</span>
+    }
+
+    @ExceptionHandler(FileUploadException.class)
+    public ResponseEntity&lt;ErrorDTO&gt; handleFileUpload(FileUploadException ex, WebRequest request) {
+<span class="nc" id="L61">        Locale locale = request.getLocale();</span>
+<span class="nc" id="L62">        String message = messageSource.getMessage(&quot;file.upload.error&quot;, null, locale);</span>
+<span class="nc" id="L63">        return ResponseEntity.badRequest()</span>
+<span class="nc" id="L64">                .body(new ErrorDTO(&quot;file_upload_error&quot;, message));</span>
+    }
+
+    @ExceptionHandler(FileNotFoundOrForbiddenException.class)
+    public ResponseEntity&lt;ErrorDTO&gt; handleFileNotFoundOrForbidden(FileNotFoundOrForbiddenException ex, WebRequest request) {
+<span class="nc" id="L69">        Locale locale = request.getLocale();</span>
+<span class="nc" id="L70">        String message = messageSource.getMessage(&quot;file.notfound&quot;, null, locale);</span>
+<span class="nc" id="L71">        return ResponseEntity.status(HttpStatus.NOT_FOUND)</span>
+<span class="nc" id="L72">                .body(new ErrorDTO(&quot;file_not_found&quot;, message));</span>
+    }
+    
+    @ExceptionHandler(OrganizationAlreadyExistsException.class)
+    public ResponseEntity&lt;ErrorDTO&gt; handleOrgExists(OrganizationAlreadyExistsException ex, WebRequest request) {
+<span class="nc" id="L77">        Locale locale = request.getLocale();</span>
+<span class="nc" id="L78">        String message = messageSource.getMessage(&quot;org.exists&quot;, null, locale);</span>
+<span class="nc" id="L79">        return ResponseEntity.status(HttpStatus.BAD_REQUEST)</span>
+<span class="nc" id="L80">                .body(new ErrorDTO(&quot;org_exists&quot;, message));</span>
+    }
+
+    @ExceptionHandler(OrganizationNotFoundException.class)
+    public ResponseEntity&lt;ErrorDTO&gt; handleOrgNotFound(OrganizationNotFoundException ex, WebRequest request) {
+<span class="nc" id="L85">        Locale locale = request.getLocale();</span>
+<span class="nc" id="L86">        String message = messageSource.getMessage(&quot;org.notfound&quot;, null, locale);</span>
+<span class="nc" id="L87">        return ResponseEntity.status(HttpStatus.NOT_FOUND)</span>
+<span class="nc" id="L88">                .body(new ErrorDTO(&quot;org_not_found&quot;, message));</span>
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity&lt;ErrorDTO&gt; handleValidation(MethodArgumentNotValidException ex, WebRequest request) {
+<span class="nc" id="L93">        Locale locale = request.getLocale();</span>
+<span class="nc" id="L94">        String details = ex.getBindingResult().getFieldErrors().stream()</span>
+<span class="nc" id="L95">                .map(fe -&gt; fe.getField() + &quot;: &quot; + messageSource.getMessage(fe, locale))</span>
+<span class="nc" id="L96">                .collect(Collectors.joining(&quot;; &quot;));</span>
+<span class="nc" id="L97">        String title = messageSource.getMessage(&quot;validation.error&quot;, null, locale);</span>
+<span class="nc" id="L98">        return ResponseEntity.status(HttpStatus.BAD_REQUEST)</span>
+<span class="nc" id="L99">            .body(new ErrorDTO(&quot;validation_error&quot;, title + &quot;: &quot; + details));</span>
+    }
+
+    @ExceptionHandler(ResponseStatusException.class)
+    public ResponseEntity&lt;ErrorDTO&gt; handleResponseStatus(ResponseStatusException ex, WebRequest request) {
+<span class="nc" id="L104">        Locale locale = request.getLocale();</span>
+<span class="nc" id="L105">        String msgKey = ex.getReason();</span>
+<span class="nc" id="L106">        String message = messageSource.getMessage(msgKey, null, msgKey, locale);</span>
+<span class="nc" id="L107">        return ResponseEntity.status(ex.getStatusCode())</span>
+<span class="nc" id="L108">                .body(new ErrorDTO(&quot;error&quot;, message));</span>
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity&lt;ErrorDTO&gt; handleUnknown(Exception ex, WebRequest request) {
+<span class="nc" id="L113">        Locale locale = request.getLocale();</span>
+<span class="nc" id="L114">        String message = messageSource.getMessage(&quot;server.error&quot;, null, &quot;Internal server error.&quot;, locale);</span>
+<span class="nc" id="L115">        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)</span>
+<span class="nc" id="L116">                .body(new ErrorDTO(&quot;error&quot;, message));</span>
+    }
+    
+    @ExceptionHandler(PasswordResetTokenInvalidException.class)
+    public ResponseEntity&lt;ErrorDTO&gt; handlePasswordResetTokenInvalid(PasswordResetTokenInvalidException ex, WebRequest request) {
+<span class="nc" id="L121">        Locale locale = request.getLocale();</span>
+<span class="nc" id="L122">        String message = messageSource.getMessage(&quot;password.reset.invalid&quot;, null, locale);</span>
+<span class="nc" id="L123">        return ResponseEntity.status(HttpStatus.BAD_REQUEST)</span>
+<span class="nc" id="L124">                .body(new ErrorDTO(&quot;reset_token_invalid&quot;, message));</span>
+    }
+
+    @ExceptionHandler(PasswordResetTokenExpiredException.class)
+    public ResponseEntity&lt;ErrorDTO&gt; handlePasswordResetTokenExpired(PasswordResetTokenExpiredException ex, WebRequest request) {
+<span class="nc" id="L129">        Locale locale = request.getLocale();</span>
+<span class="nc" id="L130">        String message = messageSource.getMessage(&quot;password.reset.expired&quot;, null, locale);</span>
+<span class="nc" id="L131">        return ResponseEntity.status(HttpStatus.BAD_REQUEST)</span>
+<span class="nc" id="L132">                .body(new ErrorDTO(&quot;reset_token_expired&quot;, message));</span>
+    }
+    
+    @ExceptionHandler(RoleAlreadyExistsException.class)
+    public ResponseEntity&lt;ErrorDTO&gt; handleRoleAlreadyExists(RoleAlreadyExistsException ex, WebRequest request) {
+<span class="nc" id="L137">        Locale locale = request.getLocale();</span>
+<span class="nc" id="L138">        String message = messageSource.getMessage(&quot;role.exists&quot;, null, locale);</span>
+<span class="nc" id="L139">        return ResponseEntity.status(HttpStatus.CONFLICT)</span>
+<span class="nc" id="L140">                .body(new ErrorDTO(&quot;role_exists&quot;, message));</span>
+    }
+
+    @ExceptionHandler(RoleNotFoundException.class)
+    public ResponseEntity&lt;ErrorDTO&gt; handleRoleNotFound(RoleNotFoundException ex, WebRequest request) {
+<span class="nc" id="L145">        Locale locale = request.getLocale();</span>
+<span class="nc" id="L146">        String message = messageSource.getMessage(&quot;role.notfound&quot;, null, locale);</span>
+<span class="nc" id="L147">        return ResponseEntity.status(HttpStatus.NOT_FOUND)</span>
+<span class="nc" id="L148">                .body(new ErrorDTO(&quot;role_not_found&quot;, message));</span>
+    }
+
+    @Data
+    @AllArgsConstructor
+    public static class ErrorDTO {
+        private String status;
+        private String message;
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AuthService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">gymstock</a> &gt; <a href="index.source.html" class="el_package">com.asafeorneles.gymstock.services</a> &gt; <span class="el_source">AuthService.java</span></div><h1>AuthService.java</h1><pre class="source lang-java linenums">package com.asafeorneles.gymstock.services;
+
+import com.asafeorneles.gymstock.dtos.auth.LoginRequest;
+import com.asafeorneles.gymstock.dtos.auth.LoginResponse;
+import com.asafeorneles.gymstock.dtos.auth.RefreshTokenRequest;
+import com.asafeorneles.gymstock.dtos.auth.RegisterRequest;
+import com.asafeorneles.gymstock.entities.Role;
+import com.asafeorneles.gymstock.entities.User;
+import com.asafeorneles.gymstock.exceptions.BusinessConflictException;
+import com.asafeorneles.gymstock.exceptions.ResourceNotFoundException;
+import com.asafeorneles.gymstock.exceptions.UnauthorizedException;
+import com.asafeorneles.gymstock.repositories.RoleRepository;
+import com.asafeorneles.gymstock.repositories.UserRepository;
+import com.asafeorneles.gymstock.security.CustomUserDetailsService;
+import com.asafeorneles.gymstock.security.TokenService;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.JwtException;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Set;
+import java.util.UUID;
+
+<span class="fc" id="L32">@Slf4j</span>
+@Service
+@RequiredArgsConstructor
+public class AuthService {
+
+    final AuthenticationManager authenticationManager;
+    final TokenService tokenService;
+    final UserRepository userRepository;
+    final RoleRepository roleRepository;
+    final CustomUserDetailsService customUserDetailsService;
+    final RefreshTokenRedisService refreshTokenRedisService;
+    final PasswordEncoder passwordEncoder;
+    final private JwtDecoder jwtDecoder;
+
+    public LoginResponse login(LoginRequest loginRequest) {
+
+<span class="fc" id="L48">        Authentication authentication = authenticationManager.authenticate(</span>
+                new UsernamePasswordAuthenticationToken(
+<span class="fc" id="L50">                        loginRequest.username(),</span>
+<span class="fc" id="L51">                        loginRequest.password()</span>
+                )
+        );
+
+<span class="fc" id="L55">        User user = userRepository.findByUsername(loginRequest.username())</span>
+<span class="pc" id="L56">                .orElseThrow(() -&gt; new ResourceNotFoundException(&quot;User not found by refresh accessToken&quot;));</span>
+
+<span class="fc" id="L58">        String token = tokenService.getAccessToken(authentication);</span>
+<span class="fc" id="L59">        String refreshTokenString = generateRefreshToken(authentication, user);</span>
+
+<span class="fc" id="L61">        return new LoginResponse(token, refreshTokenString, tokenService.getAccessTokenExpiration());</span>
+    }
+
+    @Transactional
+    public void register(RegisterRequest registerRequest) {
+<span class="fc bfc" id="L66" title="All 2 branches covered.">        if (userRepository.existsByUsername(registerRequest.username())) {</span>
+<span class="fc" id="L67">            throw new BusinessConflictException(&quot;Username already in use. Please enter another username.&quot;);</span>
+        }
+
+<span class="fc" id="L70">        Role role = roleRepository.findByName(registerRequest.role())</span>
+<span class="fc" id="L71">                .orElseThrow(() -&gt; new ResourceNotFoundException(&quot;Role not found by this name: &quot; + registerRequest.role()));</span>
+
+<span class="fc" id="L73">        User user = User.builder()</span>
+<span class="fc" id="L74">                .username(registerRequest.username())</span>
+<span class="fc" id="L75">                .password(passwordEncoder.encode(registerRequest.password()))</span>
+<span class="fc" id="L76">                .roles(Set.of(role))</span>
+<span class="fc" id="L77">                .build();</span>
+
+<span class="fc" id="L79">        user.activity();</span>
+
+<span class="fc" id="L81">        userRepository.save(user);</span>
+<span class="fc" id="L82">    }</span>
+
+
+    @Transactional
+    public LoginResponse refreshToken(RefreshTokenRequest refreshTokenRequest) {
+<span class="fc" id="L87">        String oldRefreshTokenString = refreshTokenRequest.refreshToken();</span>
+
+<span class="fc" id="L89">        Jwt jwt = validateRefreshToken(oldRefreshTokenString);</span>
+<span class="fc" id="L90">        String jti = jwt.getId();</span>
+
+<span class="fc bfc" id="L92" title="All 2 branches covered.">        if (!refreshTokenRedisService.existsInRedis(jti)){</span>
+<span class="fc" id="L93">            throw new UnauthorizedException(&quot;Refresh Token invalid or expired&quot;);</span>
+        }
+
+<span class="fc" id="L96">        refreshTokenRedisService.delete(jti);</span>
+
+<span class="fc" id="L98">        User user = userRepository.findById(UUID.fromString(jwt.getSubject()))</span>
+<span class="pc" id="L99">                .orElseThrow(() -&gt; new ResourceNotFoundException(&quot;User not found in the refresh token&quot;));</span>
+
+
+<span class="fc" id="L102">        UserDetails userDetails = customUserDetailsService.loadUserByUsername(user.getUsername());</span>
+
+<span class="fc" id="L104">        Authentication authentication = new UsernamePasswordAuthenticationToken(</span>
+<span class="fc" id="L105">                userDetails.getUsername(),</span>
+                null,
+<span class="fc" id="L107">                userDetails.getAuthorities()</span>
+        );
+
+<span class="fc" id="L110">        String token = tokenService.getAccessToken(authentication);</span>
+<span class="fc" id="L111">        String newRefreshTokenString = generateRefreshToken(authentication, user);</span>
+
+<span class="fc" id="L113">        return new LoginResponse(token, newRefreshTokenString, tokenService.getAccessTokenExpiration());</span>
+    }
+
+    @Transactional
+    public void logout(RefreshTokenRequest refreshTokenRequest) {
+<span class="fc" id="L118">        String refreshTokenString = refreshTokenRequest.refreshToken();</span>
+
+<span class="fc" id="L120">        Jwt jwt = validateRefreshToken(refreshTokenString);</span>
+<span class="fc" id="L121">        String jti = jwt.getId();</span>
+
+<span class="pc bpc" id="L123" title="1 of 2 branches missed.">        if (!refreshTokenRedisService.existsInRedis(jti)){</span>
+<span class="nc" id="L124">            throw new UnauthorizedException(&quot;Refresh Token invalid or expired&quot;);</span>
+        }
+
+<span class="fc" id="L127">        refreshTokenRedisService.delete(jti);</span>
+<span class="fc" id="L128">    }</span>
+
+    private Jwt validateRefreshToken(String refreshTokenString) {
+        try {
+<span class="fc" id="L132">            Jwt jwt = jwtDecoder.decode(refreshTokenString);</span>
+<span class="fc bfc" id="L133" title="All 2 branches covered.">            if (!&quot;refresh&quot;.equals(jwt.getClaim(&quot;type&quot;))) {</span>
+<span class="fc" id="L134">                throw new UnauthorizedException(&quot;Invalid Token type&quot;);</span>
+            }
+<span class="fc" id="L136">            return jwt;</span>
+<span class="fc" id="L137">        } catch (JwtException e) {</span>
+<span class="fc" id="L138">            throw new UnauthorizedException(&quot;Invalid or expired refresh token&quot;);</span>
+        }
+    }
+
+    private String generateRefreshToken(Authentication authentication, User user) {
+<span class="fc" id="L143">        String jti = UUID.randomUUID().toString();</span>
+
+<span class="fc" id="L145">        String newRefreshTokenString = tokenService.getRefreshToken(authentication, jti);</span>
+
+<span class="fc" id="L147">        refreshTokenRedisService.save(jti, user.getUserId().toString(), tokenService.getRefreshTokenExpiration());</span>
+<span class="fc" id="L148">        return newRefreshTokenString;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>OrganizationServiceImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">SaaS Backend Starter</a> &gt; <a href="index.source.html" class="el_package">com.urke.saasbackendstarter.service.impl</a> &gt; <span class="el_source">OrganizationServiceImpl.java</span></div><h1>OrganizationServiceImpl.java</h1><pre class="source lang-java linenums">package com.urke.saasbackendstarter.service.impl;
+
+import com.urke.saasbackendstarter.domain.Organization;
+import com.urke.saasbackendstarter.dto.organization.OrganizationCreateRequest;
+import com.urke.saasbackendstarter.events.OrganizationEvent;
+import com.urke.saasbackendstarter.exception.OrganizationAlreadyExistsException;
+import com.urke.saasbackendstarter.exception.OrganizationNotFoundException;
+import com.urke.saasbackendstarter.repository.OrganizationRepository;
+import com.urke.saasbackendstarter.service.OrganizationService;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.text.Normalizer;
+import java.util.List;
+import java.util.Optional;
+
+/**
+ * Service implementation for managing organizations.
+ */
+@Service
+@RequiredArgsConstructor
+public class OrganizationServiceImpl implements OrganizationService {
+
+    private final OrganizationRepository organizationRepository;
+    private final ApplicationEventPublisher eventPublisher;
+    private final MessageSource messageSource;
+
+    @Override
+    @Transactional
+    public Organization create(OrganizationCreateRequest request) {
+<span class="fc bfc" id="L38" title="All 2 branches covered.">        if (organizationRepository.existsByNameAndDeletedFalse(request.getName())) {</span>
+<span class="fc" id="L39">            throw new OrganizationAlreadyExistsException(</span>
+<span class="fc" id="L40">                messageSource.getMessage(&quot;org.exists&quot;, null, LocaleContextHolder.getLocale())</span>
+            );
+        }
+<span class="fc" id="L43">        String slug = toSlug(request.getName());</span>
+<span class="fc bfc" id="L44" title="All 2 branches covered.">        if (organizationRepository.existsBySlugAndDeletedFalse(slug)) {</span>
+<span class="fc" id="L45">            throw new OrganizationAlreadyExistsException(</span>
+<span class="fc" id="L46">                messageSource.getMessage(&quot;org.exists&quot;, null, LocaleContextHolder.getLocale())</span>
+            );
+        }
+<span class="fc" id="L49">        Organization organization = Organization.builder()</span>
+<span class="fc" id="L50">                .name(request.getName())</span>
+<span class="fc" id="L51">                .slug(slug)</span>
+<span class="fc" id="L52">                .deleted(false)</span>
+<span class="fc" id="L53">                .build();</span>
+<span class="fc" id="L54">        Organization saved = organizationRepository.save(organization);</span>
+<span class="fc" id="L55">        eventPublisher.publishEvent(new OrganizationEvent(this, OrganizationEvent.Type.CREATED, saved));</span>
+<span class="fc" id="L56">        return saved;</span>
+    }
+
+    @Override
+    public List&lt;Organization&gt; findAll() {
+<span class="fc" id="L61">        return organizationRepository.findAllByDeletedFalse();</span>
+    }
+
+    @Override
+    public Optional&lt;Organization&gt; findById(Long id) {
+<span class="fc" id="L66">        return organizationRepository.findByIdAndDeletedFalse(id);</span>
+    }
+
+    @Override
+    public Optional&lt;Organization&gt; findByName(String name) {
+<span class="fc" id="L71">        return organizationRepository.findByNameAndDeletedFalse(name);</span>
+    }
+
+    @Override
+    public Optional&lt;Organization&gt; findBySlug(String slug) {
+<span class="fc" id="L76">        return organizationRepository.findBySlugAndDeletedFalse(slug);</span>
+    }
+
+    @Override
+    @Transactional
+    public void deleteOrganization(Long id) {
+<span class="fc" id="L82">        Organization organization = organizationRepository.findByIdAndDeletedFalse(id)</span>
+<span class="fc" id="L83">                .orElseThrow(() -&gt; new OrganizationNotFoundException(</span>
+<span class="fc" id="L84">                    messageSource.getMessage(&quot;org.notfound&quot;, null, LocaleContextHolder.getLocale())</span>
+                ));
+<span class="fc" id="L86">        organization.setDeleted(true);</span>
+<span class="fc" id="L87">        organizationRepository.save(organization);</span>
+<span class="fc" id="L88">        eventPublisher.publishEvent(new OrganizationEvent(this, OrganizationEvent.Type.DELETED, organization));</span>
+<span class="fc" id="L89">    }</span>
+
+    @Override
+    public Page&lt;Organization&gt; findAll(Pageable pageable) {
+<span class="fc" id="L93">        return organizationRepository.findAllByDeletedFalse(pageable);</span>
+    }
+
+    @Override
+    public Page&lt;Organization&gt; findAllByNameFilter(String name, Pageable pageable) {
+<span class="fc" id="L98">        return organizationRepository.findByNameContainingIgnoreCaseAndDeletedFalse(name, pageable);</span>
+    }
+
+    /**
+     * Generates a URL-friendly slug from a given string.
+     * Removes diacritics and converts spaces/punctuation to hyphens.
+     */
+    private String toSlug(String input) {
+<span class="fc" id="L106">        String normalized = Normalizer.normalize(input, Normalizer.Form.NFD)</span>
+<span class="fc" id="L107">                .replaceAll(&quot;[\\p{InCombiningDiacriticalMarks}]&quot;, &quot;&quot;);</span>
+<span class="fc" id="L108">        return normalized</span>
+<span class="fc" id="L109">                .toLowerCase()</span>
+<span class="fc" id="L110">                .replaceAll(&quot;[^a-z0-9]+&quot;, &quot;-&quot;)</span>
+<span class="fc" id="L111">                .replaceAll(&quot;^-+|-+$&quot;, &quot;&quot;);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

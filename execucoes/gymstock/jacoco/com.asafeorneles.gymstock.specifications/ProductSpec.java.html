@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ProductSpec.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">gymstock</a> &gt; <a href="index.source.html" class="el_package">com.asafeorneles.gymstock.specifications</a> &gt; <span class="el_source">ProductSpec.java</span></div><h1>ProductSpec.java</h1><pre class="source lang-java linenums">package com.asafeorneles.gymstock.specifications;
+
+import com.asafeorneles.gymstock.entities.Product;
+import com.asafeorneles.gymstock.enums.ActivityStatus;
+import com.asafeorneles.gymstock.enums.InventoryStatus;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.util.ObjectUtils;
+
+import java.math.BigDecimal;
+import java.util.UUID;
+
+<span class="nc" id="L12">public class ProductSpec {</span>
+    public static Specification&lt;Product&gt; nameContains(String name) {
+<span class="nc" id="L14">        return (root, query, builder) -&gt; {</span>
+<span class="nc bnc" id="L15" title="All 2 branches missed.">            if (ObjectUtils.isEmpty(name)) {</span>
+<span class="nc" id="L16">                return null;</span>
+            }
+<span class="nc" id="L18">            return builder.like(root.get(&quot;name&quot;), &quot;%&quot; + name + &quot;%&quot;);</span>
+        };
+    }
+
+    public static Specification&lt;Product&gt; brandContains(String brand) {
+<span class="nc" id="L23">        return (root, query, builder) -&gt; {</span>
+<span class="nc bnc" id="L24" title="All 2 branches missed.">            if (ObjectUtils.isEmpty(brand)) {</span>
+<span class="nc" id="L25">                return null;</span>
+            }
+<span class="nc" id="L27">            return builder.like(root.get(&quot;brand&quot;), &quot;%&quot; + brand + &quot;%&quot;);</span>
+        };
+    }
+
+    public static Specification&lt;Product&gt; priceEqual(BigDecimal price) {
+<span class="nc" id="L32">        return (root, query, builder) -&gt; {</span>
+<span class="nc bnc" id="L33" title="All 2 branches missed.">            if (ObjectUtils.isEmpty(price)) {</span>
+<span class="nc" id="L34">                return null;</span>
+            }
+<span class="nc" id="L36">            return builder.equal(root.get(&quot;price&quot;), price);</span>
+        };
+    }
+
+    public static Specification&lt;Product&gt; priceGreaterThanOrEqualTo(BigDecimal price) {
+<span class="nc" id="L41">        return (root, query, builder) -&gt; {</span>
+<span class="nc bnc" id="L42" title="All 2 branches missed.">            if (ObjectUtils.isEmpty(price)) {</span>
+<span class="nc" id="L43">                return null;</span>
+            }
+<span class="nc" id="L45">            return builder.greaterThanOrEqualTo(root.get(&quot;price&quot;), price);</span>
+        };
+    }
+
+    public static Specification&lt;Product&gt; priceLessThanOrEqualTo(BigDecimal price) {
+<span class="nc" id="L50">        return (root, query, builder) -&gt; {</span>
+<span class="nc bnc" id="L51" title="All 2 branches missed.">            if (ObjectUtils.isEmpty(price)) {</span>
+<span class="nc" id="L52">                return null;</span>
+            }
+<span class="nc" id="L54">            return builder.lessThanOrEqualTo(root.get(&quot;price&quot;), price);</span>
+        };
+    }
+
+    public static Specification&lt;Product&gt; costPriceEqual(BigDecimal costPrice) {
+<span class="nc" id="L59">        return (root, query, builder) -&gt; {</span>
+<span class="nc bnc" id="L60" title="All 2 branches missed.">            if (ObjectUtils.isEmpty(costPrice)) {</span>
+<span class="nc" id="L61">                return null;</span>
+            }
+<span class="nc" id="L63">            return builder.equal(root.get(&quot;costPrice&quot;), costPrice);</span>
+        };
+    }
+
+    public static Specification&lt;Product&gt; costPriceGreaterThanOrEqualTo(BigDecimal costPrice) {
+<span class="nc" id="L68">        return (root, query, builder) -&gt; {</span>
+<span class="nc bnc" id="L69" title="All 2 branches missed.">            if (ObjectUtils.isEmpty(costPrice)) {</span>
+<span class="nc" id="L70">                return null;</span>
+            }
+<span class="nc" id="L72">            return builder.greaterThanOrEqualTo(root.get(&quot;costPrice&quot;), costPrice);</span>
+        };
+    }
+
+    public static Specification&lt;Product&gt; costPriceLessThanOrEqualTo(BigDecimal costPrice) {
+<span class="nc" id="L77">        return (root, query, builder) -&gt; {</span>
+<span class="nc bnc" id="L78" title="All 2 branches missed.">            if (ObjectUtils.isEmpty(costPrice)) {</span>
+<span class="nc" id="L79">                return null;</span>
+            }
+<span class="nc" id="L81">            return builder.lessThanOrEqualTo(root.get(&quot;costPrice&quot;), costPrice);</span>
+        };
+    }
+
+    public static Specification&lt;Product&gt; categoryIdEqual(UUID categoryId) {
+<span class="nc" id="L86">        return (root, query, builder) -&gt; {</span>
+<span class="nc bnc" id="L87" title="All 2 branches missed.">            if (ObjectUtils.isEmpty(categoryId)) {</span>
+<span class="nc" id="L88">                return null;</span>
+            }
+<span class="nc" id="L90">            return builder.equal(root.get(&quot;category&quot;).get(&quot;categoryId&quot;), categoryId);</span>
+        };
+    }
+
+    public static Specification&lt;Product&gt; inventoryStatus(InventoryStatus inventoryStatus) {
+<span class="nc" id="L95">        return (root, query, builder) -&gt; {</span>
+<span class="nc bnc" id="L96" title="All 2 branches missed.">            if (ObjectUtils.isEmpty(inventoryStatus)) {</span>
+<span class="nc" id="L97">                return null;</span>
+            }
+<span class="nc" id="L99">            return builder.equal(root.get(&quot;inventory&quot;).get(&quot;inventoryStatus&quot;), inventoryStatus);</span>
+        };
+    }
+
+    public static Specification&lt;Product&gt; activityStatusEquals(ActivityStatus activityStatus) {
+<span class="nc" id="L104">        return (root, query, builder) -&gt; {</span>
+<span class="nc bnc" id="L105" title="All 2 branches missed.">            if (ObjectUtils.isEmpty(activityStatus)) {</span>
+<span class="nc" id="L106">                return null;</span>
+            }
+<span class="nc" id="L108">            return builder.equal(root.get(&quot;activityStatus&quot;), activityStatus);</span>
+        };
+    }
+
+    public static Specification&lt;Product&gt; isActivity() {
+<span class="nc" id="L113">        return (root, query, builder) -&gt;</span>
+<span class="nc" id="L114">                builder.equal(root.get(&quot;activityStatus&quot;), ActivityStatus.ACTIVE);</span>
+    }
+
+
+}
+
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

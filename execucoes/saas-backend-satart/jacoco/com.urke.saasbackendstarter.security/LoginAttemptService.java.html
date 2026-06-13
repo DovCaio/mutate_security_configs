@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>LoginAttemptService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">SaaS Backend Starter</a> &gt; <a href="index.source.html" class="el_package">com.urke.saasbackendstarter.security</a> &gt; <span class="el_source">LoginAttemptService.java</span></div><h1>LoginAttemptService.java</h1><pre class="source lang-java linenums">package com.urke.saasbackendstarter.security;
+
+import org.springframework.stereotype.Service;
+
+import java.time.Instant;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+/**
+ * Service for tracking failed login attempts and temporarily blocking accounts after too many failures.
+ */
+@Service
+<span class="nc" id="L13">public class LoginAttemptService {</span>
+
+    private static final int MAX_ATTEMPTS = 5;
+    private static final long BLOCK_DURATION_MS = 15 * 60 * 1000; // 15 minutes
+
+<span class="nc" id="L18">    private final Map&lt;String, Integer&gt; attempts = new ConcurrentHashMap&lt;&gt;();</span>
+<span class="nc" id="L19">    private final Map&lt;String, Long&gt; blockedUntil = new ConcurrentHashMap&lt;&gt;();</span>
+
+    /**
+     * Should be called on successful login. Resets attempt counter and removes any block.
+     */
+    public void loginSucceeded(String email) {
+<span class="nc" id="L25">        attempts.remove(email);</span>
+<span class="nc" id="L26">        blockedUntil.remove(email);</span>
+<span class="nc" id="L27">    }</span>
+
+    /**
+     * Should be called on failed login. Increments attempt counter and applies block if threshold is reached.
+     */
+    public void loginFailed(String email) {
+<span class="nc" id="L33">        int current = attempts.getOrDefault(email, 0);</span>
+<span class="nc" id="L34">        attempts.put(email, current + 1);</span>
+<span class="nc bnc" id="L35" title="All 2 branches missed.">        if (attempts.get(email) &gt;= MAX_ATTEMPTS) {</span>
+<span class="nc" id="L36">            blockedUntil.put(email, Instant.now().toEpochMilli() + BLOCK_DURATION_MS);</span>
+        }
+<span class="nc" id="L38">    }</span>
+
+    /**
+     * Checks if a user is currently blocked.
+     */
+    public boolean isBlocked(String email) {
+<span class="nc" id="L44">        Long until = blockedUntil.get(email);</span>
+<span class="nc bnc" id="L45" title="All 2 branches missed.">        if (until == null) return false;</span>
+<span class="nc bnc" id="L46" title="All 2 branches missed.">        if (Instant.now().toEpochMilli() &gt; until) {</span>
+<span class="nc" id="L47">            blockedUntil.remove(email);</span>
+<span class="nc" id="L48">            attempts.remove(email);</span>
+<span class="nc" id="L49">            return false;</span>
+        }
+<span class="nc" id="L51">        return true;</span>
+    }
+
+    /**
+     * Returns the number of milliseconds left before the block is lifted.
+     */
+    public long getBlockTimeRemaining(String email) {
+<span class="nc" id="L58">        Long until = blockedUntil.get(email);</span>
+<span class="nc bnc" id="L59" title="All 2 branches missed.">        if (until == null) return 0;</span>
+<span class="nc" id="L60">        long diff = until - Instant.now().toEpochMilli();</span>
+<span class="nc" id="L61">        return Math.max(diff, 0);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>
