@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>BrevoAPIEmailSender.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report"></a> &gt; <a href="index.source.html" class="el_package">com.traine.managment.service</a> &gt; <span class="el_source">BrevoAPIEmailSender.java</span></div><h1>BrevoAPIEmailSender.java</h1><pre class="source lang-java linenums">package com.traine.managment.service;
+
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.stereotype.Service;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+
+import com.traine.managment.interfaces.notification.EmailSender;
+
+@Service
+<span class="fc" id="L17">public class BrevoAPIEmailSender implements EmailSender {</span>
+    @Value(&quot;${spring.mail.password}&quot;)
+    private String apiKey;
+
+    @Autowired
+    private RequestsService requestsService;
+
+    @Async
+    @Override
+    public void send(String to, String subject, String body) {
+
+<span class="fc" id="L28">        String url = &quot;https://api.brevo.com/v3/smtp/email&quot;;</span>
+
+<span class="fc" id="L30">        HttpHeaders headers = new HttpHeaders();</span>
+<span class="fc" id="L31">        headers.setContentType(MediaType.APPLICATION_JSON);</span>
+<span class="fc" id="L32">        headers.set(&quot;api-key&quot;, apiKey);</span>
+
+<span class="fc" id="L34">        Map&lt;String, Object&gt; bodyRequest = Map.of(</span>
+<span class="fc" id="L35">                &quot;sender&quot;, Map.of(</span>
+                        &quot;name&quot;, &quot;Trainee Manager&quot;,
+                        &quot;email&quot;, &quot;emailsend.traineemanagement.pre@gmail.com&quot;),
+<span class="fc" id="L38">                &quot;to&quot;, List.of(</span>
+<span class="fc" id="L39">                        Map.of(&quot;email&quot;, to)),</span>
+                &quot;subject&quot;, subject,
+                &quot;htmlContent&quot;, body);
+
+<span class="fc" id="L43">        Map&lt;String, Object&gt; response = requestsService.make(</span>
+                HttpMethod.POST,
+                headers,
+                bodyRequest,
+                url);
+
+<span class="fc" id="L49">        System.out.println(&quot;BREVO RESPONSE: &quot; + response);</span>
+<span class="fc" id="L50">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

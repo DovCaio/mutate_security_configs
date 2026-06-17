@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Activity.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report"></a> &gt; <a href="index.source.html" class="el_package">com.traine.managment.model</a> &gt; <span class="el_source">Activity.java</span></div><h1>Activity.java</h1><pre class="source lang-java linenums">package com.traine.managment.model;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import com.traine.managment.enums.activity.ActivityStatus;
+import com.traine.managment.enums.activity.ActivityType;
+import com.traine.managment.dto.activity.PatchActivityRequestDTO;
+import com.traine.managment.enums.activity.ActivityPriority;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.CollectionTable;
+import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Entity
+@Getter
+@Setter
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+public class Activity {
+
+    @Id
+    @GeneratedValue
+    @Column(name = &quot;id_pk&quot;)
+    private Long id;
+
+    @Column(name = &quot;description&quot;)
+    private String description;
+
+    @Column(name = &quot;activity_type&quot;)
+    @Enumerated(EnumType.STRING)
+    private ActivityType activityType;
+
+    @ManyToMany
+    @JoinTable(name = &quot;activity_trainees&quot;, joinColumns = @JoinColumn(name = &quot;activity_id&quot;), inverseJoinColumns = @JoinColumn(name = &quot;user_id&quot;))
+    private Set&lt;User&gt; trainees;
+
+    @ManyToMany
+    @JoinTable(name = &quot;activity_validators&quot;, joinColumns = @JoinColumn(name = &quot;activity_id&quot;), inverseJoinColumns = @JoinColumn(name = &quot;user_id&quot;))
+    private Set&lt;User&gt; validators;
+
+    @Column(name = &quot;term&quot;)
+    private LocalDate term;
+
+    @Column(name = &quot;createAt&quot;)
+    private LocalDate createdAt;
+
+    @Column(name = &quot;finished_at&quot;)
+    private LocalDate finishedAt;
+
+    @Column(name = &quot;status&quot;)
+    @Enumerated(EnumType.STRING)
+    private ActivityStatus activityStatus;
+
+    @Column(name = &quot;priority&quot;)
+    @Enumerated(EnumType.STRING)
+    private ActivityPriority activityPriority;
+
+    @OneToMany(mappedBy = &quot;activity&quot;)
+    private Set&lt;GoogleCalendarEvent&gt; googleEvent;
+
+    @OneToMany(mappedBy = &quot;activity&quot;)
+    private Set&lt;TrelloActivityCard&gt; trelloCardId;
+
+    @ElementCollection
+    @CollectionTable(name = &quot;activity_auxiliary_files&quot;, joinColumns = @JoinColumn(name = &quot;activity_id&quot;))
+    @Column(name = &quot;aux_file_keys&quot;)
+    @Builder.Default
+    private Set&lt;String&gt; auxiliaryFilesKeys = new HashSet&lt;&gt;();
+
+    @ElementCollection
+    @CollectionTable(name = &quot;activity_answer_files&quot;, joinColumns = @JoinColumn(name = &quot;activity_id&quot;))
+    @Column(name = &quot;answer_file_keys&quot;)
+    @Builder.Default
+    private Set&lt;String&gt; answerFilesKeys = new HashSet&lt;&gt;();
+
+    @OneToMany(mappedBy = &quot;activity&quot;)
+    @Builder.Default
+    private List&lt;ActivityStoryLine&gt; storyLines = new ArrayList&lt;&gt;();
+
+    public boolean haveAuxiliarKey(String fileKey) {
+<span class="fc" id="L103">        return auxiliaryFilesKeys.contains(fileKey);</span>
+    }
+
+    public void addAuxiliarFileKey(String key) {
+
+<span class="pc bpc" id="L108" title="1 of 2 branches missed.">        if (key != null</span>
+<span class="pc bpc" id="L109" title="1 of 2 branches missed.">                &amp;&amp; !key.isBlank()</span>
+<span class="pc bpc" id="L110" title="1 of 2 branches missed.">                &amp;&amp; !auxiliaryFilesKeys.contains(key)) {</span>
+
+<span class="fc" id="L112">            auxiliaryFilesKeys.add(key);</span>
+        }
+<span class="fc" id="L114">    }</span>
+
+    public void addAuxiliariesFileKeys(Collection&lt;String&gt; keys) {
+
+<span class="fc bfc" id="L118" title="All 4 branches covered.">        if (keys != null &amp;&amp; !keys.isEmpty()) {</span>
+
+<span class="fc" id="L120">            keys.stream()</span>
+<span class="fc" id="L121">                    .forEach(this::addAuxiliarFileKey);</span>
+        }
+<span class="fc" id="L123">    }</span>
+
+    public void deleteAuxiliarFileKey(String key) {
+<span class="pc bpc" id="L126" title="1 of 2 branches missed.">        if (key != null</span>
+<span class="pc bpc" id="L127" title="1 of 2 branches missed.">                &amp;&amp; !key.isBlank()</span>
+<span class="pc bpc" id="L128" title="1 of 2 branches missed.">                &amp;&amp; auxiliaryFilesKeys.contains(key))</span>
+<span class="fc" id="L129">            auxiliaryFilesKeys.remove(key);</span>
+<span class="fc" id="L130">    }</span>
+
+    public void delteAuxiliariesFilesKeys(Collection&lt;String&gt; keys) {
+<span class="nc bnc" id="L133" title="All 4 branches missed.">        if (keys != null &amp;&amp; !keys.isEmpty())</span>
+<span class="nc" id="L134">            keys.stream().forEach(this::deleteAuxiliarFileKey);</span>
+<span class="nc" id="L135">    }</span>
+
+    public boolean haveAnswerKey(String fileKey) {
+<span class="fc" id="L138">        return answerFilesKeys.contains(fileKey);</span>
+    }
+
+    public void addAnwerFileKey(String key) {
+
+<span class="pc bpc" id="L143" title="1 of 2 branches missed.">        if (key != null</span>
+<span class="pc bpc" id="L144" title="1 of 2 branches missed.">                &amp;&amp; !key.isBlank()</span>
+<span class="pc bpc" id="L145" title="1 of 2 branches missed.">                &amp;&amp; !auxiliaryFilesKeys.contains(key)) {</span>
+
+<span class="fc" id="L147">            answerFilesKeys.add(key);</span>
+        }
+<span class="fc" id="L149">    }</span>
+
+    public void addAnswerFileKeys(Collection&lt;String&gt; keys) {
+
+<span class="pc bpc" id="L153" title="2 of 4 branches missed.">        if (keys != null &amp;&amp; !keys.isEmpty()) {</span>
+
+<span class="fc" id="L155">            keys.stream()</span>
+<span class="fc" id="L156">                    .forEach(this::addAnwerFileKey);</span>
+        }
+<span class="fc" id="L158">    }</span>
+
+    public void finishedAt() {
+<span class="fc" id="L161">        this.finishedAt = LocalDate.now();</span>
+<span class="fc" id="L162">    }</span>
+
+    public void deleteAnswerFileKey(String key) {
+<span class="pc bpc" id="L165" title="1 of 2 branches missed.">        if (key != null</span>
+<span class="pc bpc" id="L166" title="1 of 2 branches missed.">                &amp;&amp; !key.isBlank()</span>
+<span class="pc bpc" id="L167" title="1 of 2 branches missed.">                &amp;&amp; answerFilesKeys.contains(key))</span>
+<span class="fc" id="L168">            answerFilesKeys.remove(key);</span>
+<span class="fc" id="L169">    }</span>
+
+    public void deleteAnswerFilesKeys(Collection&lt;String&gt; keys) {
+<span class="nc bnc" id="L172" title="All 4 branches missed.">        if (keys != null &amp;&amp; !keys.isEmpty())</span>
+<span class="nc" id="L173">            keys.stream().forEach(this::deleteAnswerFileKey);</span>
+<span class="nc" id="L174">    }</span>
+
+    public Set&lt;User&gt; getParticipants() {
+<span class="fc" id="L177">        Set&lt;User&gt; participants = new HashSet&lt;&gt;(this.getTrainees());</span>
+<span class="fc" id="L178">        participants.addAll(this.getValidators());</span>
+<span class="fc" id="L179">        return participants;</span>
+    }
+
+    public boolean areValidator(User user) {
+<span class="fc" id="L183">        return validators.stream().anyMatch(validator -&gt; validator.getId().equals(user.getId()));</span>
+    }
+
+    public boolean areTrainee(User user) {
+<span class="fc" id="L187">        return trainees.stream().anyMatch(trainee -&gt; trainee.getId().equals(user.getId()));</span>
+    }
+
+    public boolean areParticipant(User user) {
+<span class="fc" id="L191">        return getParticipants().stream().anyMatch(participant -&gt; participant.getId().equals(user.getId()));</span>
+    }
+
+    public String differenceBetweenPutDto(PatchActivityRequestDTO dto) {
+<span class="fc" id="L195">        List&lt;String&gt; changes = new ArrayList&lt;&gt;();</span>
+
+<span class="pc bpc" id="L197" title="1 of 4 branches missed.">        if (dto.getDescription() != null &amp;&amp; !dto.getDescription().equals(this.description)) {</span>
+<span class="fc" id="L198">            changes.add(String.format(&quot;Descrição alterada de '%s' para '%s'&quot;, this.description, dto.getDescription()));</span>
+        }
+
+<span class="fc bfc" id="L201" title="All 4 branches covered.">        if (dto.getActivityType() != null &amp;&amp; !dto.getActivityType().equals(this.activityType)) {</span>
+<span class="fc" id="L202">            changes.add(String.format(&quot;Tipo alterado de %s para %s&quot;, this.activityType, dto.getActivityType()));</span>
+        }
+
+<span class="fc bfc" id="L205" title="All 4 branches covered.">        if (dto.getActivityPriority() != null &amp;&amp; !dto.getActivityPriority().equals(this.activityPriority)) {</span>
+<span class="fc" id="L206">            changes.add(String.format(&quot;Prioridade alterada de %s para %s&quot;, this.activityPriority,</span>
+<span class="fc" id="L207">                    dto.getActivityPriority()));</span>
+        }
+
+<span class="pc bpc" id="L210" title="1 of 4 branches missed.">        if (dto.getTerm() != null &amp;&amp; !dto.getTerm().equals(this.term)) {</span>
+<span class="fc" id="L211">            changes.add(String.format(&quot;Prazo alterado de %s para %s&quot;, this.term, dto.getTerm()));</span>
+        }
+
+<span class="fc bfc" id="L214" title="All 2 branches covered.">        if (changes.isEmpty()) {</span>
+<span class="fc" id="L215">            return &quot;Nenhuma alteração detectada nos campos principais.&quot;;</span>
+        }
+
+<span class="fc" id="L218">        return String.join(&quot;\n&quot;, changes);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

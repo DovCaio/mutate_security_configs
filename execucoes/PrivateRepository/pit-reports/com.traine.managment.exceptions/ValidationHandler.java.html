@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+    <link rel="stylesheet" type="text/css" href="../style.css">
+</head>
+<body>
+
+
+<h1>ValidationHandler.java</h1>
+
+<table class="src">
+
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@73b0cfe8_1'/>
+1
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@73b0cfe8_1'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>package com.traine.managment.exceptions;</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@73b0cfe8_2'/>
+2
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@73b0cfe8_2'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@73b0cfe8_3'/>
+3
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@73b0cfe8_3'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>import org.springframework.http.HttpStatus;</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@73b0cfe8_4'/>
+4
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@73b0cfe8_4'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>import org.springframework.http.ResponseEntity;</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@73b0cfe8_5'/>
+5
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@73b0cfe8_5'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>import org.springframework.web.bind.MethodArgumentNotValidException;</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@73b0cfe8_6'/>
+6
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@73b0cfe8_6'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>import org.springframework.web.bind.annotation.ExceptionHandler;</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@73b0cfe8_7'/>
+7
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@73b0cfe8_7'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>import org.springframework.web.bind.annotation.RestControllerAdvice;</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@73b0cfe8_8'/>
+8
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@73b0cfe8_8'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>import org.springframework.web.server.ResponseStatusException;</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@73b0cfe8_9'/>
+9
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@73b0cfe8_9'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@73b0cfe8_10'/>
+10
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@73b0cfe8_10'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>import java.util.Map;</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@73b0cfe8_11'/>
+11
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@73b0cfe8_11'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@73b0cfe8_12'/>
+12
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@73b0cfe8_12'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>@RestControllerAdvice</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@73b0cfe8_13'/>
+13
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@73b0cfe8_13'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>public class ValidationHandler {</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@73b0cfe8_14'/>
+14
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@73b0cfe8_14'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@73b0cfe8_15'/>
+15
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@73b0cfe8_15'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    @ExceptionHandler(MethodArgumentNotValidException.class)</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@73b0cfe8_16'/>
+16
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@73b0cfe8_16'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    public ResponseEntity&#60;Map&#60;String, String&#62;&#62; handleValidationErrors(MethodArgumentNotValidException ex) {</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@73b0cfe8_17'/>
+17
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@73b0cfe8_17'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>        // Pega o primeiro erro de valida&#231;&#227;o e usa como mensagem</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@73b0cfe8_18'/>
+18
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@73b0cfe8_18'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>        String errorMessage = ex.getBindingResult()</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@73b0cfe8_19'/>
+19
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@73b0cfe8_19'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>                .getFieldErrors()</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@73b0cfe8_20'/>
+20
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@73b0cfe8_20'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>                .stream()</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@73b0cfe8_21'/>
+21
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@73b0cfe8_21'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>                .findFirst()</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@73b0cfe8_22'/>
+22
+</td>
+<td class='killed'>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@73b0cfe8_22'>1</a>
+<span>
+1. lambda$handleValidationErrors$0 : replaced return value with &#34;&#34; for com/traine/managment/exceptions/ValidationHandler::lambda$handleValidationErrors$0 &rarr; KILLED<br/>
+
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class='killed'>                .map(fieldError -&#62; fieldError.getDefaultMessage())</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@73b0cfe8_23'/>
+23
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@73b0cfe8_23'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>                .orElse(&#34;Erro de valida&#231;&#227;o&#34;);</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@73b0cfe8_24'/>
+24
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@73b0cfe8_24'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@73b0cfe8_25'/>
+25
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@73b0cfe8_25'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>        Map&#60;String, String&#62; body = Map.of(&#34;message&#34;, errorMessage);</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@73b0cfe8_26'/>
+26
+</td>
+<td class='killed'>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@73b0cfe8_26'>1</a>
+<span>
+1. handleValidationErrors : replaced return value with null for com/traine/managment/exceptions/ValidationHandler::handleValidationErrors &rarr; KILLED<br/>
+
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class='killed'>        return ResponseEntity.badRequest().body(body);</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@73b0cfe8_27'/>
+27
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@73b0cfe8_27'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    }</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@73b0cfe8_28'/>
+28
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@73b0cfe8_28'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@73b0cfe8_29'/>
+29
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@73b0cfe8_29'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    @ExceptionHandler(EmailAlreadyExistsException.class)</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@73b0cfe8_30'/>
+30
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@73b0cfe8_30'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    public ResponseEntity&#60;Map&#60;String, String&#62;&#62; handleUserAlreadyExists(EmailAlreadyExistsException ex) {</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@73b0cfe8_31'/>
+31
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@73b0cfe8_31'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>        Map&#60;String, String&#62; body = Map.of(&#34;message&#34;, ex.getMessage());</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@73b0cfe8_32'/>
+32
+</td>
+<td class='killed'>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@73b0cfe8_32'>1</a>
+<span>
+1. handleUserAlreadyExists : replaced return value with null for com/traine/managment/exceptions/ValidationHandler::handleUserAlreadyExists &rarr; KILLED<br/>
+
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class='killed'>        return ResponseEntity.status(HttpStatus.CONFLICT).body(body);</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@73b0cfe8_33'/>
+33
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@73b0cfe8_33'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    }</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@73b0cfe8_34'/>
+34
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@73b0cfe8_34'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@73b0cfe8_35'/>
+35
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@73b0cfe8_35'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    @ExceptionHandler(ResponseStatusException.class)</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@73b0cfe8_36'/>
+36
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@73b0cfe8_36'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    public ResponseEntity&#60;Map&#60;String, String&#62;&#62; handleResponseStatusException(ResponseStatusException ex) {</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@73b0cfe8_37'/>
+37
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@73b0cfe8_37'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>        Map&#60;String, String&#62; body = Map.of(&#34;message&#34;, ex.getReason());</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@73b0cfe8_38'/>
+38
+</td>
+<td class='killed'>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@73b0cfe8_38'>1</a>
+<span>
+1. handleResponseStatusException : replaced return value with null for com/traine/managment/exceptions/ValidationHandler::handleResponseStatusException &rarr; KILLED<br/>
+
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class='killed'>        return ResponseEntity.status(ex.getStatusCode()).body(body);</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@73b0cfe8_39'/>
+39
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@73b0cfe8_39'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    }</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@73b0cfe8_40'/>
+40
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@73b0cfe8_40'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@73b0cfe8_41'/>
+41
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@73b0cfe8_41'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>}</span></pre></td></tr>
+
+
+
+<tr><td></td><td></td><td><h2>Mutations</h2></td></tr>
+
+<tr>
+<td><a href='#org.pitest.mutationtest.report.html.SourceFile@73b0cfe8_22'>22</a></td> 
+<td></td>
+<td>
+
+<a name='grouporg.pitest.mutationtest.report.html.SourceFile@73b0cfe8_22'/> 
+
+<p class='KILLED'><span class='pop'>1.<span><b>1</b><br/><b>Location : </b>lambda$handleValidationErrors$0<br/><b>Killed by : </b>com.traine.managment.user.UserControllerTest.[engine:junit-jupiter]/[class:com.traine.managment.user.UserControllerTest]/[nested-class:CreateManagmentTEsts]/[method:shouldReturnAnErroWhenTryCreateAManagerUserWithoutEmail()]</span></span> replaced return value with &#34;&#34; for com/traine/managment/exceptions/ValidationHandler::lambda$handleValidationErrors$0 &rarr; KILLED</p> 
+</td>
+</tr>
+<tr>
+<td><a href='#org.pitest.mutationtest.report.html.SourceFile@73b0cfe8_26'>26</a></td> 
+<td></td>
+<td>
+
+<a name='grouporg.pitest.mutationtest.report.html.SourceFile@73b0cfe8_26'/> 
+
+<p class='KILLED'><span class='pop'>1.<span><b>1</b><br/><b>Location : </b>handleValidationErrors<br/><b>Killed by : </b>com.traine.managment.user.UserControllerTest.[engine:junit-jupiter]/[class:com.traine.managment.user.UserControllerTest]/[nested-class:CreateManagmentTEsts]/[method:shouldReturnAnErroWhenTryCreateAManagerUserWithoutEmail()]</span></span> replaced return value with null for com/traine/managment/exceptions/ValidationHandler::handleValidationErrors &rarr; KILLED</p> 
+</td>
+</tr>
+<tr>
+<td><a href='#org.pitest.mutationtest.report.html.SourceFile@73b0cfe8_32'>32</a></td> 
+<td></td>
+<td>
+
+<a name='grouporg.pitest.mutationtest.report.html.SourceFile@73b0cfe8_32'/> 
+
+<p class='KILLED'><span class='pop'>1.<span><b>1</b><br/><b>Location : </b>handleUserAlreadyExists<br/><b>Killed by : </b>com.traine.managment.user.UserControllerTest.[engine:junit-jupiter]/[class:com.traine.managment.user.UserControllerTest]/[nested-class:CreateManagmentTEsts]/[method:shouldReturnAnErroWhenTryCreateAManagerUserWhitAnEmalAlreadyExistent()]</span></span> replaced return value with null for com/traine/managment/exceptions/ValidationHandler::handleUserAlreadyExists &rarr; KILLED</p> 
+</td>
+</tr>
+<tr>
+<td><a href='#org.pitest.mutationtest.report.html.SourceFile@73b0cfe8_38'>38</a></td> 
+<td></td>
+<td>
+
+<a name='grouporg.pitest.mutationtest.report.html.SourceFile@73b0cfe8_38'/> 
+
+<p class='KILLED'><span class='pop'>1.<span><b>1</b><br/><b>Location : </b>handleResponseStatusException<br/><b>Killed by : </b>com.traine.managment.notification.NotificationControllerTest.[engine:junit-jupiter]/[class:com.traine.managment.notification.NotificationControllerTest]/[method:shouldReturnAnErrroWhenTryGetMyActivities()]</span></span> replaced return value with null for com/traine/managment/exceptions/ValidationHandler::handleResponseStatusException &rarr; KILLED</p> 
+</td>
+</tr>
+
+</table>
+
+
+<h2>Active mutators</h2>
+<ul>
+<li class='mutator'>CONDITIONALS_BOUNDARY</li>
+<li class='mutator'>EMPTY_RETURNS</li>
+<li class='mutator'>FALSE_RETURNS</li>
+<li class='mutator'>INCREMENTS</li>
+<li class='mutator'>INVERT_NEGS</li>
+<li class='mutator'>MATH</li>
+<li class='mutator'>NEGATE_CONDITIONALS</li>
+<li class='mutator'>NULL_RETURNS</li>
+<li class='mutator'>PRIMITIVE_RETURNS</li>
+<li class='mutator'>TRUE_RETURNS</li>
+<li class='mutator'>VOID_METHOD_CALLS</li>
+
+</ul>
+
+<h2>Tests examined</h2>
+<ul>
+<li>com.traine.managment.user.UserControllerTest.[engine:junit-jupiter]/[class:com.traine.managment.user.UserControllerTest]/[nested-class:CreateManagmentTEsts]/[method:shouldReturnAnErroWhenTryCreateAManagerUserWhitAnEmalAlreadyExistent()] (302 ms)</li><li>com.traine.managment.notification.NotificationControllerTest.[engine:junit-jupiter]/[class:com.traine.managment.notification.NotificationControllerTest]/[method:shouldReturnAnErrroWhenTryGetMyActivities()] (5 ms)</li><li>com.traine.managment.notification.NotificationControllerTest.[engine:junit-jupiter]/[class:com.traine.managment.notification.NotificationControllerTest]/[method:shouldReturnNotFoundWhenUserDoesNotExist()] (5 ms)</li><li>com.traine.managment.notification.NotificationControllerTest.[engine:junit-jupiter]/[class:com.traine.managment.notification.NotificationControllerTest]/[method:shouldReturnNotFoundWhenNotificationDoesNotExist()] (6 ms)</li><li>com.traine.managment.files.FilesControllerTest.[engine:junit-jupiter]/[class:com.traine.managment.files.FilesControllerTest]/[method:shouldReturn404WhenGeneratingUrlForNonExistingFile()] (7 ms)</li><li>com.traine.managment.activity.ActivityControllerTest.[engine:junit-jupiter]/[class:com.traine.managment.activity.ActivityControllerTest]/[nested-class:DeleteAuxiliarFileFromActiviy]/[method:shouldReturnNotFoundWhenActivityDoesNotExistOnDelete()] (8 ms)</li><li>com.traine.managment.notification.NotificationControllerTest.[engine:junit-jupiter]/[class:com.traine.managment.notification.NotificationControllerTest]/[method:shouldReturnNotFoundWhenNotificationDoesNotBelongToUser()] (9 ms)</li><li>com.traine.managment.activity.ActivityControllerTest.[engine:junit-jupiter]/[class:com.traine.managment.activity.ActivityControllerTest]/[nested-class:AddAuxFiles]/[method:shouldThrowErrorWhenMultipleInvalidFileKeysSent()] (10 ms)</li><li>com.traine.managment.user.UserControllerTest.[engine:junit-jupiter]/[class:com.traine.managment.user.UserControllerTest]/[nested-class:TestsAllAnnotherUsers]/[method:shouldNotCreateAnManagmentUserWithManagmentRole()] (12 ms)</li><li>com.traine.managment.activity.ActivityControllerTest.[engine:junit-jupiter]/[class:com.traine.managment.activity.ActivityControllerTest]/[nested-class:AddAuxFiles]/[method:shouldThrowErrorWhenSingleFileKeyIsInvalid()] (11 ms)</li><li>com.traine.managment.user.UserControllerTest.[engine:junit-jupiter]/[class:com.traine.managment.user.UserControllerTest]/[nested-class:TestsAllAnnotherUsers]/[method:shouldNotCreateAnAdminUserWithManagmentRole()] (27 ms)</li><li>com.traine.managment.activity.ActivityControllerTest.[engine:junit-jupiter]/[class:com.traine.managment.activity.ActivityControllerTest]/[nested-class:ActivityDeleteGets]/[nested-class:GetActivitiesWichIParticipate]/[method:shouldReturnAnErrorWhenActivityIsNotFound()] (16 ms)</li><li>com.traine.managment.activity.ActivityControllerTest.[engine:junit-jupiter]/[class:com.traine.managment.activity.ActivityControllerTest]/[nested-class:ACtivityProgress]/[nested-class:PendingTOInProgress]/[method:shoulReturnAnErrorWhenTrydUpdateTheStatusOfAnActivityToInProgressWhenIsFinished()] (18 ms)</li><li>com.traine.managment.activity.ActivityControllerTest.[engine:junit-jupiter]/[class:com.traine.managment.activity.ActivityControllerTest]/[nested-class:ACtivityProgress]/[nested-class:InProgressToAwaitEvaluation]/[method:shouldReturnAnErrorWhenTryToUptateToAwaitingEvaluationOfAnActivityThatAnTraineeNotParticipate()] (19 ms)</li><li>com.traine.managment.activity.ActivityControllerTest.[engine:junit-jupiter]/[class:com.traine.managment.activity.ActivityControllerTest]/[nested-class:ACtivityProgress]/[nested-class:ToFinishedOrReviewNedded]/[nested-class:ActivityMaker]/[method:shouldReturnAnErrorWhenTryToUptateToFinishedOfAnActivityThatAnActivityMakerNotParticipate()] (18 ms)</li><li>com.traine.managment.activity.ActivityControllerTest.[engine:junit-jupiter]/[class:com.traine.managment.activity.ActivityControllerTest]/[nested-class:ACtivityProgress]/[nested-class:InProgressToAwaitEvaluation]/[method:shoulReturnAnErrorWhenTrydUpdateTheStatusOfAnActivityToAwaitEvaluationWhenIsWhenIsAreadyInAwaitEvaluation()] (18 ms)</li><li>com.traine.managment.activity.ActivityControllerTest.[engine:junit-jupiter]/[class:com.traine.managment.activity.ActivityControllerTest]/[nested-class:ActivityDeleteGets]/[nested-class:GetActivitiesWichIParticipate]/[method:shouldReturnAnErrorWhenUserNotParticipate()] (22 ms)</li><li>com.traine.managment.activity.ActivityControllerTest.[engine:junit-jupiter]/[class:com.traine.managment.activity.ActivityControllerTest]/[nested-class:ACtivityProgress]/[nested-class:InProgressToAwaitEvaluation]/[method:shoulReturnAnErrorWhenTrydUpdateTheStatusOfAnActivityAwaitEvaluationWhenIsFinished()] (19 ms)</li><li>com.traine.managment.activity.ActivityControllerTest.[engine:junit-jupiter]/[class:com.traine.managment.activity.ActivityControllerTest]/[nested-class:ACtivityProgress]/[nested-class:ToFinishedOrReviewNedded]/[nested-class:Manager]/[method:shouldUpdateToFinishedAnActivityThatHaveBeenAcceptedAsAwaitAjustementsThatManagerParticipate()] (18 ms)</li><li>com.traine.managment.activity.ActivityControllerTest.[engine:junit-jupiter]/[class:com.traine.managment.activity.ActivityControllerTest]/[nested-class:ACtivityProgress]/[nested-class:PendingTOInProgress]/[method:shoulReturnAnErrorWhenTrydUpdateTheStatusOfAnActivityToInProgressWhenAlreadyInInprogress()] (20 ms)</li><li>com.traine.managment.activity.ActivityControllerTest.[engine:junit-jupiter]/[class:com.traine.managment.activity.ActivityControllerTest]/[nested-class:ACtivityProgress]/[nested-class:ToFinishedOrReviewNedded]/[nested-class:ActivityMaker]/[method:shouldReturnAnErrorWhenTryToUptateToAwaitAjustementsOfAnActivityThatAnMakerActivityNotParticipate()] (20 ms)</li><li>com.traine.managment.activity.ActivityControllerTest.[engine:junit-jupiter]/[class:com.traine.managment.activity.ActivityControllerTest]/[nested-class:ACtivityProgress]/[nested-class:PendingTOInProgress]/[method:shoulReturnAnErrorWhenTrydUpdateTheStatusOfAnActivityOfAnActivityThatAnTraineeNotParticipate()] (20 ms)</li><li>com.traine.managment.activity.ActivityControllerTest.[engine:junit-jupiter]/[class:com.traine.managment.activity.ActivityControllerTest]/[nested-class:ACtivityProgress]/[nested-class:InProgressToAwaitEvaluation]/[method:shoulReturnAnErrorWhenTrydUpdateTheStatusOfAnActivityToAwaitEvaluationWhenIsInPending()] (21 ms)</li><li>com.traine.managment.activity.ActivityControllerTest.[engine:junit-jupiter]/[class:com.traine.managment.activity.ActivityControllerTest]/[nested-class:ACtivityProgress]/[nested-class:ToFinishedOrReviewNedded]/[nested-class:Manager]/[method:sholudUptadeTheStateWhenTryToUptateToAwaitAjustemntsOfAnActivityThatAnManagerNotParticipate()] (21 ms)</li><li>com.traine.managment.activity.ActivityControllerTest.[engine:junit-jupiter]/[class:com.traine.managment.activity.ActivityControllerTest]/[nested-class:ACtivityProgress]/[nested-class:ToFinishedOrReviewNedded]/[nested-class:ActivityMaker]/[method:shouldUpdateToFinishedAnActivityThatHaveBeenAcceptedAsAwaitAjustementsThatActivityMakeParticipate()] (22 ms)</li><li>com.traine.managment.activity.ActivityControllerTest.[engine:junit-jupiter]/[class:com.traine.managment.activity.ActivityControllerTest]/[nested-class:ACtivityProgress]/[nested-class:PendingTOInProgress]/[method:shoulReturnAnErrorWhenTrydUpdateTheStatusOfAnActivityToInProgressWhenIsInAwaitEvaluation()] (24 ms)</li><li>com.traine.managment.files.FilesControllerTest.[engine:junit-jupiter]/[class:com.traine.managment.files.FilesControllerTest]/[method:shouldReturn404WhenDeleteAFileForNonExistingFile()] (19 ms)</li><li>com.traine.managment.activity.ActivityControllerTest.[engine:junit-jupiter]/[class:com.traine.managment.activity.ActivityControllerTest]/[nested-class:CreateActivityWithFiles]/[method:shouldReturnAnErrorTryPersistAnActivityWithnMultipleFilesWihtAllKeysInvalids()] (76 ms)</li><li>com.traine.managment.activity.ActivityControllerTest.[engine:junit-jupiter]/[class:com.traine.managment.activity.ActivityControllerTest]/[nested-class:CreateActivityWithFiles]/[method:shouldReturnAnErrorWhenTryPersistAnActivityWithAFileWithInvalidKey()] (81 ms)</li><li>com.traine.managment.activity.ActivityControllerTest.[engine:junit-jupiter]/[class:com.traine.managment.activity.ActivityControllerTest]/[nested-class:DeleteAuxiliarFileFromActiviy]/[method:shouldReturnErrorWhenFileKeyDoesNotExistInActivity()] (101 ms)</li><li>com.traine.managment.user.UserControllerTest.[engine:junit-jupiter]/[class:com.traine.managment.user.UserControllerTest]/[nested-class:GetUserSafeIdentification]/[method:shouldReturnAnErrorWhenTryToSaveAnIndentificationWithAnSafeIdentificationInexistent()] (231 ms)</li><li>com.traine.managment.activity.ActivityControllerTest.[engine:junit-jupiter]/[class:com.traine.managment.activity.ActivityControllerTest]/[nested-class:CreateActivityWithFiles]/[method:shouldReturnAnErrorTryPersistAnActivityWithnMultipleFilesWihtOneKeyInvalid()] (266 ms)</li><li>com.traine.managment.activity.ActivityControllerTest.[engine:junit-jupiter]/[class:com.traine.managment.activity.ActivityControllerTest]/[nested-class:AddAuxFiles]/[method:shouldThrowErrorWhenActivityDoesNotExist()] (286 ms)</li><li>com.traine.managment.activity.ActivityControllerTest.[engine:junit-jupiter]/[class:com.traine.managment.activity.ActivityControllerTest]/[nested-class:AddAuxFiles]/[method:shouldThrowErrorWhenInvalidFileKeyInMiddleOfMultipleFiles()] (357 ms)</li><li>com.traine.managment.google.GoogleControllerTest.[engine:junit-jupiter]/[class:com.traine.managment.google.GoogleControllerTest]/[method:shouldTrowAnErroWheUserThatTryToVerifyGoogleAssociationNotExist()] (568 ms)</li><li>com.traine.managment.google.GoogleControllerTest.[engine:junit-jupiter]/[class:com.traine.managment.google.GoogleControllerTest]/[method:shouldReturnAnErrorWhenTryCreateAnNewGoogleCredentialsWithUnexistentSafeIdentification()] (637 ms)</li><li>com.traine.managment.google.GoogleControllerTest.[engine:junit-jupiter]/[class:com.traine.managment.google.GoogleControllerTest]/[method:shouldThrowAnErroWhenTryToCreateAnNewGoogleCredentialsButAlreadyHaveOne()] (641 ms)</li><li>com.traine.managment.activityStoreLine.ActivityStoreLineControllerTest.[engine:junit-jupiter]/[class:com.traine.managment.activityStoreLine.ActivityStoreLineControllerTest]/[method:shouldReturnForbiddenWhenNonParticipantTriesToComment()] (768 ms)</li><li>com.traine.managment.activityStoreLine.ActivityStoreLineControllerTest.[engine:junit-jupiter]/[class:com.traine.managment.activityStoreLine.ActivityStoreLineControllerTest]/[method:shouldReturnForbiddenWhenUserIsNotParticipantOfActivity()] (983 ms)</li><li>com.traine.managment.activity.ActivityControllerTest.[engine:junit-jupiter]/[class:com.traine.managment.activity.ActivityControllerTest]/[nested-class:AddAnswerFileFromActiviy]/[method:shouldReturnErrorWhenKeyDoesNotExistInStorage()] (1227 ms)</li><li>com.traine.managment.user.UserControllerTest.[engine:junit-jupiter]/[class:com.traine.managment.user.UserControllerTest]/[nested-class:CreateManagmentTEsts]/[method:shouldReturnAnErroWhenTryCreateAManagerUserWithoutEmail()] (8 ms)</li><li>com.traine.managment.user.UserControllerTest.[engine:junit-jupiter]/[class:com.traine.managment.user.UserControllerTest]/[nested-class:CreateManagmentTEsts]/[method:shouldReturnAnErroWhenTryCreateAManagerUserWithoutPassword()] (13 ms)</li><li>com.traine.managment.user.UserControllerTest.[engine:junit-jupiter]/[class:com.traine.managment.user.UserControllerTest]/[nested-class:CreateManagmentTEsts]/[method:shouldReturnAnErroWhenTryCreateAManagerUserWithoutName()] (25 ms)</li><li>com.traine.managment.activity.ActivityControllerTest.[engine:junit-jupiter]/[class:com.traine.managment.activity.ActivityControllerTest]/[nested-class:ActivityMakePost]/[method:shouldNotCreateActivityWithPastTerm()] (27 ms)</li>
+</ul>
+
+<br/>
+
+Report generated by <a href='https://pitest.org'>PIT</a> 1.15.0
+
+</body>
+</html>

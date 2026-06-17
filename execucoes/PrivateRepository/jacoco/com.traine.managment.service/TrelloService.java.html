@@ -1,0 +1,343 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>TrelloService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report"></a> &gt; <a href="index.source.html" class="el_package">com.traine.managment.service</a> &gt; <span class="el_source">TrelloService.java</span></div><h1>TrelloService.java</h1><pre class="source lang-java linenums">package com.traine.managment.service;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.util.UriComponentsBuilder;
+
+import com.traine.managment.enums.activity.ActivityStatus;
+import com.traine.managment.model.Activity;
+import com.traine.managment.model.TrelloActivityCard;
+import com.traine.managment.model.TrelloIntegration;
+import com.traine.managment.model.User;
+import com.traine.managment.repository.TrelloActivityCardRepository;
+import com.traine.managment.repository.TrelloIntegrationsRepository;
+import com.traine.managment.repository.UserRepository;
+
+import jakarta.transaction.Transactional;
+
+@Service
+<span class="fc" id="L33">public class TrelloService {</span>
+
+        @Autowired
+        private TrelloIntegrationsRepository trelloRepository;
+        @Autowired
+        private UserRepository userRepository;
+
+        @Value(&quot;${trello.key}&quot;)
+        private String trelloKey;
+
+        @Autowired
+        private RequestsService requestsService;
+
+        @Autowired
+        private TrelloActivityCardRepository trelloActivityCardRepository;
+
+        private String createList(
+                        String boardId,
+                        String name,
+                        String token) {
+
+<span class="fc" id="L54">                String url = UriComponentsBuilder</span>
+<span class="fc" id="L55">                                .fromUriString(&quot;https://api.trello.com/1/lists&quot;)</span>
+<span class="fc" id="L56">                                .queryParam(&quot;name&quot;, name)</span>
+<span class="fc" id="L57">                                .queryParam(&quot;idBoard&quot;, boardId)</span>
+<span class="fc" id="L58">                                .queryParam(&quot;key&quot;, trelloKey)</span>
+<span class="fc" id="L59">                                .queryParam(&quot;token&quot;, token)</span>
+<span class="fc" id="L60">                                .build(false)</span>
+<span class="fc" id="L61">                                .toUriString();</span>
+
+<span class="fc" id="L63">                Map&lt;String, Object&gt; response = requestsService.make(</span>
+                                HttpMethod.POST,
+                                new HttpHeaders(),
+                                null,
+                                url);
+
+<span class="fc" id="L69">                Object id = response.get(&quot;id&quot;);</span>
+
+<span class="pc bpc" id="L71" title="1 of 2 branches missed.">                if (id == null) {</span>
+<span class="nc" id="L72">                        System.out.println(</span>
+                                        &quot;Erro ao criar lista no Trello.&quot;);
+                }
+
+<span class="fc" id="L76">                return id.toString();</span>
+        }
+
+        private Map&lt;ActivityStatus, String&gt; createLists(String boardId, String token) {
+
+<span class="fc" id="L81">                return Arrays.stream(ActivityStatus.values())</span>
+<span class="fc" id="L82">                                .collect(Collectors.toMap(</span>
+<span class="fc" id="L83">                                                status -&gt; status,</span>
+<span class="fc" id="L84">                                                status -&gt; createList(</span>
+                                                                boardId,
+<span class="fc" id="L86">                                                                status.getDisplayName(),</span>
+                                                                token)));
+        }
+
+        private String createBoard(String token) {
+<span class="fc" id="L91">                String url = UriComponentsBuilder</span>
+<span class="fc" id="L92">                                .fromUriString(&quot;https://api.trello.com/1/boards&quot;)</span>
+<span class="fc" id="L93">                                .queryParam(&quot;name&quot;, &quot;Trainee Manager&quot;)</span>
+<span class="fc" id="L94">                                .queryParam(&quot;key&quot;, trelloKey)</span>
+<span class="fc" id="L95">                                .queryParam(&quot;token&quot;, token)</span>
+<span class="fc" id="L96">                                .build(false)</span>
+<span class="fc" id="L97">                                .toUriString();</span>
+
+<span class="fc" id="L99">                Map&lt;String, Object&gt; response = requestsService.make(</span>
+                                HttpMethod.POST,
+                                new HttpHeaders(),
+                                null,
+                                url);
+
+<span class="fc" id="L105">                return response.get(&quot;id&quot;).toString();</span>
+
+        }
+
+        @Transactional
+        public void createAnAssociations(String userEmail, String token) {
+
+<span class="pc" id="L112">                User owner = userRepository.findByEmail(userEmail).orElseThrow(() -&gt; new ResponseStatusException(</span>
+                                HttpStatus.NOT_FOUND, &quot;Usuário não encontrado.&quot;));
+
+<span class="fc" id="L115">                TrelloIntegration trelloIntegration = TrelloIntegration.builder()</span>
+<span class="fc" id="L116">                                .token(token)</span>
+<span class="fc" id="L117">                                .build();</span>
+<span class="fc" id="L118">                owner.setTrelloIntegration(trelloIntegration);</span>
+
+<span class="fc" id="L120">                String boardId = createBoard(token);</span>
+
+<span class="fc" id="L122">                trelloIntegration.setBoardId(boardId);</span>
+
+<span class="fc" id="L124">                trelloIntegration.setListsIds(createLists(boardId, token));</span>
+
+<span class="fc" id="L126">                userRepository.save(owner);</span>
+
+<span class="fc" id="L128">        }</span>
+
+        public Boolean isAssociated(String email) {
+<span class="fc" id="L131">                User user = userRepository.findByEmail(email).orElseThrow(() -&gt; new ResponseStatusException(</span>
+                                HttpStatus.NOT_FOUND, &quot;Usuário não encontrado.&quot;));
+
+<span class="fc" id="L134">                return trelloRepository.existsByUser(user);</span>
+        }
+
+        private String createCard(
+                        String listId,
+                        String name,
+                        String description,
+                        String token) {
+
+<span class="nc" id="L143">                String url = UriComponentsBuilder</span>
+<span class="nc" id="L144">                                .fromUriString(</span>
+                                                &quot;https://api.trello.com/1/cards&quot;)
+<span class="nc" id="L146">                                .queryParam(&quot;idList&quot;, listId)</span>
+<span class="nc" id="L147">                                .queryParam(&quot;name&quot;, name)</span>
+<span class="nc" id="L148">                                .queryParam(&quot;desc&quot;, description)</span>
+<span class="nc" id="L149">                                .queryParam(&quot;key&quot;, trelloKey)</span>
+<span class="nc" id="L150">                                .queryParam(&quot;token&quot;, token)</span>
+<span class="nc" id="L151">                                .build(false)</span>
+<span class="nc" id="L152">                                .toUriString();</span>
+
+<span class="nc" id="L154">                Map&lt;String, Object&gt; response = requestsService.make(</span>
+                                HttpMethod.POST,
+                                new HttpHeaders(),
+                                null,
+                                url);
+
+<span class="nc" id="L160">                Object id = response.get(&quot;id&quot;);</span>
+
+<span class="nc bnc" id="L162" title="All 2 branches missed.">                if (id == null) {</span>
+<span class="nc" id="L163">                        throw new RuntimeException(</span>
+                                        &quot;Erro ao criar card no Trello.&quot;);
+                }
+
+<span class="nc" id="L167">                return id.toString();</span>
+        }
+
+        @Async
+        @Transactional
+        public void insertIntoTrello(Activity activity, Set&lt;User&gt; participants) {
+
+<span class="fc" id="L174">                Set&lt;User&gt; associateds = participants.stream()</span>
+<span class="fc" id="L175">                                .filter(participant -&gt; isAssociated(participant.getEmail()))</span>
+<span class="fc" id="L176">                                .collect(Collectors.toSet());</span>
+
+<span class="fc" id="L178">                associateds.forEach(associated -&gt; {</span>
+<span class="nc" id="L179">                        TrelloIntegration trelloIntegration = trelloRepository.findByUser(associated).orElseThrow();</span>
+<span class="nc" id="L180">                        String pendentListId = trelloIntegration.getListsIds().get(ActivityStatus.PENDENTE);</span>
+<span class="nc" id="L181">                        String cardName = activity.getActivityType().getDisplayName();</span>
+<span class="nc" id="L182">                        String cardDescription = &quot;&quot;&quot;</span>
+                                        Criada em: %s
+
+                                        Termina em: %s
+
+                                        Descrição:
+                                        %s
+                                        &quot;&quot;&quot;
+<span class="nc" id="L190">                                        .formatted(</span>
+<span class="nc" id="L191">                                                        activity.getCreatedAt(),</span>
+<span class="nc" id="L192">                                                        activity.getTerm(),</span>
+<span class="nc" id="L193">                                                        activity.getDescription());</span>
+<span class="nc" id="L194">                        String cardId = createCard(pendentListId, cardName, cardDescription,</span>
+<span class="nc" id="L195">                                        trelloIntegration.getToken());</span>
+<span class="nc" id="L196">                        TrelloActivityCard trelloActivityCard = TrelloActivityCard.builder()</span>
+<span class="nc" id="L197">                                        .activity(activity)</span>
+<span class="nc" id="L198">                                        .user(associated)</span>
+<span class="nc" id="L199">                                        .cardId(cardId)</span>
+<span class="nc" id="L200">                                        .build();</span>
+<span class="nc" id="L201">                        trelloActivityCardRepository.save(trelloActivityCard);</span>
+
+<span class="nc" id="L203">                });</span>
+<span class="fc" id="L204">        }</span>
+
+        private void moveCard(
+                        String cardId,
+                        String listId,
+                        String token) {
+
+<span class="nc" id="L211">                String url = UriComponentsBuilder</span>
+<span class="nc" id="L212">                                .fromUriString(&quot;https://api.trello.com/1/cards/&quot; + cardId)</span>
+<span class="nc" id="L213">                                .queryParam(&quot;idList&quot;, listId)</span>
+<span class="nc" id="L214">                                .queryParam(&quot;key&quot;, trelloKey)</span>
+<span class="nc" id="L215">                                .queryParam(&quot;token&quot;, token)</span>
+<span class="nc" id="L216">                                .toUriString();</span>
+
+<span class="nc" id="L218">                requestsService.make(</span>
+                                HttpMethod.PUT,
+                                new HttpHeaders(),
+                                null,
+                                url);
+<span class="nc" id="L223">        }</span>
+
+        @Async
+        @Transactional
+        public void moveCardTo(Activity activity, Set&lt;User&gt; participants, ActivityStatus activityStatus) {
+
+<span class="fc" id="L229">                Set&lt;User&gt; associateds = participants.stream()</span>
+<span class="fc" id="L230">                                .filter(participant -&gt; isAssociated(participant.getEmail()))</span>
+<span class="fc" id="L231">                                .collect(Collectors.toSet());</span>
+
+<span class="fc" id="L233">                associateds.forEach(associated -&gt; {</span>
+<span class="nc" id="L234">                        TrelloActivityCard trelloActivityCard = trelloActivityCardRepository</span>
+<span class="nc" id="L235">                                        .findByUserAndActivity(associated, activity).orElseThrow();</span>
+<span class="nc" id="L236">                        TrelloIntegration trelloIntegration = trelloRepository.findByUser(associated).orElseThrow();</span>
+<span class="nc" id="L237">                        String activityStausListId = trelloIntegration.getListsIds().get(activityStatus);</span>
+<span class="nc" id="L238">                        moveCard(trelloActivityCard.getCardId(), activityStausListId, trelloIntegration.getToken());</span>
+<span class="nc" id="L239">                });</span>
+
+<span class="fc" id="L241">        }</span>
+
+        private void updateCard(
+                        String cardId,
+                        String name,
+                        String description,
+                        String token) {
+
+<span class="nc" id="L249">                String url = UriComponentsBuilder</span>
+<span class="nc" id="L250">                                .fromUriString(&quot;https://api.trello.com/1/cards/&quot; + cardId)</span>
+<span class="nc" id="L251">                                .queryParam(&quot;name&quot;, name)</span>
+<span class="nc" id="L252">                                .queryParam(&quot;desc&quot;, description)</span>
+<span class="nc" id="L253">                                .queryParam(&quot;key&quot;, trelloKey)</span>
+<span class="nc" id="L254">                                .queryParam(&quot;token&quot;, token)</span>
+<span class="nc" id="L255">                                .build(false)</span>
+<span class="nc" id="L256">                                .toUriString();</span>
+
+<span class="nc" id="L258">                requestsService.make(</span>
+                                HttpMethod.PUT,
+                                new HttpHeaders(),
+                                null,
+                                url);
+<span class="nc" id="L263">        }</span>
+
+        @Async
+        @Transactional
+        public void updateCard(Activity activity, Set&lt;User&gt; participants) {
+
+<span class="fc" id="L269">                Set&lt;User&gt; associateds = participants.stream()</span>
+<span class="fc" id="L270">                                .filter(participant -&gt; isAssociated(participant.getEmail()))</span>
+<span class="fc" id="L271">                                .collect(Collectors.toSet());</span>
+
+<span class="fc" id="L273">                associateds.forEach(associated -&gt; {</span>
+<span class="nc" id="L274">                        TrelloActivityCard trelloActivityCard = trelloActivityCardRepository</span>
+<span class="nc" id="L275">                                        .findByUserAndActivity(associated, activity).orElseThrow();</span>
+<span class="nc" id="L276">                        TrelloIntegration trelloIntegration = trelloRepository.findByUser(associated).orElseThrow();</span>
+<span class="nc" id="L277">                        String cardName = activity.getActivityType().getDisplayName();</span>
+<span class="nc" id="L278">                        String cardDescription = &quot;&quot;&quot;</span>
+                                        Criada em: %s
+
+                                        Termina em: %s
+
+                                        Descrição:
+                                        %s
+                                        &quot;&quot;&quot;
+<span class="nc" id="L286">                                        .formatted(</span>
+<span class="nc" id="L287">                                                        activity.getCreatedAt(),</span>
+<span class="nc" id="L288">                                                        activity.getTerm(),</span>
+<span class="nc" id="L289">                                                        activity.getDescription());</span>
+
+<span class="nc" id="L291">                        updateCard(trelloActivityCard.getCardId(), cardName, cardDescription,</span>
+<span class="nc" id="L292">                                        trelloIntegration.getToken());</span>
+<span class="nc" id="L293">                });</span>
+<span class="fc" id="L294">        }</span>
+
+        private void deleteCard(
+                        String cardId,
+                        String token) {
+
+<span class="nc" id="L300">                String url = UriComponentsBuilder</span>
+<span class="nc" id="L301">                                .fromUriString(&quot;https://api.trello.com/1/cards/&quot; + cardId)</span>
+<span class="nc" id="L302">                                .queryParam(&quot;key&quot;, trelloKey)</span>
+<span class="nc" id="L303">                                .queryParam(&quot;token&quot;, token)</span>
+<span class="nc" id="L304">                                .toUriString();</span>
+
+<span class="nc" id="L306">                requestsService.make(</span>
+                                HttpMethod.DELETE,
+                                new HttpHeaders(),
+                                null,
+                                url);
+<span class="nc" id="L311">        }</span>
+
+        public void deleteCard(Long activityId, Set&lt;User&gt; participants) {
+
+<span class="fc" id="L315">                Set&lt;User&gt; associateds = participants.stream()</span>
+<span class="fc" id="L316">                                .filter(p -&gt; isAssociated(p.getEmail()))</span>
+<span class="fc" id="L317">                                .collect(Collectors.toSet());</span>
+
+<span class="fc" id="L319">                associateds.forEach(user -&gt; {</span>
+
+<span class="nc" id="L321">                        trelloActivityCardRepository</span>
+<span class="nc" id="L322">                                        .findByUserIdAndActivityId(user.getId(), activityId)</span>
+<span class="nc" id="L323">                                        .ifPresent(card -&gt; {</span>
+
+<span class="nc" id="L325">                                                TrelloIntegration integration = trelloRepository</span>
+<span class="nc" id="L326">                                                                .findByUser(user)</span>
+<span class="nc" id="L327">                                                                .orElse(null);</span>
+
+                                                try {
+<span class="nc bnc" id="L330" title="All 2 branches missed.">                                                        if (integration != null) {</span>
+<span class="nc" id="L331">                                                                deleteCard(card.getCardId(), integration.getToken());</span>
+                                                        }
+<span class="nc" id="L333">                                                } catch (Exception e) {</span>
+<span class="nc" id="L334">                                                        System.out.println(&quot;Falha ao deletar no Trello: &quot;</span>
+<span class="nc" id="L335">                                                                        + e.getMessage());</span>
+<span class="nc" id="L336">                                                }</span>
+
+<span class="nc" id="L338">                                                trelloActivityCardRepository.delete(card);</span>
+<span class="nc" id="L339">                                        });</span>
+<span class="nc" id="L340">                });</span>
+<span class="fc" id="L341">        }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

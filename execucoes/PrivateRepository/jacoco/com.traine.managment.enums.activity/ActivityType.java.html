@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ActivityType.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report"></a> &gt; <a href="index.source.html" class="el_package">com.traine.managment.enums.activity</a> &gt; <span class="el_source">ActivityType.java</span></div><h1>ActivityType.java</h1><pre class="source lang-java linenums">package com.traine.managment.enums.activity;
+
+<span class="fc" id="L3">public enum ActivityType {</span>
+
+<span class="fc" id="L5">    PRODUCAO_DE_MANUAL(&quot;Produção de manual&quot;),</span>
+<span class="fc" id="L6">    PUBLICACAO_NO_SITE(&quot;Publicação no site&quot;),</span>
+<span class="fc" id="L7">    POSTAGEM_NO_INSTAGRAM(&quot;Postagem no Instagram&quot;),</span>
+<span class="fc" id="L8">    EDICAO_NO_SITE(&quot;Edição no site&quot;),</span>
+<span class="fc" id="L9">    FORMATACAO_DE_ARQUIVO(&quot;Formatação de arquivo&quot;),</span>
+<span class="fc" id="L10">    CRIACAO_DE_DASHBOARD(&quot;Criação de dashboard&quot;),</span>
+<span class="fc" id="L11">    TAREFA_RECORRENTE(&quot;Tarefa recorrente&quot;),</span>
+<span class="fc" id="L12">    PROGRAMACAO_DE_SISTEMAS(&quot;Programação de sistemas&quot;),</span>
+<span class="fc" id="L13">    OUTROS(&quot;Outros&quot;);</span>
+
+    private final String displayName;
+
+<span class="fc" id="L17">    ActivityType(String displayName) {</span>
+<span class="fc" id="L18">        this.displayName = displayName;</span>
+<span class="fc" id="L19">    }</span>
+
+    public String getDisplayName() {
+<span class="fc" id="L22">        return displayName;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

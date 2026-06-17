@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>UserController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report"></a> &gt; <a href="index.source.html" class="el_package">com.traine.managment.controller</a> &gt; <span class="el_source">UserController.java</span></div><h1>UserController.java</h1><pre class="source lang-java linenums">package com.traine.managment.controller;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
+
+import com.traine.managment.dto.activity.GetRecentActivityResponseDTO;
+import com.traine.managment.dto.user.GetTraineeActivitiesSumaryResponseDTO;
+import com.traine.managment.dto.user.GetTraineeActivitiesYearDTO;
+import com.traine.managment.dto.user.GetValidatorsActivitiesSumaryResponseDTO;
+import com.traine.managment.dto.user.ChangePasswordRequestDTO;
+import com.traine.managment.dto.user.CreateUserRequestDTO;
+import com.traine.managment.dto.user.CreateUserResponseDTO;
+import com.traine.managment.dto.user.GetSafeIdentificationDTO;
+import com.traine.managment.dto.user.MeUserResponseDTO;
+import com.traine.managment.dto.user.PutUserRequestDTO;
+import com.traine.managment.dto.user.PutUserResponseDTO;
+import com.traine.managment.dto.user.UserGetResponseDTO;
+import com.traine.managment.enums.user.Role;
+import com.traine.managment.service.UserService;
+
+import jakarta.validation.Valid;
+
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
+
+@RestController
+@RequestMapping(&quot;/users&quot;)
+<span class="fc" id="L41">public class UserController {</span>
+
+    @Autowired
+    private UserService service;
+
+    @PostMapping
+    @PreAuthorize(&quot;hasAnyRole('ADMIN', 'MANAGMENT')&quot;)
+    public ResponseEntity&lt;CreateUserResponseDTO&gt; createManager(@RequestBody @Valid CreateUserRequestDTO request,
+            Authentication auth) {
+
+<span class="fc bfc" id="L51" title="All 2 branches covered.">        if (auth.getAuthorities().stream().anyMatch(a -&gt; a.getAuthority().equals(&quot;ROLE_MANAGMENT&quot;))</span>
+<span class="pc bpc" id="L52" title="1 of 4 branches missed.">                &amp;&amp; (request.getRole() == Role.ADMIN || request.getRole() == Role.MANAGMENT)) {</span>
+<span class="fc" id="L53">            throw new ResponseStatusException(HttpStatus.FORBIDDEN,</span>
+                    &quot;Um Gerente não pode criar usuarios com papeis iguais, nem superior ao dele.&quot;);
+        }
+
+<span class="fc" id="L57">        CreateUserResponseDTO response = service.createUser(request);</span>
+<span class="fc" id="L58">        return ResponseEntity.status(HttpStatus.CREATED).body(response);</span>
+    }
+
+    @GetMapping(&quot;/trainees&quot;)
+    @PreAuthorize(&quot;hasAnyRole('ACTIVITY_MAKER', 'MANAGMENT')&quot;)
+    public ResponseEntity&lt;List&lt;UserGetResponseDTO&gt;&gt; getAllTrainees() {
+<span class="fc" id="L64">        return ResponseEntity.ok(service.getAllTrainees());</span>
+    }
+
+    @GetMapping(&quot;/validators&quot;)
+    public ResponseEntity&lt;List&lt;UserGetResponseDTO&gt;&gt; getAllValidators() {
+<span class="fc" id="L69">        return ResponseEntity.ok(service.getAllValidators());</span>
+    }
+
+    @PutMapping(&quot;&quot;)
+    public ResponseEntity&lt;PutUserResponseDTO&gt; updateUser(@RequestBody @Valid PutUserRequestDTO request,
+            Authentication auth) {
+<span class="fc" id="L75">        UserDetails userDetails = (UserDetails) auth.getPrincipal();</span>
+<span class="fc" id="L76">        String email = userDetails.getUsername();</span>
+
+<span class="fc" id="L78">        PutUserResponseDTO response = service.updateUser(request, email);</span>
+<span class="fc" id="L79">        return ResponseEntity.ok(response);</span>
+
+    }
+
+    @PatchMapping(&quot;/change-password&quot;)
+    public ResponseEntity&lt;Void&gt; changePassword(@RequestBody @Valid ChangePasswordRequestDTO request,
+            Authentication auth) {
+<span class="fc" id="L86">        UserDetails userDetails = (UserDetails) auth.getPrincipal();</span>
+<span class="fc" id="L87">        String email = userDetails.getUsername();</span>
+
+<span class="fc" id="L89">        service.changePassword(request, email);</span>
+<span class="fc" id="L90">        return ResponseEntity.ok().build();</span>
+    }
+
+    @GetMapping(&quot;/trainee/activities-summary&quot;)
+    @PreAuthorize(&quot;hasRole('TRAINEE')&quot;)
+    public ResponseEntity&lt;GetTraineeActivitiesSumaryResponseDTO&gt; getTraineeActivitiesSummary(Authentication auth) {
+<span class="fc" id="L96">        UserDetails userDetails = (UserDetails) auth.getPrincipal();</span>
+<span class="fc" id="L97">        String email = userDetails.getUsername();</span>
+
+<span class="fc" id="L99">        GetTraineeActivitiesSumaryResponseDTO response = service.getTraineeActivitiesSummary(email);</span>
+<span class="fc" id="L100">        return ResponseEntity.ok(response);</span>
+    }
+
+    @GetMapping(&quot;/trainee/activities-year-quantity&quot;) // Isso daqui é para ver a necessidade, do quanto precisa-se dos
+                                                     // estagiários, portanto não é baseado em quando terminou a
+                                                     // atividade
+    @PreAuthorize(&quot;hasAnyRole('MANAGMENT', 'ACTIVITY_MAKER')&quot;)
+    public ResponseEntity&lt;GetTraineeActivitiesYearDTO[]&gt; getTraineeActivitiesYearQuantity() {
+
+<span class="fc" id="L109">        GetTraineeActivitiesYearDTO[] response = service.getTraineeActivitiesYearQuantity();</span>
+<span class="fc" id="L110">        return ResponseEntity.ok(response);</span>
+    }
+
+    @GetMapping(&quot;/validator/activities-summary&quot;) // Esse daqui é o mais perigoso, tem que testar mais
+    @PreAuthorize(&quot;hasAnyRole('MANAGMENT', 'ACTIVITY_MAKER')&quot;)
+    public ResponseEntity&lt;GetValidatorsActivitiesSumaryResponseDTO&gt; getValidatorsActivitiesSummary(
+            Authentication auth) {
+<span class="fc" id="L117">        UserDetails userDetails = (UserDetails) auth.getPrincipal();</span>
+<span class="fc" id="L118">        String email = userDetails.getUsername();</span>
+
+<span class="fc" id="L120">        GetValidatorsActivitiesSumaryResponseDTO response = service.getValidatorsActivitiesSummary(email);</span>
+<span class="fc" id="L121">        return ResponseEntity.ok(response);</span>
+    }
+
+    @GetMapping(&quot;/recent-activities&quot;)
+    public ResponseEntity&lt;List&lt;GetRecentActivityResponseDTO&gt;&gt; getRecentActivities(Authentication auth) {
+<span class="fc" id="L126">        UserDetails userDetails = (UserDetails) auth.getPrincipal();</span>
+<span class="fc" id="L127">        String email = userDetails.getUsername();</span>
+
+<span class="fc" id="L129">        List&lt;GetRecentActivityResponseDTO&gt; response = service.getRecentActivities(email);</span>
+<span class="fc" id="L130">        return ResponseEntity.ok(response);</span>
+    }
+
+    @GetMapping(&quot;/safe_identification&quot;)
+    public ResponseEntity&lt;GetSafeIdentificationDTO&gt; getSafeIdentication(Authentication auth) {
+<span class="fc" id="L135">        UserDetails userDetails = (UserDetails) auth.getPrincipal();</span>
+<span class="fc" id="L136">        String email = userDetails.getUsername();</span>
+
+<span class="fc" id="L138">        GetSafeIdentificationDTO response = service.getSafeIdentication(email);</span>
+
+<span class="fc" id="L140">        return ResponseEntity.ok(response);</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

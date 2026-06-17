@@ -1,0 +1,286 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GoogleService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report"></a> &gt; <a href="index.source.html" class="el_package">com.traine.managment.service</a> &gt; <span class="el_source">GoogleService.java</span></div><h1>GoogleService.java</h1><pre class="source lang-java linenums">package com.traine.managment.service;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.server.ResponseStatusException;
+
+import com.traine.managment.model.Activity;
+import com.traine.managment.model.GoogleCalendarCredentials;
+import com.traine.managment.model.GoogleCalendarEvent;
+import com.traine.managment.model.User;
+import com.traine.managment.repository.GoogleCredentialsRepository;
+import com.traine.managment.repository.UserRepository;
+
+import jakarta.transaction.Transactional;
+
+@Service
+<span class="fc" id="L38">public class GoogleService {</span>
+    @Value(&quot;${app.client-id}&quot;)
+    private String clientId;
+
+    @Value(&quot;${app.client-secret}&quot;)
+    private String clientSecret;
+
+    @Autowired
+    private GoogleCredentialsRepository googleCaledarCredentialsRepository;
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    private RequestsService requestsService;
+    @Autowired
+    private GoogleCalendarEventService googleCalendarEventService;
+
+<span class="fc" id="L54">    private final String url = &quot;https://oauth2.googleapis.com/token&quot;;</span>
+
+    private void save(GoogleCalendarCredentials credentials, User user) {
+
+<span class="fc" id="L58">        googleCaledarCredentialsRepository.save(credentials);</span>
+<span class="fc" id="L59">        userRepository.save(user);</span>
+
+<span class="fc" id="L61">    }</span>
+
+    private MultiValueMap&lt;String, String&gt; createBodyForTokensRequest(String code) {
+
+<span class="fc" id="L65">        MultiValueMap&lt;String, String&gt; body = new LinkedMultiValueMap&lt;&gt;();</span>
+<span class="fc" id="L66">        body.add(&quot;code&quot;, code);</span>
+<span class="fc" id="L67">        body.add(&quot;client_id&quot;, clientId);</span>
+<span class="fc" id="L68">        body.add(&quot;client_secret&quot;, clientSecret);</span>
+<span class="fc" id="L69">        body.add(&quot;redirect_uri&quot;, &quot;https://api.findmyride.site/google/callback&quot;); // era bom ser uma variável de ambiente</span>
+<span class="fc" id="L70">        body.add(&quot;grant_type&quot;, &quot;authorization_code&quot;);</span>
+<span class="fc" id="L71">        return body;</span>
+
+    }
+
+    private Map&lt;String, Object&gt; makeRequest(String code) {
+
+<span class="fc" id="L77">        MultiValueMap&lt;String, String&gt; body = createBodyForTokensRequest(code);</span>
+
+<span class="fc" id="L79">        HttpHeaders headers = requestsService.createHeaders(MediaType.APPLICATION_FORM_URLENCODED);</span>
+
+<span class="fc" id="L81">        return requestsService.makeForm(headers, body, url);</span>
+    }
+
+    private GoogleCalendarCredentials turnIntoCredentials(String code, User user) {
+
+<span class="fc" id="L86">        Map&lt;String, Object&gt; responseBody = makeRequest(code);</span>
+
+<span class="pc bpc" id="L88" title="1 of 2 branches missed.">        if (responseBody == null) {</span>
+<span class="nc" id="L89">            throw new ResponseStatusException(</span>
+                    HttpStatus.BAD_GATEWAY,
+                    &quot;Erro ao comunicar com o Google&quot;);
+        }
+
+<span class="fc" id="L94">        GoogleCalendarCredentials credentials = new GoogleCalendarCredentials();</span>
+<span class="fc" id="L95">        credentials.setAccessToken((String) responseBody.get(&quot;access_token&quot;));</span>
+<span class="fc" id="L96">        credentials.setRefreshToken((String) responseBody.get(&quot;refresh_token&quot;));</span>
+<span class="fc" id="L97">        credentials.setCreateAt(LocalDateTime.now());</span>
+<span class="fc" id="L98">        user.setGoogleCredentials(credentials);</span>
+
+<span class="fc" id="L100">        return credentials;</span>
+    }
+
+    public void turnCodeIntoCredentialsAndSave(String code, String state) {
+<span class="fc" id="L104">        User user = userRepository.findBySafeIdentification(state)</span>
+<span class="fc" id="L105">                .orElseThrow(() -&gt; new ResponseStatusException(HttpStatus.NOT_FOUND,</span>
+                        &quot;Usuário não encontrado.&quot;));
+
+<span class="fc bfc" id="L108" title="All 2 branches covered.">        if (areConnected(user.getEmail()))</span>
+<span class="fc" id="L109">            throw new ResponseStatusException(HttpStatus.CONFLICT, &quot;O usuário já está conectado&quot;);</span>
+
+<span class="fc" id="L111">        GoogleCalendarCredentials credentials = turnIntoCredentials(code, user);</span>
+<span class="fc" id="L112">        save(credentials, user);</span>
+
+<span class="fc" id="L114">    }</span>
+
+    public Boolean areConnected(String email) {
+<span class="fc" id="L117">        User user = userRepository.findByEmail(email)</span>
+<span class="fc" id="L118">                .orElseThrow(() -&gt; new ResponseStatusException(HttpStatus.NOT_FOUND,</span>
+                        &quot;Usuário não encontrado.&quot;));
+
+<span class="fc" id="L121">        return googleCaledarCredentialsRepository.existsByOwner(user);</span>
+
+    }
+
+    private String refreshAccessToken(String refreshToken) {
+<span class="nc" id="L126">        String url = &quot;https://oauth2.googleapis.com/token&quot;;</span>
+<span class="nc" id="L127">        HttpHeaders headers = new HttpHeaders();</span>
+<span class="nc" id="L128">        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);</span>
+
+<span class="nc" id="L130">        MultiValueMap&lt;String, String&gt; body = new LinkedMultiValueMap&lt;&gt;();</span>
+<span class="nc" id="L131">        body.add(&quot;client_id&quot;, clientId);</span>
+<span class="nc" id="L132">        body.add(&quot;client_secret&quot;, clientSecret);</span>
+<span class="nc" id="L133">        body.add(&quot;refresh_token&quot;, refreshToken);</span>
+<span class="nc" id="L134">        body.add(&quot;grant_type&quot;, &quot;refresh_token&quot;);</span>
+
+<span class="nc" id="L136">        Map&lt;String, Object&gt; response = requestsService.makeForm(headers, body, url);</span>
+
+<span class="nc" id="L138">        Object accessToken = response.get(&quot;access_token&quot;);</span>
+
+<span class="nc bnc" id="L140" title="All 2 branches missed.">        if (accessToken == null) {</span>
+<span class="nc" id="L141">            throw new RuntimeException(&quot;Erro ao renovar token: &quot; + response);</span>
+        }
+
+<span class="nc" id="L144">        return (String) accessToken;</span>
+    }
+
+    private HttpHeaders createHeadersForInsertIntoCalendar(String accessToken) {
+<span class="nc" id="L148">        HttpHeaders headers = new HttpHeaders();</span>
+<span class="nc" id="L149">        headers.setBearerAuth(accessToken);</span>
+<span class="nc" id="L150">        headers.setContentType(MediaType.APPLICATION_JSON);</span>
+<span class="nc" id="L151">        return headers;</span>
+    }
+
+    private Map&lt;String, Object&gt; createBodyForInsertIntoGoogleCalendar(Activity activity) {
+
+<span class="nc" id="L156">        Map&lt;String, Object&gt; body = new HashMap&lt;&gt;();</span>
+
+<span class="nc" id="L158">        body.put(&quot;summary&quot;, activity.getActivityType().getDisplayName());</span>
+<span class="nc" id="L159">        body.put(&quot;description&quot;, activity.getDescription());</span>
+
+<span class="nc" id="L161">        Map&lt;String, String&gt; start = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L162">        start.put(&quot;date&quot;, activity.getTerm().toString());</span>
+
+<span class="nc" id="L164">        Map&lt;String, String&gt; end = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L165">        end.put(&quot;date&quot;, activity.getTerm().plusDays(1).toString()); // Como não usa horário, e é um dia inteiro, tem que</span>
+                                                                    // ser assim.
+
+<span class="nc" id="L168">        body.put(&quot;start&quot;, start);</span>
+<span class="nc" id="L169">        body.put(&quot;end&quot;, end);</span>
+
+<span class="nc" id="L171">        return body;</span>
+
+    }
+
+    private Map&lt;String, Object&gt; makeGoogleRequestWithRetry(
+            String url,
+            HttpMethod method,
+            HttpHeaders headers,
+            Map&lt;String, Object&gt; body,
+            GoogleCalendarCredentials credentials) {
+        try {
+<span class="nc" id="L182">            return requestsService.make(method, headers, body, url);</span>
+
+<span class="nc" id="L184">        } catch (HttpClientErrorException.Unauthorized e) {</span>
+<span class="nc" id="L185">            String newAccessToken = refreshAccessToken(credentials.getRefreshToken());</span>
+
+<span class="nc" id="L187">            credentials.setAccessToken(newAccessToken);</span>
+<span class="nc" id="L188">            googleCaledarCredentialsRepository.save(credentials);</span>
+
+<span class="nc" id="L190">            headers = createHeadersForInsertIntoCalendar(credentials.getAccessToken());</span>
+
+<span class="nc" id="L192">            return requestsService.make(method, headers, body, url);</span>
+        }
+    }
+
+    private String createEvent(GoogleCalendarCredentials credentials, Activity activity) {
+
+<span class="nc" id="L198">        String url = &quot;https://www.googleapis.com/calendar/v3/calendars/primary/events&quot;;</span>
+
+<span class="nc" id="L200">        Map&lt;String, Object&gt; body = createBodyForInsertIntoGoogleCalendar(activity);</span>
+<span class="nc" id="L201">        HttpHeaders headers = createHeadersForInsertIntoCalendar(credentials.getAccessToken());</span>
+
+<span class="nc" id="L203">        Map&lt;String, Object&gt; response = makeGoogleRequestWithRetry(url, HttpMethod.POST, headers, body, credentials);</span>
+
+<span class="nc" id="L205">        return (String) response.get(&quot;id&quot;);</span>
+    }
+
+    @Async
+    public void insertIntoGoogleCalendar(Activity activity, Set&lt;User&gt; participants) {
+<span class="fc" id="L210">        Set&lt;User&gt; participantsConnected = participants.stream()</span>
+<span class="fc" id="L211">                .filter(participant -&gt; areConnected(participant.getEmail())).collect(Collectors.toSet());</span>
+
+<span class="fc" id="L213">        participantsConnected.forEach(connected -&gt; { // Isso daqui gera muitas requisições, porém entendo que seja mais</span>
+                                                     // fácil de dar manuntenção
+<span class="nc" id="L215">            GoogleCalendarCredentials credential = googleCaledarCredentialsRepository.getByOwner(connected)</span>
+<span class="nc" id="L216">                    .orElseThrow();</span>
+
+<span class="nc" id="L218">            Optional&lt;GoogleCalendarEvent&gt; existing = googleCalendarEventService.getGoogleCalendarOptional(connected,</span>
+                    activity);
+
+<span class="nc" id="L221">            String googleCalendarId = createEvent(credential, activity);</span>
+
+<span class="nc bnc" id="L223" title="All 2 branches missed.">            if (!existing.isPresent()) {</span>
+<span class="nc" id="L224">                GoogleCalendarEvent googleCalendarEvent = GoogleCalendarEvent.builder()</span>
+<span class="nc" id="L225">                        .eventId(googleCalendarId)</span>
+<span class="nc" id="L226">                        .activity(activity)</span>
+<span class="nc" id="L227">                        .user(connected)</span>
+<span class="nc" id="L228">                        .build();</span>
+<span class="nc" id="L229">                googleCalendarEventService.create(googleCalendarEvent);</span>
+            }
+
+<span class="nc" id="L232">        });</span>
+<span class="fc" id="L233">    }</span>
+
+    private void updateEvent(
+            GoogleCalendarCredentials credentials,
+            Activity activity,
+            String eventId) {
+
+<span class="nc" id="L240">        String url = &quot;https://www.googleapis.com/calendar/v3/calendars/primary/events/&quot; + eventId;</span>
+
+<span class="nc" id="L242">        Map&lt;String, Object&gt; body = createBodyForInsertIntoGoogleCalendar(activity);</span>
+<span class="nc" id="L243">        HttpHeaders headers = createHeadersForInsertIntoCalendar(credentials.getAccessToken());</span>
+
+<span class="nc" id="L245">        makeGoogleRequestWithRetry(url, HttpMethod.PUT, headers, body, credentials);</span>
+<span class="nc" id="L246">    }</span>
+
+    @Async
+    public void updateGoogleCalendar(Activity activity, Set&lt;User&gt; participants) {
+
+<span class="fc" id="L251">        Set&lt;User&gt; participantsConnected = participants.stream()</span>
+<span class="fc" id="L252">                .filter(participant -&gt; areConnected(participant.getEmail())).collect(Collectors.toSet());</span>
+
+<span class="fc" id="L254">        participantsConnected.forEach(connected -&gt; {</span>
+
+<span class="nc" id="L256">            GoogleCalendarCredentials credential = googleCaledarCredentialsRepository.getByOwner(connected)</span>
+<span class="nc" id="L257">                    .orElseThrow();</span>
+
+<span class="nc" id="L259">            Optional&lt;GoogleCalendarEvent&gt; event = googleCalendarEventService.getGoogleCalendarOptional(connected,</span>
+                    activity);
+
+<span class="nc bnc" id="L262" title="All 2 branches missed.">            if (event.isPresent()) {</span>
+<span class="nc" id="L263">                updateEvent(credential, activity, event.get().getEventId());</span>
+            } else {
+<span class="nc" id="L265">                String googleCalendarId = createEvent(credential, activity);</span>
+<span class="nc" id="L266">                GoogleCalendarEvent googleCalendarEvent = GoogleCalendarEvent.builder()</span>
+<span class="nc" id="L267">                        .eventId(googleCalendarId)</span>
+<span class="nc" id="L268">                        .activity(activity)</span>
+<span class="nc" id="L269">                        .user(connected)</span>
+<span class="nc" id="L270">                        .build();</span>
+<span class="nc" id="L271">                googleCalendarEventService.create(googleCalendarEvent);</span>
+            }
+
+<span class="nc" id="L274">        });</span>
+
+<span class="fc" id="L276">    }</span>
+
+    @Transactional
+    public void deleteEventByActivity(Activity activity) {
+
+<span class="fc" id="L281">        googleCalendarEventService.deleteAllByActivity(activity);</span>
+
+<span class="fc" id="L283">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

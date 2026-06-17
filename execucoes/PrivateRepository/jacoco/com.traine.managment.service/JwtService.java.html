@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JwtService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report"></a> &gt; <a href="index.source.html" class="el_package">com.traine.managment.service</a> &gt; <span class="el_source">JwtService.java</span></div><h1>JwtService.java</h1><pre class="source lang-java linenums">package com.traine.managment.service;
+
+import java.nio.charset.StandardCharsets;
+import java.util.Date;
+import java.util.UUID;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
+import com.traine.managment.model.User;
+
+import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
+
+import java.security.Key;
+
+@Service
+public class JwtService {
+
+    private final Key SECRET_KEY;
+
+<span class="fc" id="L24">    public JwtService(@Value(&quot;${app.jwt.secret}&quot;) String secret) {</span>
+<span class="fc" id="L25">        this.SECRET_KEY = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));</span>
+<span class="fc" id="L26">    }</span>
+
+<span class="fc" id="L28">    private final long ACCESS_TOKEN_VALIDITY = 15 * 60 * 1000; // 15 min</span>
+<span class="fc" id="L29">    private final long REFRESH_TOKEN_VALIDITY = 7L * 24 * 60 * 60 * 1000; // 7 dias</span>
+
+    public String generateAccessToken(User user) {
+<span class="fc" id="L32">        return generateToken(user, ACCESS_TOKEN_VALIDITY);</span>
+    }
+
+    public String generateRefreshToken(User user) {
+<span class="fc" id="L36">        return generateToken(user, REFRESH_TOKEN_VALIDITY);</span>
+    }
+
+    private String generateToken(User user, long durationMs) {
+<span class="fc" id="L40">        return Jwts.builder()</span>
+<span class="fc" id="L41">                .setSubject(user.getEmail())</span>
+<span class="fc" id="L42">                .claim(&quot;role&quot;, user.getRole().name())</span>
+<span class="fc" id="L43">                .setId(UUID.randomUUID().toString())</span>
+<span class="fc" id="L44">                .setIssuedAt(new Date())</span>
+<span class="fc" id="L45">                .setExpiration(new Date(System.currentTimeMillis() + durationMs))</span>
+<span class="fc" id="L46">                .signWith(SECRET_KEY, SignatureAlgorithm.HS256)</span>
+<span class="fc" id="L47">                .compact();</span>
+    }
+
+    public boolean isValidToken(String token) {
+        try {
+<span class="fc" id="L52">            Jwts.parserBuilder()</span>
+<span class="fc" id="L53">                    .setSigningKey(SECRET_KEY)</span>
+<span class="fc" id="L54">                    .build()</span>
+<span class="fc" id="L55">                    .parseClaimsJws(token);</span>
+<span class="fc" id="L56">            return true;</span>
+<span class="nc" id="L57">        } catch (JwtException e) {</span>
+<span class="nc" id="L58">            return false;</span>
+        }
+    }
+
+    public String getEmailFromToken(String token) {
+<span class="fc" id="L63">        return Jwts.parserBuilder()</span>
+<span class="fc" id="L64">                .setSigningKey(SECRET_KEY)</span>
+<span class="fc" id="L65">                .build()</span>
+<span class="fc" id="L66">                .parseClaimsJws(token)</span>
+<span class="fc" id="L67">                .getBody()</span>
+<span class="fc" id="L68">                .getSubject();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

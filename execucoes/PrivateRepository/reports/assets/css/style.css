@@ -1,0 +1,41 @@
+                body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+    background-color: #f4f4f4;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+section.summary ul {
+    list-style: none;
+    padding: 0;
+}
+
+section.summary li {
+    margin: 4px 0;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+table, th, td {
+    border: 1px solid #ccc;
+}
+
+th, td {
+    padding: 8px;
+    text-align: center;
+}
+
+.captured {
+    background-color: #d4f8d4; /* verde claro */
+}
+
+.survived {
+    background-color: #f8d4d4; /* vermelho claro */
+}

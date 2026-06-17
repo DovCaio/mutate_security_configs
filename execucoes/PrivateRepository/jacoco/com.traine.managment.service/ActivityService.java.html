@@ -1,0 +1,713 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ActivityService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report"></a> &gt; <a href="index.source.html" class="el_package">com.traine.managment.service</a> &gt; <span class="el_source">ActivityService.java</span></div><h1>ActivityService.java</h1><pre class="source lang-java linenums">package com.traine.managment.service;
+
+import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
+
+import com.traine.managment.dto.activity.*;
+import com.traine.managment.dto.user.CreateUserResponseDTO;
+import com.traine.managment.enums.activity.ActivityStatus;
+import com.traine.managment.enums.activityStoryLine.ActivityStoryLineType;
+import com.traine.managment.enums.user.Role;
+import com.traine.managment.interfaces.files.FileStorageService;
+import com.traine.managment.model.Activity;
+import com.traine.managment.model.Notification;
+import com.traine.managment.model.User;
+import com.traine.managment.repository.ActivityRepository;
+import com.traine.managment.repository.ActivityStoreLineRepository;
+import com.traine.managment.repository.TrelloActivityCardRepository;
+import com.traine.managment.repository.TrelloIntegrationsRepository;
+import com.traine.managment.repository.UserRepository;
+
+import jakarta.transaction.Transactional;
+
+@Service
+<span class="fc" id="L35">public class ActivityService {</span>
+
+        @Autowired
+        private ActivityRepository activityRepository;
+
+        @Autowired
+        private UserRepository userRepository;
+
+        @Autowired
+        private ModelMapper modelMapper;
+
+        @Autowired
+        private NotificationService notificationService;
+
+        @Autowired
+        private GoogleService googleService;
+
+        @Autowired
+        private TrelloService trelloService;
+
+        @Autowired
+        private TrelloActivityCardRepository trelloActivityCardRepository;
+
+        @Autowired
+        private FileStorageService fileStorageService;
+
+        @Autowired
+        private ActivityStoreLineService activityStoreLineService;
+
+        @Autowired
+        private ActivityStoreLineRepository activityStoreLineRepository;
+
+        @Transactional
+        private void createNotifications(Activity activity, String message, String subject, String title) {
+<span class="fc" id="L69">                Set&lt;User&gt; participants = activity.getParticipants();</span>
+
+<span class="fc" id="L71">                participants.forEach(participant -&gt; {</span>
+<span class="fc" id="L72">                        Notification notification = notificationService.createAnActivityNotification(participant,</span>
+                                        activity, message, subject, title);
+<span class="fc" id="L74">                        participant.addNotification(notification);</span>
+<span class="fc" id="L75">                });</span>
+
+<span class="fc" id="L77">                userRepository.saveAll(participants);</span>
+<span class="fc" id="L78">        }</span>
+
+        @Transactional
+        private void insertIntoGoogleCalendar(Activity activity) {
+<span class="fc" id="L82">                googleService.insertIntoGoogleCalendar(activity, activity.getParticipants());// Isso daqui é por conta</span>
+                                                                                             // do async, causa
+                // erro se
+                // eu mandar somente a atividade, algo relacionado
+                // ao hibernate
+<span class="fc" id="L87">        }</span>
+
+        @Async
+        @Transactional
+        private void insertIntoTrello(Activity activity) {
+<span class="fc" id="L92">                trelloService.insertIntoTrello(activity, activity.getParticipants());</span>
+<span class="fc" id="L93">        }</span>
+
+        private PostActivityResponseDTO mapToResponseCreate(Activity activity) {
+<span class="fc" id="L96">                return new PostActivityResponseDTO(</span>
+<span class="fc" id="L97">                                activity.getId(),</span>
+<span class="fc" id="L98">                                activity.getDescription(),</span>
+<span class="fc" id="L99">                                activity.getActivityType(),</span>
+<span class="fc" id="L100">                                new HashSet&lt;&gt;(activity.getTrainees())</span>
+<span class="fc" id="L101">                                                .stream()</span>
+<span class="fc" id="L102">                                                .map(user -&gt; modelMapper.map(user, CreateUserResponseDTO.class))</span>
+<span class="fc" id="L103">                                                .collect(Collectors.toSet()),</span>
+
+<span class="fc" id="L105">                                new HashSet&lt;&gt;(activity.getValidators())</span>
+<span class="fc" id="L106">                                                .stream()</span>
+<span class="fc" id="L107">                                                .map(user -&gt; modelMapper.map(user, CreateUserResponseDTO.class))</span>
+<span class="fc" id="L108">                                                .collect(Collectors.toSet()),</span>
+<span class="fc" id="L109">                                activity.getTerm(),</span>
+<span class="fc" id="L110">                                activity.getActivityPriority(),</span>
+<span class="fc" id="L111">                                activity.getAuxiliaryFilesKeys());</span>
+        }
+
+        private Activity create(PostActivityRequestDTO body) {
+<span class="fc" id="L115">                Activity activity = new Activity();</span>
+<span class="fc" id="L116">                activity.setDescription(body.getDescription());</span>
+<span class="fc" id="L117">                activity.setActivityType(body.getActivityType());</span>
+<span class="fc" id="L118">                activity.setActivityPriority(body.getActivityPriority());</span>
+<span class="fc" id="L119">                activity.setTerm(body.getTerm());</span>
+<span class="fc" id="L120">                activity.setActivityStatus(ActivityStatus.PENDENTE);</span>
+<span class="fc" id="L121">                activity.setCreatedAt(LocalDate.now());</span>
+
+<span class="fc" id="L123">                Set&lt;User&gt; trainees = userRepository.findAllById(body.getTrainees())</span>
+<span class="fc" id="L124">                                .stream().collect(Collectors.toSet());</span>
+<span class="fc" id="L125">                Set&lt;User&gt; validators = userRepository.findAllById(body.getValidators())</span>
+<span class="fc" id="L126">                                .stream().collect(Collectors.toSet());</span>
+
+<span class="fc" id="L128">                activity.setTrainees(trainees);</span>
+<span class="fc" id="L129">                activity.setValidators(validators);</span>
+
+<span class="fc" id="L131">                activity.addAuxiliariesFileKeys(body.getAuxiliaryFilesKeys());</span>
+
+<span class="fc" id="L133">                activity = activityRepository.save(activity);</span>
+
+<span class="fc" id="L135">                return activity;</span>
+        }
+
+        private void afterCreateOfTheActivity(Activity activity) {
+
+                try {
+<span class="fc" id="L141">                        insertIntoGoogleCalendar(activity);</span>
+<span class="nc" id="L142">                } catch (Exception e) {</span>
+<span class="nc" id="L143">                        e.printStackTrace();</span>
+<span class="fc" id="L144">                }</span>
+
+                try {
+<span class="fc" id="L147">                        createNotifications(</span>
+                                        activity,
+                                        &quot;Uma nova atividade foi criada e você está associado a ela.&quot;,
+<span class="fc" id="L150">                                        &quot;Atividade criada: &quot; + activity.getId(),</span>
+                                        &quot;Uma nova atividade foi criada&quot;);
+<span class="nc" id="L152">                } catch (Exception e) {</span>
+<span class="nc" id="L153">                        e.printStackTrace();</span>
+<span class="fc" id="L154">                }</span>
+
+                try {
+<span class="fc" id="L157">                        insertIntoTrello(activity);</span>
+<span class="nc" id="L158">                } catch (Exception e) {</span>
+<span class="nc" id="L159">                        e.printStackTrace();</span>
+<span class="fc" id="L160">                }</span>
+
+                try {
+<span class="fc" id="L163">                        activityStoreLineService.createActivityStoreLine(activity,</span>
+                                        ActivityStoryLineType.ATIVIDADE_CRIADA,
+<span class="fc" id="L165">                                        activity.getCreatedAt().toString());</span>
+
+<span class="fc" id="L167">                } catch (Exception e) {</span>
+<span class="fc" id="L168">                        e.printStackTrace();</span>
+<span class="fc" id="L169">                }</span>
+
+<span class="fc" id="L171">        }</span>
+
+        public PostActivityResponseDTO createAnActivityInsertIntoGoogleCalendarAndSendNotification(
+                        PostActivityRequestDTO body) {
+
+<span class="fc" id="L176">                boolean allFilesExist = fileStorageService.allExists(</span>
+<span class="fc" id="L177">                                body.getAuxiliaryFilesKeys());</span>
+
+<span class="fc bfc" id="L179" title="All 2 branches covered.">                if (!allFilesExist) {</span>
+<span class="fc" id="L180">                        throw new ResponseStatusException(</span>
+                                        HttpStatus.BAD_REQUEST,
+                                        &quot;Arquivo(s) inválido(s).&quot;);
+                }
+
+<span class="fc" id="L185">                Activity activity = create(body);</span>
+
+<span class="fc" id="L187">                afterCreateOfTheActivity(activity);</span>
+
+<span class="fc" id="L189">                return mapToResponseCreate(activity);</span>
+
+        }
+
+        private Activity verifyIfAnActivityExistsAndThenReturn(Long id) {
+<span class="fc" id="L194">                return activityRepository.findById(id)</span>
+<span class="fc" id="L195">                                .orElseThrow(() -&gt; new ResponseStatusException(HttpStatus.NOT_FOUND,</span>
+                                                &quot;Atividade não encontrada&quot;));
+        }
+
+        private User verifyAUserAndThenReturn(String email) {
+<span class="fc" id="L200">                return userRepository.findByEmail(email)</span>
+<span class="fc" id="L201">                                .orElseThrow(() -&gt; new ResponseStatusException(HttpStatus.BAD_REQUEST,</span>
+                                                &quot;User não encontrado.&quot;));
+        }
+
+        private Activity put(Activity activity, PatchActivityRequestDTO body) {
+
+<span class="fc bfc" id="L207" title="All 2 branches covered.">                if (body.getDescription() != null) {</span>
+<span class="fc" id="L208">                        activity.setDescription(body.getDescription());</span>
+                }
+
+<span class="fc bfc" id="L211" title="All 2 branches covered.">                if (body.getActivityType() != null) {</span>
+<span class="fc" id="L212">                        activity.setActivityType(body.getActivityType());</span>
+                }
+
+<span class="fc bfc" id="L215" title="All 2 branches covered.">                if (body.getActivityPriority() != null) {</span>
+<span class="fc" id="L216">                        activity.setActivityPriority(body.getActivityPriority());</span>
+                }
+
+<span class="fc bfc" id="L219" title="All 2 branches covered.">                if (body.getTerm() != null) {</span>
+<span class="fc" id="L220">                        activity.setTerm(body.getTerm());</span>
+                }
+
+<span class="fc bfc" id="L223" title="All 2 branches covered.">                if (body.getTrainees() != null) {</span>
+<span class="fc" id="L224">                        Set&lt;User&gt; trainees = userRepository.findAllById(body.getTrainees())</span>
+<span class="fc" id="L225">                                        .stream().collect(Collectors.toSet());</span>
+<span class="fc" id="L226">                        activity.setTrainees(trainees);</span>
+                }
+
+<span class="fc bfc" id="L229" title="All 2 branches covered.">                if (body.getValidators() != null) {</span>
+<span class="fc" id="L230">                        Set&lt;User&gt; validators = userRepository.findAllById(body.getValidators())</span>
+<span class="fc" id="L231">                                        .stream().collect(Collectors.toSet());</span>
+<span class="fc" id="L232">                        activity.setValidators(validators);</span>
+                }
+
+<span class="fc" id="L235">                activity = activityRepository.save(activity);</span>
+
+<span class="fc" id="L237">                return activity;</span>
+        }
+
+        private void afterPutActivity(Activity activity, String diferences) {
+                try {
+<span class="fc" id="L242">                        googleService.updateGoogleCalendar(activity, userRepository.findUsersByActivity(activity));</span>
+<span class="fc" id="L243">                        createNotifications(activity, &quot;Essa atividade foi modificada.&quot;,</span>
+<span class="fc" id="L244">                                        &quot;Atividade modificada: &quot; + activity.getId(),</span>
+                                        &quot;Uma das suas atividades foi modificada&quot;);
+<span class="fc" id="L246">                        trelloService.updateCard(activity, activity.getParticipants());</span>
+<span class="nc" id="L247">                } catch (Exception e) {</span>
+
+<span class="fc" id="L249">                }</span>
+
+                try {
+
+<span class="fc" id="L253">                        activityStoreLineService.createActivityStoreLine(activity,</span>
+                                        ActivityStoryLineType.ALTERACAO_ATIVIDADE,
+                                        &quot;A atividade foi alterada: \n&quot; + diferences);
+<span class="fc" id="L256">                } catch (Exception e) {</span>
+
+<span class="fc" id="L258">                }</span>
+
+<span class="fc" id="L260">        }</span>
+
+        public PatchActivityResponseDTO putNoticationAndUpdateGoogleCalendarAndSendNotification(Long id,
+                        PatchActivityRequestDTO body) {
+
+<span class="fc" id="L265">                Activity activity = verifyIfAnActivityExistsAndThenReturn(id);</span>
+
+<span class="fc" id="L267">                String differences = activity.differenceBetweenPutDto(body);</span>
+
+<span class="fc" id="L269">                activity = put(activity, body);</span>
+
+<span class="fc" id="L271">                afterPutActivity(activity, differences);</span>
+
+<span class="fc" id="L273">                return modelMapper.map(activity, PatchActivityResponseDTO.class);</span>
+        }
+
+        @Transactional
+        public void delete(Long id) {
+
+<span class="fc" id="L279">                Activity activity = verifyIfAnActivityExistsAndThenReturn(id);</span>
+
+<span class="fc" id="L281">                trelloService.deleteCard(activity.getId(), activity.getParticipants());</span>
+<span class="fc" id="L282">                googleService.deleteEventByActivity(activity);</span>
+
+                // TODO: Fazer com que notificações sejam enviadas
+<span class="fc" id="L285">                trelloActivityCardRepository.deleteByActivityId(id);</span>
+
+<span class="fc" id="L287">                activityStoreLineRepository.deleteAllByActivityDirectly(activity);</span>
+
+<span class="fc" id="L289">                activityRepository.deleteById(id);</span>
+
+<span class="fc" id="L291">        }</span>
+
+        private GetActivityIParticipateResponseDTO transformActivityInto(Activity activity) {
+<span class="fc" id="L294">                GetActivityIParticipateResponseDTO dto = new GetActivityIParticipateResponseDTO();</span>
+<span class="fc" id="L295">                dto.setId(activity.getId());</span>
+<span class="fc" id="L296">                dto.setDescription(activity.getDescription());</span>
+<span class="fc" id="L297">                dto.setActivityType(activity.getActivityType());</span>
+<span class="fc" id="L298">                dto.setActivityPriority(activity.getActivityPriority());</span>
+<span class="fc" id="L299">                dto.setActivityStatus(activity.getActivityStatus());</span>
+<span class="fc" id="L300">                dto.setTerm(activity.getTerm());</span>
+<span class="fc" id="L301">                dto.setTrainees(activity.getTrainees().stream()</span>
+<span class="fc" id="L302">                                .map(trainee -&gt; modelMapper.map(trainee,</span>
+                                                CreateUserResponseDTO.class))
+<span class="fc" id="L304">                                .collect(Collectors.toSet()));</span>
+<span class="fc" id="L305">                dto.setValidators(activity.getValidators().stream()</span>
+<span class="fc" id="L306">                                .map(validator -&gt; modelMapper.map(validator,</span>
+                                                CreateUserResponseDTO.class))
+<span class="fc" id="L308">                                .collect(Collectors.toSet()));</span>
+
+<span class="fc" id="L310">                return dto;</span>
+        }
+
+        public Set&lt;GetActivityIParticipateResponseDTO&gt; getAll() {
+<span class="fc" id="L314">                return activityRepository.findAll()</span>
+<span class="fc" id="L315">                                .stream()</span>
+<span class="fc" id="L316">                                .map(activity -&gt; {</span>
+<span class="fc" id="L317">                                        return transformActivityInto(activity);</span>
+                                })
+<span class="fc" id="L319">                                .collect(Collectors.toSet());</span>
+        }
+
+        public Set&lt;GetActivityIParticipateResponseDTO&gt; getAllWichIParticipate(String email) {
+<span class="fc" id="L323">                User user = verifyAUserAndThenReturn(email);</span>
+
+<span class="fc" id="L325">                List&lt;Activity&gt; activities = activityRepository</span>
+<span class="fc" id="L326">                                .findByTraineesContainsOrValidatorsContains(user, user);</span>
+
+<span class="fc" id="L328">                return activities.stream()</span>
+<span class="fc" id="L329">                                .map(activity -&gt; {</span>
+<span class="fc" id="L330">                                        return transformActivityInto(activity);</span>
+                                })
+<span class="fc" id="L332">                                .collect(Collectors.toSet());</span>
+        }
+
+        private void verifyIfUserIsParticipantOf(User user, Activity activity) {
+
+<span class="fc" id="L337">                boolean haveAuthority = activity.areParticipant(user);</span>
+
+<span class="fc bfc" id="L339" title="All 2 branches covered.">                if (!haveAuthority) {</span>
+<span class="fc" id="L340">                        throw new ResponseStatusException(HttpStatus.FORBIDDEN,</span>
+                                        &quot;Usuário não participa dessa atividade&quot;);
+                }
+<span class="fc" id="L343">        }</span>
+
+        private void verifyIfUserIsTraineeOf(User user, Activity activity) {
+<span class="fc" id="L346">                boolean haveAuthority = activity.areTrainee(user);</span>
+
+<span class="fc bfc" id="L348" title="All 2 branches covered.">                if (!haveAuthority) {</span>
+<span class="fc" id="L349">                        throw new ResponseStatusException(HttpStatus.FORBIDDEN,</span>
+                                        &quot;Usuário não é estagiário dessa atividade.&quot;);
+                }
+<span class="fc" id="L352">        }</span>
+
+        public GetActivityResponseDTO getById(String email, Long id) {
+<span class="fc" id="L355">                Activity activity = verifyIfAnActivityExistsAndThenReturn(id);</span>
+
+<span class="fc" id="L357">                User user = verifyAUserAndThenReturn(email);</span>
+
+<span class="fc" id="L359">                verifyIfUserIsParticipantOf(user, activity); // Deveria permitir que gerentes acessacem isso.</span>
+
+<span class="fc" id="L361">                return modelMapper.map(activity, GetActivityResponseDTO.class);</span>
+        }
+
+        private void afterPathInProgress(Activity activity) {
+                try {
+
+<span class="fc" id="L367">                        createNotifications(activity, &quot;Atividade está em adamento&quot;,</span>
+<span class="fc" id="L368">                                        &quot;Progresso na atividade: &quot; + activity.getId(), &quot;Progresso na atividade&quot;);</span>
+<span class="fc" id="L369">                        trelloService.moveCardTo(activity, activity.getParticipants(), ActivityStatus.EM_ANDAMENTO);</span>
+
+<span class="nc" id="L371">                } catch (Exception e) {</span>
+<span class="nc" id="L372">                        System.out.println(e.getStackTrace());</span>
+<span class="fc" id="L373">                }</span>
+
+                try {
+<span class="fc" id="L376">                        activityStoreLineService.createActivityStoreLine(activity, ActivityStoryLineType.MUDANCA_ESTADO,</span>
+                                        &quot;O status da atividade foi altarado para em andamento&quot;);
+<span class="nc" id="L378">                } catch (Exception e) {</span>
+<span class="nc" id="L379">                        System.out.println(e.getStackTrace());</span>
+
+<span class="fc" id="L381">                }</span>
+
+<span class="fc" id="L383">        }</span>
+
+        private void verifyIfTheActivityCanGoToInProgress(Activity activity) {
+<span class="fc bfc" id="L386" title="All 2 branches covered.">                if (!activity.getActivityStatus().equals(ActivityStatus.PENDENTE)) {</span>
+<span class="fc" id="L387">                        throw new ResponseStatusException(HttpStatus.BAD_REQUEST,</span>
+                                        &quot;A atividade não está pendente para ser colocada em andamento.&quot;);
+                }
+<span class="fc" id="L390">        }</span>
+
+        private void changeTheStatus(Activity activity, ActivityStatus activityStatus) {
+<span class="fc" id="L393">                activity.setActivityStatus(activityStatus);</span>
+<span class="fc" id="L394">                activity = activityRepository.save(activity);</span>
+
+<span class="fc" id="L396">        }</span>
+
+        public PathActivityProgressResponseDTO pathInProgress(String email, Long id) {
+
+<span class="fc" id="L400">                Activity activity = verifyIfAnActivityExistsAndThenReturn(id);</span>
+
+<span class="fc" id="L402">                User user = verifyAUserAndThenReturn(email);</span>
+
+<span class="fc" id="L404">                verifyIfUserIsTraineeOf(user, activity);</span>
+
+<span class="fc" id="L406">                verifyIfTheActivityCanGoToInProgress(activity);</span>
+
+<span class="fc" id="L408">                changeTheStatus(activity, ActivityStatus.EM_ANDAMENTO);</span>
+
+<span class="fc" id="L410">                afterPathInProgress(activity);</span>
+
+<span class="fc" id="L412">                return modelMapper.map(activity, PathActivityProgressResponseDTO.class);</span>
+
+        }
+
+        private void afterPathAwaitEvaluation(Activity activity) {
+                try {
+<span class="fc" id="L418">                        createNotifications(activity,</span>
+                                        &quot;Essa atividade está aguardado avaliação. Um dos validadores deve aceitá-la ou rejeitá-la&quot;,
+<span class="fc" id="L420">                                        &quot;Progresso na atividade: &quot; + activity.getId(), &quot;Progresso na atividade&quot;);</span>
+<span class="fc" id="L421">                        trelloService.moveCardTo(activity, activity.getParticipants(),</span>
+                                        ActivityStatus.AGUARDANDO_AVALIACAO);
+
+<span class="nc" id="L424">                } catch (Exception e) {</span>
+<span class="nc" id="L425">                        System.out.println(e.getMessage());</span>
+<span class="fc" id="L426">                }</span>
+
+                try {
+<span class="fc" id="L429">                        activityStoreLineService.createActivityStoreLine(activity, ActivityStoryLineType.MUDANCA_ESTADO,</span>
+                                        &quot;O status da atividade foi alterado para aguardando avaliação&quot;);
+<span class="nc" id="L431">                } catch (Exception e) {</span>
+<span class="nc" id="L432">                        System.out.println(e.getMessage());</span>
+<span class="fc" id="L433">                }</span>
+<span class="fc" id="L434">        }</span>
+
+        private void verifyIfTheActivityCanGoToAwaitEvaluation(Activity activity) {
+
+<span class="fc bfc" id="L438" title="All 2 branches covered.">                if (!(activity.getActivityStatus().equals(ActivityStatus.EM_ANDAMENTO)</span>
+<span class="fc bfc" id="L439" title="All 2 branches covered.">                                || activity.getActivityStatus().equals(ActivityStatus.AJUSTE_NECESSARIO))) {</span>
+<span class="fc" id="L440">                        throw new ResponseStatusException(HttpStatus.BAD_REQUEST,</span>
+                                        &quot;A atividade não está em andamento para ser colocada em aguardando avaliação.&quot;);
+                }
+<span class="fc" id="L443">        }</span>
+
+        public PathActivityProgressResponseDTO pathAwaitEvaluation(String email, Long id) {
+<span class="fc" id="L446">                Activity activity = verifyIfAnActivityExistsAndThenReturn(id);</span>
+
+<span class="fc" id="L448">                User user = verifyAUserAndThenReturn(email);</span>
+
+<span class="fc" id="L450">                verifyIfUserIsTraineeOf(user, activity);</span>
+
+<span class="fc" id="L452">                verifyIfTheActivityCanGoToAwaitEvaluation(activity);</span>
+
+<span class="fc" id="L454">                changeTheStatus(activity, ActivityStatus.AGUARDANDO_AVALIACAO);</span>
+
+<span class="fc" id="L456">                afterPathAwaitEvaluation(activity);</span>
+
+<span class="fc" id="L458">                return modelMapper.map(activity, PathActivityProgressResponseDTO.class);</span>
+        }
+
+        private void afterEvalute(Activity activity, boolean wasAccept) {
+                try {
+
+<span class="fc" id="L464">                        createNotifications(activity,</span>
+<span class="fc bfc" id="L465" title="All 2 branches covered.">                                        wasAccept ? &quot;Atividade Concluida&quot;</span>
+<span class="fc" id="L466">                                                        : &quot;A atividade foi rejeitada, ajuste são necessários&quot;,</span>
+<span class="fc" id="L467">                                        &quot;Progresso na atividade: &quot; + activity.getId(), &quot;Progresso na atividade&quot;);</span>
+
+<span class="nc" id="L469">                } catch (Exception e) {</span>
+<span class="nc" id="L470">                        System.out.println(e.getMessage());</span>
+<span class="fc" id="L471">                }</span>
+
+                try {
+<span class="fc bfc" id="L474" title="All 2 branches covered.">                        if (wasAccept) {</span>
+<span class="fc" id="L475">                                trelloService.moveCardTo(activity, activity.getParticipants(),</span>
+                                                ActivityStatus.CONCLUIDO);
+                        } else {
+
+<span class="fc" id="L479">                                trelloService.moveCardTo(activity, activity.getParticipants(),</span>
+                                                ActivityStatus.AJUSTE_NECESSARIO);
+                        }
+
+<span class="nc" id="L483">                } catch (Exception e) {</span>
+<span class="nc" id="L484">                        System.out.println(e.getMessage());</span>
+<span class="fc" id="L485">                }</span>
+
+                try {
+<span class="fc bfc" id="L488" title="All 2 branches covered.">                        if (wasAccept) {</span>
+<span class="fc" id="L489">                                activityStoreLineService.createActivityStoreLine(activity,</span>
+                                                ActivityStoryLineType.MUDANCA_ESTADO,
+                                                &quot;O status da atividade foi alterado para concluida.&quot;);
+
+                        } else {
+<span class="fc" id="L494">                                activityStoreLineService.createActivityStoreLine(activity,</span>
+                                                ActivityStoryLineType.MUDANCA_ESTADO,
+                                                &quot;O status da atividade foi alterado para ajustes necessários.&quot;);
+
+                        }
+
+<span class="nc" id="L500">                } catch (Exception e) {</span>
+<span class="nc" id="L501">                        System.out.println(e.getMessage());</span>
+<span class="fc" id="L502">                }</span>
+
+<span class="fc" id="L504">        }</span>
+
+        private void haveAuthorityToEvaluate(User user, Activity activity) {
+<span class="fc" id="L507">                boolean isValidator = activity.areValidator(user);</span>
+
+<span class="fc bfc" id="L509" title="All 4 branches covered.">                if (!user.getRole().equals(Role.MANAGMENT) &amp;&amp; !isValidator) {</span>
+<span class="fc" id="L510">                        throw new ResponseStatusException(HttpStatus.FORBIDDEN,</span>
+                                        &quot;Usuário não tem permissão para alterar essa atividade.&quot;);
+                }
+<span class="fc" id="L513">        }</span>
+
+        private void verifyIfTheActivityCanGoToAjustmentOrFinished(Activity activity) {
+<span class="fc bfc" id="L516" title="All 2 branches covered.">                if (activity.getActivityStatus() != ActivityStatus.AGUARDANDO_AVALIACAO</span>
+<span class="pc bpc" id="L517" title="1 of 2 branches missed.">                                || activity.getActivityStatus() == ActivityStatus.CONCLUIDO) {</span>
+
+<span class="fc" id="L519">                        throw new ResponseStatusException(HttpStatus.BAD_REQUEST,</span>
+                                        &quot;A atividade não pode já estar concluida ou em outro estado que não seja aguardando avaliação.&quot;);
+                }
+<span class="fc" id="L522">        }</span>
+
+        public PathActivityProgressResponseDTO evaluate(String email, Long id, PatchEvaluateRequestDTO body) {
+
+<span class="fc" id="L526">                Activity activity = verifyIfAnActivityExistsAndThenReturn(id);</span>
+
+<span class="fc" id="L528">                User user = verifyAUserAndThenReturn(email);</span>
+
+<span class="fc" id="L530">                haveAuthorityToEvaluate(user, activity);</span>
+
+<span class="fc" id="L532">                verifyIfTheActivityCanGoToAjustmentOrFinished(activity);</span>
+
+<span class="fc bfc" id="L534" title="All 2 branches covered.">                if (body.isAccepted()) {</span>
+<span class="fc" id="L535">                        changeTheStatus(activity, ActivityStatus.CONCLUIDO);</span>
+<span class="fc" id="L536">                        activity.finishedAt();</span>
+
+                } else {
+<span class="fc" id="L539">                        changeTheStatus(activity, ActivityStatus.AJUSTE_NECESSARIO);</span>
+                }
+
+<span class="fc" id="L542">                afterEvalute(activity, body.isAccepted());</span>
+
+<span class="fc" id="L544">                return modelMapper.map(activity, PathActivityProgressResponseDTO.class);</span>
+        }
+
+        private void afterAddAuxFiles(Activity activity) {
+                try {
+
+<span class="fc" id="L550">                        createNotifications(activity, &quot;Um novo material de apoio foi adicionado a essa atividade.&quot;,</span>
+<span class="fc" id="L551">                                        &quot;Material de apoio adicionado na atividade &quot; + activity.getId(),</span>
+                                        &quot;Material de apoio adicionado&quot;);
+<span class="nc" id="L553">                } catch (Exception e) {</span>
+<span class="nc" id="L554">                        System.out.println(e.getMessage());</span>
+<span class="fc" id="L555">                }</span>
+
+                try {
+<span class="fc" id="L558">                        activityStoreLineService.createActivityStoreLine(activity,</span>
+                                        ActivityStoryLineType.ARQUIVOS_AUXILIARES_ADICIONADOS,
+                                        &quot;Arquivo(s) auxiliares foram adicionados.&quot;);
+<span class="nc" id="L561">                } catch (Exception e) {</span>
+<span class="nc" id="L562">                        System.out.println(e.getMessage());</span>
+<span class="fc" id="L563">                }</span>
+<span class="fc" id="L564">        }</span>
+
+        private void haveAuthorizationToModifyAuxFiles(User user, Activity activity) {
+<span class="pc bpc" id="L567" title="1 of 4 branches missed.">                boolean haveAutorization = user.getRole().equals(Role.MANAGMENT) || activity.areValidator(user);</span>
+
+<span class="pc bpc" id="L569" title="1 of 2 branches missed.">                if (!haveAutorization) {</span>
+<span class="nc" id="L570">                        throw new ResponseStatusException(HttpStatus.FORBIDDEN,</span>
+                                        &quot;Você não tem autorização para modificar os arquivos auxiliares dessa atividade&quot;);
+                }
+<span class="fc" id="L573">        }</span>
+
+        private void verifyIfTheFileKeysAreValids(Set&lt;String&gt; auxKeys) {
+<span class="fc bfc" id="L576" title="All 2 branches covered.">                if (!fileStorageService.allExists(auxKeys)) {</span>
+<span class="fc" id="L577">                        throw new ResponseStatusException(HttpStatus.BAD_REQUEST,</span>
+                                        &quot;Arquivo(s) inválido(s)&quot;);
+                }
+<span class="fc" id="L580">        }</span>
+
+        public AddNewAuxFileResponse addAuxFiles(Long id, String email, AddNewAuxFileRequest body) {
+
+<span class="fc" id="L584">                Activity activity = verifyIfAnActivityExistsAndThenReturn(id);</span>
+
+<span class="fc" id="L586">                User user = verifyAUserAndThenReturn(email);</span>
+
+<span class="fc" id="L588">                haveAuthorizationToModifyAuxFiles(user, activity);</span>
+
+<span class="fc" id="L590">                verifyIfTheFileKeysAreValids(body.getAuxiliaryFilesKeys());</span>
+
+<span class="fc" id="L592">                activity.addAuxiliariesFileKeys(body.getAuxiliaryFilesKeys());</span>
+
+<span class="fc" id="L594">                activityRepository.save(activity);</span>
+
+<span class="fc" id="L596">                afterAddAuxFiles(activity);</span>
+
+<span class="fc" id="L598">                return new AddNewAuxFileResponse(activity.getId(),</span>
+<span class="fc" id="L599">                                activity.getAuxiliaryFilesKeys());</span>
+
+        }
+
+        private void afterDeleteAuxFile(Activity activity) {
+<span class="fc" id="L604">                createNotifications(activity, &quot;Um novo material de apoio foi adicionado a essa atividade.&quot;,</span>
+<span class="fc" id="L605">                                &quot;Material de apoio adicionado na atividade &quot; + activity.getId(),</span>
+                                &quot;Material de apoio adicionado&quot;);
+
+                try {
+<span class="fc" id="L609">                        activityStoreLineService.createActivityStoreLine(activity,</span>
+                                        ActivityStoryLineType.ARQUIVOS_AUXILIARES_REMOVIDOS,
+                                        &quot;Arquivo(s) auxiliares foram removidos.&quot;);
+<span class="nc" id="L612">                } catch (Exception e) {</span>
+
+<span class="fc" id="L614">                }</span>
+<span class="fc" id="L615">        }</span>
+
+        public void deleteAuxFile(Long id, String fileKey, String email) {
+<span class="fc" id="L618">                Activity activity = verifyIfAnActivityExistsAndThenReturn(id);</span>
+
+<span class="fc" id="L620">                User user = verifyAUserAndThenReturn(email);</span>
+
+<span class="fc" id="L622">                haveAuthorizationToModifyAuxFiles(user, activity);</span>
+
+<span class="fc bfc" id="L624" title="All 2 branches covered.">                if (!activity.haveAuxiliarKey(fileKey)) {</span>
+<span class="fc" id="L625">                        throw new ResponseStatusException(HttpStatus.BAD_REQUEST,</span>
+                                        &quot;File key não existente.&quot;);
+
+                }
+
+<span class="fc" id="L630">                activity.deleteAuxiliarFileKey(fileKey);</span>
+
+<span class="fc" id="L632">                activityRepository.save(activity);</span>
+
+<span class="fc" id="L634">                afterDeleteAuxFile(activity);</span>
+<span class="fc" id="L635">        }</span>
+
+        private void afterAddAnswerFiles(Activity activity) {
+<span class="fc" id="L638">                activityStoreLineService.createActivityStoreLine(activity,</span>
+                                ActivityStoryLineType.ARQUIVO_RESPOSTA_ADICIONADO,
+                                &quot;Arquivo(s) de resposta foram adicionados.&quot;);
+<span class="fc" id="L641">        }</span>
+
+        private void haveAuthorizationToModifyAnswerFiles(User user, Activity activity) {
+<span class="fc" id="L644">                boolean haveAutorization = activity.areTrainee(user);</span>
+
+<span class="pc bpc" id="L646" title="1 of 2 branches missed.">                if (!haveAutorization) {</span>
+<span class="nc" id="L647">                        throw new ResponseStatusException(HttpStatus.FORBIDDEN,</span>
+                                        &quot;Você não tem autorização para adicionar arquivos a essa atividade&quot;);
+                }
+<span class="fc" id="L650">        }</span>
+
+        private void verifyIfTheActivityIsInTheAllowedStatusToModifyAnswerFiles(Activity activity) {
+<span class="fc" id="L653">                var allowedStatus = List.of(ActivityStatus.EM_ANDAMENTO, ActivityStatus.AJUSTE_NECESSARIO);</span>
+
+<span class="pc bpc" id="L655" title="1 of 2 branches missed.">                if (!allowedStatus.contains(activity.getActivityStatus())) {</span>
+<span class="nc" id="L656">                        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, &quot;Status inválido para esta ação.&quot;);</span>
+                }
+<span class="fc" id="L658">        }</span>
+
+        public AddNewAnswerFileResponse addAnswerFiles(Long id, String email, AddNewAnswerFileRequest body) {
+<span class="fc" id="L661">                Activity activity = verifyIfAnActivityExistsAndThenReturn(id);</span>
+
+<span class="fc" id="L663">                User user = verifyAUserAndThenReturn(email);</span>
+
+<span class="fc" id="L665">                haveAuthorizationToModifyAnswerFiles(user, activity);</span>
+
+<span class="fc" id="L667">                verifyIfTheFileKeysAreValids(body.getAnswerFilesKeys());</span>
+
+<span class="fc" id="L669">                verifyIfTheActivityIsInTheAllowedStatusToModifyAnswerFiles(activity);</span>
+
+<span class="fc" id="L671">                activity.addAnswerFileKeys(body.getAnswerFilesKeys());</span>
+<span class="fc" id="L672">                activityRepository.save(activity);</span>
+
+<span class="fc" id="L674">                afterAddAnswerFiles(activity);</span>
+
+<span class="fc" id="L676">                return new AddNewAnswerFileResponse(id, body.getAnswerFilesKeys());</span>
+        }
+
+        private void afterDeleteAnswerFile(Activity activity) {
+
+                try {
+<span class="fc" id="L682">                        activityStoreLineService.createActivityStoreLine(activity,</span>
+                                        ActivityStoryLineType.ARQUIVO_RESPOSTA_REMOVIDO,
+                                        &quot;Arquivo(s) de resposta foram removidos.&quot;);
+<span class="nc" id="L685">                } catch (Exception e) {</span>
+
+<span class="fc" id="L687">                }</span>
+
+<span class="fc" id="L689">        }</span>
+
+        public void deleteAnswerFile(Long id, String fileKey, String email) {
+<span class="fc" id="L692">                Activity activity = verifyIfAnActivityExistsAndThenReturn(id);</span>
+
+<span class="fc" id="L694">                User user = verifyAUserAndThenReturn(email);</span>
+
+<span class="fc" id="L696">                haveAuthorizationToModifyAnswerFiles(user, activity);</span>
+
+<span class="pc bpc" id="L698" title="1 of 2 branches missed.">                if (!activity.haveAnswerKey(fileKey)) {</span>
+<span class="nc" id="L699">                        throw new ResponseStatusException(HttpStatus.BAD_REQUEST,</span>
+                                        &quot;File key não existente.&quot;);
+
+                }
+
+<span class="fc" id="L704">                verifyIfTheActivityIsInTheAllowedStatusToModifyAnswerFiles(activity);</span>
+
+<span class="fc" id="L706">                activity.deleteAnswerFileKey(fileKey);</span>
+
+<span class="fc" id="L708">                activityRepository.save(activity);</span>
+
+<span class="fc" id="L710">                afterDeleteAnswerFile(activity);</span>
+<span class="fc" id="L711">        }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

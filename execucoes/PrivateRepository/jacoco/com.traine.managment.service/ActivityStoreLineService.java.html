@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ActivityStoreLineService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report"></a> &gt; <a href="index.source.html" class="el_package">com.traine.managment.service</a> &gt; <span class="el_source">ActivityStoreLineService.java</span></div><h1>ActivityStoreLineService.java</h1><pre class="source lang-java linenums">package com.traine.managment.service;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
+
+import com.traine.managment.dto.activityStoryLine.StoryLineCommentRequestDTO;
+import com.traine.managment.dto.activityStoryLine.StoryLineCommentResponseDTO;
+import com.traine.managment.dto.activityStoryLine.StoryLineGetResponseDTO;
+import com.traine.managment.enums.activityStoryLine.ActivityStoryLineType;
+import com.traine.managment.model.Activity;
+import com.traine.managment.model.ActivityStoryLine;
+import com.traine.managment.model.User;
+import com.traine.managment.repository.ActivityRepository;
+import com.traine.managment.repository.ActivityStoreLineRepository;
+import com.traine.managment.repository.UserRepository;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+
+@Service
+<span class="fc" id="L27">public class ActivityStoreLineService {</span>
+
+    @Autowired
+    private ActivityStoreLineRepository storyLineRepository;
+
+    @Autowired
+    private AuthService authService;
+
+    @Autowired
+    private ActivityRepository activityRepository;
+
+    @Autowired
+    private ModelMapper modelMapper;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    public ActivityStoryLine createActivityStoreLine(Activity activity,
+            ActivityStoryLineType type,
+            String content) {
+
+<span class="fc" id="L48">        User author = authService.getAuthenticatedUser();</span>
+
+<span class="fc" id="L50">        ActivityStoryLine line = ActivityStoryLine.builder()</span>
+<span class="fc" id="L51">                .activity(activity)</span>
+<span class="fc" id="L52">                .author(author)</span>
+<span class="fc" id="L53">                .type(type)</span>
+<span class="fc" id="L54">                .content(content)</span>
+<span class="fc" id="L55">                .createdAt(LocalDateTime.now())</span>
+<span class="fc" id="L56">                .build();</span>
+
+<span class="fc" id="L58">        return storyLineRepository.save(line);</span>
+
+    }
+
+    private Activity verifyIfAnActivityExistsAndThenReturn(Long id) {
+<span class="fc" id="L63">        return activityRepository.findById(id)</span>
+<span class="pc" id="L64">                .orElseThrow(() -&gt; new ResponseStatusException(HttpStatus.NOT_FOUND,</span>
+                        &quot;Atividade não encontrada&quot;));
+    }
+
+    private User verifyAUserAndThenReturn(String email) {
+<span class="fc" id="L69">        return userRepository.findByEmail(email)</span>
+<span class="pc" id="L70">                .orElseThrow(() -&gt; new ResponseStatusException(HttpStatus.BAD_REQUEST,</span>
+                        &quot;User não encontrado.&quot;));
+    }
+
+    private void verifyIfUserIsParticipantOf(User user, Activity activity) {
+
+<span class="fc" id="L76">        boolean haveAuthority = activity.areParticipant(user);</span>
+
+<span class="fc bfc" id="L78" title="All 2 branches covered.">        if (!haveAuthority) {</span>
+<span class="fc" id="L79">            throw new ResponseStatusException(HttpStatus.FORBIDDEN,</span>
+                    &quot;Usuário não participa dessa atividade&quot;);
+        }
+<span class="fc" id="L82">    }</span>
+
+    private StoryLineGetResponseDTO transformStoryLineInto(ActivityStoryLine activityStoryLine) {
+<span class="fc" id="L85">        return modelMapper.map(activityStoryLine, StoryLineGetResponseDTO.class);</span>
+    }
+
+    public Page&lt;StoryLineGetResponseDTO&gt; getStoryLines(Long activityId, String email, Pageable pageable) {
+<span class="fc" id="L89">        Activity activity = verifyIfAnActivityExistsAndThenReturn(activityId);</span>
+
+<span class="fc" id="L91">        User user = verifyAUserAndThenReturn(email);</span>
+
+<span class="fc" id="L93">        verifyIfUserIsParticipantOf(user, activity);</span>
+
+<span class="fc" id="L95">        Page&lt;ActivityStoryLine&gt; storyLines = storyLineRepository.findByActivityId(activityId, pageable);</span>
+
+<span class="fc" id="L97">        return storyLines.map(this::transformStoryLineInto);</span>
+    }
+
+    public StoryLineCommentResponseDTO makeAComment(Long activityId, String email, StoryLineCommentRequestDTO body) {
+
+<span class="fc" id="L102">        Activity activity = verifyIfAnActivityExistsAndThenReturn(activityId);</span>
+
+<span class="fc" id="L104">        User user = verifyAUserAndThenReturn(email);</span>
+
+<span class="fc" id="L106">        verifyIfUserIsParticipantOf(user, activity);</span>
+<span class="fc" id="L107">        ActivityStoryLine activityStoryLine = createActivityStoreLine(activity, ActivityStoryLineType.COMENTARIO,</span>
+<span class="fc" id="L108">                body.getComment());</span>
+
+<span class="fc" id="L110">        return StoryLineCommentResponseDTO.builder()</span>
+<span class="fc" id="L111">                .id(activityStoryLine.getId())</span>
+<span class="fc" id="L112">                .authorEmail(user.getEmail())</span>
+<span class="fc" id="L113">                .authorName(user.getName())</span>
+<span class="fc" id="L114">                .type(activityStoryLine.getType())</span>
+<span class="fc" id="L115">                .content(activityStoryLine.getContent())</span>
+<span class="fc" id="L116">                .createdAt(activityStoryLine.getCreatedAt())</span>
+<span class="fc" id="L117">                .build();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

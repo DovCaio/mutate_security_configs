@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>EmailTemplateService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report"></a> &gt; <a href="index.source.html" class="el_package">com.traine.managment.service</a> &gt; <span class="el_source">EmailTemplateService.java</span></div><h1>EmailTemplateService.java</h1><pre class="source lang-java linenums">package com.traine.managment.service;
+
+import org.springframework.stereotype.Service;
+
+import com.traine.managment.model.Activity;
+import com.traine.managment.model.User;
+
+@Service
+<span class="fc" id="L9">public class EmailTemplateService {</span>
+
+  public String buildActivityNotification(User user,
+      Activity activity,
+      String message,
+      String title) {
+
+<span class="fc" id="L16">    return &quot;&quot;&quot;</span>
+            &lt;div style=&quot;
+                max-width: 700px;
+                margin: 40px auto;
+                font-family: Arial, sans-serif;
+                border: 1px solid #e5e5e5;
+                border-radius: 12px;
+                overflow: hidden;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            &quot;&gt;
+
+              &lt;header style=&quot;background: #1f2937; color: white; padding: 20px&quot;&gt;
+                &lt;h1 style=&quot;margin: 0; font-size: 20px&quot;&gt;
+                  📢 Notificações sobre as atividades
+                &lt;/h1&gt;
+              &lt;/header&gt;
+
+              &lt;main style=&quot;padding: 20px; background: #fafafa&quot;&gt;
+
+                &lt;div style=&quot;
+                    background: white;
+                    padding: 15px;
+                    border-radius: 10px;
+                    margin-bottom: 12px;
+                    border-left: 5px solid #3b82f6;
+                &quot;&gt;
+                  &lt;h3 style=&quot;margin: 0&quot;&gt;%s&lt;/h3&gt;
+                &lt;/div&gt;
+
+                &lt;div style=&quot;background: white; padding: 15px; border-radius: 10px; margin-bottom: 12px;&quot;&gt;
+                  &lt;h3 style=&quot;margin: 0 0 5px 0&quot;&gt;📌 Tipo de atividade&lt;/h3&gt;
+                  &lt;p style=&quot;margin: 0; color: #555&quot;&gt;%s&lt;/p&gt;
+                &lt;/div&gt;
+
+                &lt;div style=&quot;background: white; padding: 15px; border-radius: 10px; margin-bottom: 12px;&quot;&gt;
+                  &lt;h3 style=&quot;margin: 0 0 5px 0&quot;&gt;⚠️ Nível de urgência&lt;/h3&gt;
+                  &lt;p style=&quot;margin: 0; color: #d97706; font-weight: bold&quot;&gt;%s&lt;/p&gt;
+                &lt;/div&gt;
+
+                &lt;div style=&quot;
+                    background: white;
+                    padding: 15px;
+                    border-radius: 10px;
+                    margin-bottom: 12px;
+                    border-left: 5px solid #ef4444;
+                &quot;&gt;
+                  &lt;h3 style=&quot;margin: 0&quot;&gt;⏰ Prazo próximo&lt;/h3&gt;
+                  &lt;p style=&quot;margin: 5px 0 0 0; color: #555&quot;&gt;%s&lt;/p&gt;
+                &lt;/div&gt;
+
+                &lt;div style=&quot;background: #e0f2fe; padding: 15px; border-radius: 10px&quot;&gt;
+                  &lt;p style=&quot;margin: 0; font-weight: 500&quot;&gt;✉️ %s&lt;/p&gt;
+                &lt;/div&gt;
+
+              &lt;/main&gt;
+
+              &lt;footer style=&quot;text-align: center; padding: 15px; background: #1f2937; color: white&quot;&gt;
+                &lt;small&gt;© 2026 PRE&lt;/small&gt;
+              &lt;/footer&gt;
+
+            &lt;/div&gt;
+<span class="fc" id="L77">        &quot;&quot;&quot;.formatted(</span>
+        title,
+<span class="fc" id="L79">        activity.getActivityType().getDisplayName(),</span>
+<span class="fc" id="L80">        activity.getActivityPriority().getDisplayName(),</span>
+<span class="fc" id="L81">        activity.getTerm(),</span>
+        message);
+  }
+
+  public String buildUserNotification(User user,
+      String message,
+      String title) {
+
+<span class="fc" id="L89">    return &quot;&quot;&quot;</span>
+            &lt;div style=&quot;
+                max-width: 700px;
+                margin: 40px auto;
+                font-family: Arial, sans-serif;
+                border: 1px solid #e5e5e5;
+                border-radius: 12px;
+                overflow: hidden;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            &quot;&gt;
+
+              &lt;header style=&quot;background: #1f2937; color: white; padding: 20px&quot;&gt;
+                &lt;h1 style=&quot;margin: 0; font-size: 20px&quot;&gt;
+                  📢 Notificações sobre o seu usuário
+                &lt;/h1&gt;
+              &lt;/header&gt;
+
+              &lt;main style=&quot;padding: 20px; background: #fafafa&quot;&gt;
+
+                &lt;div style=&quot;
+                    background: white;
+                    padding: 15px;
+                    border-radius: 10px;
+                    margin-bottom: 12px;
+                    border-left: 5px solid #3b82f6;
+                &quot;&gt;
+                  &lt;h3 style=&quot;margin: 0&quot;&gt;🆕 %s&lt;/h3&gt;
+                &lt;/div&gt;
+
+                &lt;div style=&quot;background: #e0f2fe; padding: 15px; border-radius: 10px&quot;&gt;
+
+                  &lt;p style=&quot;margin: 0 0 8px 0&quot;&gt;
+                    Olá %s,
+                  &lt;/p&gt;
+
+                  &lt;p style=&quot;margin: 0; font-weight: 500&quot;&gt;
+                    ✉️ %s
+                  &lt;/p&gt;
+
+                &lt;/div&gt;
+
+              &lt;/main&gt;
+
+              &lt;footer style=&quot;text-align: center; padding: 15px; background: #1f2937; color: white&quot;&gt;
+                &lt;small&gt;© 2026 PRE&lt;/small&gt;
+              &lt;/footer&gt;
+
+            &lt;/div&gt;
+<span class="fc" id="L137">        &quot;&quot;&quot;.formatted(</span>
+        title,
+<span class="fc" id="L139">        user.getName(),</span>
+        message);
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

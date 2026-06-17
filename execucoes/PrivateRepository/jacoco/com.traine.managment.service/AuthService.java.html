@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AuthService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report"></a> &gt; <a href="index.source.html" class="el_package">com.traine.managment.service</a> &gt; <span class="el_source">AuthService.java</span></div><h1>AuthService.java</h1><pre class="source lang-java linenums">package com.traine.managment.service;
+
+import java.time.Instant;
+
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
+
+import com.traine.managment.dto.auth.LoginPostRequestDTO;
+import com.traine.managment.dto.user.MeUserResponseDTO;
+import com.traine.managment.model.RefreshToken;
+import com.traine.managment.model.User;
+import com.traine.managment.record.LoginResponse;
+import com.traine.managment.repository.RefreshTokenRepository;
+import com.traine.managment.repository.UserRepository;
+
+import io.jsonwebtoken.JwtException;
+import lombok.RequiredArgsConstructor;
+
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
+@Service
+@RequiredArgsConstructor
+public class AuthService {
+
+    private final AuthenticationManager authenticationManager;
+    private final JwtService jwtService;
+    private final UserRepository userRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
+
+    @Autowired
+    private ModelMapper modelMapper;
+
+    public LoginResponse login(LoginPostRequestDTO request) {
+
+<span class="fc" id="L42">        Authentication authentication = authenticationManager.authenticate(</span>
+                new UsernamePasswordAuthenticationToken(
+<span class="fc" id="L44">                        request.getEmail(),</span>
+<span class="fc" id="L45">                        request.getPassword()));</span>
+
+<span class="fc" id="L47">        var user = (User) authentication.getPrincipal();</span>
+
+<span class="fc" id="L49">        String accessToken = jwtService.generateAccessToken(user);</span>
+<span class="fc" id="L50">        String refreshToken = jwtService.generateRefreshToken(user);</span>
+
+<span class="fc" id="L52">        refreshTokenRepository.save(new RefreshToken(user.getId(), refreshToken));</span>
+
+<span class="fc" id="L54">        return new LoginResponse(accessToken, refreshToken);</span>
+
+    }
+
+    public LoginResponse refreshToken(String oldRefreshToken) {
+
+<span class="fc" id="L60">        RefreshToken tokenEntity = refreshTokenRepository.findByToken(oldRefreshToken)</span>
+<span class="pc" id="L61">                .orElseThrow(() -&gt; new ResponseStatusException(HttpStatus.UNAUTHORIZED,</span>
+                        &quot;Refresh token inválido ou expirado&quot;));
+
+<span class="fc" id="L64">        User user = userRepository.findById(tokenEntity.getUserId())</span>
+<span class="fc" id="L65">                .orElseThrow(</span>
+<span class="nc" id="L66">                        () -&gt; new ResponseStatusException(HttpStatus.UNAUTHORIZED, &quot;Usuário do token não encontrado&quot;));</span>
+
+        try {
+<span class="fc" id="L69">            jwtService.isValidToken(oldRefreshToken);</span>
+<span class="nc" id="L70">        } catch (JwtException e) {</span>
+<span class="nc" id="L71">            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, &quot;Refresh token inválido ou expirado&quot;);</span>
+<span class="fc" id="L72">        }</span>
+
+<span class="fc" id="L74">        String newAccessToken = jwtService.generateAccessToken(user);</span>
+<span class="fc" id="L75">        String newRefreshToken = jwtService.generateRefreshToken(user);</span>
+
+<span class="fc" id="L77">        tokenEntity.setToken(newRefreshToken);</span>
+<span class="fc" id="L78">        tokenEntity.setCreatedAt(Instant.now());</span>
+<span class="fc" id="L79">        refreshTokenRepository.save(tokenEntity);</span>
+
+<span class="fc" id="L81">        return new LoginResponse(newAccessToken, newRefreshToken);</span>
+    }
+
+    public void logout(String refreshToken) {
+<span class="fc" id="L85">        refreshTokenRepository.findByToken(refreshToken)</span>
+<span class="fc" id="L86">                .ifPresent(refreshTokenRepository::delete);</span>
+<span class="fc" id="L87">    }</span>
+
+    public MeUserResponseDTO me(String email) {
+<span class="fc" id="L90">        User user = userRepository.findByEmail(email)</span>
+<span class="pc" id="L91">                .orElseThrow(() -&gt; new ResponseStatusException(HttpStatus.NOT_FOUND, &quot;Usuário não encontrado!&quot;));</span>
+        ;
+<span class="fc" id="L93">        return modelMapper.map(user, MeUserResponseDTO.class);</span>
+    }
+
+    public User getAuthenticatedUser() {
+
+<span class="fc" id="L98">        Authentication authentication = SecurityContextHolder.getContext()</span>
+<span class="fc" id="L99">                .getAuthentication();</span>
+
+<span class="pc bpc" id="L101" title="2 of 4 branches missed.">        if (authentication == null || !authentication.isAuthenticated()) {</span>
+<span class="nc" id="L102">            throw new ResponseStatusException(</span>
+                    HttpStatus.UNAUTHORIZED,
+                    &quot;Usuário não autenticado&quot;);
+        }
+
+<span class="fc" id="L107">        String email = authentication.getName();</span>
+
+<span class="fc" id="L109">        return userRepository.findByEmail(email)</span>
+<span class="fc" id="L110">                .orElseThrow(() -&gt; new ResponseStatusException(</span>
+                        HttpStatus.NOT_FOUND,
+                        &quot;Usuário autenticado não encontrado&quot;));
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>UserService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report"></a> &gt; <a href="index.source.html" class="el_package">com.traine.managment.service</a> &gt; <span class="el_source">UserService.java</span></div><h1>UserService.java</h1><pre class="source lang-java linenums">package com.traine.managment.service;
+
+import java.sql.Date;
+import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.List;
+
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.repository.query.Param;
+import org.springframework.data.domain.Pageable;
+
+import com.traine.managment.dto.activity.GetRecentActivityResponseDTO;
+import com.traine.managment.dto.user.GetTraineeActivitiesSumaryResponseDTO;
+import com.traine.managment.dto.user.GetTraineeActivitiesYearDTO;
+import com.traine.managment.dto.user.GetValidatorsActivitiesSumaryResponseDTO;
+import com.traine.managment.dto.user.ChangePasswordRequestDTO;
+import com.traine.managment.dto.user.CreateUserRequestDTO;
+import com.traine.managment.dto.user.CreateUserResponseDTO;
+import com.traine.managment.dto.user.GetSafeIdentificationDTO;
+import com.traine.managment.dto.user.MeUserResponseDTO;
+import com.traine.managment.dto.user.PutUserRequestDTO;
+import com.traine.managment.dto.user.PutUserResponseDTO;
+import com.traine.managment.dto.user.UserGetResponseDTO;
+import com.traine.managment.enums.activity.ActivityStatus;
+import com.traine.managment.enums.user.Role;
+import com.traine.managment.exceptions.EmailAlreadyExistsException;
+import com.traine.managment.model.Notification;
+import com.traine.managment.model.User;
+import com.traine.managment.repository.ActivityRepository;
+import com.traine.managment.repository.UserRepository;
+
+@Service
+<span class="fc" id="L42">public class UserService {</span>
+
+        @Autowired
+        private UserRepository repository;
+
+        @Autowired
+        private ActivityRepository activityRepository;
+
+        @Autowired
+        private PasswordEncoder passwordEncoder;
+
+        @Autowired
+        private NotificationService notificationService;
+
+        @Autowired
+        private ModelMapper modelMapper;
+
+        private void createNotification(User user, String message, String subject, String title) {
+<span class="fc" id="L60">                Notification notification = notificationService.createUserNotification(user,</span>
+                                message,
+                                subject, title);
+<span class="fc" id="L63">                user.addNotification(notification);</span>
+<span class="fc" id="L64">        }</span>
+
+        public CreateUserResponseDTO createUser(CreateUserRequestDTO request) {
+
+<span class="fc bfc" id="L68" title="All 2 branches covered.">                if (repository.existsByEmail(request.getEmail())) {</span>
+<span class="fc" id="L69">                        throw new EmailAlreadyExistsException(request.getEmail());</span>
+                }
+
+<span class="fc" id="L72">                User user = modelMapper.map(request, User.class);</span>
+
+<span class="fc" id="L74">                user.setPassword(passwordEncoder.encode(request.getPassword()));</span>
+
+<span class="fc" id="L76">                user = repository.save(user);</span>
+
+<span class="fc" id="L78">                createNotification(user,</span>
+                                &quot;Seu usuário foi criado, você já pode logar com seu email e a senha que lhe foi dado.&quot;,
+                                &quot;Criação de usuário&quot;, &quot;Usuário criado.&quot;);
+
+<span class="fc" id="L82">                CreateUserResponseDTO response = modelMapper.map(user, CreateUserResponseDTO.class);</span>
+
+<span class="fc" id="L84">                return response;</span>
+        }
+
+        public List&lt;UserGetResponseDTO&gt; getAllTrainees() {
+
+<span class="fc" id="L89">                List&lt;User&gt; trainees = repository</span>
+<span class="fc" id="L90">                                .findByRole(Role.TRAINEE)</span>
+<span class="pc" id="L91">                                .orElseThrow(() -&gt; new ResponseStatusException(</span>
+                                                HttpStatus.NOT_FOUND, &quot;Nenhum trainee encontrado&quot;));
+
+<span class="fc" id="L94">                List&lt;UserGetResponseDTO&gt; response = trainees.stream()</span>
+<span class="fc" id="L95">                                .map(t -&gt; modelMapper.map(t, UserGetResponseDTO.class))</span>
+<span class="fc" id="L96">                                .toList();</span>
+
+<span class="fc" id="L98">                return response;</span>
+
+        }
+
+        public List&lt;UserGetResponseDTO&gt; getAllValidators() {
+
+<span class="fc" id="L104">                List&lt;User&gt; validators = repository</span>
+<span class="fc" id="L105">                                .findByRoleIn(List.of(Role.ACTIVITY_MAKER, Role.MANAGMENT))</span>
+<span class="pc" id="L106">                                .orElseThrow(() -&gt; new ResponseStatusException(</span>
+                                                HttpStatus.NOT_FOUND, &quot;Nenhum validador encontrado&quot;));
+
+<span class="fc" id="L109">                List&lt;UserGetResponseDTO&gt; response = validators.stream()</span>
+<span class="fc" id="L110">                                .map(t -&gt; modelMapper.map(t, UserGetResponseDTO.class))</span>
+<span class="fc" id="L111">                                .toList();</span>
+
+<span class="fc" id="L113">                return response;</span>
+
+        }
+
+        public PutUserResponseDTO updateUser(PutUserRequestDTO request, String email) {
+<span class="fc" id="L118">                User user = repository.findByEmail(email)</span>
+<span class="pc" id="L119">                                .orElseThrow(() -&gt; new ResponseStatusException(HttpStatus.NOT_FOUND,</span>
+                                                &quot;Usuário não encontrado.&quot;));
+
+<span class="fc" id="L122">                user.setName(request.getName());</span>
+<span class="fc" id="L123">                user.setEmail(request.getEmail());</span>
+<span class="fc" id="L124">                user.setSector(request.getSector());</span>
+
+<span class="fc" id="L126">                user = repository.save(user);</span>
+
+<span class="fc" id="L128">                createNotification(user, &quot;Seu usuário foi alterado.&quot;, &quot;Alteração de cadastro&quot;, &quot;Usuário Atualizado.&quot;);</span>
+
+<span class="fc" id="L130">                PutUserResponseDTO response = modelMapper.map(user, PutUserResponseDTO.class);</span>
+<span class="fc" id="L131">                return response;</span>
+        }
+
+        public void changePassword(ChangePasswordRequestDTO request, String email) {
+<span class="fc" id="L135">                User user = repository.findByEmail(email)</span>
+<span class="pc" id="L136">                                .orElseThrow(() -&gt; new ResponseStatusException(HttpStatus.NOT_FOUND,</span>
+                                                &quot;Usuário não encontrado.&quot;));
+
+<span class="pc bpc" id="L139" title="1 of 2 branches missed.">                if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {</span>
+<span class="nc" id="L140">                        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, &quot;Senha atual incorreta.&quot;);</span>
+                }
+
+<span class="pc bpc" id="L143" title="1 of 2 branches missed.">                if (passwordEncoder.matches(request.getNewPassword(), user.getPassword())) {</span>
+<span class="nc" id="L144">                        throw new ResponseStatusException(HttpStatus.BAD_REQUEST,</span>
+                                        &quot;A nova senha deve ser diferente da senha atual.&quot;);
+                }
+
+<span class="fc" id="L148">                user.setPassword(passwordEncoder.encode(request.getNewPassword()));</span>
+
+<span class="fc" id="L150">                createNotification(user, &quot;Seu usuário foi alterado.&quot;, &quot;Alteração de senha&quot;,</span>
+                                &quot;Sua senha foi alterada com sucesso.&quot;);
+
+<span class="fc" id="L153">                repository.save(user);</span>
+
+<span class="fc" id="L155">        }</span>
+
+        private Long[] mapToMonthlyCounts(List&lt;Object[]&gt; raw) {
+<span class="fc" id="L158">                Long[] result = new Long[12];</span>
+<span class="fc" id="L159">                Arrays.fill(result, 0L);</span>
+
+<span class="fc" id="L161">                raw</span>
+<span class="fc" id="L162">                                .stream()</span>
+<span class="fc" id="L163">                                .forEach(o -&gt; {</span>
+<span class="fc" id="L164">                                        int month = ((Number) o[0]).intValue() - 1;</span>
+<span class="fc" id="L165">                                        result[month] = (Long) o[1];</span>
+<span class="fc" id="L166">                                });</span>
+<span class="fc" id="L167">                return result;</span>
+        }
+
+        public GetTraineeActivitiesSumaryResponseDTO getTraineeActivitiesSummary(String email) {
+<span class="fc" id="L171">                User user = repository.findByEmail(email)</span>
+<span class="pc" id="L172">                                .orElseThrow(() -&gt; new ResponseStatusException(HttpStatus.NOT_FOUND,</span>
+                                                &quot;Usuário não encontrado.&quot;));
+
+<span class="fc" id="L175">                Long activitiesDone = activityRepository.countByUserAndStatus(</span>
+                                user, ActivityStatus.CONCLUIDO);
+<span class="fc" id="L177">                Long activitiesPending = activityRepository.countByUserAndStatus(</span>
+                                user,
+                                ActivityStatus.PENDENTE);
+
+<span class="fc" id="L181">                Long[] activitiesParticipatedThisYear = mapToMonthlyCounts(</span>
+<span class="fc" id="L182">                                activityRepository.countFinishedByMonth(user.getId(),</span>
+                                                ActivityStatus.CONCLUIDO,
+<span class="fc" id="L184">                                                LocalDate.now().getYear()));</span>
+
+<span class="fc" id="L186">                GetTraineeActivitiesSumaryResponseDTO response = new GetTraineeActivitiesSumaryResponseDTO();</span>
+<span class="fc" id="L187">                response.setActivitiesDone(activitiesDone);</span>
+<span class="fc" id="L188">                response.setActivitiesPending(activitiesPending);</span>
+<span class="fc" id="L189">                response.setActivitiesFinishedThisYear(activitiesParticipatedThisYear);</span>
+
+<span class="fc" id="L191">                return response;</span>
+        }
+
+        public GetValidatorsActivitiesSumaryResponseDTO getValidatorsActivitiesSummary(String email) {
+<span class="fc" id="L195">                User user = repository.findByEmail(email)</span>
+<span class="pc" id="L196">                                .orElseThrow(() -&gt; new ResponseStatusException(HttpStatus.NOT_FOUND,</span>
+                                                &quot;Usuário não encontrado.&quot;));
+
+<span class="fc" id="L199">                Long activitiesDone = activityRepository.countByUserAndStatus(</span>
+                                user, ActivityStatus.CONCLUIDO);
+<span class="fc" id="L201">                Long activitiesPending = activityRepository.countByUserAndStatus(</span>
+                                user,
+                                ActivityStatus.PENDENTE);
+<span class="fc" id="L204">                Long activitiesInAdjustment = activityRepository.countByUserAndStatus(</span>
+                                user,
+                                ActivityStatus.AJUSTE_NECESSARIO);
+<span class="fc" id="L207">                Long activitiesInProgress = activityRepository.countByUserAndStatus(</span>
+                                user,
+                                ActivityStatus.EM_ANDAMENTO);
+
+<span class="fc" id="L211">                Long[] activitiesParticipatedThisYear = mapToMonthlyCounts(activityRepository.countParticipatedByYear(</span>
+<span class="fc" id="L212">                                user.getId(),</span>
+<span class="fc" id="L213">                                LocalDate.now().getYear()));</span>
+
+<span class="fc" id="L215">                GetValidatorsActivitiesSumaryResponseDTO response = new GetValidatorsActivitiesSumaryResponseDTO();</span>
+<span class="fc" id="L216">                response.setActivitiesDone(activitiesDone);</span>
+<span class="fc" id="L217">                response.setActivitiesPending(activitiesPending);</span>
+<span class="fc" id="L218">                response.setActivitiesInAdjustment(activitiesInAdjustment);</span>
+<span class="fc" id="L219">                response.setActivitiesInProgress(activitiesInProgress);</span>
+<span class="fc" id="L220">                response.setActivitiesParticipatedThisYear(activitiesParticipatedThisYear);</span>
+
+<span class="fc" id="L222">                return response;</span>
+        }
+
+        public List&lt;GetRecentActivityResponseDTO&gt; getRecentActivities(String email) {
+<span class="fc" id="L226">                User user = repository.findByEmail(email)</span>
+<span class="pc" id="L227">                                .orElseThrow(() -&gt; new ResponseStatusException(HttpStatus.NOT_FOUND,</span>
+                                                &quot;Usuário não encontrado.&quot;));
+
+<span class="fc" id="L230">                Pageable pageable = PageRequest.of(0, 5, Sort.by(&quot;term&quot;).descending());</span>
+
+<span class="fc" id="L232">                List&lt;GetRecentActivityResponseDTO&gt; response = activityRepository</span>
+<span class="fc" id="L233">                                .findByUserAndNotFinishedOrderByTermDesc(user.getId(), ActivityStatus.CONCLUIDO,</span>
+                                                pageable)
+<span class="fc" id="L235">                                .stream()</span>
+<span class="fc" id="L236">                                .map(a -&gt; modelMapper.map(a, GetRecentActivityResponseDTO.class))</span>
+<span class="fc" id="L237">                                .toList();</span>
+
+<span class="fc" id="L239">                return response;</span>
+        }
+
+        public GetTraineeActivitiesYearDTO[] getTraineeActivitiesYearQuantity() {
+<span class="fc" id="L243">                List&lt;User&gt; trainees = repository</span>
+<span class="fc" id="L244">                                .findByRole(Role.TRAINEE)</span>
+<span class="pc" id="L245">                                .orElseThrow(() -&gt; new ResponseStatusException(</span>
+                                                HttpStatus.NOT_FOUND, &quot;Nenhum trainee encontrado&quot;));
+
+<span class="fc" id="L248">                GetTraineeActivitiesYearDTO[] response = new GetTraineeActivitiesYearDTO[trainees.size()];</span>
+
+<span class="fc" id="L250">                response = trainees.stream()</span>
+<span class="fc" id="L251">                                .map(t -&gt; {</span>
+
+<span class="fc" id="L253">                                        Long[] activitiesParticipatedThisYear = mapToMonthlyCounts(activityRepository</span>
+<span class="fc" id="L254">                                                        .countParticipatedTraineeByMonthForYear(t.getId(),</span>
+<span class="fc" id="L255">                                                                        java.time.LocalDate.now().getYear()));</span>
+
+<span class="fc" id="L257">                                        return new GetTraineeActivitiesYearDTO(t.getName(),</span>
+                                                        activitiesParticipatedThisYear);
+                                })
+<span class="fc" id="L260">                                .toArray(GetTraineeActivitiesYearDTO[]::new);</span>
+
+<span class="fc" id="L262">                return response;</span>
+        }
+
+        public GetSafeIdentificationDTO getSafeIdentication(String email) {
+
+<span class="fc" id="L267">                User user = repository.findByEmail(email).orElseThrow(() -&gt; new ResponseStatusException(</span>
+                                HttpStatus.NOT_FOUND, &quot;Usuário não encontrado.&quot;));
+
+<span class="fc" id="L270">                return modelMapper.map(user, GetSafeIdentificationDTO.class);</span>
+        }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>FilesController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report"></a> &gt; <a href="index.source.html" class="el_package">com.traine.managment.controller</a> &gt; <span class="el_source">FilesController.java</span></div><h1>FilesController.java</h1><pre class="source lang-java linenums">package com.traine.managment.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+
+import com.traine.managment.dto.files.FileDownloadDTO;
+import com.traine.managment.dto.files.FileUrlGetResponseDTO;
+import com.traine.managment.dto.files.UploadPostResponseDTO;
+import com.traine.managment.interfaces.files.FileStorageService;
+
+@RestController
+@RequestMapping(&quot;/files&quot;)
+<span class="fc" id="L22">public class FilesController {</span>
+
+    @Autowired
+    private FileStorageService fileService;
+
+    @PostMapping(&quot;/upload&quot;)
+    public ResponseEntity&lt;UploadPostResponseDTO&gt; upload(@RequestParam(&quot;file&quot;) MultipartFile file) {
+
+<span class="fc" id="L30">        UploadPostResponseDTO response = fileService.upload(file);</span>
+
+<span class="fc" id="L32">        return ResponseEntity.ok().body(response);</span>
+
+    }
+
+    @GetMapping(&quot;/url/{fileKey}&quot;)
+    public ResponseEntity&lt;FileUrlGetResponseDTO&gt; getUrl(@PathVariable(&quot;fileKey&quot;) String fileKey) {
+
+<span class="fc" id="L39">        FileUrlGetResponseDTO response = fileService.generateUrl(fileKey);</span>
+
+<span class="fc" id="L41">        return ResponseEntity.ok().body(response);</span>
+
+    }
+
+    @GetMapping(&quot;/download/{fileKey}&quot;)
+    public ResponseEntity&lt;byte[]&gt; download(@PathVariable String fileKey) {
+
+<span class="nc" id="L48">        FileDownloadDTO file = fileService.download(fileKey);</span>
+
+<span class="nc" id="L50">        return ResponseEntity.ok()</span>
+<span class="nc" id="L51">                .header(HttpHeaders.CONTENT_DISPOSITION,</span>
+<span class="nc" id="L52">                        &quot;attachment; filename=\&quot;&quot; + file.getFileName() + &quot;\&quot;&quot;)</span>
+<span class="nc" id="L53">                .contentType(file.getContentType())</span>
+<span class="nc" id="L54">                .body(file.getContent());</span>
+    }
+
+    @GetMapping(&quot;/view/{fileKey}&quot;)
+    public ResponseEntity&lt;byte[]&gt; view(@PathVariable String fileKey) {
+
+<span class="nc" id="L60">        FileDownloadDTO file = fileService.download(fileKey);</span>
+
+<span class="nc" id="L62">        return ResponseEntity.ok()</span>
+<span class="nc" id="L63">                .contentType(file.getContentType())</span>
+<span class="nc" id="L64">                .body(file.getContent());</span>
+    }
+
+    @DeleteMapping(&quot;/{fileKey}&quot;)
+    public ResponseEntity&lt;Void&gt; delete(@PathVariable(&quot;fileKey&quot;) String fileKey) {
+
+<span class="fc" id="L70">        fileService.delete(fileKey);</span>
+
+<span class="fc" id="L72">        return ResponseEntity.noContent().build();</span>
+
+    }
+
+    @GetMapping(&quot;/exists/{fileKey}&quot;)
+    public ResponseEntity&lt;Boolean&gt; exists(@PathVariable(&quot;fileKey&quot;) String fileKey) {
+<span class="fc" id="L78">        return ResponseEntity.ok().body(fileService.exists(fileKey));</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

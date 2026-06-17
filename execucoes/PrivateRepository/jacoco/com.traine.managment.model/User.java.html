@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>User.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report"></a> &gt; <a href="index.source.html" class="el_package">com.traine.managment.model</a> &gt; <span class="el_source">User.java</span></div><h1>User.java</h1><pre class="source lang-java linenums">package com.traine.managment.model;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import com.traine.managment.enums.user.Role;
+import com.traine.managment.enums.user.UserSector;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Data
+@Entity
+@Table(name = &quot;users&quot;)
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+@Getter
+@Setter
+public class User implements UserDetails {
+    @Id
+    @GeneratedValue
+    @Column(name = &quot;id_pk&quot;)
+    private Long id;
+
+    @Column(name = &quot;name&quot;)
+    private String name;
+
+    @Column(name = &quot;email&quot;, unique = true)
+    private String email;
+
+    @Column(name = &quot;sector&quot;)
+    @Enumerated(EnumType.STRING)
+    private UserSector sector;
+
+    @Column(name = &quot;password&quot;)
+    private String password;
+
+    @Builder.Default
+    @OneToMany(mappedBy = &quot;user&quot;, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List&lt;Notification&gt; notifications = new ArrayList&lt;Notification&gt;();
+
+    public void addNotification(Notification notification) {
+<span class="pc bpc" id="L69" title="1 of 2 branches missed.">        if (notification == null)</span>
+<span class="nc" id="L70">            return;</span>
+<span class="fc" id="L71">        notifications.add(notification);</span>
+<span class="fc" id="L72">        notification.setUser(this);</span>
+<span class="fc" id="L73">    }</span>
+
+    @ManyToMany(mappedBy = &quot;trainees&quot;)
+    private Set&lt;Activity&gt; traineeActivities;
+
+    @ManyToMany(mappedBy = &quot;validators&quot;)
+    private Set&lt;Activity&gt; validatorActivities;
+
+    @Column(name = &quot;role&quot;)
+    @Enumerated(EnumType.STRING)
+    private Role role;
+
+    @OneToOne(mappedBy = &quot;owner&quot;, cascade = CascadeType.ALL)
+    private GoogleCalendarCredentials googleCredential;
+
+    public void setGoogleCredentials(GoogleCalendarCredentials credentials) {
+<span class="pc bpc" id="L89" title="1 of 2 branches missed.">        if (credentials == null) {</span>
+<span class="nc" id="L90">            return;</span>
+        }
+<span class="fc" id="L92">        this.googleCredential = credentials;</span>
+<span class="fc" id="L93">        credentials.setOwner(this);</span>
+<span class="fc" id="L94">    }</span>
+
+    @OneToOne(mappedBy = &quot;user&quot;, cascade = CascadeType.ALL)
+    private TrelloIntegration TrelloIntegration;
+
+    public void setTrelloIntegration(TrelloIntegration credential) {
+<span class="pc bpc" id="L100" title="1 of 2 branches missed.">        if (credential == null) {</span>
+<span class="nc" id="L101">            return;</span>
+        }
+<span class="fc" id="L103">        this.TrelloIntegration = credential;</span>
+<span class="fc" id="L104">        credential.setUser(this);</span>
+<span class="fc" id="L105">    }</span>
+
+    @OneToMany(mappedBy = &quot;user&quot;)
+    private Set&lt;TrelloActivityCard&gt; trelloActivityCard;
+
+    @OneToMany(mappedBy = &quot;user&quot;)
+    private Set&lt;GoogleCalendarEvent&gt; googleEvent;
+
+    @Column(name = &quot;safe_identification&quot;)
+    private String safeIdentification;
+
+    @Builder.Default
+    @OneToMany(mappedBy = &quot;author&quot;)
+    private List&lt;ActivityStoryLine&gt; activityStoryLines = new ArrayList&lt;&gt;();
+
+    @PrePersist
+    public void prePersist() {
+<span class="pc bpc" id="L122" title="1 of 4 branches missed.">        if (safeIdentification == null || safeIdentification.isEmpty())</span>
+<span class="fc" id="L123">            this.safeIdentification = UUID.randomUUID().toString();</span>
+<span class="fc" id="L124">    }</span>
+
+    @Override
+    public Collection&lt;? extends GrantedAuthority&gt; getAuthorities() {
+<span class="fc" id="L128">        return List.of(new SimpleGrantedAuthority(&quot;ROLE_&quot; + role));</span>
+    }
+
+    @Override
+    public String getUsername() {
+<span class="fc" id="L133">        return email;</span>
+    }
+
+    @Override
+    public String getPassword() {
+<span class="fc" id="L138">        return password;</span>
+    }
+
+    // pode retornar true por enquanto, porém vai surgir implementações para isso
+    @Override
+    public boolean isAccountNonExpired() {
+<span class="fc" id="L144">        return true;</span>
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+<span class="fc" id="L149">        return true;</span>
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+<span class="fc" id="L154">        return true;</span>
+    }
+
+    @Override
+    public boolean isEnabled() {
+<span class="fc" id="L159">        return true;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

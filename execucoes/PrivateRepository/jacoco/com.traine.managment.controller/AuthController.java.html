@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AuthController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report"></a> &gt; <a href="index.source.html" class="el_package">com.traine.managment.controller</a> &gt; <span class="el_source">AuthController.java</span></div><h1>AuthController.java</h1><pre class="source lang-java linenums">package com.traine.managment.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.CookieValue;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
+
+import com.traine.managment.dto.auth.LoginPostRequestDTO;
+import com.traine.managment.dto.user.MeUserResponseDTO;
+import com.traine.managment.record.LoginResponse;
+import com.traine.managment.service.AuthService;
+
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
+
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+
+@RestController
+@RequestMapping(&quot;/auth&quot;)
+<span class="fc" id="L31">public class AuthController {</span>
+
+    @Autowired
+    private AuthService authService;
+    @Value(&quot;${app.prod}&quot;)
+    private boolean isProd;
+
+    @Value(&quot;${app.domain}&quot;)
+    private String domain;
+
+    @PostMapping(&quot;/signin&quot;)
+    public ResponseEntity&lt;String&gt; signIn(@RequestBody @Valid LoginPostRequestDTO request,
+            HttpServletResponse response) {
+
+<span class="fc" id="L45">        LoginResponse tokens = authService.login(request);</span>
+
+<span class="fc" id="L47">        ResponseCookie refreshCookie = ResponseCookie.from(&quot;refreshToken&quot;, tokens.refreshToken())</span>
+<span class="fc" id="L48">                .httpOnly(true)</span>
+<span class="fc" id="L49">                .secure(isProd)</span>
+<span class="fc" id="L50">                .path(&quot;/&quot;)</span>
+<span class="pc bpc" id="L51" title="1 of 2 branches missed.">                .sameSite(isProd ? &quot;None&quot; : &quot;Lax&quot;) // necessário por que o none precisa ser enviado de um servidor que</span>
+                                                   // use https. Para o desenvolvimento, ter um servidor assim daria
+                                                   // trabalho
+<span class="fc" id="L54">                .maxAge(7 * 24 * 60 * 60)</span>
+<span class="fc" id="L55">                .domain(domain)</span>
+<span class="fc" id="L56">                .build();</span>
+
+<span class="fc" id="L58">        ResponseCookie accessToken = ResponseCookie.from(&quot;accessToken&quot;, tokens.accessToken())</span>
+<span class="fc" id="L59">                .httpOnly(true)</span>
+<span class="fc" id="L60">                .secure(isProd)</span>
+<span class="fc" id="L61">                .path(&quot;/&quot;)</span>
+<span class="pc bpc" id="L62" title="1 of 2 branches missed.">                .sameSite(isProd ? &quot;None&quot; : &quot;Lax&quot;)</span>
+<span class="fc" id="L63">                .maxAge(15 * 60)</span>
+<span class="fc" id="L64">                .domain(domain)</span>
+<span class="fc" id="L65">                .build();</span>
+
+<span class="fc" id="L67">        response.addHeader(&quot;Set-Cookie&quot;, refreshCookie.toString());</span>
+<span class="fc" id="L68">        response.addHeader(&quot;Set-Cookie&quot;, accessToken.toString());</span>
+
+<span class="fc" id="L70">        return ResponseEntity.status(HttpStatus.OK).body(&quot;success&quot;);</span>
+
+    }
+
+    @PostMapping(&quot;/refresh&quot;)
+    public ResponseEntity&lt;String&gt; refresh(@CookieValue(name = &quot;refreshToken&quot;, required = false) String refreshToken,
+            HttpServletResponse response) {
+
+<span class="pc bpc" id="L78" title="1 of 2 branches missed.">        if (refreshToken == null) {</span>
+<span class="nc" id="L79">            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, &quot;Refresh token ausente&quot;);</span>
+        }
+
+<span class="fc" id="L82">        LoginResponse tokens = authService.refreshToken(refreshToken);</span>
+
+<span class="fc" id="L84">        ResponseCookie refreshCookie = ResponseCookie.from(&quot;refreshToken&quot;, tokens.refreshToken())</span>
+<span class="fc" id="L85">                .httpOnly(true)</span>
+<span class="fc" id="L86">                .secure(isProd)</span>
+<span class="fc" id="L87">                .path(&quot;/&quot;)</span>
+<span class="pc bpc" id="L88" title="1 of 2 branches missed.">                .sameSite(isProd ? &quot;None&quot; : &quot;Lax&quot;)</span>
+<span class="fc" id="L89">                .maxAge(7 * 24 * 60 * 60)</span>
+<span class="fc" id="L90">                .domain(domain)</span>
+<span class="fc" id="L91">                .build();</span>
+
+<span class="fc" id="L93">        ResponseCookie accessToken = ResponseCookie.from(&quot;accessToken&quot;, tokens.accessToken())</span>
+<span class="fc" id="L94">                .httpOnly(true)</span>
+<span class="fc" id="L95">                .secure(isProd)</span>
+<span class="fc" id="L96">                .path(&quot;/&quot;)</span>
+<span class="pc bpc" id="L97" title="1 of 2 branches missed.">                .sameSite(isProd ? &quot;None&quot; : &quot;Lax&quot;)</span>
+<span class="fc" id="L98">                .maxAge(15 * 60)</span>
+<span class="fc" id="L99">                .domain(domain)</span>
+<span class="fc" id="L100">                .build();</span>
+
+<span class="fc" id="L102">        response.addHeader(&quot;Set-Cookie&quot;, refreshCookie.toString());</span>
+<span class="fc" id="L103">        response.addHeader(&quot;Set-Cookie&quot;, accessToken.toString());</span>
+
+<span class="fc" id="L105">        return ResponseEntity.status(HttpStatus.OK).body(&quot;success&quot;);</span>
+    }
+
+    @DeleteMapping(&quot;/logout&quot;)
+    public ResponseEntity&lt;Void&gt; logout(@CookieValue(name = &quot;refreshToken&quot;, required = false) String refreshToken,
+            @CookieValue(name = &quot;accessToken&quot;, required = false) String accessToken, HttpServletResponse response) {
+
+<span class="fc" id="L112">        authService.logout(refreshToken);</span>
+
+<span class="fc" id="L114">        ResponseCookie accessTokenCookie = ResponseCookie.from(&quot;accessToken&quot;, &quot;&quot;)</span>
+<span class="fc" id="L115">                .httpOnly(true)</span>
+<span class="fc" id="L116">                .secure(isProd)</span>
+<span class="fc" id="L117">                .path(&quot;/&quot;)</span>
+<span class="pc bpc" id="L118" title="1 of 2 branches missed.">                .sameSite(isProd ? &quot;None&quot; : &quot;Lax&quot;)</span>
+<span class="fc" id="L119">                .maxAge(0)</span>
+<span class="fc" id="L120">                .domain(domain)</span>
+<span class="fc" id="L121">                .build();</span>
+
+<span class="fc" id="L123">        ResponseCookie refreshTokenCookie = ResponseCookie.from(&quot;refreshToken&quot;, &quot;&quot;)</span>
+<span class="fc" id="L124">                .httpOnly(true)</span>
+<span class="fc" id="L125">                .secure(isProd)</span>
+<span class="fc" id="L126">                .path(&quot;/&quot;)</span>
+<span class="pc bpc" id="L127" title="1 of 2 branches missed.">                .sameSite(isProd ? &quot;None&quot; : &quot;Lax&quot;)</span>
+<span class="fc" id="L128">                .maxAge(0)</span>
+<span class="fc" id="L129">                .domain(domain)</span>
+<span class="fc" id="L130">                .build();</span>
+
+<span class="fc" id="L132">        response.addHeader(&quot;Set-Cookie&quot;, accessTokenCookie.toString());</span>
+<span class="fc" id="L133">        response.addHeader(&quot;Set-Cookie&quot;, refreshTokenCookie.toString());</span>
+
+<span class="fc" id="L135">        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();</span>
+
+    }
+
+    @GetMapping(&quot;/test&quot;)
+    public String test() {
+<span class="nc" id="L141">        return &quot;ok&quot;;</span>
+    }
+
+    @GetMapping(&quot;/me&quot;)
+    public ResponseEntity&lt;MeUserResponseDTO&gt; me(@AuthenticationPrincipal UserDetails user) {
+
+<span class="fc" id="L147">        MeUserResponseDTO response = authService.me(user.getUsername());</span>
+
+<span class="fc" id="L149">        return ResponseEntity.status(HttpStatus.OK).body(response);</span>
+
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

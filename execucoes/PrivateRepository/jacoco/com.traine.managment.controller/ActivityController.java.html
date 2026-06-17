@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ActivityController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report"></a> &gt; <a href="index.source.html" class="el_package">com.traine.managment.controller</a> &gt; <span class="el_source">ActivityController.java</span></div><h1>ActivityController.java</h1><pre class="source lang-java linenums">package com.traine.managment.controller;
+
+import java.util.Set;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import jakarta.validation.Valid;
+
+import com.traine.managment.dto.activity.*;
+import com.traine.managment.enums.user.Role;
+import com.traine.managment.model.User;
+import com.traine.managment.service.ActivityService;
+
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+
+@RestController
+@RequestMapping(&quot;/activity&quot;)
+<span class="fc" id="L33">public class ActivityController {</span>
+
+    @Autowired
+    private ActivityService activityService;
+
+    @PostMapping
+    @PreAuthorize(&quot;hasAnyRole('MANAGMENT', 'ADMIN', 'ACTIVITY_MAKER')&quot;)
+    public ResponseEntity&lt;PostActivityResponseDTO&gt; createAnActivity(@RequestBody @Valid PostActivityRequestDTO body) {
+<span class="fc" id="L41">        PostActivityResponseDTO response = activityService</span>
+<span class="fc" id="L42">                .createAnActivityInsertIntoGoogleCalendarAndSendNotification(body);</span>
+<span class="fc" id="L43">        return ResponseEntity.status(HttpStatus.CREATED).body(response);</span>
+    }
+
+    @PatchMapping(&quot;/{id}&quot;)
+    @PreAuthorize(&quot;hasAnyRole('MANAGMENT', 'ADMIN', 'ACTIVITY_MAKER')&quot;)
+    public ResponseEntity&lt;PatchActivityResponseDTO&gt; patchAnActivity(@RequestBody @Valid PatchActivityRequestDTO body,
+            @PathVariable Long id) {
+<span class="fc" id="L50">        PatchActivityResponseDTO response = activityService.putNoticationAndUpdateGoogleCalendarAndSendNotification(id,</span>
+                body);
+<span class="fc" id="L52">        return ResponseEntity.status(HttpStatus.OK).body(response);</span>
+    }
+
+    @DeleteMapping(&quot;/{id}&quot;)
+    @PreAuthorize(&quot;hasAnyRole('MANAGMENT', 'ADMIN', 'ACTIVITY_MAKER')&quot;)
+    public ResponseEntity&lt;Void&gt; deleteAnActivity(@PathVariable Long id) {
+<span class="fc" id="L58">        activityService.delete(id);</span>
+<span class="fc" id="L59">        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();</span>
+    }
+
+    @GetMapping()
+    @PreAuthorize(&quot;hasAnyRole('MANAGMENT', 'ADMIN')&quot;)
+    public ResponseEntity&lt;Set&lt;GetActivityIParticipateResponseDTO&gt;&gt; getAll() {
+<span class="fc" id="L65">        Set&lt;GetActivityIParticipateResponseDTO&gt; activities = activityService.getAll();</span>
+<span class="fc" id="L66">        return ResponseEntity.status(HttpStatus.OK).body(activities);</span>
+    }
+
+    @GetMapping(&quot;/{id}&quot;)
+    @PreAuthorize(&quot;hasAnyRole('MANAGMENT', 'ADMIN', 'ACTIVITY_MAKER', 'TRAINEE')&quot;)
+    public ResponseEntity&lt;GetActivityResponseDTO&gt; getById(@PathVariable Long id,
+            @AuthenticationPrincipal UserDetails user) {
+<span class="fc" id="L73">        GetActivityResponseDTO activity = activityService.getById(user.getUsername(), id);</span>
+<span class="fc" id="L74">        return ResponseEntity.status(HttpStatus.OK).body(activity);</span>
+    }
+
+    @GetMapping(&quot;/i-participate&quot;)
+    public ResponseEntity&lt;Set&lt;GetActivityIParticipateResponseDTO&gt;&gt; getAllWichIParticipate(
+            @AuthenticationPrincipal UserDetails user) {
+<span class="fc" id="L80">        Set&lt;GetActivityIParticipateResponseDTO&gt; activities = activityService.getAllWichIParticipate(user.getUsername());</span>
+<span class="fc" id="L81">        return ResponseEntity.status(HttpStatus.OK).body(activities);</span>
+    }
+
+    @PatchMapping(&quot;/{id}/in_progress&quot;)
+    @PreAuthorize(&quot;hasRole('TRAINEE')&quot;)
+    public ResponseEntity&lt;PathActivityProgressResponseDTO&gt; makeAnActivityInProgress(
+            @AuthenticationPrincipal UserDetails user, @PathVariable Long id) {
+<span class="fc" id="L88">        PathActivityProgressResponseDTO progress = activityService.pathInProgress(user.getUsername(), id);</span>
+<span class="fc" id="L89">        return ResponseEntity.status(HttpStatus.OK).body(progress);</span>
+    }
+
+    @PatchMapping(&quot;/{id}/awating_evaluation&quot;)
+    @PreAuthorize(&quot;hasRole('TRAINEE')&quot;)
+    public ResponseEntity&lt;PathActivityProgressResponseDTO&gt; makeAnActivityAwaitEvaluation(
+            @AuthenticationPrincipal UserDetails user, @PathVariable Long id) {
+<span class="fc" id="L96">        PathActivityProgressResponseDTO progress = activityService.pathAwaitEvaluation(user.getUsername(), id);</span>
+<span class="fc" id="L97">        return ResponseEntity.status(HttpStatus.OK).body(progress);</span>
+    }
+
+    @PatchMapping(&quot;/{id}/evaluate&quot;)
+    @PreAuthorize(&quot;hasAnyRole('ACTIVITY_MAKER', 'MANAGMENT')&quot;)
+    public ResponseEntity&lt;PathActivityProgressResponseDTO&gt; evaluateActivity(
+            @AuthenticationPrincipal UserDetails user, @PathVariable Long id,
+            @RequestBody @Valid PatchEvaluateRequestDTO body) {
+
+<span class="fc" id="L106">        PathActivityProgressResponseDTO progress = activityService.evaluate(user.getUsername(), id, body);</span>
+<span class="fc" id="L107">        return ResponseEntity.status(HttpStatus.OK).body(progress);</span>
+    }
+
+    @PostMapping(&quot;/{id}/aux-files&quot;)
+    @PreAuthorize(&quot;hasAnyRole('ACTIVITY_MAKER', 'MANAGMENT')&quot;)
+    public ResponseEntity&lt;AddNewAuxFileResponse&gt; addAuxFiles(@AuthenticationPrincipal UserDetails user,
+            @PathVariable Long id, @RequestBody @Valid AddNewAuxFileRequest body) {
+<span class="fc" id="L114">        AddNewAuxFileResponse response = activityService.addAuxFiles(id, user.getUsername(), body);</span>
+<span class="fc" id="L115">        return ResponseEntity.ok().body(response);</span>
+    }
+
+    @DeleteMapping(&quot;/{id}/aux-files/{fileKey}&quot;)
+    @PreAuthorize(&quot;hasAnyRole('ACTIVITY_MAKER', 'MANAGMENT')&quot;)
+    public ResponseEntity&lt;AddNewAuxFileResponse&gt; deleteAuxFiles(@AuthenticationPrincipal UserDetails user,
+            @PathVariable Long id, @PathVariable String fileKey) {
+<span class="fc" id="L122">        activityService.deleteAuxFile(id, fileKey, user.getUsername());</span>
+<span class="fc" id="L123">        return ResponseEntity.noContent().build();</span>
+    }
+
+    @PostMapping(&quot;/{id}/answer-files&quot;)
+    @PreAuthorize(&quot;hasRole('TRAINEE')&quot;)
+    public ResponseEntity&lt;AddNewAnswerFileResponse&gt; addAnswerFiles(@AuthenticationPrincipal UserDetails user,
+            @PathVariable Long id, @RequestBody @Valid AddNewAnswerFileRequest body) {
+<span class="fc" id="L130">        AddNewAnswerFileResponse response = activityService.addAnswerFiles(id, user.getUsername(), body);</span>
+<span class="fc" id="L131">        return ResponseEntity.ok().body(response);</span>
+    }
+
+    @DeleteMapping(&quot;/{id}/answers-files/{fileKey}&quot;)
+    @PreAuthorize(&quot;hasRole('TRAINEE')&quot;)
+    public ResponseEntity&lt;AddNewAuxFileResponse&gt; deleteAnswerFiles(@AuthenticationPrincipal UserDetails user,
+            @PathVariable Long id, @PathVariable String fileKey) {
+<span class="fc" id="L138">        activityService.deleteAnswerFile(id, fileKey, user.getUsername());</span>
+<span class="fc" id="L139">        return ResponseEntity.noContent().build();</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>
