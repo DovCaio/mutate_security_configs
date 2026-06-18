@@ -64,13 +64,13 @@ To prevent interruptions caused by network failures or terminal timeouts, all ex
 
 The execution time of AutoMutSec was measured using the Linux `time` utility. The following command was executed:
 
-`\{ time java -jar target/mutate\_security\_configs-1.0-SNAPSHOT.jar <repository-path>; \} 2> time.txt`
+`{ time java -jar target/mutate_security_configs-1.0-SNAPSHOT.jar <repository-path>; } 2> time.txt`
 
-where `target/mutate\_security\_configs-1.0-SNAPSHOT.jar` corresponds to the compiled AutoMutSec artifact and `<repository-path>` is the path to the target repository. The execution time was recorded in the file `time.txt`.
+where `target/mutate_security_configs-1.0-SNAPSHOT.jar` corresponds to the compiled AutoMutSec artifact and `<repository-path>` is the path to the target repository. The execution time was recorded in the file `time.txt`.
 
 For comparison with PIT, the mutation analysis was executed using the following command:
 
-`\{ time mvn -Ppitest clean test org\.pitest\:pitest-maven:mutationCoverage\; \} 2> time.txt`
+`{ time mvn -Ppitest clean test org.pitest:pitest-maven:mutationCoverage; } 2> time.txt`
 
 The PIT dependency was added to each project before execution. The execution time was collected using the same procedure adopted for AutoMutSec.
 
