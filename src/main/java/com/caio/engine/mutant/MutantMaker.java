@@ -5,8 +5,11 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.caio.engine.mutant.detect_pattern.AbstractDetectPattern;
+import com.caio.engine.mutant.detect_pattern.DetectPattern;
+import com.caio.engine.mutant.detect_pattern.SimpleCasePattern;
+
 public class MutantMaker {
-    private final String regexSimpleCases = "(!?)(?:hasAuthority|hasRole)\\(['\"]([^'\"]+)['\"]\\)";
     private final String regexCompositeCases = "(!?)(?:hasAnyRole|hasAnyAuthority)\\s*\\(\\s*([^)]*)\\s*\\)";
 
     private final String regexPermitAll = "(?:permitAll())";
@@ -22,6 +25,8 @@ public class MutantMaker {
     private String value;
     private List<String> rolesAndAuthorities;
 
+    private List<DetectPattern> detectPatterns;
+
     public MutantMaker(String value, List<String> roles, List<String> authorities) {
 
         this.value = value;
@@ -30,12 +35,30 @@ public class MutantMaker {
         rolesAndAuthorities.addAll(roles);
         rolesAndAuthorities.addAll(authorities);
 
+        List<String> sameSecurityIdentifier = new ArrayList<>();
+        List<String> diffSecurityIdentifier = new ArrayList<>();
+
+        if (value.contains("hasRole") || value.contains("hasAnyRole")) {
+            sameSecurityIdentifier.addAll(roles);
+            diffSecurityIdentifier.addAll(authorities);
+
+        } else {
+            sameSecurityIdentifier.addAll(authorities);
+            diffSecurityIdentifier.addAll(roles);
+
+        }
+
+        detectPatterns.add(new SimpleCasePattern(value, sameSecurityIdentifier, diffSecurityIdentifier));
     }
 
     public List<String> genAllMutants() throws Exception {
         List<String> result = new ArrayList<>();
 
-        Pattern patternSimpleCase = Pattern.compile(regexSimpleCases);
+        detectPatterns.forEach(pattern -> {
+            pattern.execute().forEach(strategy -> result.add(strategy.make(value)));
+            ;
+        });
+
         Pattern patternCompostCase = Pattern.compile(regexCompositeCases);
         Pattern patternPermitAll = Pattern.compile(regexPermitAll);
         Pattern patternDenyAll = Pattern.compile(regexDenyAll);
@@ -44,7 +67,6 @@ public class MutantMaker {
         Pattern patternLogicalOperators = Pattern.compile(regexLogicalOperators);
         Pattern patternAllPredicates = Pattern.compile(regexAllPredicates);
 
-        Matcher matcherSimpleCase = patternSimpleCase.matcher(this.value);
         Matcher matcherCompostCase = patternCompostCase.matcher(this.value);
         Matcher matcherPermitAllCase = patternPermitAll.matcher(this.value);
         Matcher matcherDenyCase = patternDenyAll.matcher(this.value);
@@ -53,7 +75,6 @@ public class MutantMaker {
         Matcher matcherLogicalOperatorsCase = patternLogicalOperators.matcher(this.value);
         Matcher matcherAllPredicatesCase = patternAllPredicates.matcher(this.value);
 
-        boolean hasSimple = matcherSimpleCase.find();
         boolean hasCompost = matcherCompostCase.find();
         boolean hasPermitAll = matcherPermitAllCase.find();
         boolean hasDenyAll = matcherDenyCase.find();
@@ -77,10 +98,6 @@ public class MutantMaker {
             result.addAll(mutateLogicalOperators(matcherLogicalOperatorsCase));
         }
 
-        if (hasSimple) {
-            result.addAll(mutateSimpleValue(matcherSimpleCase));
-            result.add(removeInsideParentheses(matcherSimpleCase));
-        }
         if (hasCompost) {
             result.addAll(mutateCompositeValue(matcherCompostCase));
             result.add(removeInsideParentheses(matcherCompostCase));
@@ -104,18 +121,20 @@ public class MutantMaker {
             result.addAll(muteHasPermission(matcherHasPermissionCase));
         }
 
-        boolean hasAnyPattern = hasSimple ||
-                hasCompost ||
-                hasPermitAll ||
-                hasDenyAll ||
-                hasHasPermission ||
-                hasHasPermissionCustom ||
-                hasLogicalOperators;
-
-        if (!hasAnyPattern) {
-            result.add(wildcardMutation(value));
-
-        }
+        /*
+         * boolean hasAnyPattern = hasSimple ||
+         * hasCompost ||
+         * hasPermitAll ||
+         * hasDenyAll ||
+         * hasHasPermission ||
+         * hasHasPermissionCustom ||
+         * hasLogicalOperators;
+         * 
+         * if (!hasAnyPattern) {
+         * result.add(wildcardMutation(value));
+         * 
+         * }
+         */
 
         return result.stream().distinct().toList();
     }
@@ -163,27 +182,6 @@ public class MutantMaker {
         }
 
         return mutants;
-    }
-
-    private List<String> mutateSimpleValue(Matcher matcher) {
-        List<String> mutateOperators = new ArrayList<>();
-
-        String insideQuotes = matcher.group(2);
-        mutateOperators.add(value.replace(insideQuotes, "NO_" + insideQuotes));
-
-        if (value.contains("hasAuthority")) {
-            mutateOperators.add(value.replace("hasAuthority", "hasRole"));
-        } else if (value.contains("hasRole")) {
-            mutateOperators.add(value.replace("hasRole", "hasAuthority"));
-        }
-
-        for (String ra : rolesAndAuthorities) {
-            if (!insideQuotes.equals(ra)) {
-                mutateOperators.add(value.replace(insideQuotes, ra));
-            }
-        }
-
-        return mutateOperators;
     }
 
     private List<String> mutateCompositeValue(Matcher matcher) {
