@@ -6,12 +6,12 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.caio.engine.mutant.detect_pattern.CompositeCasePattern;
+import com.caio.engine.mutant.detect_pattern.DenyAllCase;
 import com.caio.engine.mutant.detect_pattern.DetectPattern;
+import com.caio.engine.mutant.detect_pattern.PermitAllCase;
 import com.caio.engine.mutant.detect_pattern.SimpleCasePattern;
 
 public class MutantMaker {
-
-    private final String regexDenyAll = "(?:denyAll)";
 
     private final String regexHasPermission = "(?<!\\.)hasPermission\\(([^)]*)\\)";
     private final String regexHasPermissionCustom = "@(\\w+)\\.hasPermission\\s*\\(\\s*([^)]*)\\)";
@@ -48,6 +48,8 @@ public class MutantMaker {
 
         detectPatterns.add(new SimpleCasePattern(value, sameSecurityIdentifier, diffSecurityIdentifier));
         detectPatterns.add(new CompositeCasePattern(value, sameSecurityIdentifier, diffSecurityIdentifier));
+        detectPatterns.add(new PermitAllCase(value));
+        detectPatterns.add(new DenyAllCase(value));
     }
 
     public List<String> genAllMutants() throws Exception {
@@ -58,19 +60,16 @@ public class MutantMaker {
             ;
         });
 
-        Pattern patternDenyAll = Pattern.compile(regexDenyAll);
         Pattern patternHasPermission = Pattern.compile(regexHasPermission);
         Pattern patternHasPermissionCustom = Pattern.compile(regexHasPermissionCustom);
         Pattern patternLogicalOperators = Pattern.compile(regexLogicalOperators);
         Pattern patternAllPredicates = Pattern.compile(regexAllPredicates);
 
-        Matcher matcherDenyCase = patternDenyAll.matcher(this.value);
         Matcher matcherHasPermissionCase = patternHasPermission.matcher(this.value);
         Matcher matcherHasPermissionCustomCase = patternHasPermissionCustom.matcher(this.value);
         Matcher matcherLogicalOperatorsCase = patternLogicalOperators.matcher(this.value);
         Matcher matcherAllPredicatesCase = patternAllPredicates.matcher(this.value);
 
-        boolean hasDenyAll = matcherDenyCase.find();
         boolean hasHasPermission = matcherHasPermissionCase.find();
         boolean hasHasPermissionCustom = matcherHasPermissionCustomCase.find();
         boolean hasLogicalOperators = matcherLogicalOperatorsCase.find();
@@ -81,23 +80,11 @@ public class MutantMaker {
             result.addAll(mutateNegation(matcherAllPredicatesCase));
         }
 
-        if (!hasDenyAll && !hasPermitAll) {
-            result.add("permitAll()");
-            result.add("denyAll");
-        }
-
         if (hasLogicalOperators) {
             matcherLogicalOperatorsCase.reset();
             result.addAll(mutateLogicalOperators(matcherLogicalOperatorsCase));
         }
 
-        if (hasPermitAll) {
-            result.addAll(mutePermitAll(matcherPermitAllCase));
-        }
-        if (hasDenyAll) {
-            result.addAll(muteDenyAll(matcherDenyCase));
-
-        }
         if (hasHasPermissionCustom) {
             matcherHasPermissionCustomCase.reset();
             result.addAll(muteHasPermissionCustom(matcherHasPermissionCustomCase));
@@ -169,57 +156,6 @@ public class MutantMaker {
         }
 
         return mutants;
-    }
-
-    private List<String> mutePermitAll(Matcher matcher) {
-
-        List<String> mutateOperators = new ArrayList<>();
-
-        mutateOperators.add("denyAll");
-
-        return mutateOperators;
-
-    }
-
-    private List<String> muteDenyAll(Matcher matcher) {
-
-        List<String> mutateOperators = new ArrayList<>();
-
-        mutateOperators.add("permitAll()");
-
-        return mutateOperators;
-
-    }
-
-    private String removeInsideParentheses(Matcher matcher) {
-        String str = matcher.group(0);
-        String mutant = str.replaceAll("\\(([^)]*)\\)", "(\'\')");
-        return mutant;
-    }
-
-    private List<String> alterIntoQuantitiesOfParamsAndWhichParams(Matcher matcher) {
-
-        List<String> ra = matcher.group(2) != null ? List.of(matcher.group(2).split(",")) : new ArrayList<>();
-
-        List<String> result = new ArrayList<>();
-
-        for (int i = 0; i < ra.size(); i++) {
-            StringBuilder sb = new StringBuilder();
-            for (int j = 0; j < ra.size(); j++) {
-                if (i != j) {
-                    if (sb.length() > 0) {
-                        sb.append(", ");
-                    }
-                    sb.append(ra.get(j));
-                }
-            }
-            String mutatedInsideQuotes = sb.toString();
-            String fullExpression = matcher.group(0);
-            String mutatedExpression = fullExpression.replace(matcher.group(2), mutatedInsideQuotes);
-            result.add(mutatedExpression);
-        }
-
-        return result;
     }
 
     private List<String> muteHasPermission(Matcher matcher) {
