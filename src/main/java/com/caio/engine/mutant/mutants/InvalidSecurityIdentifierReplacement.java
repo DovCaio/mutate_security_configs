@@ -18,7 +18,23 @@ public class InvalidSecurityIdentifierReplacement implements MutantStrategy {
         List<String> mutateOperators = new ArrayList<>();
 
         String[] expressions = insideQuotes.split(",");
+        if (value.contains("hasPermission")) {
+            mutatenOnlyPermission(expressions, mutateOperators, value);
+        } else {
+            mutateEachParam(expressions, mutateOperators);
+        }
 
+        return mutateOperators;
+    }
+
+    private void mutatenOnlyPermission(String[] args, List<String> mutateOperators, String value) {
+        if (args.length < 3)
+            throw new Error("Não é uma hasPermission válida.");
+
+        mutateOperators.add(value.replace(args[2], "NO_" + args[2]));
+    }
+
+    private void mutateEachParam(String[] expressions, List<String> mutateOperators) {
         for (int i = 0; i < expressions.length; i++) {
             String[] mutatedExpressions = expressions.clone();
 
@@ -34,8 +50,6 @@ public class InvalidSecurityIdentifierReplacement implements MutantStrategy {
 
             mutateOperators.add(mutatedExpression);
         }
-
-        return mutateOperators;
     }
 
 }
