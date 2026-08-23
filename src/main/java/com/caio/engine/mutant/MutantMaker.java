@@ -11,7 +11,6 @@ import com.caio.engine.mutant.detect_pattern.SimpleCasePattern;
 
 public class MutantMaker {
 
-    private final String regexPermitAll = "(?:permitAll())";
     private final String regexDenyAll = "(?:denyAll)";
 
     private final String regexHasPermission = "(?<!\\.)hasPermission\\(([^)]*)\\)";
@@ -59,21 +58,18 @@ public class MutantMaker {
             ;
         });
 
-        Pattern patternPermitAll = Pattern.compile(regexPermitAll);
         Pattern patternDenyAll = Pattern.compile(regexDenyAll);
         Pattern patternHasPermission = Pattern.compile(regexHasPermission);
         Pattern patternHasPermissionCustom = Pattern.compile(regexHasPermissionCustom);
         Pattern patternLogicalOperators = Pattern.compile(regexLogicalOperators);
         Pattern patternAllPredicates = Pattern.compile(regexAllPredicates);
 
-        Matcher matcherPermitAllCase = patternPermitAll.matcher(this.value);
         Matcher matcherDenyCase = patternDenyAll.matcher(this.value);
         Matcher matcherHasPermissionCase = patternHasPermission.matcher(this.value);
         Matcher matcherHasPermissionCustomCase = patternHasPermissionCustom.matcher(this.value);
         Matcher matcherLogicalOperatorsCase = patternLogicalOperators.matcher(this.value);
         Matcher matcherAllPredicatesCase = patternAllPredicates.matcher(this.value);
 
-        boolean hasPermitAll = matcherPermitAllCase.find();
         boolean hasDenyAll = matcherDenyCase.find();
         boolean hasHasPermission = matcherHasPermissionCase.find();
         boolean hasHasPermissionCustom = matcherHasPermissionCustomCase.find();
@@ -95,12 +91,6 @@ public class MutantMaker {
             result.addAll(mutateLogicalOperators(matcherLogicalOperatorsCase));
         }
 
-        // if (hasCompost) {
-        // result.addAll(mutateCompositeValue(matcherCompostCase));
-        // result.add(removeInsideParentheses(matcherCompostCase));
-        // result.addAll(alterIntoQuantitiesOfParamsAndWhichParams(matcherCompostCase));
-
-        // }
         if (hasPermitAll) {
             result.addAll(mutePermitAll(matcherPermitAllCase));
         }
@@ -179,57 +169,6 @@ public class MutantMaker {
         }
 
         return mutants;
-    }
-
-    private List<String> mutateCompositeValue(Matcher matcher) {
-        List<String> mutateOperators = new ArrayList<>();
-
-        String fullExpression = matcher.group(0); // hasAnyRole("User", "Admin", "Guest")
-        String insideQuotes = matcher.group(2); // "User", "Admin", "Guest"
-
-        // mutateOperators.addAll(swapAuthenticationMethod(fullExpression));
-        // mutateOperators.addAll(addNewRoleOrAuthority(fullExpression, insideQuotes));
-        // mutateOperators.addAll(mutateEachValue(fullExpression, insideQuotes));
-
-        return mutateOperators;
-    }
-
-    private List<String> addNewRoleOrAuthority(String fullExpression, String insideQuotes) {
-        List<String> mutateOperators = new ArrayList<>();
-
-        for (String ra : rolesAndAuthorities) {
-            if (!insideQuotes.contains(ra)) {
-                String mutatedInsideQuotes = insideQuotes + ", " + "'" + ra + "'";
-                String mutatedExpression = fullExpression.replace(insideQuotes, mutatedInsideQuotes);
-                mutateOperators.add(mutatedExpression);
-            }
-        }
-
-        return mutateOperators;
-    }
-
-    private List<String> mutateEachValue(String fullExpression, String insideQuotes) {
-        List<String> mutateOperators = new ArrayList<>();
-
-        String[] values = insideQuotes.split(",");
-
-        for (int i = 0; i < values.length; i++) {
-            String[] mutatedValues = values.clone();
-
-            String value = values[i].trim();
-            String mutatedValue = value.startsWith("NO_")
-                    ? "" + value.substring(4)
-                    : value.substring(0, 1) + "NO_" + value.substring(1);
-
-            mutatedValues[i] = mutatedValue;
-
-            String mutatedInsideQuotes = String.join(", ", mutatedValues);
-            String mutatedExpression = fullExpression.replace(insideQuotes, mutatedInsideQuotes);
-
-            mutateOperators.add(mutatedExpression);
-        }
-
-        return mutateOperators;
     }
 
     private List<String> mutePermitAll(Matcher matcher) {
