@@ -5,12 +5,11 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.caio.engine.mutant.detect_pattern.AbstractDetectPattern;
+import com.caio.engine.mutant.detect_pattern.CompositeCasePattern;
 import com.caio.engine.mutant.detect_pattern.DetectPattern;
 import com.caio.engine.mutant.detect_pattern.SimpleCasePattern;
 
 public class MutantMaker {
-    private final String regexCompositeCases = "(!?)(?:hasAnyRole|hasAnyAuthority)\\s*\\(\\s*([^)]*)\\s*\\)";
 
     private final String regexPermitAll = "(?:permitAll())";
     private final String regexDenyAll = "(?:denyAll)";
@@ -49,17 +48,17 @@ public class MutantMaker {
         }
 
         detectPatterns.add(new SimpleCasePattern(value, sameSecurityIdentifier, diffSecurityIdentifier));
+        detectPatterns.add(new CompositeCasePattern(value, sameSecurityIdentifier, diffSecurityIdentifier));
     }
 
     public List<String> genAllMutants() throws Exception {
         List<String> result = new ArrayList<>();
 
         detectPatterns.forEach(pattern -> {
-            pattern.execute().forEach(strategy -> result.add(strategy.make(value)));
+            pattern.execute().forEach(strategy -> result.addAll(strategy.make(value)));
             ;
         });
 
-        Pattern patternCompostCase = Pattern.compile(regexCompositeCases);
         Pattern patternPermitAll = Pattern.compile(regexPermitAll);
         Pattern patternDenyAll = Pattern.compile(regexDenyAll);
         Pattern patternHasPermission = Pattern.compile(regexHasPermission);
@@ -67,7 +66,6 @@ public class MutantMaker {
         Pattern patternLogicalOperators = Pattern.compile(regexLogicalOperators);
         Pattern patternAllPredicates = Pattern.compile(regexAllPredicates);
 
-        Matcher matcherCompostCase = patternCompostCase.matcher(this.value);
         Matcher matcherPermitAllCase = patternPermitAll.matcher(this.value);
         Matcher matcherDenyCase = patternDenyAll.matcher(this.value);
         Matcher matcherHasPermissionCase = patternHasPermission.matcher(this.value);
@@ -75,7 +73,6 @@ public class MutantMaker {
         Matcher matcherLogicalOperatorsCase = patternLogicalOperators.matcher(this.value);
         Matcher matcherAllPredicatesCase = patternAllPredicates.matcher(this.value);
 
-        boolean hasCompost = matcherCompostCase.find();
         boolean hasPermitAll = matcherPermitAllCase.find();
         boolean hasDenyAll = matcherDenyCase.find();
         boolean hasHasPermission = matcherHasPermissionCase.find();
@@ -98,12 +95,12 @@ public class MutantMaker {
             result.addAll(mutateLogicalOperators(matcherLogicalOperatorsCase));
         }
 
-        if (hasCompost) {
-            result.addAll(mutateCompositeValue(matcherCompostCase));
-            result.add(removeInsideParentheses(matcherCompostCase));
-            result.addAll(alterIntoQuantitiesOfParamsAndWhichParams(matcherCompostCase));
+        // if (hasCompost) {
+        // result.addAll(mutateCompositeValue(matcherCompostCase));
+        // result.add(removeInsideParentheses(matcherCompostCase));
+        // result.addAll(alterIntoQuantitiesOfParamsAndWhichParams(matcherCompostCase));
 
-        }
+        // }
         if (hasPermitAll) {
             result.addAll(mutePermitAll(matcherPermitAllCase));
         }
@@ -190,21 +187,9 @@ public class MutantMaker {
         String fullExpression = matcher.group(0); // hasAnyRole("User", "Admin", "Guest")
         String insideQuotes = matcher.group(2); // "User", "Admin", "Guest"
 
-        mutateOperators.addAll(swapAuthenticationMethod(fullExpression));
-        mutateOperators.addAll(addNewRoleOrAuthority(fullExpression, insideQuotes));
-        mutateOperators.addAll(mutateEachValue(fullExpression, insideQuotes));
-
-        return mutateOperators;
-    }
-
-    private List<String> swapAuthenticationMethod(String fullExpression) {
-        List<String> mutateOperators = new ArrayList<>();
-
-        if (fullExpression.contains("hasAnyAuthority")) {
-            mutateOperators.add(fullExpression.replace("hasAnyAuthority", "hasAnyRole"));
-        } else if (fullExpression.contains("hasAnyRole")) {
-            mutateOperators.add(fullExpression.replace("hasAnyRole", "hasAnyAuthority"));
-        }
+        // mutateOperators.addAll(swapAuthenticationMethod(fullExpression));
+        // mutateOperators.addAll(addNewRoleOrAuthority(fullExpression, insideQuotes));
+        // mutateOperators.addAll(mutateEachValue(fullExpression, insideQuotes));
 
         return mutateOperators;
     }

@@ -1,16 +1,23 @@
 package com.caio.engine.mutant.mutants;
 
-import java.util.regex.Matcher;
+import java.util.ArrayList;
+import java.util.List;
 
 public class SecurityExpressionTypeReplacement implements MutantStrategy {
 
     @Override
-    public String make(String value) {
+    public List<String> make(String value) {
+        List<String> mutant = new ArrayList<>();
 
         if (value.contains("hasAuthority")) {
-            return value.replace("hasAuthority", "hasRole");
+            mutant.add(value.replace("hasAuthority", "hasRole"));
+        } else if (value.contains("hasRole")) {
+            mutant.add(value.replace("hasRole", "hasAuthority"));
+        } else if (value.contains("hasAnyAuthority")) {
+            mutant.add(value.replace("hasAnyAuthority", "hasAnyRole"));
         }
-        return value.replace("hasRole", "hasAuthority");
+        mutant.add(value.replace("hasAnyRole", "hasAnyAuthority"));
+        return mutant;
 
     }
 
