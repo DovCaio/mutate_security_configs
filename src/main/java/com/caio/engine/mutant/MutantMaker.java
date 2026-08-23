@@ -8,6 +8,7 @@ import java.util.regex.Pattern;
 import com.caio.engine.mutant.detect_pattern.CompositeCasePattern;
 import com.caio.engine.mutant.detect_pattern.DenyAllCase;
 import com.caio.engine.mutant.detect_pattern.DetectPattern;
+import com.caio.engine.mutant.detect_pattern.LogicalCase;
 import com.caio.engine.mutant.detect_pattern.PermitAllCase;
 import com.caio.engine.mutant.detect_pattern.SimpleCasePattern;
 
@@ -15,8 +16,6 @@ public class MutantMaker {
 
     private final String regexHasPermission = "(?<!\\.)hasPermission\\(([^)]*)\\)";
     private final String regexHasPermissionCustom = "@(\\w+)\\.hasPermission\\s*\\(\\s*([^)]*)\\)";
-
-    private final String regexLogicalOperators = "\\b(and|or)\\b";
 
     private final String regexAllPredicates = "(!?)(hasRole\\([^)]*\\)|hasAuthority\\([^)]*\\)|hasAnyRole\\([^)]*\\)|hasAnyAuthority\\([^)]*\\)|hasPermission\\([^)]*\\)|@\\w+\\.hasPermission\\([^)]*\\))";
 
@@ -50,6 +49,7 @@ public class MutantMaker {
         detectPatterns.add(new CompositeCasePattern(value, sameSecurityIdentifier, diffSecurityIdentifier));
         detectPatterns.add(new PermitAllCase(value));
         detectPatterns.add(new DenyAllCase(value));
+        detectPatterns.add(new LogicalCase(value));
     }
 
     public List<String> genAllMutants() throws Exception {
@@ -62,12 +62,10 @@ public class MutantMaker {
 
         Pattern patternHasPermission = Pattern.compile(regexHasPermission);
         Pattern patternHasPermissionCustom = Pattern.compile(regexHasPermissionCustom);
-        Pattern patternLogicalOperators = Pattern.compile(regexLogicalOperators);
         Pattern patternAllPredicates = Pattern.compile(regexAllPredicates);
 
         Matcher matcherHasPermissionCase = patternHasPermission.matcher(this.value);
         Matcher matcherHasPermissionCustomCase = patternHasPermissionCustom.matcher(this.value);
-        Matcher matcherLogicalOperatorsCase = patternLogicalOperators.matcher(this.value);
         Matcher matcherAllPredicatesCase = patternAllPredicates.matcher(this.value);
 
         boolean hasHasPermission = matcherHasPermissionCase.find();
