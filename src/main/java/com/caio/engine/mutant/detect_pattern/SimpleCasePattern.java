@@ -14,14 +14,13 @@ public class SimpleCasePattern extends AbstractDetectPattern implements DetectPa
 
     private List<String> sameSecurityIdentifier;
     private List<String> diffSecurityIdentifier;
-    private String insideQuotes;
 
     public SimpleCasePattern(String target, List<String> sameSecurityIdentifier,
             List<String> diffSecurityIdentifier) {
         super("(!?)(?:hasAuthority|hasRole)\\(['\"]([^'\"]+)['\"]\\)", target);
         this.sameSecurityIdentifier = sameSecurityIdentifier;
         this.diffSecurityIdentifier = diffSecurityIdentifier;
-        this.insideQuotes = getGroup(2);
+
     }
 
     @Override
@@ -29,6 +28,7 @@ public class SimpleCasePattern extends AbstractDetectPattern implements DetectPa
         if (!this.detect()) {
             return new ArrayList<MutantStrategy>();
         }
+        String insideQuotes = getGroup(2);
 
         addMutantStrategy(new InvalidSecurityIdentifierReplacement(getMatcher()));
         addMutantStrategy(new SecurityExpressionTypeReplacement());

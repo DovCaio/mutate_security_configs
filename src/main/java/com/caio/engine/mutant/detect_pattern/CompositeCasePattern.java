@@ -3,6 +3,7 @@ package com.caio.engine.mutant.detect_pattern;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.caio.engine.mutant.mutants.AuthorizationParameterReductionOperator;
 import com.caio.engine.mutant.mutants.AuthorizationReplacementOperator;
 import com.caio.engine.mutant.mutants.EmptyAuthorizationArgumentOperator;
 import com.caio.engine.mutant.mutants.InvalidSecurityIdentifierReplacement;
@@ -14,14 +15,13 @@ public class CompositeCasePattern extends AbstractDetectPattern implements Detec
 
     private List<String> sameSecurityIdentifier;
     private List<String> diffSecurityIdentifier;
-    private String insideQuotes;
 
     public CompositeCasePattern(String target, List<String> sameSecurityIdentifier,
             List<String> diffSecurityIdentifier) {
         super("(!?)(?:hasAnyRole|hasAnyAuthority)\\s*\\(\\s*([^)]*)\\s*\\)", target);
         this.sameSecurityIdentifier = sameSecurityIdentifier;
         this.diffSecurityIdentifier = diffSecurityIdentifier;
-        this.insideQuotes = getGroup(2);
+
     }
 
     @Override
@@ -29,11 +29,14 @@ public class CompositeCasePattern extends AbstractDetectPattern implements Detec
         if (!this.detect()) {
             return new ArrayList<MutantStrategy>();
         }
+        String insideQuotes = getGroup(2);
         addMutantStrategy(new SecurityExpressionTypeReplacement());
         addMutantStrategy(new AuthorizationReplacementOperator(getMatcher(), sameSecurityIdentifier));
         addMutantStrategy(new SecurityIdentifierTypeReplacement(insideQuotes, diffSecurityIdentifier));
         addMutantStrategy(new InvalidSecurityIdentifierReplacement(getMatcher()));
         addMutantStrategy(new EmptyAuthorizationArgumentOperator());
+        addMutantStrategy(new AuthorizationParameterReductionOperator(insideQuotes));
+
         return getMutantStrategies();
     }
 

@@ -100,7 +100,7 @@ class MutantMakerTest {
 
         List<String> mutants = m.genAllMutants();
 
-        assertEquals(mutants.size(), 11);
+        assertEquals(11, mutants.size());
         assertTrue(mutants.contains("permitAll()"));
         assertTrue(mutants.contains("denyAll"));
         assertTrue(mutants.contains("hasAnyAuthority('ADMIN','USER')"));
@@ -145,10 +145,10 @@ class MutantMakerTest {
 
         List<String> mutants = m.genAllMutants();
 
-        assertEquals(mutants.size(), 11);
+        assertEquals(11, mutants.size());
         assertTrue(mutants.contains("hasAnyRole('READ','WRITE')"));
-        assertTrue(mutants.contains("!hasAnyAuthority('READ','WRITE')"));
         assertTrue(mutants.contains("hasAnyAuthority('NO_READ', 'WRITE')"));
+        assertTrue(mutants.contains("!hasAnyAuthority('READ','WRITE')"));
         assertTrue(mutants.contains("hasAnyAuthority('READ', 'NO_WRITE')"));
         assertTrue(mutants.contains("permitAll()"));
         assertTrue(mutants.contains("denyAll"));

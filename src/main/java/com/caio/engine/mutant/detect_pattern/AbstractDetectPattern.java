@@ -22,6 +22,7 @@ public class AbstractDetectPattern {
     }
 
     public boolean detect() {
+        this.matcher.reset();
         return this.matcher.find();
     }
 
