@@ -13,7 +13,12 @@ public class AuthorizationParameterReductionOperator implements MutantStrategy {
 
     @Override
     public List<String> make(String value) {
-        List<String> ra = insideQuotes != null ? List.of(insideQuotes.split(",")) : new ArrayList<>();
+        List<String> ra = insideQuotes != null
+                ? List.of(insideQuotes.split(","))
+                        .stream()
+                        .map(String::trim)
+                        .toList()
+                : new ArrayList<>();
 
         List<String> result = new ArrayList<>();
 

@@ -15,8 +15,8 @@ public class AuthorizationReplacementOperator implements MutantStrategy {
         this.roleOrAuthority = roleOrAuthority;
     }
 
-    public AuthorizationReplacementOperator(Matcher matcher, List<String> rolesOrAuthorities) {
-        this.insideQuotes = matcher.group(2);
+    public AuthorizationReplacementOperator(String insideQuotes, List<String> rolesOrAuthorities) {
+        this.insideQuotes = insideQuotes;
         this.rolesOrAuthorities = rolesOrAuthorities;
     }
 

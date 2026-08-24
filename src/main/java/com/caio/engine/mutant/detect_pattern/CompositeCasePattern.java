@@ -31,7 +31,7 @@ public class CompositeCasePattern extends AbstractDetectPattern implements Detec
         }
         String insideQuotes = getGroup(2);
         addMutantStrategy(new SecurityExpressionTypeReplacement());
-        addMutantStrategy(new AuthorizationReplacementOperator(getMatcher(), sameSecurityIdentifier));
+        addMutantStrategy(new AuthorizationReplacementOperator(insideQuotes, sameSecurityIdentifier));
         addMutantStrategy(new SecurityIdentifierTypeReplacement(insideQuotes, diffSecurityIdentifier));
         addMutantStrategy(new InvalidSecurityIdentifierReplacement(getMatcher()));
         addMutantStrategy(new EmptyAuthorizationArgumentOperator());
