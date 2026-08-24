@@ -6,10 +6,10 @@ import java.util.List;
 import com.caio.engine.mutant.mutants.InvalidSecurityIdentifierReplacement;
 import com.caio.engine.mutant.mutants.MutantStrategy;
 
-public class HasPermissionPattern extends AbstractDetectPattern implements DetectPattern {
+public class HasPermissionCustomPattern extends AbstractDetectPattern implements DetectPattern {
 
-    public HasPermissionPattern(String target) {
-        super("(?<!\\\\.)hasPermission\\\\(([^)]*)\\\\)", target);
+    public HasPermissionCustomPattern(String target) {
+        super("@(\\\\w+)\\\\.hasPermission\\\\s*\\\\(\\\\s*([^)]*)\\\\)", target);
         addMutantStrategy(new InvalidSecurityIdentifierReplacement(getMatcher()));
     }
 
@@ -20,5 +20,4 @@ public class HasPermissionPattern extends AbstractDetectPattern implements Detec
         }
         return new ArrayList<MutantStrategy>();
     }
-
 }

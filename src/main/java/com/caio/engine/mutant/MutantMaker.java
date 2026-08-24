@@ -9,14 +9,13 @@ import com.caio.engine.mutant.detect_pattern.AllPredicatesCasePattern;
 import com.caio.engine.mutant.detect_pattern.CompositeCasePattern;
 import com.caio.engine.mutant.detect_pattern.DenyAllCase;
 import com.caio.engine.mutant.detect_pattern.DetectPattern;
+import com.caio.engine.mutant.detect_pattern.HasPermissionCustomPattern;
 import com.caio.engine.mutant.detect_pattern.HasPermissionPattern;
 import com.caio.engine.mutant.detect_pattern.LogicalCase;
 import com.caio.engine.mutant.detect_pattern.PermitAllCase;
 import com.caio.engine.mutant.detect_pattern.SimpleCasePattern;
 
 public class MutantMaker {
-
-    private final String regexHasPermissionCustom = "@(\\w+)\\.hasPermission\\s*\\(\\s*([^)]*)\\)";
 
     private String value;
     private List<String> rolesAndAuthorities;
@@ -51,6 +50,7 @@ public class MutantMaker {
         detectPatterns.add(new LogicalCase(value));
         detectPatterns.add(new HasPermissionPattern(value));
         detectPatterns.add(new AllPredicatesCasePattern(value));
+        detectPatterns.add(new HasPermissionCustomPattern(value));
     }
 
     public List<String> genAllMutants() throws Exception {
@@ -60,12 +60,6 @@ public class MutantMaker {
             pattern.execute().forEach(strategy -> result.addAll(strategy.make(value)));
             ;
         });
-
-        Pattern patternHasPermissionCustom = Pattern.compile(regexHasPermissionCustom);
-
-        Matcher matcherHasPermissionCustomCase = patternHasPermissionCustom.matcher(this.value);
-
-        boolean hasHasPermissionCustom = matcherHasPermissionCustomCase.find();
 
         if (hasHasPermissionCustom) {
             matcherHasPermissionCustomCase.reset();
@@ -88,30 +82,6 @@ public class MutantMaker {
          */
 
         return result.stream().distinct().toList();
-    }
-
-    private List<String> muteHasPermissionCustom(Matcher matcher) {
-
-        List<String> mutants = new ArrayList<>();
-
-        while (matcher.find()) {
-
-            String beanName = matcher.group(1);
-            String params = matcher.group(2);
-
-            String mutatedParams = params.replaceAll("'([^']+)'", "'MUTATED_$1'");
-            mutants.add(
-                    value.substring(0, matcher.start()) +
-                            "@" + beanName + ".hasPermission(" + mutatedParams + ")" +
-                            value.substring(matcher.end()));
-
-            mutants.add(
-                    value.substring(0, matcher.start()) +
-                            "@" + beanName + ".hasPermition(" + params + ")" +
-                            value.substring(matcher.end()));
-        }
-
-        return mutants;
     }
 
     private String wildcardMutation(String str) {

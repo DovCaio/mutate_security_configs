@@ -7,8 +7,10 @@ import java.util.regex.Matcher;
 public class InvalidSecurityIdentifierReplacement implements MutantStrategy {
 
     private String insideQuotes;
+    private Matcher matcher;
 
     public InvalidSecurityIdentifierReplacement(Matcher matcher) {
+        this.matcher = matcher;
         this.insideQuotes = matcher.group(2);
     }
 
@@ -18,7 +20,9 @@ public class InvalidSecurityIdentifierReplacement implements MutantStrategy {
         List<String> mutateOperators = new ArrayList<>();
 
         String[] expressions = insideQuotes.split(",");
-        if (value.contains("hasPermission")) {
+        if (value.contains("hasPermission") && value.contains("@")) {
+            mutateCustomHasPermission(mutateOperators, value);
+        } else if (value.contains("hasPermission")) {
             mutatenOnlyPermission(expressions, mutateOperators, value);
         } else {
             mutateEachParam(expressions, mutateOperators);
@@ -50,6 +54,27 @@ public class InvalidSecurityIdentifierReplacement implements MutantStrategy {
 
             mutateOperators.add(mutatedExpression);
         }
+    }
+
+    private void mutateCustomHasPermission(List<String> mutateOperators, String value) {
+
+        while (matcher.find()) {
+
+            String beanName = matcher.group(1);
+            String params = matcher.group(2);
+
+            String mutatedParams = params.replaceAll("'([^']+)'", "'MUTATED_$1'");
+            mutateOperators.add(
+                    value.substring(0, matcher.start()) +
+                            "@" + beanName + ".hasPermission(" + mutatedParams + ")" +
+                            value.substring(matcher.end()));
+
+            mutateOperators.add(
+                    value.substring(0, matcher.start()) +
+                            "@" + beanName + ".hasPermition(" + params + ")" +
+                            value.substring(matcher.end()));
+        }
+
     }
 
 }
