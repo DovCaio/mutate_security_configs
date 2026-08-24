@@ -2,14 +2,13 @@ package com.caio.engine.mutant.mutants;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
 
 public class AuthorizationParameterReductionOperator implements MutantStrategy {
 
     private String insideQuotes;
 
-    public AuthorizationParameterReductionOperator(Matcher matcher) {
-        this.insideQuotes = matcher.group(2);
+    public AuthorizationParameterReductionOperator(String insideQuotes) {
+        this.insideQuotes = insideQuotes;
     }
 
     @Override

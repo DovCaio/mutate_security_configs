@@ -7,8 +7,6 @@ public class DenyAllReplacementOperator implements MutantStrategy {
 
     @Override
     public List<String> make(String value) {
-        return new ArrayList<>(List.of("denyAll"));
-
+        return List.of("denyAll");
     }
-
 }

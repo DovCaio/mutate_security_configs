@@ -22,7 +22,7 @@ public class AbstractDetectPattern {
     }
 
     public boolean detect() {
-        return matcher.find();
+        return this.matcher.find();
     }
 
     public void addMutantStrategy(MutantStrategy mutantStrategy) {
@@ -31,11 +31,13 @@ public class AbstractDetectPattern {
 
     public List<MutantStrategy> getMutantStrategies() {
         return mutantStrategies;
-
     }
 
     public Matcher getMatcher() {
         return matcher;
     }
 
+    public String getGroup(int group) {
+        return matcher.group(group);
+    }
 }

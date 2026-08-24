@@ -9,15 +9,15 @@ import com.caio.engine.mutant.mutants.MutantStrategy;
 public class HasPermissionCustomPattern extends AbstractDetectPattern implements DetectPattern {
 
     public HasPermissionCustomPattern(String target) {
-        super("@(\\\\w+)\\\\.hasPermission\\\\s*\\\\(\\\\s*([^)]*)\\\\)", target);
-        addMutantStrategy(new InvalidSecurityIdentifierReplacement(getMatcher()));
+        super("@(\\w+)\\.hasPermission\\s*\\(\\s*([^)]*)\\)", target);
     }
 
     @Override
     public List<MutantStrategy> execute() {
-        if (this.detect()) {
-            return getMutantStrategies();
+        if (!this.detect()) {
+            return new ArrayList<MutantStrategy>();
         }
-        return new ArrayList<MutantStrategy>();
+        addMutantStrategy(new InvalidSecurityIdentifierReplacement(getMatcher()));
+        return getMutantStrategies();
     }
 }

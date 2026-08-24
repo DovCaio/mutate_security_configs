@@ -10,8 +10,8 @@ public class AuthorizationReplacementOperator implements MutantStrategy {
     private String roleOrAuthority;
     private List<String> rolesOrAuthorities;
 
-    public AuthorizationReplacementOperator(Matcher matcher, String roleOrAuthority) {
-        this.insideQuotes = matcher.group(2);
+    public AuthorizationReplacementOperator(String insideQuotes, String roleOrAuthority) {
+        this.insideQuotes = insideQuotes;
         this.roleOrAuthority = roleOrAuthority;
     }
 
@@ -35,7 +35,7 @@ public class AuthorizationReplacementOperator implements MutantStrategy {
                 }
             }
         } else {
-            throw new Error("Invalid initiation!");
+            throw new IllegalStateException("AuthorizationReplacementOperator was not properly initialized");
         }
 
         return mutateOperators;

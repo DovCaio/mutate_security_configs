@@ -12,13 +12,13 @@ public class SecurityIdentifierTypeReplacement implements MutantStrategy { // fa
     private String roleOrAuthority;
     private List<String> rolesOrAuthorities;
 
-    public SecurityIdentifierTypeReplacement(Matcher matcher, String roleOrAuthority) {
-        this.insideQuotes = matcher.group(2);
+    public SecurityIdentifierTypeReplacement(String insideQuotes, String roleOrAuthority) {
+        this.insideQuotes = insideQuotes;
         this.roleOrAuthority = roleOrAuthority;
     }
 
-    public SecurityIdentifierTypeReplacement(Matcher matcher, List<String> rolesOrAuthorities) {
-        this.insideQuotes = matcher.group(2);
+    public SecurityIdentifierTypeReplacement(String insideQuotes, List<String> rolesOrAuthorities) {
+        this.insideQuotes = insideQuotes;
         this.rolesOrAuthorities = rolesOrAuthorities;
     }
 

@@ -11,7 +11,10 @@ public class InvalidSecurityIdentifierReplacement implements MutantStrategy {
 
     public InvalidSecurityIdentifierReplacement(Matcher matcher) {
         this.matcher = matcher;
-        this.insideQuotes = matcher.group(2);
+        this.insideQuotes = matcher.group(1);
+        if (matcher.groupCount() >= 2) {
+            this.insideQuotes = matcher.group(2);
+        }
     }
 
     @Override
@@ -61,7 +64,7 @@ public class InvalidSecurityIdentifierReplacement implements MutantStrategy {
         while (matcher.find()) {
 
             String beanName = matcher.group(1);
-            String params = matcher.group(2);
+            String params = insideQuotes;
 
             String mutatedParams = params.replaceAll("'([^']+)'", "'MUTATED_$1'");
             mutateOperators.add(

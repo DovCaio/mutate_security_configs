@@ -11,14 +11,15 @@ public class PermitAllCase extends AbstractDetectPattern implements DetectPatter
 
     public PermitAllCase(String target) {
         super("(?:permitAll())", target);
-        addMutantStrategy(new DenyAllReplacementOperator());
+
     }
 
     @Override
     public List<MutantStrategy> execute() {
-        if (detect()) {
-            return getMutantStrategies();
+        if (!detect()) {
+            return new ArrayList<MutantStrategy>();
         }
-        return new ArrayList<MutantStrategy>(List.of(new PermitAllReplacementOperator()));
+        addMutantStrategy(new DenyAllReplacementOperator());
+        return getMutantStrategies();
     }
 }

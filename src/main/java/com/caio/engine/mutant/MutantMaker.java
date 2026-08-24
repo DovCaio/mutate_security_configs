@@ -2,8 +2,6 @@ package com.caio.engine.mutant;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import com.caio.engine.mutant.detect_pattern.AllPredicatesCasePattern;
 import com.caio.engine.mutant.detect_pattern.CompositeCasePattern;
@@ -20,7 +18,7 @@ public class MutantMaker {
     private String value;
     private List<String> rolesAndAuthorities;
 
-    private List<DetectPattern> detectPatterns;
+    private List<DetectPattern> detectPatterns = new ArrayList<>();
 
     public MutantMaker(String value, List<String> roles, List<String> authorities) {
 
@@ -61,31 +59,7 @@ public class MutantMaker {
             ;
         });
 
-        if (hasHasPermissionCustom) {
-            matcherHasPermissionCustomCase.reset();
-            result.addAll(muteHasPermissionCustom(matcherHasPermissionCustomCase));
-        }
-
-        /*
-         * boolean hasAnyPattern = hasSimple ||
-         * hasCompost ||
-         * hasPermitAll ||
-         * hasDenyAll ||
-         * hasHasPermission ||
-         * hasHasPermissionCustom ||
-         * hasLogicalOperators;
-         * 
-         * if (!hasAnyPattern) {
-         * result.add(wildcardMutation(value));
-         * 
-         * }
-         */
-
         return result.stream().distinct().toList();
-    }
-
-    private String wildcardMutation(String str) {
-        return "!" + str;
     }
 
 }

@@ -10,16 +10,16 @@ import com.caio.engine.mutant.mutants.PermitAllReplacementOperator;
 public class DenyAllCase extends AbstractDetectPattern implements DetectPattern {
 
     public DenyAllCase(String target) {
-        super("(?:permitAll())", target);
-        addMutantStrategy(new PermitAllReplacementOperator());
+        super("(?:denyAll())", target);
     }
 
     @Override
     public List<MutantStrategy> execute() {
-        if (detect()) {
-            return getMutantStrategies();
+        if (!detect()) {
+            return new ArrayList<MutantStrategy>();
         }
-        return new ArrayList<MutantStrategy>(List.of(new DenyAllReplacementOperator()));
+        addMutantStrategy(new PermitAllReplacementOperator());
+        return getMutantStrategies();
     }
 
 }
