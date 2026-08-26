@@ -19,6 +19,9 @@ public class PermitAllCase extends AbstractDetectPattern implements DetectPatter
         if (!detect()) {
             return new ArrayList<MutantStrategy>();
         }
+        if (!getMutantStrategies().isEmpty()) {
+            return getMutantStrategies();
+        }
         addMutantStrategy(new DenyAllReplacementOperator());
         return getMutantStrategies();
     }

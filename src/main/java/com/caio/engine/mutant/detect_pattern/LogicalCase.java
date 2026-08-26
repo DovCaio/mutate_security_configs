@@ -17,6 +17,9 @@ public class LogicalCase extends AbstractDetectPattern implements DetectPattern 
         if (!this.detect()) {
             return new ArrayList<MutantStrategy>();
         }
+        if (!getMutantStrategies().isEmpty()) {
+            return getMutantStrategies();
+        }
         addMutantStrategy(new LogicalSecurityOperatorReplacement(getMatcher()));
         return getMutantStrategies();
     }

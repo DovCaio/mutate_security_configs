@@ -17,6 +17,9 @@ public class HasPermissionCustomPattern extends AbstractDetectPattern implements
         if (!this.detect()) {
             return new ArrayList<MutantStrategy>();
         }
+        if (!getMutantStrategies().isEmpty()) {
+            return getMutantStrategies();
+        }
         addMutantStrategy(new InvalidSecurityIdentifierReplacement(getGroup(2), getGroup(1)));
         return getMutantStrategies();
     }

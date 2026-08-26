@@ -28,6 +28,9 @@ public class SimpleCasePattern extends AbstractDetectPattern implements DetectPa
         if (!this.detect()) {
             return new ArrayList<MutantStrategy>();
         }
+        if (!getMutantStrategies().isEmpty()) {
+            return getMutantStrategies();
+        }
         String insideQuotes = getGroup(2);
 
         addMutantStrategy(new InvalidSecurityIdentifierReplacement(insideQuotes));
