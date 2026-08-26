@@ -3,7 +3,6 @@ package com.caio.engine.mutant.mutants;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.regex.Matcher;
 
 import com.caio.exceptions.InvalidClassInitiation;
 

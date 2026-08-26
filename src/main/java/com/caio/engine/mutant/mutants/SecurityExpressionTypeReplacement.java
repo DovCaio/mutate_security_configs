@@ -7,18 +7,20 @@ public class SecurityExpressionTypeReplacement implements MutantStrategy {
 
     @Override
     public List<String> make(String value) {
-        List<String> mutant = new ArrayList<>();
+
+        List<String> mutants = new ArrayList<>();
 
         if (value.contains("hasAuthority")) {
-            mutant.add(value.replace("hasAuthority", "hasRole"));
+            mutants.add(value.replace("hasAuthority", "hasRole"));
         } else if (value.contains("hasRole")) {
-            mutant.add(value.replace("hasRole", "hasAuthority"));
+            mutants.add(value.replace("hasRole", "hasAuthority"));
         } else if (value.contains("hasAnyAuthority")) {
-            mutant.add(value.replace("hasAnyAuthority", "hasAnyRole"));
+            mutants.add(value.replace("hasAnyAuthority", "hasAnyRole"));
+        } else if (value.contains("hasAnyRole")) {
+            mutants.add(value.replace("hasAnyRole", "hasAnyAuthority"));
         }
-        mutant.add(value.replace("hasAnyRole", "hasAnyAuthority"));
-        return mutant;
 
+        return mutants;
     }
 
 }
