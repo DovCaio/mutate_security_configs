@@ -16,7 +16,7 @@ class DenyAllCaseTest {
     @Test
     void shouldDetectDenyAll() {
 
-        DenyAllCase pattern = new DenyAllCase("denyAll()");
+        DenyAllCase pattern = new DenyAllCase("denyAll");
 
         assertTrue(pattern.detect());
     }
@@ -30,24 +30,11 @@ class DenyAllCaseTest {
     }
 
     @Test
-    void shouldNotDetectDenyAllWithoutParentheses() {
-
-        DenyAllCase pattern = new DenyAllCase("denyAll");
-
-        assertFalse(pattern.detect());
-    }
-
-    @Test
-    void shouldReturnPermitAllReplacementStrategy() {
+    void shouldNotDetectDenyAllWithParentheses() {
 
         DenyAllCase pattern = new DenyAllCase("denyAll()");
 
-        List<MutantStrategy> strategies = pattern.execute();
-
-        assertEquals(1, strategies.size());
-
-        assertTrue(
-                strategies.get(0) instanceof PermitAllReplacementOperator);
+        assertFalse(pattern.detect());
     }
 
     @Test
@@ -63,7 +50,7 @@ class DenyAllCaseTest {
     @Test
     void shouldNotDuplicateStrategyWhenExecuteIsCalledMultipleTimes() {
 
-        DenyAllCase pattern = new DenyAllCase("denyAll()");
+        DenyAllCase pattern = new DenyAllCase("denyAll");
 
         pattern.execute();
         pattern.execute();
@@ -71,5 +58,24 @@ class DenyAllCaseTest {
         assertEquals(
                 1,
                 pattern.getMutantStrategies().size());
+    }
+
+    @Test
+    void shouldDetectOnlyDenyAllWithoutParentheses() {
+
+        assertTrue(
+                new DenyAllCase("denyAll").detect());
+
+        assertFalse(
+                new DenyAllCase("denyAll()").detect());
+
+        assertFalse(
+                new DenyAllCase("denyAll(0)").detect());
+
+        assertFalse(
+                new DenyAllCase("denyAll (0)").detect());
+
+        assertFalse(
+                new DenyAllCase("mydenyAll").detect());
     }
 }
