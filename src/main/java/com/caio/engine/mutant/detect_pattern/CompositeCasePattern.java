@@ -29,6 +29,11 @@ public class CompositeCasePattern extends AbstractDetectPattern implements Detec
         if (!this.detect()) {
             return new ArrayList<MutantStrategy>();
         }
+
+        if (!getMutantStrategies().isEmpty()) {
+            return getMutantStrategies();
+        }
+
         String insideQuotes = getGroup(2);
         addMutantStrategy(new SecurityExpressionTypeReplacement());
         addMutantStrategy(new AuthorizationReplacementOperator(insideQuotes, sameSecurityIdentifier));
