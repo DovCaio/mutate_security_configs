@@ -5,12 +5,11 @@ import java.util.List;
 
 import com.caio.engine.mutant.mutants.DenyAllReplacementOperator;
 import com.caio.engine.mutant.mutants.MutantStrategy;
-import com.caio.engine.mutant.mutants.PermitAllReplacementOperator;
 
 public class PermitAllCase extends AbstractDetectPattern implements DetectPattern {
 
     public PermitAllCase(String target) {
-        super("(?:permitAll())", target);
+        super("(?<!\\w)permitAll\\(\\)", target);
 
     }
 
