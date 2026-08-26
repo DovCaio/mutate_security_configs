@@ -30,7 +30,7 @@ public class SimpleCasePattern extends AbstractDetectPattern implements DetectPa
         }
         String insideQuotes = getGroup(2);
 
-        addMutantStrategy(new InvalidSecurityIdentifierReplacement(getMatcher()));
+        addMutantStrategy(new InvalidSecurityIdentifierReplacement(insideQuotes));
         addMutantStrategy(new SecurityExpressionTypeReplacement());
         sameSecurityIdentifier
                 .forEach(ra -> addMutantStrategy(new AuthorizationReplacementOperator(insideQuotes, ra)));

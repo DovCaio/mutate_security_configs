@@ -33,7 +33,7 @@ public class CompositeCasePattern extends AbstractDetectPattern implements Detec
         addMutantStrategy(new SecurityExpressionTypeReplacement());
         addMutantStrategy(new AuthorizationReplacementOperator(insideQuotes, sameSecurityIdentifier));
         addMutantStrategy(new SecurityIdentifierTypeReplacement(insideQuotes, diffSecurityIdentifier));
-        addMutantStrategy(new InvalidSecurityIdentifierReplacement(getMatcher()));
+        addMutantStrategy(new InvalidSecurityIdentifierReplacement(insideQuotes));
         addMutantStrategy(new EmptyAuthorizationArgumentOperator());
         addMutantStrategy(new AuthorizationParameterReductionOperator(insideQuotes));
 
