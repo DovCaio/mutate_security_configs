@@ -16,6 +16,8 @@ public class LogicalNegationSecurityOperator implements MutantStrategy {
     public List<String> make(String value) {
         List<String> mutants = new ArrayList<>();
 
+        matcher.reset();
+
         while (matcher.find()) {
             String expr = matcher.group(0);
 
@@ -33,6 +35,7 @@ public class LogicalNegationSecurityOperator implements MutantStrategy {
 
                 mutants.add(mutant);
             }
+
         }
 
         return mutants;

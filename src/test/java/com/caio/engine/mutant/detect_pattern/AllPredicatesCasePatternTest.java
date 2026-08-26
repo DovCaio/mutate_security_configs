@@ -8,8 +8,10 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
+import com.caio.engine.mutant.mutants.DenyAllReplacementOperator;
 import com.caio.engine.mutant.mutants.LogicalNegationSecurityOperator;
 import com.caio.engine.mutant.mutants.MutantStrategy;
+import com.caio.engine.mutant.mutants.PermitAllReplacementOperator;
 
 class AllPredicatesCasePatternTest {
 
@@ -93,9 +95,13 @@ class AllPredicatesCasePatternTest {
 
         List<MutantStrategy> strategies = pattern.execute();
 
-        assertEquals(1, strategies.size());
+        assertEquals(3, strategies.size());
         assertTrue(
                 strategies.get(0) instanceof LogicalNegationSecurityOperator);
+        assertTrue(
+                strategies.get(1) instanceof PermitAllReplacementOperator);
+        assertTrue(
+                strategies.get(2) instanceof DenyAllReplacementOperator);
     }
 
     @Test

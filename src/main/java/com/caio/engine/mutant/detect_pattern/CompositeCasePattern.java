@@ -5,9 +5,12 @@ import java.util.List;
 
 import com.caio.engine.mutant.mutants.AuthorizationParameterReductionOperator;
 import com.caio.engine.mutant.mutants.AuthorizationReplacementOperator;
+import com.caio.engine.mutant.mutants.DenyAllReplacementOperator;
 import com.caio.engine.mutant.mutants.EmptyAuthorizationArgumentOperator;
 import com.caio.engine.mutant.mutants.InvalidSecurityIdentifierReplacement;
+import com.caio.engine.mutant.mutants.LogicalNegationSecurityOperator;
 import com.caio.engine.mutant.mutants.MutantStrategy;
+import com.caio.engine.mutant.mutants.PermitAllReplacementOperator;
 import com.caio.engine.mutant.mutants.SecurityExpressionTypeReplacement;
 import com.caio.engine.mutant.mutants.SecurityIdentifierTypeReplacement;
 

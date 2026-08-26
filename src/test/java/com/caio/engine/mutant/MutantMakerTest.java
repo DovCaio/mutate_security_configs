@@ -144,7 +144,6 @@ class MutantMakerTest {
                 "hasAnyAuthority('READ','WRITE')", roles, auths);
 
         List<String> mutants = m.genAllMutants();
-
         assertEquals(11, mutants.size());
         assertTrue(mutants.contains("hasAnyRole('READ','WRITE')"));
         assertTrue(mutants.contains("hasAnyAuthority('NO_READ', 'WRITE')"));
@@ -219,23 +218,30 @@ class MutantMakerTest {
 
         assertTrue(mutants.contains("!hasPermission(#id, 'DOC', 'READ')"));
 
-        assertTrue(mutants.contains("hasPermission(#id, 'MUTATED_DOC', 'READ')"));
-        assertTrue(mutants.contains("hasPermission(#id, 'DOC', 'MUTATED_READ')"));
+        assertTrue(mutants.contains("hasPermission(#id, 'DOC', 'NO_READ')"));
+        assertTrue(mutants.contains("denyAll"));
+        assertTrue(mutants.contains("permitAll()"));
 
     }
 
     @Test
     void shouldMutateCustomHasPermission() throws Exception {
+
         MutantMaker m = new MutantMaker(
-                "@cps.hasPermission('sys_dept_add')", roles, auths);
+                "@cps.hasPermission('sys_dept_add')",
+                roles,
+                auths);
 
         List<String> mutants = m.genAllMutants();
 
-        assertTrue(mutants.contains("!@cps.hasPermission('sys_dept_add')"));
+        assertTrue(mutants.contains(
+                "!@cps.hasPermission('sys_dept_add')"));
+
+        assertTrue(mutants.contains(
+                "@cps.hasPermission('MUTATED_sys_dept_add')"));
 
         assertTrue(mutants.contains("permitAll()"));
         assertTrue(mutants.contains("denyAll"));
-        assertTrue(mutants.stream().anyMatch(s -> s.equals("@cps.hasPermission('MUTATED_sys_dept_add')")));
     }
 
     @Test
@@ -256,6 +262,7 @@ class MutantMakerTest {
                 "hasRole('ADMIN') and hasAuthority('READ') or hasRole('USER')", roles, auths);
 
         List<String> mutants = m.genAllMutants();
+        mutants.forEach(System.out::println);
         assertTrue(mutants.contains("hasRole('ADMIN') or hasAuthority('READ') or hasRole('USER')"));
         assertTrue(mutants.contains("hasRole('ADMIN') and hasAuthority('READ') and hasRole('USER')"));
     }

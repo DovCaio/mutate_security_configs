@@ -28,6 +28,7 @@ public class LogicalSecurityOperatorReplacement implements MutantStrategy {
                     value.substring(end);
 
             mutateOperators.add(mutant);
+
         }
 
         return mutateOperators;
