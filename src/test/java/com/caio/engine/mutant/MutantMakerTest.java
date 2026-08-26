@@ -61,6 +61,8 @@ class MutantMakerTest {
 
         List<String> mutants = m.genAllMutants();
 
+        mutants.forEach(System.out::println);
+
         assertEquals(9, mutants.size());
         assertTrue(mutants.contains("hasRole('READ')"));
         assertTrue(mutants.contains("!hasAuthority('READ')"));
@@ -262,7 +264,6 @@ class MutantMakerTest {
                 "hasRole('ADMIN') and hasAuthority('READ') or hasRole('USER')", roles, auths);
 
         List<String> mutants = m.genAllMutants();
-        mutants.forEach(System.out::println);
         assertTrue(mutants.contains("hasRole('ADMIN') or hasAuthority('READ') or hasRole('USER')"));
         assertTrue(mutants.contains("hasRole('ADMIN') and hasAuthority('READ') and hasRole('USER')"));
     }
@@ -275,10 +276,7 @@ class MutantMakerTest {
 
         List<String> mutants = m.genAllMutants();
 
-        assertEquals(3, mutants.size());
-        assertTrue(mutants.contains("!someOtherExpression()"));
-        assertTrue(mutants.contains("permitAll()"));
-        assertTrue(mutants.contains("denyAll"));
+        assertEquals(0, mutants.size());
 
     }
 

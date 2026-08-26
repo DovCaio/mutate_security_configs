@@ -8,6 +8,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 import com.caio.exceptions.InvalidClassInitiation;
+import com.caio.exceptions.InvalidOperator;
 
 class InvalidSecurityIdentifierReplacementTest {
 
@@ -64,7 +65,7 @@ class InvalidSecurityIdentifierReplacementTest {
                                 "'user', 'read'");
 
                 assertThrows(
-                                Error.class,
+                                InvalidOperator.class,
                                 () -> operator.make(
                                                 "hasPermission('user', 'read')"));
         }

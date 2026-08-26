@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.caio.exceptions.InvalidClassInitiation;
+import com.caio.exceptions.InvalidOperator;
 
 public class InvalidSecurityIdentifierReplacement implements MutantStrategy {
 
@@ -48,30 +49,63 @@ public class InvalidSecurityIdentifierReplacement implements MutantStrategy {
 
     private void mutatenOnlyPermission(String[] args, List<String> mutateOperators, String value) {
         if (args.length < 3)
-            throw new Error("Não é uma hasPermission válida.");
+            throw new InvalidOperator("Não é uma hasPermission válida.");
         if (args[2].contains("NO_"))
             mutateOperators.add(value.replace(args[2], args[2].replace("NO_", "")));
         else
             mutateOperators.add(value.replace(args[2], "'NO_" + args[2].replace("'", "") + "'"));
     }
 
-    private void mutateEachParam(String[] expressions, List<String> mutateOperators, String value) {
+    private void mutateEachParam(
+            String[] expressions,
+            List<String> mutateOperators,
+            String value) {
+
         for (int i = 0; i < expressions.length; i++) {
+
             String[] mutatedExpressions = expressions.clone();
 
             String expression = expressions[i].trim();
-            String mutatedexpression = expression.startsWith("'NO_")
-                    ? "'" + expression.substring(4)
-                    : expression.substring(0, 1) + "NO_" + expression.substring(1);
 
-            mutatedExpressions[i] = mutatedexpression;
+            String content = expression;
+
+            if (content.length() >= 2
+                    && content.startsWith("'")
+                    && content.endsWith("'")) {
+
+                content = content.substring(1, content.length() - 1);
+            }
+
+            String mutatedContent;
+
+            if (content.startsWith("NO_")) {
+                mutatedContent = content.replaceFirst("NO_", "");
+            } else {
+                mutatedContent = "NO_" + content;
+            }
+
+            String mutatedExpression;
+
+            if (expression.length() >= 2
+                    && ((expression.startsWith("'") && expression.endsWith("'"))
+                            || (expression.startsWith("\"") && expression.endsWith("\"")))) {
+
+                mutatedExpression = expression.charAt(0)
+                        + mutatedContent
+                        + expression.charAt(expression.length() - 1);
+
+            } else {
+                mutatedExpression = mutatedContent;
+            }
+
+            mutatedExpressions[i] = mutatedExpression;
 
             String mutatedInsideQuotes = String.join(", ", mutatedExpressions);
-            String mutatedExpression = value.replace(
-                    insideQuotes,
-                    mutatedInsideQuotes);
 
-            mutateOperators.add(mutatedExpression);
+            mutateOperators.add(
+                    value.replace(
+                            insideQuotes,
+                            mutatedInsideQuotes));
         }
     }
 

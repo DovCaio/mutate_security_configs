@@ -27,13 +27,18 @@ public class SecurityIdentifierTypeReplacement implements MutantStrategy { // fa
         List<String> mutateOperators = new ArrayList<>();
 
         if (roleOrAuthority != null) {
+            if (insideQuotes.equals(roleOrAuthority)) {
+                return mutateOperators;
+            }
             mutateOperators.add(value.replace(insideQuotes, roleOrAuthority));
-
         } else if (rolesOrAuthorities != null) {
 
             for (String ra : rolesOrAuthorities) {
                 if (!insideQuotes.contains(ra)) {
                     String mutatedInsideQuotes = insideQuotes + ", " + "'" + ra + "'";
+                    if (mutatedInsideQuotes.equals(insideQuotes)) {
+                        continue;
+                    }
                     String mutatedExpression = value.replace(insideQuotes, mutatedInsideQuotes);
                     mutateOperators.add(mutatedExpression);
                 }

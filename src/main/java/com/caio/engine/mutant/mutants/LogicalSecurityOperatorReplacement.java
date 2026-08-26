@@ -16,6 +16,8 @@ public class LogicalSecurityOperatorReplacement implements MutantStrategy {
     public List<String> make(String value) {
         List<String> mutateOperators = new ArrayList<>();
 
+        matcher.reset();
+
         while (matcher.find()) {
             int start = matcher.start();
             int end = matcher.end();

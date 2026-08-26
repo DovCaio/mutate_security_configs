@@ -2,7 +2,6 @@ package com.caio.engine.mutant.mutants;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
 
 public class AuthorizationReplacementOperator implements MutantStrategy {
 
@@ -25,11 +24,15 @@ public class AuthorizationReplacementOperator implements MutantStrategy {
         List<String> mutateOperators = new ArrayList<>();
 
         if (roleOrAuthority != null) {
+            if (insideQuotes.equals(roleOrAuthority)) {
+                return mutateOperators;
+            }
             mutateOperators.add(value.replace(insideQuotes, roleOrAuthority));
         } else if (rolesOrAuthorities != null) {
             for (String ra : rolesOrAuthorities) {
                 if (!insideQuotes.contains(ra)) {
                     String mutatedInsideQuotes = insideQuotes + ", " + "'" + ra + "'";
+
                     String mutatedExpression = value.replace(insideQuotes, mutatedInsideQuotes);
                     mutateOperators.add(mutatedExpression);
                 }
