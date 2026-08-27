@@ -1,6 +1,7 @@
 package com.caio.cli_controller;
 
 import com.caio.analize.CodeAnalyzer;
+import com.caio.args.ApplicationArguments;
 import com.caio.directory_scan.DirectoryScan;
 import com.caio.engine.Engine;
 import com.caio.models.AnnotationMutationPoint;
@@ -12,53 +13,33 @@ import static com.caio.util.Printers.printPaths;
 import static com.caio.util.Printers.printSimpleListString;
 import static com.caio.util.HandleWithFile.copyToTemporaryDirectory;
 
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
-
 
 public class CliController {
 
-    private static final List<String> EXISTENT_FLAGS = List.of("-v");
-    private Path originalDirectory;
+    private ApplicationArguments applicationArguments;
     private Path temporaryDirectory;
-    private String flag = "";
     private DirectoryScan directoryScan;
     private CodeAnalyzer bca;
     private Engine engine;
     private Report report;
     private ParallelExecutionContext parallelExecutionConfiguration;
 
-    public CliController(String[] args) throws IOException {
-        if (args.length == 0) {
-            System.err.println("Uso: java  Main <flag> <diretorio>");
-            System.exit(1);
-        }
+    public CliController(ApplicationArguments applicationArguments) throws IOException {
 
-        if (args.length == 1) {
-            this.originalDirectory = Paths.get(args[0]);
-        } else if (args.length == 2) {
-            this.originalDirectory = Paths.get(args[1]);
-            this.flag = args[0];
-            if (!EXISTENT_FLAGS.contains(this.flag))
-                throw new IllegalArgumentException("A flag " + this.flag + " não existe.");
-        } else {
-            throw new IllegalArgumentException("Muitos argumentos, no máximo 2");
-        }
+        this.applicationArguments = applicationArguments;
 
-        temporaryDirectory = copyToTemporaryDirectory(originalDirectory);
+        temporaryDirectory = copyToTemporaryDirectory(applicationArguments.getOriginalDirectory());
 
         this.bca = new CodeAnalyzer();
         this.directoryScan = new DirectoryScan(temporaryDirectory);
 
         this.parallelExecutionConfiguration = new ParallelExecutionContext(new LinkedBlockingQueue<>(1000),
-            new LinkedBlockingQueue<>(5000), new AtomicInteger(0)
-        );
+                new LinkedBlockingQueue<>(5000), new AtomicInteger(0));
 
     }
 
@@ -71,13 +52,13 @@ public class CliController {
 
     private void scanForDotFiles() throws IOException {
         directoryScan.findFiles(".java");
-        if (flag.equals("-v"))
+        if (applicationArguments.isVerbose())
             printPaths(directoryScan.getFindeds());
     }
 
     private void searchForPossibleMutations() throws Exception {
         this.bca.analyze(directoryScan.getFindeds());
-        if (flag.equals("-v")) {
+        if (applicationArguments.isVerbose()) {
             printSimpleListString("Roles encontradas", bca.getRoles());
             printSimpleListString("Authorities encontradas", bca.getAuthorities());
             System.out.println("Possíveis pontos de mutação:");
@@ -88,13 +69,13 @@ public class CliController {
 
     private void startEngine() throws Exception {
         this.engine = new Engine(bca.getMutationsPoints(), bca.getmainClasses(), directoryScan.getDirectory(),
-                directoryScan.getBuildTool(), bca.getRoles(), bca.getAuthorities(), flag);
+                directoryScan.getBuildTool(), bca.getRoles(), bca.getAuthorities(), applicationArguments);
         engine.start();
     }
 
     private void generateReport() {
         this.report = new Report(engine.getTestsResults());
-        this.report.generate(originalDirectory);
+        this.report.generate(applicationArguments.getOriginalDirectory());
     }
 
     public Path getTemporaryDirectory() {

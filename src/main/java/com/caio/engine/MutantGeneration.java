@@ -8,70 +8,68 @@ import com.caio.models.AnnotationMutationPoint;
 
 import static com.caio.util.Printers.printMutationPoints;
 
-
+import com.caio.args.ApplicationArguments;
 import com.caio.engine.mutant.MutantMaker;
 
 public class MutantGeneration {
 
     private List<AnnotationMutationPoint> amps;
     private List<AnnotationMutationPoint> mutants;
-    private String flag;
+    private ApplicationArguments applicationArguments;
 
-    public MutantGeneration(List<AnnotationMutationPoint> amps, String flag) {
+    public MutantGeneration(List<AnnotationMutationPoint> amps, ApplicationArguments applicationArguments) {
         this.amps = amps;
         this.mutants = new ArrayList<>();
-        this.flag = flag;
+        this.applicationArguments = applicationArguments;
     }
-
 
     public MutantGeneration(List<AnnotationMutationPoint> amps) {
         this.amps = amps;
         this.mutants = new ArrayList<>();
-        this.flag = "";
+        this.applicationArguments = new ApplicationArguments();
     }
 
     public void createMutants(List<String> roles, List<String> authorities) throws Exception {
         for (AnnotationMutationPoint amp : amps) {
-            MutantMaker mutantGeneration  = new MutantMaker(amp.getOriginalValue(),roles, authorities);
+            MutantMaker mutantGeneration = new MutantMaker(amp.getOriginalValue(), roles, authorities);
             List<String> mutates = mutantGeneration.genAllMutants();
-            if (!mutates.isEmpty()){
+            if (!mutates.isEmpty()) {
 
                 List<AnnotationMutationPoint> aux = new ArrayList<>();
 
                 mutates.stream().forEach(mutant -> {
-                    try { //Talvez esse try/catch não seja mais necessário, nem o aux
-                        if(!mutant.equals(""))
+                    try { // Talvez esse try/catch não seja mais necessário, nem o aux
+                        if (!mutant.equals(""))
                             aux.add(createMutant(amp, mutant));
                     } catch (Exception e) {
                         System.out.println("Não foi possível de adicionar o mutant " + mutant);
                     }
                 });
 
-                if(!aux.isEmpty())
+                if (!aux.isEmpty())
                     this.mutants.addAll(aux);
-                }
+            }
         }
         if (this.mutants.isEmpty())
             throw new NoOnePossibleMutant();
-        if (flag.equals("-v")){
+        if (applicationArguments.isVerbose()) {
             System.out.println("Mutantes");
             printMutationPoints(this.mutants);
 
         }
 
     }
-    
+
     private AnnotationMutationPoint createMutant(AnnotationMutationPoint amp, String novoValor) throws Exception {
         AnnotationMutationPoint mutant = new AnnotationMutationPoint(
-            amp.getPackageName(),
-            amp.getClassName(),
-            amp.getMethodName(),
-            amp.getOriginalValue(),
-            novoValor,
-            amp.getTargetType(),
-            amp.getFilePath(),
-            amp.getLineNumber()
-        );
+                amp.getPackageName(),
+                amp.getClassName(),
+                amp.getMethodName(),
+                amp.getOriginalValue(),
+                novoValor,
+                amp.getTargetType(),
+                amp.getFilePath(),
+                amp.getLineNumber());
 
         return mutant;
     }

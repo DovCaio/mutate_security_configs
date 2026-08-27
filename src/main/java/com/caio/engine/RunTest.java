@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import com.caio.args.ApplicationArguments;
 import com.caio.directory_scan.DirectoryScan;
 import com.caio.enums.BuildTool;
 import com.caio.exceptions.NoOneTestPasses;
@@ -22,16 +23,16 @@ public class RunTest {
         private BuildTool buildTool;
         private String[] command = new String[] {};
         private DirectoryScan directoryScan;
-        private String flag;
         private long startTestFirstExecutionTime;
         private long totalTestFirstExecutionTime = TimeUnit.MINUTES.toMillis(5); // Valor padrão, caso haja algum
                                                                                  // problema na medição do tempo da
                                                                                  // execução inicial dos testes.
+        private ApplicationArguments applicationArguments;
 
-        public RunTest(Path repoDirectory, BuildTool buildTool, String flag) {
+        public RunTest(Path repoDirectory, BuildTool buildTool, ApplicationArguments applicationArguments) {
                 this.repoDirectory = repoDirectory;
                 this.buildTool = buildTool;
-                this.flag = flag;
+                this.applicationArguments = applicationArguments;
                 this.testsResults = new ArrayList<TestResult>();
                 String dir = repoDirectory.toAbsolutePath().toString();
 
@@ -68,7 +69,7 @@ public class RunTest {
                 long endTestFirstExecutionTime = System.currentTimeMillis();
                 long baseline = endTestFirstExecutionTime - this.startTestFirstExecutionTime;
 
-                if (flag.equals("-v")) {
+                if (applicationArguments.isVerbose()) {
                         System.out.println("Tempo gasto para execução do primeiro test: " + baseline + " ms");
                 }
 
@@ -85,7 +86,7 @@ public class RunTest {
                                 while ((reader.readLine()) != null) {
                                 }
                         } catch (IOException e) {
-                                if (flag.equals("-v")) {
+                                if (applicationArguments.isVerbose()) {
                                         System.out.println("Erro ao ler a saída do processo: " + e.getMessage());
                                 }
                         }
@@ -97,7 +98,7 @@ public class RunTest {
                                 while (reader.readLine() != null) {
                                 }
                         } catch (IOException e) {
-                                if (flag.equals("-v")) {
+                                if (applicationArguments.isVerbose()) {
                                         System.out.println("Erro ao ler a saída do processo: " + e.getMessage());
                                 }
                         }
@@ -118,7 +119,7 @@ public class RunTest {
                 boolean finished = process.waitFor(totalTestFirstExecutionTime, TimeUnit.MILLISECONDS);
 
                 if (!finished) {
-                        if (flag.equals("-v")) {
+                        if (applicationArguments.isVerbose()) {
                                 System.out.println(
                                                 "Timeout atingido para execução dos testes. Processo será finalizado.");
                         }
@@ -145,7 +146,7 @@ public class RunTest {
         public TestResult executeTestForMutation(ParamsForTestMutationApresentation params)
                         throws IOException, InterruptedException {
                 TestResult testResult = new TestResult(runAllTestsCorrect(), params);
-                if (flag.equals("-v")) {
+                if (applicationArguments.isVerbose()) {
                         System.out.println(testResult.toString());
                 }
                 this.testsResults.add(testResult);

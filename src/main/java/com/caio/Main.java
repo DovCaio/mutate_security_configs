@@ -4,10 +4,13 @@ import com.caio.cli_controller.CliController;
 
 import static com.caio.util.HandleWithFile.deleteTemporaryDirectory;
 
+import com.caio.args.ApplicationArguments;
+
 public class Main {
 
     public static void main(String[] args) throws Exception {
-        CliController cliController = new CliController(args);
+        ApplicationArguments applicationArguments = new ApplicationArguments(args);
+        CliController cliController = new CliController(applicationArguments);
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             try {
