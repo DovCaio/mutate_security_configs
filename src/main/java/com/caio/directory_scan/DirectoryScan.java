@@ -30,7 +30,11 @@ import org.w3c.dom.Element;
 
 import com.sun.management.OperatingSystemMXBean;
 
-public class DirectoryScan{
+public class DirectoryScan { // Meu pai amado, isso precisa urgentemente ser refatorado, está muito grande e
+                             // com muitas responsabilidades, talvez seja melhor criar uma classe para cada
+                             // responsabilidade, como por exemplo, uma classe para scanear os arquivos,
+                             // outra para identificar a ferramenta de build, outra para ler os relatórios de
+                             // teste, etc.
 
     private Path directory;
     private List<Path> dependenciesPath;
@@ -216,7 +220,8 @@ public class DirectoryScan{
             throw new RuntimeException("Erro ao calcular tamanho do repositório", e);
         }
     }
-    protected int availableProcessors() { 
+
+    protected int availableProcessors() {
         return Runtime.getRuntime().availableProcessors();
     }
 
