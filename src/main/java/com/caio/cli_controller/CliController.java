@@ -27,7 +27,6 @@ public class CliController {
     private CodeAnalyzer bca;
     private Engine engine;
     private Report report;
-    private ParallelExecutionContext parallelExecutionConfiguration;
 
     public CliController(ApplicationArguments applicationArguments) throws IOException {
 
@@ -37,9 +36,6 @@ public class CliController {
 
         this.bca = new CodeAnalyzer();
         this.directoryScan = new DirectoryScan(temporaryDirectory);
-
-        this.parallelExecutionConfiguration = new ParallelExecutionContext(new LinkedBlockingQueue<>(1000),
-                new LinkedBlockingQueue<>(5000), new AtomicInteger(0));
 
     }
 

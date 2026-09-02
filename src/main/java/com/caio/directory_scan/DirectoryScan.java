@@ -1,33 +1,14 @@
 package com.caio.directory_scan;
 
 import com.caio.enums.BuildTool;
-import com.caio.enums.TestStatus;
 import com.caio.exceptions.NoOneClasseFinded;
 import com.caio.exceptions.PathNotExists;
-import com.caio.models.tests.FailureDetail;
-import com.caio.models.tests.TestCaseResult;
-import com.caio.models.tests.TestExecutionReport;
-import com.caio.models.tests.TestSuiteResult;
 
-import java.io.File;
 import java.io.IOException;
-import java.lang.annotation.Annotation;
-import java.lang.management.ManagementFactory;
 import java.nio.file.*;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
-
-import com.sun.management.OperatingSystemMXBean;
 
 public class DirectoryScan { // Meu pai amado, isso precisa urgentemente ser refatorado, está muito grande e
                              // com muitas responsabilidades, talvez seja melhor criar uma classe para cada
@@ -40,9 +21,6 @@ public class DirectoryScan { // Meu pai amado, isso precisa urgentemente ser ref
     private List<Path> configsPath;
     private List<Path> findeds;
     private BuildTool buildTool;
-
-    private static final Set<String> IGNORE_DIRS = Set.of(
-            ".git", "target", "build", ".gradle", "node_modules");
 
     public DirectoryScan(Path baseDir) {
         if (baseDir == null)
@@ -81,59 +59,6 @@ public class DirectoryScan { // Meu pai amado, isso precisa urgentemente ser ref
                     "Não foi possível identificar a ferramenta de build do projeto. Nenhum arquivo pom.xml, build.gradle ou gradlew encontrado no diretório raiz. Talvez esse não seja o diretório raiz do projeto.");
 
         return this.buildTool;
-    }
-
-    protected Long repoSizeMB() {
-
-        try (Stream<Path> walk = Files.walk(directory)) {
-
-            long bytes = walk
-                    .filter(Files::isRegularFile)
-                    .filter(path -> IGNORE_DIRS.stream()
-                            .noneMatch(dir -> path.toString().contains(dir)))
-                    .mapToLong(path -> {
-                        try {
-                            return Files.size(path);
-                        } catch (IOException e) {
-                            return 0L;
-                        }
-                    })
-                    .sum();
-
-            return bytes / (1024 * 1024);
-
-        } catch (IOException e) {
-            throw new RuntimeException("Erro ao calcular tamanho do repositório", e);
-        }
-    }
-
-    protected int availableProcessors() {
-        return Runtime.getRuntime().availableProcessors();
-    }
-
-    protected long totalMemoryMB() {
-        OperatingSystemMXBean os = (OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
-        return os.getTotalMemorySize() / (1024 * 1024);
-    }
-
-    public int calculateWorkers() {
-        int cores = availableProcessors();
-
-        int workersByCpu = Math.max(1, cores / 2);
-
-        long totalMemMB = totalMemoryMB();
-
-        int workerMemoryMB = 800;
-
-        int workersByMemory = (int) ((totalMemMB * 0.6) / workerMemoryMB);
-
-        long repoSizeMBVar = repoSizeMB();
-
-        double repoFactor = repoSizeMBVar > 500 ? 0.5 : repoSizeMBVar > 200 ? 0.7 : 1.0;
-
-        int workers = (int) (Math.min(workersByCpu, workersByMemory) * repoFactor);
-
-        return Math.max(workers, 1);
     }
 
     public List<Path> getFindeds() {
