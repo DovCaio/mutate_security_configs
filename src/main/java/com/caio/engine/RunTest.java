@@ -24,9 +24,7 @@ public class RunTest {
         private String[] command = new String[] {};
         private TestExtraction testExtraction;
         private long startTestFirstExecutionTime;
-        private long totalTestFirstExecutionTime = TimeUnit.MINUTES.toMillis(5); // Valor padrão, caso haja algum
-                                                                                 // problema na medição do tempo da
-                                                                                 // execução inicial dos testes.
+        private long totalTestFirstExecutionTime;
         private ApplicationArguments applicationArguments;
 
         public RunTest(Path repoDirectory, BuildTool buildTool, ApplicationArguments applicationArguments) {
@@ -35,6 +33,7 @@ public class RunTest {
                 this.applicationArguments = applicationArguments;
                 this.testsResults = new ArrayList<TestResult>();
                 String dir = repoDirectory.toAbsolutePath().toString();
+                totalTestFirstExecutionTime = TimeUnit.MINUTES.toMillis(applicationArguments.getTimeOut());
 
                 switch (this.buildTool) {
                         case MAVEN:
@@ -73,8 +72,8 @@ public class RunTest {
                         System.out.println("Tempo gasto para execução do primeiro test: " + baseline + " ms");
                 }
 
-                long tolerance = TimeUnit.MINUTES.toMillis(2);
-                double factor = 1.7;
+                long tolerance = TimeUnit.MINUTES.toMillis(1);
+                double factor = 1.2;
 
                 this.totalTestFirstExecutionTime = (long) (baseline * factor) + tolerance;
         }

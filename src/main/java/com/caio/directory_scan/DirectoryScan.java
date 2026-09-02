@@ -10,11 +10,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class DirectoryScan { // Meu pai amado, isso precisa urgentemente ser refatorado, está muito grande e
-                             // com muitas responsabilidades, talvez seja melhor criar uma classe para cada
-                             // responsabilidade, como por exemplo, uma classe para scanear os arquivos,
-                             // outra para identificar a ferramenta de build, outra para ler os relatórios de
-                             // teste, etc.
+public class DirectoryScan {
 
     private Path directory;
     private List<Path> dependenciesPath;

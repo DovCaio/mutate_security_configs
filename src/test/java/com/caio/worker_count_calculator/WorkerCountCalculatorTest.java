@@ -12,8 +12,6 @@ import java.nio.file.Path;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
-import com.caio.directory_scan.DirectoryScan;
-
 public class WorkerCountCalculatorTest {
     @TempDir
     Path tempDir;

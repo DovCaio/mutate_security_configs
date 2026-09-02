@@ -14,7 +14,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.HashMap;
 
-public class CodeAnalyzer {
+public class CodeAnalyzer { // Dá para reduzir a quantidade de parâmetros de alguns métodos, e talvez
+                            // reduzir o tamanho também.
 
     private List<AnnotationMutationPoint> mutationsPoints;
 
@@ -119,7 +120,7 @@ public class CodeAnalyzer {
         return result;
     }
 
-    private List<AuthorizationOccurrence> findOriginalsValues(String content) { // Uma regex resolve isso daqui fácil
+    private List<AuthorizationOccurrence> findOriginalsValues(String content) {
 
         Pattern pattern = Pattern.compile(
                 "@(?:PostAuthorize|PreAuthorize)\\s*\\(\\s*\"([^\"]*)\"\\s*\\)");
