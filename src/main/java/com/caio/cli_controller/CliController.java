@@ -12,7 +12,6 @@ import com.caio.util.ParallelExecutionContext;
 import static com.caio.util.Printers.printMutationPoints;
 import static com.caio.util.Printers.printPaths;
 import static com.caio.util.Printers.printSimpleListString;
-import static com.caio.util.HandleWithFile.copyToTemporaryDirectory;
 
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -38,10 +37,8 @@ public class CliController {
 
         this.applicationArguments = applicationArguments;
 
-        temporaryDirectory = copyToTemporaryDirectory(applicationArguments.getOriginalDirectory());
-
         this.bca = new CodeAnalyzer();
-        this.directoryScan = new DirectoryScan(temporaryDirectory);
+        this.directoryScan = new DirectoryScan(applicationArguments.getOriginalDirectory());
 
     }
 
@@ -71,7 +68,7 @@ public class CliController {
 
     private void startEngine() throws Exception {
         this.engine = new Engine(new EngineParams(bca.getMutationsPoints(), bca.getmainClasses(),
-                directoryScan.getDirectory(), directoryScan.getBuildTool(), bca.getRoles(), bca.getAuthorities(),
+                directoryScan.getBuildTool(), bca.getRoles(), bca.getAuthorities(),
                 applicationArguments));
         engine.start();
     }
