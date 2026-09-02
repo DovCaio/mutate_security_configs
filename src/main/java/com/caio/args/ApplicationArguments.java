@@ -44,7 +44,8 @@ public class ApplicationArguments {
     }
 
     private void verifyFlags() {
-        for (int i = 0; i < this.flags.size() - 1; i++) { // vai virar uma strategy
+        for (int i = 0; i < this.flags.size() - 1; i++) { // vai virar uma strategy, Open closed principle, e talvez um
+                                                          // factory method para criar a strategy correta.
             String flag = this.flags.get(i).split("::")[0];
             if (!EXISTENT_FLAGS.contains(flag)) {
                 throw new IllegalArgumentException(
@@ -72,6 +73,7 @@ public class ApplicationArguments {
                 }
                 this.verbose = true;
             }
+
         }
 
     }

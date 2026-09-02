@@ -3,9 +3,12 @@ package com.caio.engine;
 import com.caio.args.ApplicationArguments;
 import com.caio.enums.BuildTool;
 import com.caio.models.AnnotationMutationPoint;
+import com.caio.util.ParallelExecutionContext;
 
 import java.nio.file.Path;
 import java.util.List;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class Engine {
 
@@ -15,14 +18,13 @@ public class Engine {
     private List<String> roles;
     private List<String> authorities;
 
-    public Engine(List<AnnotationMutationPoint> amps, List<AnnotationMutationPoint> mainClasses, Path repoDirectory,
-            BuildTool buildTool, List<String> roles, List<String> authorities,
-            ApplicationArguments applicationArguments) {
-        this.runTest = new RunTest(repoDirectory, buildTool, applicationArguments);
-        this.mutantGeneration = new MutantGeneration(amps, applicationArguments);
+    public Engine(EngineParams engineParams) {
+        this.runTest = new RunTest(engineParams.repoDirectory(), engineParams.buildTool(),
+                engineParams.applicationArguments());
+        this.mutantGeneration = new MutantGeneration(engineParams.amps(), engineParams.applicationArguments());
         this.codeLoader = new CodeLoader(this.runTest);
-        this.roles = roles;
-        this.authorities = authorities;
+        this.roles = engineParams.roles();
+        this.authorities = engineParams.authorities();
     }
 
     public void start() throws Exception {

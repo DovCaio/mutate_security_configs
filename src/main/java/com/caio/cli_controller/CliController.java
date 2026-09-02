@@ -4,6 +4,7 @@ import com.caio.analize.CodeAnalyzer;
 import com.caio.args.ApplicationArguments;
 import com.caio.directory_scan.DirectoryScan;
 import com.caio.engine.Engine;
+import com.caio.engine.EngineParams;
 import com.caio.models.AnnotationMutationPoint;
 import com.caio.report.Report;
 import com.caio.util.ParallelExecutionContext;
@@ -27,6 +28,11 @@ public class CliController {
     private CodeAnalyzer bca;
     private Engine engine;
     private Report report;
+
+    private LinkedBlockingQueue<AnnotationMutationPoint> mutationPointsQueue; // Ter uma classe para lidar com o
+    // paralelismo
+    private AtomicInteger mutationPointsCounter;
+    private ParallelExecutionContext parallelExecutionContext;
 
     public CliController(ApplicationArguments applicationArguments) throws IOException {
 
@@ -64,8 +70,9 @@ public class CliController {
     }
 
     private void startEngine() throws Exception {
-        this.engine = new Engine(bca.getMutationsPoints(), bca.getmainClasses(), directoryScan.getDirectory(),
-                directoryScan.getBuildTool(), bca.getRoles(), bca.getAuthorities(), applicationArguments);
+        this.engine = new Engine(new EngineParams(bca.getMutationsPoints(), bca.getmainClasses(),
+                directoryScan.getDirectory(), directoryScan.getBuildTool(), bca.getRoles(), bca.getAuthorities(),
+                applicationArguments));
         engine.start();
     }
 
