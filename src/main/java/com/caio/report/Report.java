@@ -6,16 +6,15 @@ import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.List;
 
-import com.caio.engine.RunTest;
+import com.caio.engine.runing_test.RunTest;
+import com.caio.engine.runing_test.TestResult;
 import com.caio.util.GetData;
 
 public class Report {
 
-    private List<RunTest.TestResult> testResults;
+    private List<TestResult> testResults;
 
-
-
-    public Report(List<RunTest.TestResult> testResults){
+    public Report(List<TestResult> testResults) {
         this.testResults = testResults;
     }
 
@@ -23,17 +22,17 @@ public class Report {
         try {
             Path cssDirectory = directory.resolve("reports/assets/css");
 
-            if (Files.exists(cssDirectory)) return;
+            if (Files.exists(cssDirectory))
+                return;
 
             Files.createDirectories(cssDirectory);
-                
 
             Path cssFile = cssDirectory.resolve("style.css");
 
             String cssContent = Contents.css();
 
-            Files.writeString(cssFile, cssContent, 
-                    StandardOpenOption.CREATE, 
+            Files.writeString(cssFile, cssContent,
+                    StandardOpenOption.CREATE,
                     StandardOpenOption.TRUNCATE_EXISTING);
 
         } catch (IOException e) {
@@ -41,39 +40,34 @@ public class Report {
         }
     }
 
-    
-
-    private void generateHtml(Path directory){
+    private void generateHtml(Path directory) {
         try {
 
             Path htmlDirectory = directory.resolve("reports/report_" + GetData.mothDayMinutsAndSecs());
             if (Files.notExists(htmlDirectory)) {
-                Files.createDirectories(htmlDirectory);       
+                Files.createDirectories(htmlDirectory);
             }
 
             Path cssFile = htmlDirectory.resolve("index.html");
 
             String content = Contents.html(testResults);
 
-            Files.writeString(cssFile, content, 
-                    StandardOpenOption.CREATE, 
+            Files.writeString(cssFile, content,
+                    StandardOpenOption.CREATE,
                     StandardOpenOption.TRUNCATE_EXISTING);
 
-            
-        }catch (IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
             System.err.println("Erro ao gerar o relatório: " + e.getMessage());
 
         }
 
-
     }
 
-
-    public void generate(Path directory){
+    public void generate(Path directory) {
 
         this.generateCss(directory);
         this.generateHtml(directory);
     }
-    
+
 }

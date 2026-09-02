@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.List;
 
+import com.caio.engine.runing_test.RunTest;
+import com.caio.engine.runing_test.TestResult;
 import com.caio.models.AnnotationMutationPoint;
 
 public class CodeLoader {
@@ -13,17 +15,17 @@ public class CodeLoader {
     public CodeLoader(RunTest runTest) {
         this.runTest = runTest;
     }
-    
+
     public void verifyTestsPassing() throws IOException, InterruptedException {
-        RunTest.TestResult testResult = runTest.executeTestForVerification();
+        TestResult testResult = runTest.executeTestForVerification();
         if (testResult.getFailed() > 0) {
-            throw new IOException("Nem todos os testes passaram na execução inicial. Impossível continuar com a mutação.");
+            throw new IOException(
+                    "Nem todos os testes passaram na execução inicial. Impossível continuar com a mutação.");
         }
 
     }
 
-
-    private String replace(String content, String original, String newValue, Integer line){
+    private String replace(String content, String original, String newValue, Integer line) {
 
         String[] aux = content.split("\n");
 
@@ -46,16 +48,16 @@ public class CodeLoader {
         Files.writeString(amp.getFilePath(), modifiedContent);
     }
 
-    public void start( List<AnnotationMutationPoint> mutants) throws IOException, InterruptedException {
-
+    public void start(List<AnnotationMutationPoint> mutants) throws IOException, InterruptedException {
 
         for (AnnotationMutationPoint amp : mutants) {
             try {
                 modifyCode(amp, false);
                 runTest.executeTestForMutation(
-                        new ParamsForTestMutationApresentation(amp.getPackageName(), amp.getClassName(), amp.getMethodName(), "", amp.getOriginalValue(), amp.getMutatedValue()));
+                        new ParamsForTestMutationApresentation(amp.getPackageName(), amp.getClassName(),
+                                amp.getMethodName(), "", amp.getOriginalValue(), amp.getMutatedValue()));
                 modifyCode(amp, true);
-            } catch (Exception e) { //Provisório
+            } catch (Exception e) { // Provisório
                 e.printStackTrace();
             }
         }

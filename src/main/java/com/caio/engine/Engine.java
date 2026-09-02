@@ -1,5 +1,7 @@
 package com.caio.engine;
 
+import com.caio.engine.runing_test.RunTest;
+import com.caio.engine.runing_test.TestResult;
 import com.caio.models.AnnotationMutationPoint;
 
 import java.nio.file.Path;
@@ -44,7 +46,7 @@ public class Engine {
         this.mutantGeneration.setMutants(mutants);
     }
 
-    public List<RunTest.TestResult> getTestsResults() {
+    public List<TestResult> getTestsResults() {
         return this.runTest.getTestsResults();
     }
 
