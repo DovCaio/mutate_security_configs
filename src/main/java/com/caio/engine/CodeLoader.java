@@ -48,18 +48,22 @@ public class CodeLoader {
         Files.writeString(amp.getFilePath(), modifiedContent);
     }
 
-    public void start(List<AnnotationMutationPoint> mutants) throws IOException, InterruptedException {
+    public void executeOne(AnnotationMutationPoint amp) {
+        try {
+            modifyCode(amp, false);
+            runTest.executeTestForMutation(
+                    new ParamsForTestMutationApresentation(amp.getPackageName(), amp.getClassName(),
+                            amp.getMethodName(), "", amp.getOriginalValue(), amp.getMutatedValue()));
+            modifyCode(amp, true);
+        } catch (Exception e) { // Provisório
+            e.printStackTrace();
+        }
+    }
+
+    public void executeMultiple(List<AnnotationMutationPoint> mutants) throws IOException, InterruptedException {
 
         for (AnnotationMutationPoint amp : mutants) {
-            try {
-                modifyCode(amp, false);
-                runTest.executeTestForMutation(
-                        new ParamsForTestMutationApresentation(amp.getPackageName(), amp.getClassName(),
-                                amp.getMethodName(), "", amp.getOriginalValue(), amp.getMutatedValue()));
-                modifyCode(amp, true);
-            } catch (Exception e) { // Provisório
-                e.printStackTrace();
-            }
+            executeOne(amp);
         }
 
     }

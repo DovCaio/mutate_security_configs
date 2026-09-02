@@ -13,6 +13,7 @@ import static com.caio.util.Printers.printMutationPoints;
 import static com.caio.util.Printers.printPaths;
 import static com.caio.util.Printers.printSimpleListString;
 
+import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import java.io.IOException;
@@ -22,16 +23,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class CliController {
 
     private ApplicationArguments applicationArguments;
-    private Path temporaryDirectory;
     private DirectoryScan directoryScan;
     private CodeAnalyzer bca;
     private Engine engine;
     private Report report;
-
-    private LinkedBlockingQueue<AnnotationMutationPoint> mutationPointsQueue; // Ter uma classe para lidar com o
-    // paralelismo
-    private AtomicInteger mutationPointsCounter;
-    private ParallelExecutionContext parallelExecutionContext;
 
     public CliController(ApplicationArguments applicationArguments) throws IOException {
 
@@ -78,8 +73,8 @@ public class CliController {
         this.report.generate(applicationArguments.getOriginalDirectory());
     }
 
-    public Path getTemporaryDirectory() {
-        return temporaryDirectory;
+    public List<Path> getTemporaryDirectories() {
+        return engine.getDirectoryParallelExecutor().getTemporaryDirectories();
     }
 
 }
