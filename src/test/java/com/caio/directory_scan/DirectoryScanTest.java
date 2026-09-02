@@ -241,97 +241,6 @@ class DirectoryScanTest {
                 scan::getBuildTool);
     }
 
-    private String fullJUnitXml() {
-        return """
-                <testsuite name="SuiteA" tests="3" failures="1" errors="1" skipped="1" time="0.5">
-
-                    <testcase classname="A" name="passTest" time="0.1"/>
-
-                    <testcase classname="A" name="failTest" time="0.2">
-                        <failure type="AssertionError" message="boom">
-                            stacktrace here
-                        </failure>
-                    </testcase>
-
-                    <testcase classname="A" name="errorTest" time="0.2">
-                        <error type="Exception" message="bad">
-                            error stack
-                        </error>
-                    </testcase>
-
-                    <testcase classname="A" name="skipTest" time="0.0">
-                        <skipped/>
-                    </testcase>
-
-                </testsuite>
-                """;
-    }
-
-    @Test
-    void shouldParseFullTestReport() throws Exception {
-
-        Path xml = createFile("TEST-report.xml", fullJUnitXml());
-
-        DirectoryScan scan = new DirectoryScan(tempDir);
-
-        TestExecutionReport report = scan.getTestsReports();
-
-        assertEquals(1, report.getSuites().size());
-
-        TestSuiteResult suite = report.getSuites().get(0);
-
-        assertEquals(3, suite.getTests());
-        assertEquals(1, suite.getTotalFailures());
-        assertEquals(1, suite.getErrors());
-        assertEquals(1, suite.getSkipped());
-
-        assertEquals(4, suite.getTestCases().size());
-    }
-
-    // ===============================
-    // PRIVATE METHOD COVERAGE
-    // ===============================
-
-    @Test
-    void shouldCallExtractSuitCaseViaReflection()
-            throws Exception {
-
-        Path xml = createFile("TEST-x.xml", fullJUnitXml());
-
-        DirectoryScan scan = new DirectoryScan(tempDir);
-
-        Method m = DirectoryScan.class
-                .getDeclaredMethod("extractSuitCase", File.class);
-
-        m.setAccessible(true);
-
-        Object suite = m.invoke(scan, xml.toFile());
-
-        assertNotNull(suite);
-    }
-
-    // ===============================
-    // FAILURE DETAIL EXTRACTION
-    // ===============================
-
-    @Test
-    void shouldExtractFailureDetails()
-            throws Exception {
-
-        Path xml = createFile("TEST-fail.xml", fullJUnitXml());
-
-        DirectoryScan scan = new DirectoryScan(tempDir);
-
-        TestExecutionReport report = scan.getTestsReports();
-
-        assertNotNull(report.getSuites().get(0).getFailureDetails());
-        assertFalse(report.getSuites().get(0).getFailureDetails().isEmpty());
-    }
-
-    // ===============================
-    // SETTERS / GETTERS
-    // ===============================
-
     @Test
     void shouldSetFindeds() {
         DirectoryScan scan = new DirectoryScan(tempDir);
@@ -348,24 +257,6 @@ class DirectoryScanTest {
         scan.setDependenciesPath(List.of(tempDir));
 
         assertEquals(1, scan.getDependenciesPath().size());
-    }
-
-    @Test
-    void shouldHandleMissingSkippedAttribute() throws Exception {
-
-        String xml = """
-                <testsuite name="S" tests="1" failures="0" errors="0" skipped="" time="0.1">
-                    <testcase classname="A" name="t" time="0.1"/>
-                </testsuite>
-                """;
-
-        createFile("TEST-no-skip.xml", xml);
-
-        DirectoryScan scan = new DirectoryScan(tempDir);
-
-        TestExecutionReport report = scan.getTestsReports();
-
-        assertEquals(0, report.getSuites().get(0).getSkipped());
     }
 
     @Nested
@@ -448,7 +339,6 @@ class DirectoryScanTest {
 
             assertEquals(1, workers);
         }
-
 
     }
 

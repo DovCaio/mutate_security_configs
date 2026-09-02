@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import com.caio.args.ApplicationArguments;
-import com.caio.directory_scan.DirectoryScan;
+import com.caio.engine.test_extraction.TestExtraction;
 import com.caio.enums.BuildTool;
 import com.caio.exceptions.NoOneTestPasses;
 import com.caio.models.tests.FailureDetail;
@@ -22,7 +22,7 @@ public class RunTest {
         private Path repoDirectory;
         private BuildTool buildTool;
         private String[] command = new String[] {};
-        private DirectoryScan directoryScan;
+        private TestExtraction testExtraction;
         private long startTestFirstExecutionTime;
         private long totalTestFirstExecutionTime = TimeUnit.MINUTES.toMillis(5); // Valor padrão, caso haja algum
                                                                                  // problema na medição do tempo da
@@ -54,12 +54,12 @@ public class RunTest {
                 }
 
                 Path reportsDir = Path.of(dir);
-                this.directoryScan = new DirectoryScan(reportsDir);
+                this.testExtraction = new TestExtraction(reportsDir);
         }
 
         private TestExecutionReport readResult() {
                 try {
-                        return directoryScan.getTestsReports();
+                        return testExtraction.getTestsReports();
                 } catch (Exception e) { // Está genérico porque eu não tenho como controlar muita coisa.
                         throw new RuntimeException("Erro ao ler relatórios de testes: " + e.getMessage(), e);
                 }
