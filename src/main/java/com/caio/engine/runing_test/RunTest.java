@@ -36,14 +36,26 @@ public class RunTest {
 
                 switch (this.buildTool) {
                         case MAVEN:
-                                this.command = new String[] { "mvn", "clean", "test", "-U", "-DreuseForks=false",
-                                                "-DforkCount=1" };
+                                this.command = new String[] {
+                                                "mvn",
+                                                "test",
+                                                "-B",
+                                                "-DforkCount=1",
+                                                "-DreuseForks=true"
+                                };
                                 dir = dir + "/target/surefire-reports";
                                 break;
                         case GRADLE:
                         case GRADLE_WRAPPER:
-                                this.command = new String[] { "./gradlew", "test", "--no-daemon", "--rerun-tasks",
-                                                "--no-build-cache" };
+                                this.command = new String[] {
+                                                "./gradlew",
+                                                "test",
+                                                "--no-daemon",
+                                                "--console=plain",
+                                                "--rerun-tasks",
+                                                "--no-build-cache",
+                                                "--max-workers=1"
+                                };
                                 dir = dir + "/build/test-results/test";
                                 break;
 
