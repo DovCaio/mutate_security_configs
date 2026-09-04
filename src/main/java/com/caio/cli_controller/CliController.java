@@ -1,24 +1,18 @@
 package com.caio.cli_controller;
 
+import com.caio.TemporaryDirectoryManager;
 import com.caio.analize.CodeAnalyzer;
 import com.caio.args.ApplicationArguments;
 import com.caio.directory_scan.DirectoryScan;
 import com.caio.engine.Engine;
 import com.caio.engine.EngineParams;
-import com.caio.models.AnnotationMutationPoint;
 import com.caio.report.Report;
-import com.caio.util.ParallelExecutionContext;
 
 import static com.caio.util.Printers.printMutationPoints;
 import static com.caio.util.Printers.printPaths;
 import static com.caio.util.Printers.printSimpleListString;
 
-import java.util.List;
-import java.util.concurrent.LinkedBlockingQueue;
-
 import java.io.IOException;
-import java.nio.file.Path;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class CliController {
 
@@ -27,10 +21,13 @@ public class CliController {
     private CodeAnalyzer bca;
     private Engine engine;
     private Report report;
+    private TemporaryDirectoryManager temporaryDirectoryManager;
 
-    public CliController(ApplicationArguments applicationArguments) throws IOException {
+    public CliController(ApplicationArguments applicationArguments, TemporaryDirectoryManager temporaryDirectoryManager)
+            throws IOException {
 
         this.applicationArguments = applicationArguments;
+        this.temporaryDirectoryManager = temporaryDirectoryManager;
 
         this.bca = new CodeAnalyzer();
         this.directoryScan = new DirectoryScan(applicationArguments.getOriginalDirectory());
@@ -64,17 +61,13 @@ public class CliController {
     private void startEngine() throws Exception {
         this.engine = new Engine(new EngineParams(bca.getMutationsPoints(), bca.getmainClasses(),
                 directoryScan.getBuildTool(), bca.getRoles(), bca.getAuthorities(),
-                applicationArguments));
+                applicationArguments, temporaryDirectoryManager));
         engine.start();
     }
 
     private void generateReport() {
         this.report = new Report(engine.getTestsResults());
         this.report.generate(applicationArguments.getOriginalDirectory());
-    }
-
-    public List<Path> getTemporaryDirectories() {
-        return engine.getDirectoryParallelExecutor().getTemporaryDirectories();
     }
 
 }

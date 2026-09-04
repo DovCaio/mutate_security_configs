@@ -2,18 +2,26 @@ package com.caio.engine;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 
+import com.caio.args.ApplicationArguments;
 import com.caio.engine.runing_test.RunTest;
 import com.caio.engine.runing_test.TestResult;
+import com.caio.enums.BuildTool;
 import com.caio.models.AnnotationMutationPoint;
 
 public class CodeLoader {
 
     private RunTest runTest;
+    private final Path originalDirectory;
+    private final Path workingDirectory;
 
-    public CodeLoader(RunTest runTest) {
-        this.runTest = runTest;
+    public CodeLoader(Path originalDirectory, Path workingDirectory, BuildTool buildTool,
+            ApplicationArguments applicationArguments) throws IOException {
+        this.runTest = new RunTest(workingDirectory, buildTool, applicationArguments);
+        this.originalDirectory = originalDirectory;
+        this.workingDirectory = workingDirectory;
     }
 
     public void verifyTestsPassing() throws IOException, InterruptedException {
@@ -34,9 +42,15 @@ public class CodeLoader {
         return String.join("\n", aux);
     }
 
-    private void modifyCode(AnnotationMutationPoint amp, Boolean revert) throws ClassNotFoundException, IOException {
+    private Path resolveWorkingFile(Path originalFile) {
+        Path relative = originalDirectory.relativize(originalFile);
+        return workingDirectory.resolve(relative);
+    }
 
-        String content = Files.readString(amp.getFilePath());
+    private void modifyCode(AnnotationMutationPoint amp, Boolean revert) throws ClassNotFoundException, IOException {
+        Path workFile = resolveWorkingFile(amp.getFilePath());
+
+        String content = Files.readString(workFile);
         String modifiedContent;
 
         if (!revert) {
@@ -45,7 +59,7 @@ public class CodeLoader {
             modifiedContent = replace(content, amp.getMutatedValue(), amp.getOriginalValue(), amp.getLineNumber() - 1);
         }
 
-        Files.writeString(amp.getFilePath(), modifiedContent);
+        Files.writeString(workFile, modifiedContent);
     }
 
     public void executeOne(AnnotationMutationPoint amp) {
@@ -55,7 +69,7 @@ public class CodeLoader {
                     new ParamsForTestMutationApresentation(amp.getPackageName(), amp.getClassName(),
                             amp.getMethodName(), "", amp.getOriginalValue(), amp.getMutatedValue()));
             modifyCode(amp, true);
-        } catch (Exception e) { // Provisório
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

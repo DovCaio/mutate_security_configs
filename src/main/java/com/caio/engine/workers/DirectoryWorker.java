@@ -18,7 +18,6 @@ public class DirectoryWorker implements Runnable {
     @Override
     public void run() {
         AnnotationMutationPoint mutation;
-
         while ((mutation = mutationQueue.poll()) != null) {
             codeLoader.executeOne(mutation);
 

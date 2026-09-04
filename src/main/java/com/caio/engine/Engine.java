@@ -1,5 +1,6 @@
 package com.caio.engine;
 
+import com.caio.TemporaryDirectoryManager;
 import com.caio.engine.runing_test.RunTest;
 import com.caio.engine.runing_test.TestResult;
 import com.caio.engine.workers.DirectoryParallelExecutor;
@@ -7,34 +8,33 @@ import com.caio.engine.workers.DirectoryParallelExecutorParams;
 import com.caio.models.AnnotationMutationPoint;
 import com.caio.worker_count_calculator.WorkerCountCalculator;
 
-import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
-
-import static com.caio.util.HandleWithFile.copyToTemporaryDirectory;
 
 public class Engine {
 
     private MutantGeneration mutantGeneration;
     private CodeLoader codeLoader;
-    private RunTest runTest;
     private List<String> roles;
     private List<String> authorities;
     private EngineParams engineParams;
     private DirectoryParallelExecutor directoryParallelExecutor;
+    private TemporaryDirectoryManager temporaryDirectoryManager;
 
     public Engine(EngineParams engineParams) {
         this.engineParams = engineParams;
         this.mutantGeneration = new MutantGeneration(engineParams.amps(), engineParams.applicationArguments());
         this.roles = engineParams.roles();
         this.authorities = engineParams.authorities();
+        this.temporaryDirectoryManager = engineParams.temporaryDirectoryManager();
 
     }
 
     private void firstExecution() throws Exception {
 
-        this.runTest = new RunTest(engineParams.applicationArguments().getOriginalDirectory(), engineParams.buildTool(),
+        this.codeLoader = new CodeLoader(engineParams.applicationArguments().getOriginalDirectory(),
+                engineParams.applicationArguments().getOriginalDirectory(), engineParams.buildTool(),
                 engineParams.applicationArguments());
-        this.codeLoader = new CodeLoader(this.runTest);
 
         this.codeLoader.verifyTestsPassing();
     }
@@ -49,7 +49,7 @@ public class Engine {
                 workerCountCalculator.calculateWorkers(),
                 engineParams.applicationArguments().getOriginalDirectory(),
                 engineParams.buildTool(),
-                engineParams.applicationArguments()));
+                engineParams.applicationArguments(), engineParams.temporaryDirectoryManager()));
 
         this.mutantGeneration.createMutants(roles, authorities);
         this.directoryParallelExecutor.process(getMutants());
@@ -65,11 +65,8 @@ public class Engine {
     }
 
     public List<TestResult> getTestsResults() {
-        return this.runTest.getTestsResults();
-    }
-
-    public DirectoryParallelExecutor getDirectoryParallelExecutor() {
-        return this.directoryParallelExecutor;
+        // TODO
+        return new ArrayList<>();
     }
 
 }

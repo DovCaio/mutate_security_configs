@@ -9,30 +9,25 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
-import com.caio.args.ApplicationArguments;
 import com.caio.engine.CodeLoader;
 import com.caio.engine.runing_test.RunTest;
-import com.caio.enums.BuildTool;
 import com.caio.models.AnnotationMutationPoint;
-
-import static com.caio.util.HandleWithFile.copyToTemporaryDirectory;
 
 public class DirectoryParallelExecutor {
 
     private final ExecutorService executor;
-    private final List<RunTest> runTests = new ArrayList<>();
     private final List<CodeLoader> codeLoaders = new ArrayList<>();
     private final List<Path> temporaryDirectories = new ArrayList<>();
 
     public DirectoryParallelExecutor(DirectoryParallelExecutorParams params) throws IOException {
         this.executor = Executors.newFixedThreadPool(params.workerCount());
         for (int i = 0; i < params.workerCount(); i++) {
-            Path temporaryDirectory = copyToTemporaryDirectory(params.originalDirectory());
-            temporaryDirectories.add(temporaryDirectory);
-            RunTest runTest = new RunTest(temporaryDirectory, params.buildTool(), params.applicationArguments());
-            runTests.add(runTest);
-            CodeLoader codeLoader = new CodeLoader(runTest);
+            params.temporaryDirectoryManager().generate(params.originalDirectory());
+            CodeLoader codeLoader = new CodeLoader(params.originalDirectory(),
+                    params.temporaryDirectoryManager().getTemporaryDirectory(i), params.buildTool(),
+                    params.applicationArguments());
             codeLoaders.add(codeLoader);
         }
     }
@@ -42,6 +37,8 @@ public class DirectoryParallelExecutor {
         for (CodeLoader codeLoader : codeLoaders) {
             executor.submit(new DirectoryWorker(codeLoader, mutationQueue));
         }
+
+        executor.shutdown();
     }
 
     public List<Path> getTemporaryDirectories() {

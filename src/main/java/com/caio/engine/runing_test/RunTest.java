@@ -13,14 +13,12 @@ import com.caio.engine.ParamsForTestMutationApresentation;
 import com.caio.engine.test_extraction.TestExtraction;
 import com.caio.enums.BuildTool;
 import com.caio.exceptions.NoOneTestPasses;
-import com.caio.models.tests.FailureDetail;
 import com.caio.models.tests.TestExecutionReport;
 
 public class RunTest {
 
         private List<TestResult> testsResults;
-        private TestResult verifyTestResult;
-        private Path repoDirectory;
+        private Path repo;
         private BuildTool buildTool;
         private String[] command = new String[] {};
         private TestExtraction testExtraction;
@@ -28,12 +26,12 @@ public class RunTest {
         private long totalTestFirstExecutionTime;
         private ApplicationArguments applicationArguments;
 
-        public RunTest(Path repoDirectory, BuildTool buildTool, ApplicationArguments applicationArguments) {
-                this.repoDirectory = repoDirectory;
+        public RunTest(Path repo, BuildTool buildTool, ApplicationArguments applicationArguments) {
+                this.repo = repo;
                 this.buildTool = buildTool;
                 this.applicationArguments = applicationArguments;
                 this.testsResults = new ArrayList<TestResult>();
-                String dir = repoDirectory.toAbsolutePath().toString();
+                String dir = repo.toAbsolutePath().toString();
                 totalTestFirstExecutionTime = TimeUnit.MINUTES.toMillis(applicationArguments.getTimeOut());
 
                 switch (this.buildTool) {
@@ -109,7 +107,7 @@ public class RunTest {
                         throws IOException, InterruptedException {
 
                 ProcessBuilder processBuilder = new ProcessBuilder();
-                processBuilder.directory(repoDirectory.toFile());
+                processBuilder.directory(repo.toFile());
                 processBuilder.command(this.command);
 
                 Process process = processBuilder.start();
@@ -136,7 +134,6 @@ public class RunTest {
                 this.startTestFirstExecutionTime = System.currentTimeMillis();
                 TestResult testResult = new TestResult(runAllTestsCorrect());
                 this.defineTimeOut();
-                verifyTestResult = testResult;
                 if (testResult.getTotalTest() == testResult.getFailed())
                         throw new NoOneTestPasses();
 
