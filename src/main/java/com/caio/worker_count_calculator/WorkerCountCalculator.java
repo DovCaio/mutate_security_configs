@@ -6,16 +6,12 @@ import com.sun.management.OperatingSystemMXBean;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Set;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
-
-import com.caio.util.ParallelExecutionContext;
 
 public class WorkerCountCalculator {
 
     private static final Set<String> IGNORE_DIRS = Set.of(
-            ".git", "target", "build", ".gradle", "node_modules");
+            ".git", "target", "build", ".gradle");
 
     private Path directory;
 

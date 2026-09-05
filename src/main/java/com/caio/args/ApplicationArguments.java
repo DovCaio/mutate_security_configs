@@ -4,26 +4,29 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
+
+import com.caio.args.flags.FlagsConfig;
+import com.caio.args.flags.FlagsStrategy;
+import com.caio.args.flags.StartTimeOutFlag;
+import com.caio.args.flags.VerboseFlag;
 
 public class ApplicationArguments {
 
-    private boolean verbose;
-    private Integer timeOut;
-    private static final Set<String> EXISTENT_FLAGS = Set.of(
-            "-v", "--startTimeOut");// , "--maxWorkers", "--minWorkers", "--maxRepoSizeMB", "--minRepoSizeMB");
-
     private final Path originalDirectory;
     private final List<String> flags;
+    private final List<FlagsStrategy> flagsStrategies = List.of(new VerboseFlag(), new StartTimeOutFlag());
+    private final FlagsConfig flagsConfig = new FlagsConfig();
+    private final Set<String> EXISTENT_FLAGS = flagsStrategies.stream()
+            .map(FlagsStrategy::getFlagName)
+            .collect(Collectors.toSet());
 
     public ApplicationArguments() {
         this.originalDirectory = null;
         this.flags = null;
-        this.verbose = false;
     }
 
     public ApplicationArguments(String[] args) {
-        timeOut = 3;
-        this.verbose = false;
         if (args.length == 0) {
             throw new IllegalArgumentException(
                     "Uso: java Main <flag> <diretorio>");
@@ -39,51 +42,31 @@ public class ApplicationArguments {
             verifyFlags();
         } else {
             throw new IllegalArgumentException(
-                    "Muitos argumentos, no máximo 2");
+                    "Muitos argumentos.");
         }
     }
 
-    private void verifyFlags() {
-        for (int i = 0; i < this.flags.size() - 1; i++) { // vai virar uma strategy, Open closed principle, e talvez um
-                                                          // factory method para criar a strategy correta.
+    private void flagsValidation() {
+        for (int i = 0; i < this.flags.size() - 1; i++) {
             String flag = this.flags.get(i).split("::")[0];
             if (!EXISTENT_FLAGS.contains(flag)) {
                 throw new IllegalArgumentException(
                         "A flag " + this.flags.get(i) + " não existe.");
             }
-
-            if (flag.equals("--startTimeOut")) {
-                String[] parts = this.flags.get(i).split("::");
-                if (parts.length != 2) {
-                    throw new IllegalArgumentException(
-                            "A flag --startTimeOut deve ser seguida de um valor, ex: --startTimeOut::3");
-                }
-                try {
-                    this.timeOut = Integer.parseInt(parts[1]);
-                } catch (NumberFormatException e) {
-                    throw new IllegalArgumentException(
-                            "O valor da flag --startTimeOut deve ser um número inteiro.");
-                }
-            }
-
-            if (flag.equals("-v")) {
-                if (this.flags.get(i).contains("::")) {
-                    throw new IllegalArgumentException(
-                            "A flag -v não deve ser seguida de um valor, ex: -v");
-                }
-                this.verbose = true;
-            }
-
         }
+    }
 
+    private void verifyFlags() {
+        flagsValidation();
+        flagsStrategies.forEach(strategy -> strategy.execute(flags, flagsConfig));
     }
 
     public boolean isVerbose() {
-        return verbose;
+        return flagsConfig.isVerbose();
     }
 
     public Integer getTimeOut() {
-        return timeOut;
+        return flagsConfig.timeOut();
     }
 
     public Path getOriginalDirectory() {
