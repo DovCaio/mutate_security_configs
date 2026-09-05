@@ -10,12 +10,14 @@ import com.caio.args.flags.FlagsConfig;
 import com.caio.args.flags.FlagsStrategy;
 import com.caio.args.flags.StartTimeOutFlag;
 import com.caio.args.flags.VerboseFlag;
+import com.caio.args.flags.WorkersQuantityFlag;
 
 public class ApplicationArguments {
 
     private final Path originalDirectory;
     private final List<String> flags;
-    private final List<FlagsStrategy> flagsStrategies = List.of(new VerboseFlag(), new StartTimeOutFlag());
+    private final List<FlagsStrategy> flagsStrategies = List.of(new VerboseFlag(), new StartTimeOutFlag(),
+            new WorkersQuantityFlag());
     private final FlagsConfig flagsConfig = new FlagsConfig();
     private final Set<String> EXISTENT_FLAGS = flagsStrategies.stream()
             .map(FlagsStrategy::getFlagName)
@@ -67,6 +69,14 @@ public class ApplicationArguments {
 
     public Integer getTimeOut() {
         return flagsConfig.timeOut();
+    }
+
+    public boolean workersDefined() {
+        return flagsConfig.workersDefined();
+    }
+
+    public Integer getWorkersQuantity() {
+        return flagsConfig.getWorkersQuantity();
     }
 
     public Path getOriginalDirectory() {

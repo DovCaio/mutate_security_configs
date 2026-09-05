@@ -1,6 +1,7 @@
 package com.caio.engine;
 
 import com.caio.TemporaryDirectoryManager;
+import com.caio.args.ApplicationArguments;
 import com.caio.engine.runing_test.RunTest;
 import com.caio.engine.runing_test.TestResult;
 import com.caio.engine.workers.DirectoryParallelExecutor;
@@ -39,17 +40,28 @@ public class Engine {
         this.codeLoader.verifyTestsPassing();
     }
 
+    private int calculateWorkers(ApplicationArguments arguments) {
+        if (arguments.workersDefined()) {
+            return arguments.getWorkersQuantity();
+        } else {
+            WorkerCountCalculator calculator = new WorkerCountCalculator(arguments.getOriginalDirectory());
+            return calculator.calculateWorkers();
+        }
+    }
+
     public void start() throws Exception {
 
         firstExecution();
 
-        WorkerCountCalculator workerCountCalculator = new WorkerCountCalculator(
-                engineParams.applicationArguments().getOriginalDirectory());
+        ApplicationArguments arguments = engineParams.applicationArguments();
+
+        int workers = calculateWorkers(arguments);
+
         this.directoryParallelExecutor = new DirectoryParallelExecutor(new DirectoryParallelExecutorParams(
-                workerCountCalculator.calculateWorkers(),
-                engineParams.applicationArguments().getOriginalDirectory(),
+                workers,
+                arguments.getOriginalDirectory(),
                 engineParams.buildTool(),
-                engineParams.applicationArguments(), engineParams.temporaryDirectoryManager()));
+                arguments, engineParams.temporaryDirectoryManager()));
 
         this.mutantGeneration.createMutants(roles, authorities);
         this.directoryParallelExecutor.process(getMutants());
@@ -65,7 +77,7 @@ public class Engine {
     }
 
     public List<TestResult> getTestsResults() {
-        // TODO
+        // TODO - IMPORTANTE
         return new ArrayList<>();
     }
 

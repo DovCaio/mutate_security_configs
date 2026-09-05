@@ -71,4 +71,8 @@ public class WorkerCountCalculator {
 
         return Math.max(workers, 1);
     }
+
+    public static int logicalCores() {
+        return Runtime.getRuntime().availableProcessors();
+    }
 }
