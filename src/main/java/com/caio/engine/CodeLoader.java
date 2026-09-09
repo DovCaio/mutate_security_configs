@@ -82,4 +82,8 @@ public class CodeLoader {
 
     }
 
+    public List<TestResult> getTestsResults() {
+        return runTest.getTestsResults();
+    }
+
 }

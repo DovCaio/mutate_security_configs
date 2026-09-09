@@ -1,34 +1,24 @@
 package com.caio.engine;
 
-import com.caio.TemporaryDirectoryManager;
 import com.caio.args.ApplicationArguments;
-import com.caio.engine.runing_test.RunTest;
 import com.caio.engine.runing_test.TestResult;
 import com.caio.engine.workers.DirectoryParallelExecutor;
 import com.caio.engine.workers.DirectoryParallelExecutorParams;
 import com.caio.models.AnnotationMutationPoint;
 import com.caio.worker_count_calculator.WorkerCountCalculator;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class Engine {
 
     private MutantGeneration mutantGeneration;
     private CodeLoader codeLoader;
-    private List<String> roles;
-    private List<String> authorities;
     private EngineParams engineParams;
     private DirectoryParallelExecutor directoryParallelExecutor;
-    private TemporaryDirectoryManager temporaryDirectoryManager;
 
     public Engine(EngineParams engineParams) {
         this.engineParams = engineParams;
         this.mutantGeneration = new MutantGeneration(engineParams.amps(), engineParams.applicationArguments());
-        this.roles = engineParams.roles();
-        this.authorities = engineParams.authorities();
-        this.temporaryDirectoryManager = engineParams.temporaryDirectoryManager();
-
     }
 
     private void firstExecution() throws Exception {
@@ -55,15 +45,13 @@ public class Engine {
 
         ApplicationArguments arguments = engineParams.applicationArguments();
 
-        int workers = calculateWorkers(arguments);
-
         this.directoryParallelExecutor = new DirectoryParallelExecutor(new DirectoryParallelExecutorParams(
-                workers,
+                calculateWorkers(arguments),
                 arguments.getOriginalDirectory(),
                 engineParams.buildTool(),
                 arguments, engineParams.temporaryDirectoryManager()));
 
-        this.mutantGeneration.createMutants(roles, authorities);
+        this.mutantGeneration.createMutants(engineParams.roles(), engineParams.authorities());
         this.directoryParallelExecutor.process(getMutants());
 
     }
@@ -77,8 +65,7 @@ public class Engine {
     }
 
     public List<TestResult> getTestsResults() {
-        // TODO - IMPORTANTE
-        return new ArrayList<>();
+        return this.directoryParallelExecutor.getTestsResults();
     }
 
 }
